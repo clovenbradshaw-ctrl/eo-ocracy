@@ -1,0 +1,3624 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Holonic Org Knowledge Graph</title>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/d3/7.8.5/d3.min.js"></script>
+    <script src="https://unpkg.com/@phosphor-icons/web"></script>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+            background: #F5F2ED;
+            color: #3D2E1F;
+            overflow: hidden;
+        }
+
+        .header {
+            background: linear-gradient(135deg, #C88F4A 0%, #B87B5B 100%);
+            color: white;
+            padding: 1rem 2rem;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .header h1 {
+            font-size: 1.5rem;
+            font-weight: 600;
+        }
+
+        .header-controls {
+            display: flex;
+            gap: 1rem;
+            align-items: center;
+        }
+
+        .view-toggle {
+            display: flex;
+            gap: 0.5rem;
+            background: rgba(255,255,255,0.2);
+            padding: 0.25rem;
+            border-radius: 6px;
+        }
+
+        .view-toggle-btn {
+            background: transparent;
+            color: white;
+            border: none;
+            padding: 0.5rem 1rem;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 0.875rem;
+            font-weight: 500;
+            transition: background 0.2s;
+        }
+
+        .view-toggle-btn:hover {
+            background: rgba(255,255,255,0.2);
+        }
+
+        .view-toggle-btn.active {
+            background: white;
+            color: #C88F4A;
+        }
+
+        .container {
+            display: grid;
+            grid-template-columns: 300px 1fr 320px;
+            height: calc(100vh - 65px);
+        }
+
+        .panel {
+            background: white;
+            overflow-y: auto;
+            padding: 1.5rem;
+        }
+
+        .panel-left {
+            border-right: 1px solid #E5DDD1;
+        }
+
+        .panel-right {
+            border-left: 1px solid #E5DDD1;
+        }
+
+        .panel-title {
+            font-size: 1.125rem;
+            color: #6B5642;
+            margin-bottom: 1rem;
+            font-weight: 600;
+        }
+
+        .btn {
+            background: #C88F4A;
+            color: white;
+            border: none;
+            padding: 0.5rem 1rem;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 0.875rem;
+            font-weight: 500;
+            transition: background 0.2s;
+            display: inline-block;
+        }
+
+        .btn:hover {
+            background: #B87B5B;
+        }
+
+        .btn-small {
+            padding: 0.35rem 0.75rem;
+            font-size: 0.75rem;
+        }
+
+        .btn-secondary {
+            background: #8B6F47;
+        }
+
+        .btn-secondary:hover {
+            background: #6B5642;
+        }
+
+        .btn-outline {
+            background: transparent;
+            border: 1px solid #C88F4A;
+            color: #C88F4A;
+        }
+
+        .btn-outline:hover {
+            background: #C88F4A;
+            color: white;
+        }
+
+        .entity-type-selector {
+            display: flex;
+            gap: 0.5rem;
+            margin-bottom: 1rem;
+            flex-wrap: wrap;
+        }
+
+        .entity-type-btn {
+            padding: 0.5rem 1rem;
+            border: 1px solid #E5DDD1;
+            background: white;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 0.875rem;
+            transition: all 0.2s;
+        }
+
+        .entity-type-btn:hover {
+            border-color: #C88F4A;
+        }
+
+        .filter-pill {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 0.5rem 0.75rem;
+            border: 2px solid #E5DDD1;
+            background: white;
+            border-radius: 20px;
+            cursor: pointer;
+            font-size: 0.8rem;
+            font-weight: 500;
+            color: #8B6F47;
+            transition: all 0.2s;
+            position: relative;
+        }
+
+        .filter-pill input[type="checkbox"] {
+            position: absolute;
+            opacity: 0;
+            cursor: pointer;
+        }
+
+        .filter-pill:hover {
+            border-color: #C88F4A;
+            background: #FAF7F5;
+        }
+
+        .filter-pill:has(input:checked) {
+            border-color: #C88F4A;
+            background: #C88F4A;
+            color: white;
+        }
+
+        .filter-pill span {
+            pointer-events: none;
+        }
+
+        .entity-type-btn.active {
+            background: #C88F4A;
+            color: white;
+            border-color: #C88F4A;
+        }
+
+        .input-group {
+            margin-bottom: 1rem;
+        }
+
+        .input-group label {
+            display: block;
+            margin-bottom: 0.5rem;
+            color: #6B5642;
+            font-weight: 500;
+            font-size: 0.85rem;
+        }
+
+        .input-group input, .input-group select {
+            width: 100%;
+            padding: 0.625rem;
+            border: 1px solid #E5DDD1;
+            border-radius: 6px;
+            font-family: inherit;
+            font-size: 0.9rem;
+        }
+
+        .entity-list {
+            display: flex;
+            flex-direction: column;
+            gap: 0.375rem;
+        }
+
+        .entity-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 0.625rem 0.75rem;
+            background: white;
+            border-radius: 6px;
+            border: 1px solid #E5DDD1;
+        }
+
+        .entity-item.unit { border-left-color: #C88F4A; }
+        .entity-item.team { border-left-color: #B87B5B; }
+        .entity-item.role { border-left-color: #8B6F47; }
+        .entity-item.person { border-left-color: #6B5642; }
+        .entity-item.object { border-left-color: #F5E6D3; background: #FFFBF5; }
+
+        .entity-name {
+            font-size: 0.9rem;
+            color: #3D2E1F;
+        }
+
+        .entity-type {
+            font-size: 0.75rem;
+            color: #8B6F47;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .btn-icon {
+            background: none;
+            border: none;
+            color: #B87B5B;
+            cursor: pointer;
+            padding: 0.375rem;
+            border-radius: 6px;
+            transition: all 0.2s;
+            font-size: 1rem;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            width: 28px;
+            height: 28px;
+        }
+
+        .btn-icon:hover {
+            background: #F5E6D3;
+            color: #8B6F47;
+        }
+
+        .btn-icon.add {
+            background: #C88F4A;
+            color: white;
+        }
+
+        .btn-icon.add:hover {
+            background: #B87B5B;
+        }
+
+        #graph {
+            width: 100%;
+            height: 100%;
+            background: #FAFAF8;
+        }
+
+        .layer-bg {
+            pointer-events: none;
+        }
+
+        .layer-label {
+            pointer-events: none;
+            user-select: none;
+        }
+
+        .graph-legend {
+            position: absolute;
+            bottom: 20px;
+            right: 20px;
+            background: white;
+            border: 1px solid #E5DDD1;
+            border-radius: 8px;
+            padding: 1rem;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+            font-size: 0.75rem;
+            max-width: 200px;
+        }
+
+        .legend-title {
+            font-weight: 600;
+            color: #6B5642;
+            margin-bottom: 0.5rem;
+            font-size: 0.85rem;
+        }
+
+        .legend-item {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            margin: 0.25rem 0;
+        }
+
+        .legend-line {
+            width: 30px;
+            height: 2px;
+            background: #8B6F47;
+        }
+
+        .legend-line.bold {
+            height: 3px;
+        }
+
+        .legend-line.dashed {
+            background: repeating-linear-gradient(
+                to right,
+                #8B6F47 0,
+                #8B6F47 4px,
+                transparent 4px,
+                transparent 8px
+            );
+        }
+
+        .legend-line.dotted {
+            background: repeating-linear-gradient(
+                to right,
+                #8B6F47 0,
+                #8B6F47 2px,
+                transparent 2px,
+                transparent 6px
+            );
+        }
+
+        .triple-form {
+            background: #FAF7F5;
+            padding: 1rem;
+            border-radius: 6px;
+            margin-bottom: 1rem;
+        }
+
+        .triple-preview {
+            display: flex;
+            flex-direction: column;
+            gap: 0.5rem;
+            padding: 1rem;
+            background: white;
+            border-radius: 6px;
+            margin-top: 1rem;
+            border-left: 3px solid #C88F4A;
+        }
+
+        .triple-part {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            font-size: 0.9rem;
+        }
+
+        .triple-label {
+            font-weight: 600;
+            color: #8B6F47;
+            min-width: 80px;
+        }
+
+        .triple-value {
+            color: #3D2E1F;
+        }
+
+        .predicate-selector {
+            display: flex;
+            gap: 0.5rem;
+            margin-bottom: 1rem;
+        }
+
+        .predicate-btn {
+            flex: 1;
+            padding: 0.75rem;
+            border: 2px solid #E5DDD1;
+            background: white;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 0.875rem;
+            font-weight: 600;
+            transition: all 0.2s;
+            text-align: center;
+        }
+
+        .predicate-btn:hover {
+            border-color: #C88F4A;
+        }
+
+        .predicate-btn.active {
+            border-color: #C88F4A;
+            background: #FFF9F0;
+            color: #C88F4A;
+        }
+
+        /* EO Operator specific colors */
+        .predicate-btn.NUL.active { border-color: #6B5642; background: #F5F2ED; color: #6B5642; }
+        .predicate-btn.DES.active { border-color: #C88F4A; background: #FFF9F0; color: #C88F4A; }
+        .predicate-btn.INS.active { border-color: #8B6F47; background: #F5F0E8; color: #8B6F47; }
+        .predicate-btn.SEG.active { border-color: #A89984; background: #FAFAF8; color: #A89984; }
+        .predicate-btn.CON.active { border-color: #7B95A3; background: #F0F4F7; color: #7B95A3; }
+        .predicate-btn.ALT.active { border-color: #B87B5B; background: #FFF5EB; color: #B87B5B; }
+        .predicate-btn.SYN.active { border-color: #D4A574; background: #FFFAF3; color: #D4A574; }
+        .predicate-btn.SUP.active { border-color: #9B6F47; background: #F7F3EF; color: #9B6F47; }
+        .predicate-btn.REC.active { border-color: #C8997F; background: #FFF8F4; color: #C8997F; }
+
+        .relationship-list {
+            display: flex;
+            flex-direction: column;
+            gap: 0.5rem;
+            margin-top: 1rem;
+        }
+
+        .relationship-item {
+            padding: 0.75rem;
+            background: #FAF7F5;
+            border-radius: 6px;
+            border-left: 3px solid;
+            font-size: 0.85rem;
+        }
+
+        .relationship-item.NUL { border-left-color: #6B5642; }
+        .relationship-item.DES { border-left-color: #C88F4A; }
+        .relationship-item.INS { border-left-color: #8B6F47; }
+        .relationship-item.SEG { border-left-color: #A89984; }
+        .relationship-item.CON { border-left-color: #7B95A3; }
+        .relationship-item.ALT { border-left-color: #B87B5B; }
+        .relationship-item.SYN { border-left-color: #D4A574; }
+        .relationship-item.SUP { border-left-color: #9B6F47; }
+        .relationship-item.REC { border-left-color: #C8997F; }
+
+        .relationship-text {
+            color: #3D2E1F;
+            margin-bottom: 0.25rem;
+        }
+
+        .relationship-meta {
+            font-size: 0.75rem;
+            color: #8B6F47;
+        }
+
+        .graph-controls {
+            position: absolute;
+            top: 1rem;
+            right: 1rem;
+            display: flex;
+            gap: 0.5rem;
+            background: white;
+            padding: 0.5rem;
+            border-radius: 6px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+        }
+
+        .tooltip {
+            position: absolute;
+            background: rgba(61, 46, 31, 0.95);
+            color: white;
+            padding: 0.75rem;
+            border-radius: 6px;
+            font-size: 0.875rem;
+            pointer-events: none;
+            opacity: 0;
+            transition: opacity 0.2s;
+            max-width: 250px;
+            z-index: 1000;
+        }
+
+        .section {
+            margin-bottom: 2rem;
+        }
+
+        .divider {
+            height: 1px;
+            background: #E5DDD1;
+            margin: 1.5rem 0;
+        }
+
+        .modal-overlay {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(61, 46, 31, 0.7);
+            z-index: 1000;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .modal-overlay.active {
+            display: flex;
+        }
+
+        .modal-dialog {
+            background: white;
+            border-radius: 8px;
+            max-width: 600px;
+            width: 90%;
+            max-height: 80vh;
+            overflow-y: auto;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.2);
+        }
+
+        .modal-header-section {
+            padding: 2rem;
+            border-bottom: 2px solid #F5E6D3;
+            background: linear-gradient(135deg, #C88F4A 0%, #B87B5B 100%);
+            color: white;
+        }
+
+        .modal-title-text {
+            font-size: 1.5rem;
+            font-weight: 600;
+            margin-bottom: 0.5rem;
+        }
+
+        .modal-body {
+            padding: 2rem;
+        }
+
+        .modal-section {
+            margin-bottom: 2rem;
+        }
+
+        .modal-section-title {
+            font-size: 1rem;
+            color: #8B6F47;
+            margin-bottom: 1rem;
+            font-weight: 600;
+        }
+
+        .related-entity {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+            padding: 0.5rem 0.75rem;
+            background: #FAF7F5;
+            border-radius: 6px;
+            margin: 0.25rem;
+            cursor: pointer;
+            transition: background 0.2s;
+            border-left: 3px solid #C88F4A;
+        }
+
+        .related-entity:hover {
+            background: #F5E6D3;
+        }
+
+        .card-view {
+            display: none;
+            padding: 2rem;
+            overflow-y: auto;
+            max-height: 100vh;
+            background: white;
+        }
+
+        .card-view.active {
+            display: block;
+        }
+
+        .card-row {
+            margin-bottom: 2.5rem;
+        }
+
+        .card-row-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 1.25rem;
+            padding-bottom: 0.75rem;
+            border-bottom: 2px solid #E5DDD1;
+        }
+
+        .card-row-title {
+            font-size: 1.25rem;
+            color: #3D2E1F;
+            font-weight: 700;
+        }
+
+        .card-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+            gap: 1.25rem;
+        }
+
+        .entity-card {
+            background: white;
+            border: 2px solid #E5DDD1;
+            border-radius: 12px;
+            padding: 1rem;
+            cursor: pointer;
+            transition: all 0.2s;
+            display: flex;
+            flex-direction: column;
+            gap: 0.75rem;
+            min-height: 140px;
+        }
+
+        .entity-card:hover {
+            border-color: #C88F4A;
+            box-shadow: 0 2px 8px rgba(200, 143, 74, 0.2);
+        }
+
+        .entity-card.unit { background: linear-gradient(135deg, #FFF9F0 0%, white 100%); }
+        .entity-card.team { background: linear-gradient(135deg, #FAF7F5 0%, white 100%); }
+        .entity-card.role { background: linear-gradient(135deg, #F5F3F0 0%, white 100%); }
+        .entity-card.person { background: linear-gradient(135deg, #F0EDE8 0%, white 100%); }
+        .entity-card.object { background: linear-gradient(135deg, #FFFBF5 0%, white 100%); }
+        .entity-card.activity { background: linear-gradient(135deg, #F5F8FA 0%, white 100%); }
+
+        .card-header {
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+        }
+
+        .card-icon {
+            font-size: 2rem;
+            line-height: 1;
+        }
+
+        .card-title {
+            font-size: 1.05rem;
+            font-weight: 600;
+            color: #3D2E1F;
+            line-height: 1.3;
+        }
+
+        .card-meta {
+            font-size: 0.875rem;
+            color: #6B5642;
+            line-height: 1.5;
+        }
+
+        .card-description {
+            font-size: 0.85rem;
+            color: #8B6F47;
+            line-height: 1.5;
+            font-style: italic;
+        }
+
+        .card-connections {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 0.375rem;
+            margin-top: auto;
+        }
+
+        .connection-badge {
+            font-size: 0.75rem;
+            padding: 0.375rem 0.625rem;
+            background: #F5E6D3;
+            color: #6B5642;
+            border-radius: 16px;
+            font-weight: 500;
+            border: 1px solid #E5DDD1;
+        }
+
+        .sentence-preview {
+            padding: 1rem;
+            background: #FAF7F5;
+            border-radius: 6px;
+            border-left: 3px solid #C88F4A;
+            margin-top: 1rem;
+            font-size: 0.95rem;
+            color: #3D2E1F;
+            line-height: 1.5;
+        }
+
+        .sentence-preview strong {
+            color: #C88F4A;
+        }
+
+        .inline-add-btn {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.25rem;
+            padding: 0.35rem 0.75rem;
+            background: transparent;
+            border: 1px dashed #C88F4A;
+            color: #C88F4A;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 0.85rem;
+            margin: 0.5rem 0;
+            transition: all 0.2s;
+        }
+
+        .inline-add-btn:hover {
+            background: #FFF9F0;
+            border-style: solid;
+        }
+
+        .tree-view {
+            display: none;
+            padding: 2rem;
+            overflow-y: auto;
+            height: 100%;
+            background: white;
+        }
+
+        .tree-view.active {
+            display: block;
+        }
+
+        .graph-view {
+            display: none;
+            position: relative;
+            height: 100%;
+        }
+
+        .graph-view.active {
+            display: block;
+        }
+
+        .tree-node-container {
+            margin-bottom: 0.5rem;
+        }
+
+        .tree-node-item {
+            display: flex;
+            align-items: center;
+            padding: 0.625rem 0.75rem;
+            border-radius: 6px;
+            cursor: pointer;
+            transition: all 0.15s;
+            gap: 0.625rem;
+            background: white;
+            border: 1px solid #E5DDD1;
+            margin-bottom: 0.375rem;
+        }
+
+        .tree-node-item:hover {
+            background: #FAF7F5;
+            border-color: #C88F4A;
+        }
+
+        .tree-node-item.unit {
+            background: #C88F4A;
+            color: white;
+            font-weight: 600;
+            border: none;
+            padding: 0.75rem 0.875rem;
+        }
+
+        .tree-node-item.unit:hover {
+            background: #B87B5B;
+        }
+
+        .tree-node-item.team {
+            background: #FAF7F5;
+            border-left: 3px solid #B87B5B;
+            font-weight: 500;
+        }
+
+        .tree-node-item.role {
+            background: white;
+            border-left: 3px solid #8B6F47;
+        }
+
+        .tree-expand-icon {
+            width: 16px;
+            height: 16px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 0.65rem;
+            transition: transform 0.2s;
+            opacity: 0.6;
+        }
+
+        .tree-expand-icon.expanded {
+            transform: rotate(90deg);
+        }
+
+        .tree-node-content {
+            flex: 1;
+        }
+
+        .tree-node-name {
+            font-size: 0.9rem;
+            line-height: 1.3;
+        }
+
+        .tree-node-meta {
+            font-size: 0.75rem;
+            opacity: 0.7;
+            margin-top: 0.25rem;
+        }
+
+        .tree-children {
+            max-height: 0;
+            overflow: hidden;
+            transition: max-height 0.3s ease-out;
+        }
+
+        .tree-children.expanded {
+            max-height: 5000px;
+        }
+
+        .tree-people-assigned {
+            display: flex;
+            gap: 0.5rem;
+            margin-top: 0.5rem;
+            flex-wrap: wrap;
+        }
+
+        .tree-person-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.25rem;
+            padding: 0.25rem 0.5rem;
+            background: #6B5642;
+            color: white;
+            border-radius: 12px;
+            font-size: 0.75rem;
+        }
+
+        .tree-relationships-header {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            padding: 0.5rem 0.75rem;
+            margin-left: 3rem;
+            margin-top: 0.5rem;
+            background: #FAF7F5;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 0.85rem;
+            color: #6B5642;
+            font-weight: 500;
+            transition: background 0.2s;
+        }
+
+        .tree-relationships-header:hover {
+            background: #F5E6D3;
+        }
+
+        .tree-relationships {
+            margin-left: 3rem;
+            margin-top: 0.25rem;
+            padding: 0.75rem;
+            background: white;
+            border-radius: 6px;
+            border: 1px solid #E5DDD1;
+            font-size: 0.85rem;
+        }
+
+        .tree-relationship-item {
+            padding: 0.5rem 0.75rem;
+            margin-bottom: 0.375rem;
+            border-radius: 6px;
+            background: #FAF7F5;
+            border-left: 3px solid #C88F4A;
+            line-height: 1.5;
+        }
+
+        .tree-relationship-item:last-child {
+            margin-bottom: 0;
+        }
+
+        .tree-relationship-item.shares {
+            background: #F0F4F7;
+            color: #7B95A3;
+        }
+    </style>
+</head>
+<body>
+    <div class="header">
+        <h1>
+            <i class="ph ph-buildings"></i> 
+            <span id="workspaceNameText" contenteditable="true" style="cursor: text; outline: none; display: inline-block;" onblur="saveWorkspaceName()">My Organization</span>
+        </h1>
+        <div class="header-controls">
+            <div id="filterStatus" style="color: rgba(255,255,255,0.9); font-size: 0.875rem; margin-right: 0.5rem;"></div>
+            <div class="view-toggle">
+                <button class="view-toggle-btn" data-view="tree" onclick="switchView('tree')">
+                    <i class="ph ph-tree-structure"></i> Tree
+                </button>
+                <button class="view-toggle-btn active" data-view="card" onclick="switchView('card')">
+                    <i class="ph ph-squares-four"></i> Cards
+                </button>
+                <button class="view-toggle-btn" data-view="graph" onclick="switchView('graph')">
+                    <i class="ph ph-graph"></i> Graph
+                </button>
+            </div>
+            <button class="btn btn-small btn-outline" onclick="toggleSampleData()" id="sampleDataBtn">
+                <i class="ph ph-database"></i> <span id="sampleDataText">Clear Sample Data</span>
+            </button>
+            <button class="btn btn-small btn-outline" onclick="clearAllData()">
+                <i class="ph ph-trash"></i> Clear All
+            </button>
+            <button class="btn btn-small btn-outline" onclick="resetGraph()">Reset View</button>
+            <button class="btn btn-small" onclick="exportData()">Export Data</button>
+        </div>
+    </div>
+
+    <div class="container">
+        <!-- Left Panel: Entities -->
+        <div class="panel panel-left">
+            <div class="panel-title">Entities</div>
+            
+            <div class="input-group">
+                <label>Search Entities</label>
+                <input type="text" id="entitySearch" placeholder="Search by name..." oninput="filterEntities()">
+            </div>
+
+            <div class="divider"></div>
+
+            <div class="panel-title" style="font-size: 1rem;">Add New Entity</div>
+            
+            <div class="entity-type-selector">
+                <button class="entity-type-btn active" data-type="unit" onclick="selectEntityType('unit')" title="Organizational unit or department">
+                    <i class="ph ph-buildings"></i> Unit
+                </button>
+                <button class="entity-type-btn" data-type="team" onclick="selectEntityType('team')" title="Working team or group">
+                    <i class="ph ph-users-three"></i> Team
+                </button>
+                <button class="entity-type-btn" data-type="role" onclick="selectEntityType('role')" title="Position or function">
+                    <i class="ph ph-briefcase"></i> Role
+                </button>
+                <button class="entity-type-btn" data-type="person" onclick="selectEntityType('person')" title="Individual person">
+                    <i class="ph ph-user"></i> Person
+                </button>
+                <button class="entity-type-btn" data-type="object" onclick="selectEntityType('object')" title="Work product or deliverable">
+                    <i class="ph ph-package"></i> Object
+                </button>
+            </div>
+
+            <div class="input-group">
+                <label>Name</label>
+                <input type="text" id="entityName" placeholder="Enter entity name" onkeypress="if(event.key==='Enter') addEntity()">
+            </div>
+
+            <div class="input-group" id="parentSelectGroup">
+                <label>Parent Entity (Optional)</label>
+                <select id="parentEntitySelect">
+                    <option value="">None - Top Level</option>
+                </select>
+            </div>
+
+            <button class="btn" onclick="addEntity()" style="width: 100%; display: flex; align-items: center; justify-content: center; gap: 0.5rem;">
+                <i class="ph ph-plus-circle" style="color: white; font-size: 1.25rem;"></i> Add Entity
+            </button>
+
+            <div class="divider"></div>
+
+            <div class="panel-title" style="font-size: 1rem;">All Entities</div>
+            <div id="entityList" class="entity-list"></div>
+        </div>
+
+        <!-- Center Panel: Multiple Views -->
+        <div>
+            <!-- Tree View -->
+            <div id="treeView" class="tree-view"></div>
+            
+            <!-- Card View -->
+            <div id="cardView" class="card-view"></div>
+            
+            <!-- Graph View -->
+            <div id="graphView" class="graph-view active">
+                <svg id="graph"></svg>
+                <div class="tooltip" id="tooltip"></div>
+            </div>
+        </div>
+
+        <!-- Right Panel: Relationships -->
+        <div class="panel panel-right">
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1rem;">
+                <div class="panel-title" style="margin-bottom: 0;">Filters</div>
+                <button class="btn btn-small btn-secondary" onclick="toggleAllFilters()">Toggle All</button>
+            </div>
+            
+            <div style="background: #FAF7F5; padding: 1rem; border-radius: 8px; margin-bottom: 1rem; border: 1px solid #E5DDD1;">
+                <label style="font-size: 0.9rem; color: #6B5642; font-weight: 600; margin-bottom: 0.75rem; display: block;">Activity Operators</label>
+                <div style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 0.5rem; margin-bottom: 1rem;">
+                    <label class="filter-pill" title="Recognize absence, remove, delete">
+                        <input type="checkbox" id="filterNUL" checked onchange="applyFilters()">
+                        <span>Notice</span>
+                    </label>
+                    <label class="filter-pill" title="Designate, describe, assign">
+                        <input type="checkbox" id="filterDES" checked onchange="applyFilters()">
+                        <span>Define</span>
+                    </label>
+                    <label class="filter-pill" title="Instantiate, create, initiate">
+                        <input type="checkbox" id="filterINS" checked onchange="applyFilters()">
+                        <span>Start</span>
+                    </label>
+                    <label class="filter-pill" title="Divide, segment, break down">
+                        <input type="checkbox" id="filterSEG" checked onchange="applyFilters()">
+                        <span>Divide</span>
+                    </label>
+                    <label class="filter-pill" title="Connect, associate, relate">
+                        <input type="checkbox" id="filterCON" checked onchange="applyFilters()">
+                        <span>Link</span>
+                    </label>
+                    <label class="filter-pill" title="Alternate, modify, switch">
+                        <input type="checkbox" id="filterALT" checked onchange="applyFilters()">
+                        <span>Shift</span>
+                    </label>
+                    <label class="filter-pill" title="Synthesize, combine, bring together">
+                        <input type="checkbox" id="filterSYN" checked onchange="applyFilters()">
+                        <span>Merge</span>
+                    </label>
+                    <label class="filter-pill" title="Superpose, balance multiple frames, oversee">
+                        <input type="checkbox" id="filterSUP" checked onchange="applyFilters()">
+                        <span>Balance</span>
+                    </label>
+                    <label class="filter-pill" title="Recurse, restructure, iterate">
+                        <input type="checkbox" id="filterREC" checked onchange="applyFilters()">
+                        <span>Loop</span>
+                    </label>
+                </div>
+                
+                <label style="font-size: 0.9rem; color: #6B5642; font-weight: 600; margin-bottom: 0.75rem; display: block;">Entity Types</label>
+                <div style="display: flex; gap: 0.5rem; flex-wrap: wrap;">
+                    <label class="filter-pill" style="flex: 0 0 auto;">
+                        <input type="checkbox" id="filterUnit" checked onchange="applyFilters()">
+                        <span>Units</span>
+                    </label>
+                    <label class="filter-pill" style="flex: 0 0 auto;">
+                        <input type="checkbox" id="filterTeam" checked onchange="applyFilters()">
+                        <span>Teams</span>
+                    </label>
+                    <label class="filter-pill" style="flex: 0 0 auto;">
+                        <input type="checkbox" id="filterRole" checked onchange="applyFilters()">
+                        <span>Roles</span>
+                    </label>
+                    <label class="filter-pill" style="flex: 0 0 auto;">
+                        <input type="checkbox" id="filterPerson" checked onchange="applyFilters()">
+                        <span>People</span>
+                    </label>
+                    <label class="filter-pill" style="flex: 0 0 auto;">
+                        <input type="checkbox" id="filterObject" checked onchange="applyFilters()">
+                        <span>Objects</span>
+                    </label>
+                </div>
+            </div>
+
+            <div class="divider"></div>
+
+            <div class="panel-title">Create Activity</div>
+            
+            <div class="triple-form">
+                <div class="input-group">
+                    <label>Subject (Who)</label>
+                    <select id="subjectSelect" onchange="updateSentencePreview()">
+                        <option value="">Select subject...</option>
+                    </select>
+                </div>
+
+                <div class="predicate-selector" style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 0.5rem;">
+                    <button class="predicate-btn NUL" onclick="selectPredicate('NUL')" title="Recognize absence, remove, delete">Notice</button>
+                    <button class="predicate-btn DES active" onclick="selectPredicate('DES')" title="Designate, describe, assign">Define</button>
+                    <button class="predicate-btn INS" onclick="selectPredicate('INS')" title="Instantiate, create, initiate">Start</button>
+                    <button class="predicate-btn SEG" onclick="selectPredicate('SEG')" title="Divide, segment, break down">Divide</button>
+                    <button class="predicate-btn CON" onclick="selectPredicate('CON')" title="Connect, associate, relate">Link</button>
+                    <button class="predicate-btn ALT" onclick="selectPredicate('ALT')" title="Alternate, modify, switch">Shift</button>
+                    <button class="predicate-btn SYN" onclick="selectPredicate('SYN')" title="Synthesize, combine, bring together">Merge</button>
+                    <button class="predicate-btn SUP" onclick="selectPredicate('SUP')" title="Superpose, balance multiple frames, oversee">Balance</button>
+                    <button class="predicate-btn REC" onclick="selectPredicate('REC')" title="Recurse, restructure, iterate">Loop</button>
+                </div>
+
+                <div class="input-group">
+                    <label>To Organizational Entity (Optional)</label>
+                    <select id="orgEntitySelect" onchange="handleOrgEntityChange()">
+                        <option value="">Select unit/team/role...</option>
+                    </select>
+                </div>
+
+                <div class="input-group">
+                    <label>To Work Product (Optional)</label>
+                    <div style="display: flex; gap: 0.5rem; align-items: center;">
+                        <select id="objectSelect" onchange="handleWorkObjectChange()" style="flex: 1;">
+                            <option value="">Select work product...</option>
+                        </select>
+                        <button class="btn btn-small" onclick="toggleQuickCreateObject()" title="Quick create new work product" style="padding: 0.5rem; width: 36px; height: 36px; display: flex; align-items: center; justify-content: center;"><i class="ph ph-plus-circle" style="font-size: 1.25rem;"></i></button>
+                    </div>
+                    <div id="quickCreateObject" style="display: none; margin-top: 0.5rem; padding: 0.75rem; background: #FAF7F5; border-radius: 6px; border: 1px solid #E5DDD1;">
+                        <div style="display: flex; gap: 0.5rem; margin-bottom: 0.5rem;">
+                            <input type="text" id="quickObjectName" placeholder="Work product name..." onkeypress="if(event.key==='Enter') createQuickObject()" style="flex: 1; padding: 0.5rem; border: 1px solid #E5DDD1; border-radius: 4px; font-size: 0.875rem;">
+                        </div>
+                        <button class="btn btn-small" onclick="createQuickObject()" style="width: 100%;">Create Work Product</button>
+                    </div>
+                </div>
+
+                <div class="input-group">
+                    <label>Description (Optional)</label>
+                    <textarea id="activityDescription" placeholder="Add details about this connection..." maxlength="240" rows="2" style="width: 100%; padding: 0.5rem; border: 1px solid #E5DDD1; border-radius: 6px; font-family: inherit; font-size: 0.875rem; resize: vertical;"></textarea>
+                    <div style="font-size: 0.75rem; color: #8B6F47; text-align: right; margin-top: 0.25rem;">
+                        <span id="charCount">0</span>/240
+                    </div>
+                </div>
+
+                <div class="sentence-preview" id="sentencePreview">
+                    <em style="color: #8B6F47;">Select subject and object to preview...</em>
+                </div>
+
+                <button class="btn" onclick="addActivity()" style="width: 100%; margin-top: 0.5rem;">+ Create Activity</button>
+            </div>
+
+            <div class="divider"></div>
+
+            <div class="panel-title" style="font-size: 1rem;">All Activities</div>
+            <div class="input-group" style="margin-bottom: 1rem;">
+                <input type="text" id="activitySearch" placeholder="Search activities..." oninput="renderActivityList()">
+            </div>
+            <div id="activityList" class="relationship-list"></div>
+        </div>
+    </div>
+
+    <!-- Entity Detail Modal -->
+    <div id="entityModal" class="modal-overlay">
+        <div class="modal-dialog">
+            <div class="modal-header-section">
+                <div class="modal-title-text" id="modalEntityName"></div>
+                <div style="font-size: 0.875rem; opacity: 0.9;" id="modalEntityType"></div>
+            </div>
+            <div class="modal-body">
+                <div class="modal-section" id="modalConnections"></div>
+                <div class="modal-section" id="modalActivities"></div>
+                <div style="display: flex; justify-content: flex-end; gap: 1rem; margin-top: 2rem;">
+                    <button class="btn btn-secondary" onclick="closeEntityModal()">Close</button>
+                    <button class="btn" onclick="editEntityFromModal()">Edit</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Data structure
+        let entities = {
+            unit: [],
+            team: [],
+            role: [],
+            person: [],
+            object: []
+        };
+
+        let relationships = [];
+        
+        // EO Operators - Emergence Operators for activity modeling
+        // Internal codes used for data store, friendly labels for UI
+        // 
+        // APPEND-ONLY ACTIVITY TRACKING:
+        // Every action creates a new record in Xano activity_store
+        // - Creates: INS (Start)
+        // - Updates: ALT (Shift) 
+        // - Deletes: NUL (Notice)
+        // - Connections: CON (Link), DES (Define)
+        // - Structural: SEG (Break), REC (Loop), SYN (Merge)
+        // - Oversight: SUP (Hold)
+        //
+        // External (UI) → Internal (Data Store)
+        // Notice → NUL | Define → DES | Start → INS
+        // Divide → SEG | Link → CON | Shift → ALT
+        // Merge → SYN | Balance → SUP | Loop → REC
+        const eoOperators = {
+            NUL: { 
+                code: 'NUL', 
+                label: 'Notice', 
+                fullLabel: 'NULLIFY',
+                color: '#6B5642', 
+                description: 'Recognize absence, remove, delete', 
+                style: 'solid', 
+                weight: 3 
+            },
+            DES: { 
+                code: 'DES', 
+                label: 'Define', 
+                fullLabel: 'DESIGNATE',
+                color: '#C88F4A', 
+                description: 'Designate, describe, assign', 
+                style: 'solid', 
+                weight: 2 
+            },
+            INS: { 
+                code: 'INS', 
+                label: 'Start', 
+                fullLabel: 'INSERT',
+                color: '#8B6F47', 
+                description: 'Instantiate, create, initiate', 
+                style: 'solid', 
+                weight: 2 
+            },
+            SEG: { 
+                code: 'SEG', 
+                label: 'Divide', 
+                fullLabel: 'SEGMENT',
+                color: '#A89984', 
+                description: 'Divide, segment, break down', 
+                style: 'dashed', 
+                weight: 1 
+            },
+            CON: { 
+                code: 'CON', 
+                label: 'Link', 
+                fullLabel: 'CONNECT',
+                color: '#7B95A3', 
+                description: 'Connect, associate, relate', 
+                style: 'solid', 
+                weight: 1 
+            },
+            ALT: { 
+                code: 'ALT', 
+                label: 'Shift', 
+                fullLabel: 'ALTER',
+                color: '#B87B5B', 
+                description: 'Alternate, modify, switch', 
+                style: 'solid', 
+                weight: 2 
+            },
+            SYN: { 
+                code: 'SYN', 
+                label: 'Merge', 
+                fullLabel: 'SYNTHESIZE',
+                color: '#D4A574', 
+                description: 'Synthesize, combine, bring together', 
+                style: 'solid', 
+                weight: 2 
+            },
+            SUP: { 
+                code: 'SUP', 
+                label: 'Balance', 
+                fullLabel: 'SUPERSEDE',
+                color: '#9B6F47', 
+                description: 'Superpose, balance multiple frames, oversee', 
+                style: 'solid', 
+                weight: 3 
+            },
+            REC: { 
+                code: 'REC', 
+                label: 'Loop', 
+                fullLabel: 'RECONFIGURE',
+                color: '#C8997F', 
+                description: 'Recurse, restructure, iterate', 
+                style: 'dashed', 
+                weight: 2 
+            }
+        };
+        
+        // Xano configuration
+        const XANO_BASE_URL = 'https://xvkq-pq7i-idtl.n7d.xano.io/api:nrIL-Oi-';
+        const APP_ID = 'holonic-org-graph'; // Your app identifier
+        
+        let selectedEntityType = 'unit';
+        let selectedPredicate = 'DES'; // Default to Define operator
+        let focusedNode = null;
+        let currentView = 'card';
+
+        // Graph variables
+        let width = 800;
+        let height = 600;
+        let simulation, link, node, linkText;
+
+        // View switching
+        function switchView(view) {
+            currentView = view;
+            
+            document.querySelectorAll('.view-toggle-btn').forEach(btn => {
+                btn.classList.remove('active');
+                if (btn.dataset.view === view) {
+                    btn.classList.add('active');
+                }
+            });
+
+            document.getElementById('treeView').classList.remove('active');
+            document.getElementById('cardView').classList.remove('active');
+            document.getElementById('graphView').classList.remove('active');
+
+            if (view === 'tree') {
+                document.getElementById('treeView').classList.add('active');
+                renderTreeView();
+            } else if (view === 'card' || view === 'cards') {
+                document.getElementById('cardView').classList.add('active');
+                renderCardView();
+            } else {
+                document.getElementById('graphView').classList.add('active');
+                setTimeout(() => updateGraph(), 100);
+            }
+        }
+
+        // Initialize with sample data
+        // Entity Modal
+        function openEntityModal(entityId, entityType) {
+            const entity = entities[entityType]?.find(e => e.id === entityId);
+            if (!entity) return;
+
+            document.getElementById('modalEntityName').textContent = entity.name;
+            document.getElementById('modalEntityType').textContent = entityType.toUpperCase();
+
+            // Get connected entities  
+            const connections = [];
+            relationships.forEach(r => {
+                if (r.subject === entityId) {
+                    const conn = findEntity(r.object);
+                    if (conn && !connections.find(c => c.id === conn.id)) {
+                        connections.push(conn);
+                    }
+                } else if (r.object === entityId) {
+                    const conn = findEntity(r.subject);
+                    if (conn && !connections.find(c => c.id === conn.id)) {
+                        connections.push(conn);
+                    }
+                }
+            });
+
+            const connectionsEl = document.getElementById('modalConnections');
+            if (connections.length > 0) {
+                connectionsEl.innerHTML = '<div class="modal-section-title">Connected To</div>';
+                const wrapper = document.createElement('div');
+                wrapper.style.display = 'flex';
+                wrapper.style.flexWrap = 'wrap';
+                wrapper.style.gap = '0.5rem';
+
+                connections.forEach(conn => {
+                    const badge = document.createElement('div');
+                    badge.className = 'related-entity';
+                    badge.innerHTML = `${getIcon(conn.type)} ${conn.name}`;
+                    badge.onclick = () => openEntityModal(conn.id, conn.type);
+                    wrapper.appendChild(badge);
+                });
+                connectionsEl.appendChild(wrapper);
+            } else {
+                connectionsEl.innerHTML = '';
+            }
+
+            // Get activities
+            const entityActivities = relationships.filter(r => 
+                r.subject === entityId || r.object === entityId
+            );
+            const activitiesEl = document.getElementById('modalActivities');
+            if (entityActivities.length > 0) {
+                activitiesEl.innerHTML = '<div class="modal-section-title">Activities</div>';
+                entityActivities.forEach(rel => {
+                    const subj = findEntity(rel.subject);
+                    const obj = findEntity(rel.object);
+                    const operator = eoOperators[rel.predicate];
+                    const item = document.createElement('div');
+                    item.className = `relationship-item ${rel.predicate}`;
+                    item.style.marginBottom = '0.5rem';
+                    item.innerHTML = `
+                        <div class="relationship-text">
+                            <strong>${subj?.name || rel.subject}</strong>
+                            <span style="color: ${operator.color}; margin: 0 0.25rem; font-weight: 600;">${operator.label}</span>
+                            <strong>${obj?.name || rel.object}</strong>
+                        </div>
+                    `;
+                    activitiesEl.appendChild(item);
+                });
+            } else {
+                activitiesEl.innerHTML = '';
+            }
+
+            document.getElementById('entityModal').classList.add('active');
+        }
+
+        function closeEntityModal() {
+            document.getElementById('entityModal').classList.remove('active');
+        }
+
+        function editEntityFromModal() {
+            const nameEl = document.getElementById('modalEntityName');
+            const typeEl = document.getElementById('modalEntityType');
+            
+            if (!nameEl || !typeEl) return;
+            
+            const currentName = nameEl.textContent;
+            const entityType = typeEl.textContent.toLowerCase();
+            
+            // Find the entity
+            const entity = entities[entityType]?.find(e => e.name === currentName);
+            if (!entity) return;
+            
+            // Prompt for new name
+            const newName = prompt('Enter new name:', entity.name);
+            if (!newName || newName.trim() === '' || newName === entity.name) return;
+            
+            // Update entity
+            entity.name = newName.trim();
+            
+            // Log to Xano
+            logActivityToXano({
+                event_verb: 'Shift Entity',
+                eo_operator: 'ALT',
+                object_type: entityType,
+                object_id: entity.id,
+                object_label: `${currentName} → ${newName}`,
+                data_json: {
+                    old_name: currentName,
+                    new_name: newName,
+                    entity_type: entityType
+                }
+            });
+            
+            // Close modal and refresh
+            closeEntityModal();
+            saveToLocalStorage();
+            renderEntityList();
+            updateSelects();
+            renderActivityList();
+            
+            if (currentView === 'graph') {
+                updateGraph();
+            } else if (currentView === 'tree') {
+                renderTreeView();
+            } else if (currentView === 'card') {
+                renderCardView();
+            }
+        }
+
+        function openRelationshipModal(relationshipData) {
+            // Get the actual relationship object from the data
+            const rel = relationships.find(r => r.id === relationshipData.id);
+            if (!rel) return;
+
+            const subject = findEntity(rel.subject);
+            const object = findEntity(rel.object);
+            const operator = eoOperators[rel.predicate];
+
+            const modal = document.getElementById('entityModal');
+            document.getElementById('modalEntityName').innerHTML = `
+                ${subject?.name} 
+                <span style="color: ${operator.color}; font-weight: 600;">${operator.label}</span> 
+                ${object?.name}
+            `;
+            document.getElementById('modalEntityType').textContent = 'CONNECTION';
+
+            // Show connection details
+            const connectionsEl = document.getElementById('modalConnections');
+            connectionsEl.innerHTML = `
+                <div class="modal-section-title">Connection Details</div>
+                <div style="background: #FAF7F5; padding: 1rem; border-radius: 6px; border-left: 3px solid ${operator.color};">
+                    <div style="margin-bottom: 0.75rem;">
+                        <strong>Operator:</strong> ${operator.label} (${operator.code})
+                    </div>
+                    <div style="margin-bottom: 0.75rem;">
+                        <strong>Description:</strong> ${operator.description}
+                    </div>
+                    <div style="margin-bottom: 0.75rem;">
+                        <strong>From:</strong> ${getIcon(subject.type)} ${subject.name} (${subject.type})
+                    </div>
+                    <div>
+                        <strong>To:</strong> ${getIcon(object.type)} ${object.name} (${object.type})
+                    </div>
+                </div>
+            `;
+
+            // Show actions
+            const activitiesEl = document.getElementById('modalActivities');
+            activitiesEl.innerHTML = `
+                <div class="modal-section-title">Actions</div>
+                <button class="btn btn-secondary" onclick="deleteRelationship('${rel.id}')" style="width: 100%;">
+                    Delete Connection
+                </button>
+            `;
+
+            modal.classList.add('active');
+        }
+
+        function deleteRelationship(relId) {
+            if (!confirm('Delete this connection?')) return;
+            
+            const rel = relationships.find(r => r.id === relId);
+            relationships = relationships.filter(r => r.id !== relId);
+            
+            // Log deletion to Xano
+            if (rel) {
+                const subject = findEntity(rel.subject);
+                const object = findEntity(rel.object);
+                logActivityToXano({
+                    event_verb: 'Notice Removal',
+                    eo_operator: 'NUL',
+                    object_type: 'relationship',
+                    object_id: relId,
+                    object_label: `${subject?.name} → ${object?.name}`,
+                    data_json: {
+                        relationship_deleted: true,
+                        subject_id: rel.subject,
+                        object_id: rel.object,
+                        predicate: rel.predicate
+                    }
+                });
+            }
+            
+            closeEntityModal();
+            saveToLocalStorage();
+            renderActivityList();
+            
+            if (currentView === 'graph') {
+                updateGraph();
+            } else if (currentView === 'tree') {
+                renderTreeView();
+            } else if (currentView === 'card') {
+                renderCardView();
+            }
+        }
+
+        // Sentence Preview
+        function updateSentencePreview() {
+            const subjectId = document.getElementById('subjectSelect')?.value;
+            const orgEntityId = document.getElementById('orgEntitySelect')?.value;
+            const objectId = document.getElementById('objectSelect')?.value;
+            const preview = document.getElementById('sentencePreview');
+
+            if (!preview) return; // Safety check
+
+            // Determine which object was selected (org entity or work object)
+            const selectedObjectId = objectId || orgEntityId;
+
+            if (!subjectId || !selectedObjectId) {
+                preview.innerHTML = '<em style="color: #8B6F47;">Select subject and object to preview...</em>';
+                return;
+            }
+
+            const subject = findEntity(subjectId);
+            const object = findEntity(selectedObjectId);
+
+            if (!subject || !object) {
+                preview.innerHTML = '<em style="color: #8B6F47;">Select subject and object to preview...</em>';
+                return;
+            }
+
+            const operatorLabel = eoOperators[selectedPredicate]?.label || selectedPredicate;
+            const operatorColor = eoOperators[selectedPredicate]?.color || '#8B6F47';
+
+            preview.innerHTML = `
+                <strong>${subject.name}</strong> 
+                <span style="color: ${operatorColor}; font-weight: 600;">${operatorLabel}</span> 
+                <strong>${object.name}</strong>
+                <div style="font-size: 0.75rem; color: #8B6F47; margin-top: 0.5rem; font-style: italic;">
+                    ${eoOperators[selectedPredicate]?.description || ''}
+                </div>
+            `;
+        }
+
+        // Handle mutual exclusivity: when org entity is selected, clear work object
+        function handleOrgEntityChange() {
+            if (document.getElementById('orgEntitySelect').value) {
+                document.getElementById('objectSelect').value = '';
+            }
+            updateSentencePreview();
+        }
+
+        // Handle mutual exclusivity: when work object is selected, clear org entity
+        function handleWorkObjectChange() {
+            if (document.getElementById('objectSelect').value) {
+                document.getElementById('orgEntitySelect').value = '';
+            }
+            updateSentencePreview();
+        }
+
+        // Xano Activity Store Integration
+        async function logActivityToXano(activity) {
+            try {
+                const payload = {
+                    app_id: APP_ID,
+                    event_verb: activity.event_verb,
+                    eo_operator: activity.eo_operator, // Store the EO code (NUL, DES, INS, etc)
+                    agent_type: 'user',
+                    agent_id: 'user_' + Date.now(), // Replace with actual user ID
+                    agent_name: 'User', // Replace with actual user name
+                    object_type: activity.object_type,
+                    object_id: activity.object_id,
+                    object_label: activity.object_label,
+                    data_json: activity.data_json || {}
+                };
+
+                console.log('📝 Logging activity to Xano:', payload);
+
+                const response = await fetch(`${XANO_BASE_URL}/activity_store`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify(payload)
+                });
+
+                if (!response.ok) {
+                    console.error('❌ Failed to log activity:', response.statusText);
+                    return null;
+                }
+
+                const result = await response.json();
+                console.log('✅ Activity logged:', result);
+                return result;
+            } catch (error) {
+                console.error('❌ Error logging activity to Xano:', error);
+                return null;
+            }
+        }
+
+        async function getActivitiesFromXano() {
+            try {
+                const response = await fetch(`${XANO_BASE_URL}/activity_store`);
+                
+                if (!response.ok) {
+                    console.error('Failed to fetch activities:', response.statusText);
+                    return [];
+                }
+
+                const activities = await response.json();
+                // Filter by app_id since we might get all activities
+                return activities.filter(a => a.app_id === APP_ID);
+            } catch (error) {
+                console.error('Error fetching activities from Xano:', error);
+                return [];
+            }
+        }
+
+        async function updateActivityInXano(activityId, updates) {
+            try {
+                const response = await fetch(`${XANO_BASE_URL}/activity_store/${activityId}`, {
+                    method: 'PUT',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify(updates)
+                });
+
+                if (!response.ok) {
+                    console.error('Failed to update activity:', response.statusText);
+                    return null;
+                }
+
+                return await response.json();
+            } catch (error) {
+                console.error('Error updating activity in Xano:', error);
+                return null;
+            }
+        }
+
+        function initSampleData() {
+            // Units
+            entities.unit.push({ id: 'u1', name: 'Immigration Practice', type: 'unit' });
+            
+            // Teams
+            entities.team.push({ id: 't1', name: 'Asylum Team', type: 'team' });
+            entities.team.push({ id: 't2', name: 'Family Petitions Team', type: 'team' });
+            
+            // Roles
+            entities.role.push({ id: 'r1', name: 'Managing Attorney', type: 'role' });
+            entities.role.push({ id: 'r2', name: 'Associate Attorney', type: 'role' });
+            entities.role.push({ id: 'r3', name: 'Case Manager', type: 'role' });
+            entities.role.push({ id: 'r4', name: 'Lead Attorney', type: 'role' });
+            
+            // People
+            entities.person.push({ id: 'p1', name: 'Maria Santos', type: 'person' });
+            entities.person.push({ id: 'p2', name: 'James Chen', type: 'person' });
+            entities.person.push({ id: 'p3', name: 'Ana Rodriguez', type: 'person' });
+            
+            // Objects (work items)
+            entities.object.push({ id: 'o1', name: 'Court Filings', type: 'object' });
+            entities.object.push({ id: 'o2', name: 'Client Interviews', type: 'object' });
+            entities.object.push({ id: 'o3', name: 'Case Preparation', type: 'object' });
+            entities.object.push({ id: 'o4', name: 'Schedule Management', type: 'object' });
+            
+            // Hierarchical relationships (Unit DESignates Teams, Teams DESignate Roles)
+            relationships.push({ subject: 'u1', predicate: 'DES', object: 't1', id: 'rel_h1' }); // Immigration Practice designates Asylum Team
+            relationships.push({ subject: 'u1', predicate: 'DES', object: 't2', id: 'rel_h2' }); // Immigration Practice designates Family Petitions Team
+            relationships.push({ subject: 't1', predicate: 'DES', object: 'r1', id: 'rel_h3' }); // Asylum Team designates Managing Attorney
+            relationships.push({ subject: 't1', predicate: 'DES', object: 'r2', id: 'rel_h4' }); // Asylum Team designates Associate Attorney
+            relationships.push({ subject: 't1', predicate: 'DES', object: 'r3', id: 'rel_h5' }); // Asylum Team designates Case Manager
+            relationships.push({ subject: 't2', predicate: 'DES', object: 'r4', id: 'rel_h6' }); // Family Petitions Team designates Lead Attorney
+            
+            // Work relationships (Roles CONnected to Objects)
+            relationships.push({ subject: 'r1', predicate: 'SUP', object: 'o1', id: 'rel1' }); // Managing Attorney supervises Court Filings
+            relationships.push({ subject: 'r2', predicate: 'CON', object: 'o3', id: 'rel2' }); // Associate Attorney connects to Case Preparation
+            relationships.push({ subject: 'r3', predicate: 'CON', object: 'o4', id: 'rel3' }); // Case Manager connects to Schedule Management
+            
+            // People INSerted into roles
+            relationships.push({ subject: 'p1', predicate: 'INS', object: 'r1', id: 'rel4' }); // Maria Santos inserted into Managing Attorney
+            relationships.push({ subject: 'p2', predicate: 'INS', object: 'r2', id: 'rel5' }); // James Chen inserted into Associate Attorney
+            relationships.push({ subject: 'p3', predicate: 'INS', object: 'r3', id: 'rel6' }); // Ana Rodriguez inserted into Case Manager
+            
+            // Oversight relationships  
+            relationships.push({ subject: 'r1', predicate: 'SUP', object: 'r2', id: 'rel7' }); // Managing Attorney supersedes Associate Attorney
+            
+            // Collaborative relationships
+            relationships.push({ subject: 'r3', predicate: 'SYN', object: 'o4', id: 'rel8' }); // Case Manager synthesizes Schedule Management
+        }
+
+        // Entity management
+        function selectEntityType(type) {
+            selectedEntityType = type;
+            document.querySelectorAll('.entity-type-btn').forEach(btn => {
+                btn.classList.toggle('active', btn.dataset.type === type);
+            });
+            updateParentOptions();
+        }
+
+        function updateParentOptions() {
+            const parentSelectGroup = document.getElementById('parentSelectGroup');
+            const parentSelect = document.getElementById('parentEntitySelect');
+            
+            // Persons cannot have parents
+            if (selectedEntityType === 'person') {
+                parentSelectGroup.style.display = 'none';
+                return;
+            }
+            
+            parentSelectGroup.style.display = 'block';
+            parentSelect.innerHTML = '<option value="">None - Top Level</option>';
+
+            // Determine valid parent types based on selected entity type
+            let validParentTypes = [];
+            if (selectedEntityType === 'team') {
+                validParentTypes = ['unit', 'team']; // Teams can be under units or other teams
+            } else if (selectedEntityType === 'role') {
+                validParentTypes = ['unit', 'team']; // Roles can be under units or teams
+            } else if (selectedEntityType === 'object') {
+                validParentTypes = ['role']; // Objects can be under roles
+            } else if (selectedEntityType === 'unit') {
+                validParentTypes = ['unit']; // Units can be under other units
+            }
+
+            // Populate with valid parent entities
+            validParentTypes.forEach(type => {
+                entities[type].forEach(entity => {
+                    const option = document.createElement('option');
+                    option.value = entity.id;
+                    option.innerHTML = `${getIcon(type)} ${entity.name}`;
+                    parentSelect.appendChild(option);
+                });
+            });
+        }
+
+        function addEntity() {
+            const name = document.getElementById('entityName').value.trim();
+            if (!name) return;
+
+            const id = selectedEntityType[0] + Date.now();
+            const entity = {
+                id,
+                name,
+                type: selectedEntityType
+            };
+            
+            entities[selectedEntityType].push(entity);
+
+            // Log to Xano activity store
+            logActivityToXano({
+                event_verb: 'Start Entity',
+                eo_operator: 'INS',
+                object_type: selectedEntityType,
+                object_id: id,
+                object_label: name,
+                data_json: {
+                    entity_type: selectedEntityType,
+                    entity_name: name
+                }
+            });
+
+            // If parent is selected, create the parent relationship (persons cannot have parents)
+            const parentId = document.getElementById('parentEntitySelect').value;
+
+            if (parentId && selectedEntityType !== 'person') {
+                const relId = 'rel' + Date.now();
+                const parentEntity = findEntity(parentId);
+                
+                relationships.push({
+                    id: relId,
+                    subject: parentId,
+                    predicate: 'DES', // Define relationship for hierarchy
+                    object: id
+                });
+
+                // Log parent relationship to Xano
+                logActivityToXano({
+                    event_verb: 'Define Connection',
+                    eo_operator: 'DES',
+                    object_type: 'relationship',
+                    object_id: relId,
+                    object_label: `${parentEntity?.name} Define ${name}`,
+                    data_json: {
+                        subject_id: parentId,
+                        subject_type: parentEntity?.type,
+                        subject_name: parentEntity?.name,
+                        predicate: 'DES',
+                        predicate_label: 'Define',
+                        object_id: id,
+                        object_type: selectedEntityType,
+                        object_name: name,
+                        connection_target: 'hierarchy'
+                    }
+                });
+            }
+
+            document.getElementById('entityName').value = '';
+            document.getElementById('parentEntitySelect').value = '';
+            
+            saveToLocalStorage();
+            renderEntityList();
+            updateSelects();
+            updateParentOptions();
+            
+            if (currentView === 'graph') {
+                updateGraph();
+            } else if (currentView === 'tree') {
+                renderTreeView();
+            } else if (currentView === 'card') {
+                renderCardView();
+            }
+        }
+
+        function quickAddChild(parentId, parentType) {
+            const parent = findEntity(parentId);
+            if (!parent) return;
+
+            // Determine appropriate child type
+            let childType = 'team'; // Default
+            if (parentType === 'team') {
+                childType = 'role';
+            }
+
+            // Set the entity type
+            selectEntityType(childType);
+
+            // Set the parent
+            document.getElementById('parentEntitySelect').value = parentId;
+
+            // Focus on name input
+            document.getElementById('entityName').focus();
+
+            // Scroll to the add entity form
+            document.querySelector('.panel-left').scrollTop = 0;
+        }
+
+        function deleteEntity(id, type) {
+            if (!confirm('Delete this entity? This will also remove related relationships.')) return;
+            
+            const entity = entities[type].find(e => e.id === id);
+            
+            entities[type] = entities[type].filter(e => e.id !== id);
+            relationships = relationships.filter(r => r.subject !== id && r.object !== id);
+            
+            // Log to Xano activity store
+            if (entity) {
+                logActivityToXano({
+                    event_verb: 'Notice Removal', // NUL = Notice
+                    eo_operator: 'NUL',
+                    object_type: type,
+                    object_id: id,
+                    object_label: entity.name,
+                    data_json: {
+                        entity_type: type,
+                        entity_name: entity.name,
+                        action: 'deleted'
+                    }
+                });
+            }
+            
+            saveToLocalStorage();
+            renderEntityList();
+            updateSelects();
+            renderActivityList();
+            
+            if (currentView === 'graph') {
+                updateGraph();
+            } else if (currentView === 'tree') {
+                renderTreeView();
+            }
+        }
+
+        function renderEntityList() {
+            const list = document.getElementById('entityList');
+            if (!list) return; // Safety check
+            
+            const searchTerm = document.getElementById('entitySearch')?.value.toLowerCase() || '';
+            list.innerHTML = '';
+
+            // Helper function to recursively render entity tree
+            function renderEntityNode(entity, depth = 0, searchTerm = '') {
+                const marginLeft = depth * 1;
+                
+                // Skip if doesn't match search
+                if (searchTerm && !entity.name.toLowerCase().includes(searchTerm)) {
+                    const hasMatchingChildren = findMatchingChildren(entity.id, searchTerm);
+                    if (!hasMatchingChildren) return null;
+                }
+
+                const container = document.createElement('div');
+                const node = document.createElement('div');
+                node.className = `tree-node-item ${entity.type}`;
+                node.style.marginLeft = `${marginLeft}rem`;
+                node.style.cursor = 'pointer';
+                node.onclick = (e) => {
+                    if (!e.target.closest('.btn-icon') && !e.target.closest('.tree-expand-icon')) {
+                        openEntityModal(entity.id, entity.type);
+                    }
+                };
+
+                const icon = getIcon(entity.type);
+                
+                // Get all potential children (units, teams, roles - NOT objects)
+                let children = [];
+                if (entity.type === 'unit') {
+                    children = [
+                        ...getConnectedEntities(entity.id, 'unit'),
+                        ...getConnectedEntities(entity.id, 'team'),
+                        ...getConnectedEntities(entity.id, 'role')
+                    ];
+                } else if (entity.type === 'team') {
+                    children = [
+                        ...getConnectedEntities(entity.id, 'team'),
+                        ...getConnectedEntities(entity.id, 'role')
+                    ];
+                }
+                // Roles don't show objects as children - objects shown separately
+
+                const hasChildren = children.length > 0;
+
+                node.innerHTML = `
+                    <span class="tree-expand-icon ${hasChildren ? 'expanded' : ''}" style="${hasChildren ? '' : 'visibility: hidden;'}">▶</span>
+                    <span style="font-size: ${depth === 0 ? '1.2rem' : '1rem'};">${icon}</span>
+                    <div style="flex: 1;">
+                        <div class="tree-node-name">${entity.name}</div>
+                    </div>
+                    ${(entity.type === 'unit' || entity.type === 'team') ? `<button class="btn-icon add" onclick="event.stopPropagation(); quickAddChild('${entity.id}', '${entity.type}')" title="Add sub-entity"><i class="ph ph-plus"></i></button>` : ''}
+                    <button class="btn-icon" onclick="event.stopPropagation(); deleteEntity('${entity.id}', '${entity.type}')"><i class="ph ph-x"></i></button>
+                `;
+
+                container.appendChild(node);
+
+                if (hasChildren) {
+                    const childrenContainer = document.createElement('div');
+                    childrenContainer.className = 'tree-children expanded';
+
+                    children.forEach(child => {
+                        if (searchTerm && !child.name.toLowerCase().includes(searchTerm)) {
+                            const hasMatchingGrandchildren = findMatchingChildren(child.id, searchTerm);
+                            if (!hasMatchingGrandchildren) return;
+                        }
+                        
+                        const childNode = renderEntityNode(child, depth + 1, searchTerm);
+                        if (childNode) {
+                            childrenContainer.appendChild(childNode);
+                        }
+                    });
+
+                    if (childrenContainer.children.length > 0) {
+                        container.appendChild(childrenContainer);
+
+                        // Add expand/collapse
+                        const expandIcon = node.querySelector('.tree-expand-icon');
+                        if (expandIcon) {
+                            expandIcon.onclick = (e) => {
+                                e.stopPropagation();
+                                childrenContainer.classList.toggle('expanded');
+                                expandIcon.classList.toggle('expanded');
+                            };
+                        }
+                    }
+                }
+
+                return container;
+            }
+
+            // Find top-level units (not contained by any other unit)
+            const topLevelUnits = entities.unit.filter(unit => {
+                return !relationships.some(r => 
+                    r.object === unit.id && entities.unit.some(u => u.id === r.subject)
+                );
+            });
+
+            topLevelUnits.forEach(unit => {
+                const unitNode = renderEntityNode(unit, 0, searchTerm);
+                if (unitNode) {
+                    unitNode.style.marginBottom = '1rem';
+                    list.appendChild(unitNode);
+                }
+            });
+
+            // Show orphaned entities (not connected to anything or to non-existent parents)
+            const orphanedSection = document.createElement('div');
+            orphanedSection.style.marginTop = '1.5rem';
+            
+            // Orphaned teams (not connected to any unit or team)
+            const orphanedTeams = entities.team.filter(team => {
+                const isConnected = relationships.some(r => 
+                    (r.subject === team.id || r.object === team.id) &&
+                    (entities.unit.some(u => u.id === r.subject || u.id === r.object) ||
+                     entities.team.some(t => t.id === r.subject || t.id === r.object))
+                );
+                return !isConnected;
+            });
+
+            if (orphanedTeams.length > 0 && (!searchTerm || orphanedTeams.some(t => t.name.toLowerCase().includes(searchTerm)))) {
+                const header = document.createElement('div');
+                header.style.fontSize = '0.75rem';
+                header.style.color = '#8B6F47';
+                header.style.fontWeight = '600';
+                header.style.textTransform = 'uppercase';
+                header.style.marginBottom = '0.5rem';
+                header.textContent = 'Unassigned Teams';
+                orphanedSection.appendChild(header);
+
+                orphanedTeams.forEach(team => {
+                    if (searchTerm && !team.name.toLowerCase().includes(searchTerm)) return;
+                    const node = document.createElement('div');
+                    node.className = 'entity-item team';
+                    node.style.cursor = 'pointer';
+                    node.onclick = (e) => {
+                        if (!e.target.closest('.btn-icon')) {
+                            openEntityModal(team.id, 'team');
+                        }
+                    };
+                    node.innerHTML = `
+                        <div>
+                            <div class="entity-name">👥 ${team.name}</div>
+                        </div>
+                        <button class="btn-icon" onclick="event.stopPropagation(); deleteEntity('${team.id}', 'team')">✕</button>
+                    `;
+                    orphanedSection.appendChild(node);
+                });
+            }
+
+            // Orphaned roles
+            const orphanedRoles = entities.role.filter(role => {
+                const isConnected = relationships.some(r => 
+                    (r.subject === role.id || r.object === role.id) &&
+                    (entities.team.some(t => t.id === r.subject || t.id === r.object))
+                );
+                return !isConnected;
+            });
+
+            if (orphanedRoles.length > 0 && (!searchTerm || orphanedRoles.some(r => r.name.toLowerCase().includes(searchTerm)))) {
+                const header = document.createElement('div');
+                header.style.fontSize = '0.75rem';
+                header.style.color = '#8B6F47';
+                header.style.fontWeight = '600';
+                header.style.textTransform = 'uppercase';
+                header.style.marginBottom = '0.5rem';
+                header.style.marginTop = '1rem';
+                header.textContent = 'Unassigned Roles';
+                orphanedSection.appendChild(header);
+
+                orphanedRoles.forEach(role => {
+                    if (searchTerm && !role.name.toLowerCase().includes(searchTerm)) return;
+                    const node = document.createElement('div');
+                    node.className = 'entity-item role';
+                    node.style.cursor = 'pointer';
+                    node.onclick = (e) => {
+                        if (!e.target.closest('.btn-icon')) {
+                            openEntityModal(role.id, 'role');
+                        }
+                    };
+                    node.innerHTML = `
+                        <div>
+                            <div class="entity-name">📋 ${role.name}</div>
+                        </div>
+                        <button class="btn-icon" onclick="event.stopPropagation(); deleteEntity('${role.id}', 'role')">✕</button>
+                    `;
+                    orphanedSection.appendChild(node);
+                });
+            }
+
+            // People
+            if (entities.person.length > 0 && (!searchTerm || entities.person.some(p => p.name.toLowerCase().includes(searchTerm)))) {
+                const header = document.createElement('div');
+                header.style.fontSize = '0.75rem';
+                header.style.color = '#8B6F47';
+                header.style.fontWeight = '600';
+                header.style.textTransform = 'uppercase';
+                header.style.marginBottom = '0.5rem';
+                header.style.marginTop = '1rem';
+                header.textContent = 'People';
+                orphanedSection.appendChild(header);
+
+                entities.person.forEach(person => {
+                    if (searchTerm && !person.name.toLowerCase().includes(searchTerm)) return;
+                    const node = document.createElement('div');
+                    node.className = 'entity-item person';
+                    node.style.cursor = 'pointer';
+                    node.onclick = (e) => {
+                        if (!e.target.closest('.btn-icon')) {
+                            openEntityModal(person.id, 'person');
+                        }
+                    };
+                    node.innerHTML = `
+                        <div>
+                            <div class="entity-name">👤 ${person.name}</div>
+                        </div>
+                        <button class="btn-icon" onclick="event.stopPropagation(); deleteEntity('${person.id}', 'person')">✕</button>
+                    `;
+                    orphanedSection.appendChild(node);
+                });
+            }
+
+            // Objects (shown separately since they can connect to multiple roles)
+            if (entities.object.length > 0 && (!searchTerm || entities.object.some(o => o.name.toLowerCase().includes(searchTerm)))) {
+                const header = document.createElement('div');
+                header.style.fontSize = '0.75rem';
+                header.style.color = '#8B6F47';
+                header.style.fontWeight = '600';
+                header.style.textTransform = 'uppercase';
+                header.style.marginBottom = '0.5rem';
+                header.style.marginTop = '1rem';
+                header.textContent = 'Work Products';
+                orphanedSection.appendChild(header);
+
+                entities.object.forEach(obj => {
+                    if (searchTerm && !obj.name.toLowerCase().includes(searchTerm)) return;
+                    
+                    // Find roles connected to this object
+                    const connectedRoles = relationships
+                        .filter(r => r.object === obj.id || r.subject === obj.id)
+                        .map(r => {
+                            const entityId = r.object === obj.id ? r.subject : r.object;
+                            return findEntity(entityId);
+                        })
+                        .filter(e => e && e.type === 'role');
+                    
+                    const node = document.createElement('div');
+                    node.className = 'entity-item object';
+                    node.style.cursor = 'pointer';
+                    node.onclick = (e) => {
+                        if (!e.target.closest('.btn-icon')) {
+                            openEntityModal(obj.id, 'object');
+                        }
+                    };
+                    
+                    const connectionBadges = connectedRoles.length > 0 
+                        ? `<div style="display: flex; gap: 0.25rem; flex-wrap: wrap; margin-top: 0.25rem;">
+                            ${connectedRoles.map(role => 
+                                `<span style="font-size: 0.7rem; padding: 0.125rem 0.375rem; background: #F5E6D3; color: #8B6F47; border-radius: 10px;">📋 ${role.name}</span>`
+                            ).join('')}
+                           </div>`
+                        : '';
+                    
+                    node.innerHTML = `
+                        <div style="flex: 1;">
+                            <div class="entity-name">📦 ${obj.name}</div>
+                            ${connectionBadges}
+                        </div>
+                        <button class="btn-icon" onclick="event.stopPropagation(); deleteEntity('${obj.id}', 'object')">✕</button>
+                    `;
+                    orphanedSection.appendChild(node);
+                });
+            }
+
+            if (orphanedSection.children.length > 0) {
+                list.appendChild(orphanedSection);
+            }
+
+            if (list.children.length === 0) {
+                list.innerHTML = '<div style="color: #8B6F47; text-align: center; padding: 2rem;">No matching entities</div>';
+            }
+        }
+
+        function getConnectedEntities(entityId, targetType) {
+            const connected = [];
+            relationships.forEach(rel => {
+                if (rel.subject === entityId) {
+                    // If targetType is specified, look only for that type
+                    if (targetType) {
+                        const entity = entities[targetType]?.find(e => e.id === rel.object);
+                        if (entity && !connected.find(c => c.id === entity.id)) {
+                            connected.push(entity);
+                        }
+                    } else {
+                        // If no targetType, find any connected entity
+                        const entity = findEntity(rel.object);
+                        if (entity && !connected.find(c => c.id === entity.id)) {
+                            connected.push(entity);
+                        }
+                    }
+                } else if (rel.object === entityId) {
+                    if (targetType) {
+                        const entity = entities[targetType]?.find(e => e.id === rel.subject);
+                        if (entity && !connected.find(c => c.id === entity.id)) {
+                            connected.push(entity);
+                        }
+                    } else {
+                        const entity = findEntity(rel.subject);
+                        if (entity && !connected.find(c => c.id === entity.id)) {
+                            connected.push(entity);
+                        }
+                    }
+                }
+            });
+            return connected;
+        }
+
+        function findMatchingChildren(entityId, searchTerm) {
+            // Check if any children match the search term
+            const connectedTeams = getConnectedEntities(entityId, 'team');
+            for (let team of connectedTeams) {
+                if (team.name.toLowerCase().includes(searchTerm)) return true;
+                const connectedRoles = getConnectedEntities(team.id, 'role');
+                for (let role of connectedRoles) {
+                    if (role.name.toLowerCase().includes(searchTerm)) return true;
+                }
+            }
+            const connectedRoles = getConnectedEntities(entityId, 'role');
+            for (let role of connectedRoles) {
+                if (role.name.toLowerCase().includes(searchTerm)) return true;
+            }
+            return false;
+        }
+
+        function filterEntities() {
+            renderEntityList();
+        }
+
+        function applyFilters() {
+            updateFilterStatus();
+            if (currentView === 'graph') {
+                updateGraph();
+            } else if (currentView === 'tree') {
+                renderTreeView();
+            } else if (currentView === 'cards') {
+                renderCardView();
+            }
+        }
+
+        function updateFilterStatus() {
+            const filters = getActiveFilters();
+            const statusEl = document.getElementById('filterStatus');
+            if (!statusEl) return;
+
+            // Count active filters (9 operators, 5 entity types)
+            const activeRelTypes = Object.values(filters.relationships).filter(v => v).length;
+            const activeEntityTypes = Object.values(filters.entities).filter(v => v).length;
+            
+            if (activeRelTypes === 9 && activeEntityTypes === 5) {
+                statusEl.textContent = 'Showing all';
+            } else if (activeRelTypes === 0 || activeEntityTypes === 0) {
+                statusEl.textContent = 'No filters active';
+            } else {
+                statusEl.textContent = `Filtered: ${activeRelTypes}/9 operators, ${activeEntityTypes}/5 entities`;
+            }
+        }
+
+        function clearFilters() {
+            // Uncheck all operator filters
+            Object.keys(eoOperators).forEach(op => {
+                const el = document.getElementById(`filter${op}`);
+                if (el) el.checked = false;
+            });
+            // Uncheck entity filters
+            document.getElementById('filterUnit').checked = false;
+            document.getElementById('filterTeam').checked = false;
+            document.getElementById('filterRole').checked = false;
+            document.getElementById('filterPerson').checked = false;
+            document.getElementById('filterObject').checked = false;
+            applyFilters();
+        }
+
+        function selectAllFilters() {
+            // Check all operator filters
+            Object.keys(eoOperators).forEach(op => {
+                const el = document.getElementById(`filter${op}`);
+                if (el) el.checked = true;
+            });
+            // Check entity filters
+            document.getElementById('filterUnit').checked = true;
+            document.getElementById('filterTeam').checked = true;
+            document.getElementById('filterRole').checked = true;
+            document.getElementById('filterPerson').checked = true;
+            document.getElementById('filterObject').checked = true;
+            applyFilters();
+        }
+
+        function toggleAllFilters() {
+            const filters = getActiveFilters();
+            // Check if any operator or entity filters are unchecked
+            const anyRelUnchecked = Object.values(filters.relationships).some(v => !v);
+            const anyEntityUnchecked = Object.values(filters.entities).some(v => !v);
+            
+            if (anyRelUnchecked || anyEntityUnchecked) {
+                selectAllFilters();
+            } else {
+                clearFilters();
+            }
+        }
+
+        function getActiveFilters() {
+            // Build relationships filter from all EO operators
+            const relationshipsFilter = {};
+            Object.keys(eoOperators).forEach(op => {
+                relationshipsFilter[op] = document.getElementById(`filter${op}`)?.checked !== false;
+            });
+            
+            return {
+                relationships: relationshipsFilter,
+                entities: {
+                    unit: document.getElementById('filterUnit')?.checked !== false,
+                    team: document.getElementById('filterTeam')?.checked !== false,
+                    role: document.getElementById('filterRole')?.checked !== false,
+                    person: document.getElementById('filterPerson')?.checked !== false,
+                    object: document.getElementById('filterObject')?.checked !== false
+                }
+            };
+        }
+
+        // Relationship management
+        function selectPredicate(predicate) {
+            selectedPredicate = predicate;
+            document.querySelectorAll('.predicate-btn').forEach(btn => {
+                btn.classList.remove('active');
+            });
+            event.target.classList.add('active');
+            updateSentencePreview(); // Update preview when operator changes
+        }
+
+        function addActivity() {
+            const subject = document.getElementById('subjectSelect').value;
+            const orgEntity = document.getElementById('orgEntitySelect').value;
+            const workObject = document.getElementById('objectSelect').value;
+
+            // Determine which object was selected
+            const object = workObject || orgEntity;
+
+            if (!subject || !object) {
+                alert('Please select subject and either an organizational entity or work object');
+                return;
+            }
+
+            const subjectEntity = findEntity(subject);
+            const objectEntity = findEntity(object);
+            
+            // Validate connection rules based on entity types and operators
+            const validationError = validateConnection(subjectEntity, objectEntity, selectedPredicate);
+            if (validationError) {
+                alert(validationError);
+                return;
+            }
+
+            const id = 'rel' + Date.now();
+            const description = document.getElementById('activityDescription').value.trim();
+            
+            const relationship = {
+                id,
+                subject,
+                predicate: selectedPredicate,
+                object,
+                description
+            };
+            
+            relationships.push(relationship);
+
+            // Log to Xano activity store (append-only)
+            const operatorData = eoOperators[selectedPredicate];
+            logActivityToXano({
+                event_verb: `${operatorData.label} Connection`, // e.g., "Define Connection"
+                eo_operator: selectedPredicate, // Store EO code (DES, INS, etc)
+                object_type: 'relationship',
+                object_id: id,
+                object_label: `${subjectEntity?.name} ${operatorData.label} ${objectEntity?.name}`,
+                data_json: {
+                    subject_id: subject,
+                    subject_type: subjectEntity?.type,
+                    subject_name: subjectEntity?.name,
+                    predicate: selectedPredicate,
+                    predicate_label: operatorData.label,
+                    object_id: object,
+                    object_type: objectEntity?.type,
+                    object_name: objectEntity?.name,
+                    connection_target: workObject ? 'work_object' : 'org_entity',
+                    description: description
+                }
+            });
+
+            document.getElementById('subjectSelect').value = '';
+            document.getElementById('orgEntitySelect').value = '';
+            document.getElementById('objectSelect').value = '';
+            document.getElementById('activityDescription').value = '';
+            document.getElementById('charCount').textContent = '0';
+
+            saveToLocalStorage();
+            renderActivityList();
+            
+            if (currentView === 'graph') {
+                updateGraph();
+            } else if (currentView === 'tree') {
+                renderTreeView();
+            } else if (currentView === 'card') {
+                renderCardView();
+            }
+        }
+
+        function validateConnection(subject, object, predicate) {
+            if (!subject || !object) return 'Invalid entities selected';
+            
+            // Define operator: hierarchical relationships
+            if (predicate === 'DES') {
+                // Units can Define units, teams, or roles
+                if (subject.type === 'unit' && !['unit', 'team', 'role'].includes(object.type)) {
+                    return 'Units can only Define other units, teams, or roles';
+                }
+                // Teams can Define teams or roles
+                if (subject.type === 'team' && !['team', 'role'].includes(object.type)) {
+                    return 'Teams can only Define other teams or roles';
+                }
+                // Roles cannot Define
+                if (subject.type === 'role') {
+                    return 'Roles cannot use Define operator (use Link or other operators)';
+                }
+            }
+            
+            // Start operator: people joining roles, creating work
+            if (predicate === 'INS') {
+                // People can Start (join) roles
+                if (subject.type === 'person' && object.type !== 'role') {
+                    return 'People can only Start roles';
+                }
+            }
+            
+            // Link operator: connecting work
+            if (predicate === 'CON') {
+                // Roles Link to objects
+                if (subject.type === 'role' && object.type !== 'object') {
+                    return 'Roles should Link to work objects';
+                }
+            }
+            
+            // Prevent nonsensical connections
+            if (subject.type === 'object' && object.type === 'unit') {
+                return 'Work objects cannot connect upward to organizational units';
+            }
+            
+            return null; // Valid connection
+        }
+
+        function deleteActivity(id) {
+            relationships = relationships.filter(r => r.id !== id);
+            saveToLocalStorage();
+            renderActivityList();
+            
+            if (currentView === 'graph') {
+                updateGraph();
+            } else if (currentView === 'tree') {
+                renderTreeView();
+            } else if (currentView === 'card') {
+                renderCardView();
+            }
+        }
+
+        function renderActivityList() {
+            const list = document.getElementById('activityList');
+            const searchTerm = document.getElementById('activitySearch')?.value.toLowerCase() || '';
+            
+            if (!list) return; // Safety check
+            
+            list.innerHTML = '';
+
+            if (relationships.length === 0) {
+                list.innerHTML = '<div style="color: #8B6F47; font-size: 0.85rem; text-align: center; padding: 1rem;">No activities yet</div>';
+                return;
+            }
+
+            const filtered = relationships.filter(rel => {
+                const subjectEntity = findEntity(rel.subject);
+                const objectEntity = findEntity(rel.object);
+                const searchText = `${subjectEntity?.name || ''} ${rel.predicate} ${objectEntity?.name || ''}`.toLowerCase();
+                return searchText.includes(searchTerm);
+            });
+
+            if (filtered.length === 0) {
+                list.innerHTML = '<div style="color: #8B6F47; font-size: 0.85rem; text-align: center; padding: 1rem;">No matching activities</div>';
+                return;
+            }
+
+            filtered.forEach(rel => {
+                const subjectEntity = findEntity(rel.subject);
+                const objectEntity = findEntity(rel.object);
+                const operator = eoOperators[rel.predicate];
+
+                const item = document.createElement('div');
+                item.className = `relationship-item ${rel.predicate}`;
+                item.innerHTML = `
+                    <div class="relationship-text">
+                        <strong>${subjectEntity?.name || rel.subject}</strong>
+                        <span style="color: ${operator.color}; margin: 0 0.25rem; font-weight: 600;">${operator.label}</span>
+                        <strong>${objectEntity?.name || rel.object}</strong>
+                    </div>
+                    <div style="display: flex; justify-content: space-between; align-items: center;">
+                        <div class="relationship-meta">${subjectEntity?.type} → ${objectEntity?.type}</div>
+                        <button class="btn-icon" onclick="deleteActivity('${rel.id}')">✕</button>
+                    </div>
+                `;
+                list.appendChild(item);
+            });
+        }
+
+        function updateSelects() {
+            const subjectSelect = document.getElementById('subjectSelect');
+            const orgEntitySelect = document.getElementById('orgEntitySelect');
+            const objectSelect = document.getElementById('objectSelect');
+
+            subjectSelect.innerHTML = '<option value="">Select subject...</option>';
+            orgEntitySelect.innerHTML = '<option value="">Select unit/team/role...</option>';
+            objectSelect.innerHTML = '<option value="">Select work object...</option>';
+
+            // Subject: all entity types
+            const types = ['unit', 'team', 'role', 'person', 'object'];
+            types.forEach(type => {
+                entities[type].forEach(entity => {
+                    const option = document.createElement('option');
+                    option.value = entity.id;
+                    option.textContent = `${entity.name} (${type})`;
+                    subjectSelect.appendChild(option);
+                });
+            });
+
+            // Org Entity: only units, teams, roles
+            const orgTypes = ['unit', 'team', 'role'];
+            orgTypes.forEach(type => {
+                entities[type].forEach(entity => {
+                    const option = document.createElement('option');
+                    option.value = entity.id;
+                    option.textContent = `${entity.name} (${type})`;
+                    orgEntitySelect.appendChild(option);
+                });
+            });
+
+            // Work Products: only objects
+            entities.object.forEach(entity => {
+                const option = document.createElement('option');
+                option.value = entity.id;
+                option.textContent = entity.name;
+                objectSelect.appendChild(option);
+            });
+        }
+
+        // Quick create for work objects only
+        function toggleQuickCreateObject() {
+            const quickCreate = document.getElementById('quickCreateObject');
+            quickCreate.style.display = quickCreate.style.display === 'none' ? 'block' : 'none';
+            if (quickCreate.style.display === 'block') {
+                document.getElementById('quickObjectName').focus();
+            }
+        }
+
+        function createQuickObject() {
+            const name = document.getElementById('quickObjectName').value.trim();
+
+            if (!name) {
+                alert('Please enter a name for the work object');
+                return;
+            }
+
+            const id = 'o' + Date.now();
+            const entity = { id, name, type: 'object' };
+            entities.object.push(entity);
+
+            // Log to Xano
+            logActivityToXano({
+                event_verb: 'Start Entity',
+                eo_operator: 'INS',
+                object_type: 'object',
+                object_id: id,
+                object_label: name,
+                data_json: {
+                    entity_type: 'object',
+                    entity_name: name,
+                    created_from: 'quick_create_object'
+                }
+            });
+
+            // Update UI
+            updateSelects();
+            renderEntityList();
+            
+            // Select the new object
+            document.getElementById('objectSelect').value = id;
+            
+            // Hide quick create and clear
+            document.getElementById('quickCreateObject').style.display = 'none';
+            document.getElementById('quickObjectName').value = '';
+            
+            updateSentencePreview();
+            
+            if (currentView === 'graph') {
+                updateGraph();
+            } else if (currentView === 'tree') {
+                renderTreeView();
+            }
+        }
+
+        function findEntity(id) {
+            const types = ['unit', 'team', 'role', 'person', 'object'];
+            for (let type of types) {
+                const entity = entities[type].find(e => e.id === id);
+                if (entity) return entity;
+            }
+            return null;
+        }
+
+        // Card View Rendering
+        function renderCardView() {
+            const container = document.getElementById('cardView');
+            if (!container) return; // Safety check
+            
+            container.innerHTML = '';
+
+            const filters = getActiveFilters();
+
+            // Units
+            if (filters.entities.unit && entities.unit.length > 0) {
+                container.appendChild(createCardRow('Units', entities.unit, getIcon('unit')));
+            }
+
+            // Teams
+            if (filters.entities.team && entities.team.length > 0) {
+                container.appendChild(createCardRow('Teams', entities.team, getIcon('team')));
+            }
+
+            // Roles
+            if (filters.entities.role && entities.role.length > 0) {
+                container.appendChild(createCardRow('Roles', entities.role, getIcon('role')));
+            }
+
+            // People
+            if (filters.entities.person && entities.person.length > 0) {
+                container.appendChild(createCardRow('People', entities.person, getIcon('person')));
+            }
+
+            // Work Products
+            if (filters.entities.object && entities.object.length > 0) {
+                container.appendChild(createCardRow('Work Products', entities.object, getIcon('object')));
+            }
+
+            // Activities
+            if (relationships.length > 0) {
+                container.appendChild(createActivityCardRow());
+            }
+        }
+
+        function createCardRow(title, entities, icon) {
+            const row = document.createElement('div');
+            row.className = 'card-row';
+
+            const header = document.createElement('div');
+            header.className = 'card-row-header';
+            header.innerHTML = `
+                <div class="card-row-title">${icon} ${title} (${entities.length})</div>
+            `;
+            row.appendChild(header);
+
+            const grid = document.createElement('div');
+            grid.className = 'card-grid';
+
+            entities.forEach(entity => {
+                const card = document.createElement('div');
+                card.className = `entity-card ${entity.type}`;
+                card.onclick = () => openEntityModal(entity.id, entity.type);
+
+                // Get all activities this entity is involved in
+                const entityActivities = relationships.filter(r => 
+                    r.subject === entity.id || r.object === entity.id
+                );
+
+                // Build activities HTML
+                let activitiesHTML = '';
+                if (entityActivities.length > 0) {
+                    activitiesHTML = '<div class="card-connections">';
+                    entityActivities.slice(0, 3).forEach(rel => {
+                        const operator = eoOperators[rel.predicate];
+                        const isSubject = rel.subject === entity.id;
+                        const otherEntity = findEntity(isSubject ? rel.object : rel.subject);
+                        activitiesHTML += `
+                            <span class="connection-badge" style="background: ${operator.color}; color: white; border-color: ${operator.color};">
+                                ${isSubject ? '→' : '←'} ${operator.label} ${otherEntity?.name || ''}
+                            </span>
+                        `;
+                    });
+                    if (entityActivities.length > 3) {
+                        activitiesHTML += `<span class="connection-badge">+${entityActivities.length - 3} more</span>`;
+                    }
+                    activitiesHTML += '</div>';
+                }
+
+                card.innerHTML = `
+                    <div class="card-header">
+                        <div class="card-icon">${icon}</div>
+                        <div class="card-title">${entity.name}</div>
+                    </div>
+                    ${activitiesHTML}
+                `;
+
+                grid.appendChild(card);
+            });
+
+            row.appendChild(grid);
+            return row;
+        }
+
+        function createActivityCardRow() {
+            const filters = getActiveFilters();
+            const filteredActivities = relationships.filter(r => filters.relationships[r.predicate]);
+
+            const row = document.createElement('div');
+            row.className = 'card-row';
+
+            const header = document.createElement('div');
+            header.className = 'card-row-header';
+            header.innerHTML = `
+                <div class="card-row-title">⚡ Activities (${filteredActivities.length})</div>
+            `;
+            row.appendChild(header);
+
+            const grid = document.createElement('div');
+            grid.className = 'card-grid';
+
+            filteredActivities.forEach(rel => {
+                const subj = findEntity(rel.subject);
+                const obj = findEntity(rel.object);
+                const operator = eoOperators[rel.predicate];
+
+                const card = document.createElement('div');
+                card.className = `entity-card activity`;
+                card.onclick = () => openRelationshipModal(rel);
+
+                card.innerHTML = `
+                    <div class="card-header">
+                        <div class="card-icon" style="background: ${operator.color}; color: white; padding: 0.5rem; border-radius: 8px; font-size: 1.25rem;">⚡</div>
+                        <div class="card-title">${operator.label}</div>
+                    </div>
+                    <div class="card-meta">
+                        <strong>${subj?.name || rel.subject}</strong> → <strong>${obj?.name || rel.object}</strong>
+                    </div>
+                    ${rel.description ? `<div class="card-description">${rel.description}</div>` : ''}
+                    <div class="card-connections">
+                        <span class="connection-badge" style="cursor: pointer;" onclick="event.stopPropagation(); openEntityModal('${rel.subject}', '${subj?.type}')">${getIcon(subj?.type)} ${subj?.name}</span>
+                        <span class="connection-badge" style="cursor: pointer;" onclick="event.stopPropagation(); openEntityModal('${rel.object}', '${obj?.type}')">${getIcon(obj?.type)} ${obj?.name}</span>
+                    </div>
+                `;
+
+                grid.appendChild(card);
+            });
+
+            row.appendChild(grid);
+            return row;
+        }
+
+        // Tree View Rendering
+        function toggleRelationships(relId) {
+            const relsDiv = document.getElementById(relId);
+            const header = event.target.closest('.tree-relationships-header');
+            const icon = header?.querySelector('.tree-expand-icon');
+            
+            if (relsDiv && icon) {
+                const isHidden = relsDiv.style.display === 'none';
+                relsDiv.style.display = isHidden ? 'block' : 'none';
+                icon.classList.toggle('expanded', isHidden);
+            }
+        }
+
+        function renderTreeView() {
+            const container = document.getElementById('treeView');
+            if (!container) return; // Safety check
+            
+            container.innerHTML = '';
+
+            const filters = getActiveFilters();
+
+            if (entities.unit.length === 0 && entities.team.length === 0 && entities.role.length === 0 && entities.person.length === 0 && entities.object.length === 0) {
+                container.innerHTML = '<div style="text-align: center; padding: 3rem; color: #8B6F47;">No entities created yet. Add entities to get started.</div>';
+                return;
+            }
+
+            // Render each unit (if unit filter is on)
+            if (filters.entities.unit) {
+                entities.unit.forEach(unit => {
+                    const unitEl = createTreeNodeDetailed(unit, filters);
+                    container.appendChild(unitEl);
+                });
+            }
+
+            // Show unassigned teams
+            const unassignedTeams = entities.team.filter(team => {
+                const isAssigned = relationships.some(r => 
+                    (r.subject === team.id || r.object === team.id) &&
+                    entities.unit.some(u => u.id === r.subject || u.id === r.object)
+                );
+                return !isAssigned;
+            });
+
+            if (unassignedTeams.length > 0 && filters.entities.team) {
+                const section = document.createElement('div');
+                section.style.marginTop = '2rem';
+                const header = document.createElement('div');
+                header.style.fontSize = '1.1rem';
+                header.style.color = '#8B6F47';
+                header.style.fontWeight = '600';
+                header.style.marginBottom = '1rem';
+                header.textContent = '📁 Unassigned Teams';
+                section.appendChild(header);
+
+                unassignedTeams.forEach(team => {
+                    const teamEl = createTreeNodeDetailed(team, filters);
+                    section.appendChild(teamEl);
+                });
+
+                container.appendChild(section);
+            }
+
+            // Show unassigned roles
+            const unassignedRoles = entities.role.filter(role => {
+                const isAssigned = relationships.some(r => 
+                    (r.subject === role.id || r.object === role.id) &&
+                    (entities.team.some(t => t.id === r.subject || t.id === r.object) ||
+                     entities.unit.some(u => u.id === r.subject || u.id === r.object))
+                );
+                return !isAssigned;
+            });
+
+            if (unassignedRoles.length > 0 && filters.entities.role) {
+                const section = document.createElement('div');
+                section.style.marginTop = '2rem';
+                const header = document.createElement('div');
+                header.style.fontSize = '1.1rem';
+                header.style.color = '#8B6F47';
+                header.style.fontWeight = '600';
+                header.style.marginBottom = '1rem';
+                header.textContent = '📁 Unassigned Roles';
+                section.appendChild(header);
+
+                unassignedRoles.forEach(role => {
+                    const roleEl = createTreeNodeDetailed(role, filters);
+                    section.appendChild(roleEl);
+                });
+
+                container.appendChild(section);
+            }
+
+            // Show all people
+            if (entities.person.length > 0 && filters.entities.person) {
+                const section = document.createElement('div');
+                section.style.marginTop = '2rem';
+                const header = document.createElement('div');
+                header.style.fontSize = '1.1rem';
+                header.style.color = '#8B6F47';
+                header.style.fontWeight = '600';
+                header.style.marginBottom = '1rem';
+                header.textContent = '👥 People';
+                section.appendChild(header);
+
+                entities.person.forEach(person => {
+                    const personEl = createTreeNodeDetailed(person, filters);
+                    section.appendChild(personEl);
+                });
+
+                container.appendChild(section);
+            }
+
+            // Show all objects
+            if (entities.object.length > 0 && filters.entities.object) {
+                const section = document.createElement('div');
+                section.style.marginTop = '2rem';
+                const header = document.createElement('div');
+                header.style.fontSize = '1.1rem';
+                header.style.color = '#8B6F47';
+                header.style.fontWeight = '600';
+                header.style.marginBottom = '1rem';
+                header.textContent = '📦 Objects';
+                section.appendChild(header);
+
+                entities.object.forEach(obj => {
+                    const objEl = createTreeNodeDetailed(obj, filters);
+                    section.appendChild(objEl);
+                });
+
+                container.appendChild(section);
+            }
+        }
+
+        function createTreeNodeDetailed(entity, filters) {
+            const container = document.createElement('div');
+            container.className = 'tree-node-container';
+
+            const node = document.createElement('div');
+            node.className = `tree-node-item ${entity.type}`;
+
+            const icon = getIcon(entity.type);
+            
+            // Get connected entities
+            const connectedTeams = entity.type === 'unit' ? getConnectedEntities(entity.id, 'team') : [];
+            const connectedRoles = (entity.type === 'team' || entity.type === 'unit') ? getConnectedEntities(entity.id, 'role') : [];
+            const hasChildren = (connectedTeams.length > 0 && filters.entities.team) || 
+                               (connectedRoles.length > 0 && filters.entities.role);
+
+            let expandIcon = '';
+            if (hasChildren) {
+                expandIcon = '<span class="tree-expand-icon expanded">▶</span>';
+            }
+
+            // Get people assigned to roles
+            let peopleHTML = '';
+            if (entity.type === 'role' && filters.entities.person) {
+                const assignedPeople = entities.person.filter(p => 
+                    relationships.some(r => 
+                        filters.relationships[r.predicate] &&
+                        ((r.subject === p.id && r.object === entity.id) ||
+                        (r.object === p.id && r.subject === entity.id))
+                    )
+                );
+
+                if (assignedPeople.length > 0) {
+                    peopleHTML = '<div class="tree-people-assigned">';
+                    assignedPeople.forEach(person => {
+                        peopleHTML += `<span class="tree-person-badge">👤 ${person.name}</span>`;
+                    });
+                    peopleHTML += '</div>';
+                }
+            }
+
+            // Get relationships for this entity (filtered)
+            const entityRels = relationships.filter(r => 
+                filters.relationships[r.predicate] &&
+                (r.subject === entity.id || r.object === entity.id)
+            );
+
+            let relsHTML = '';
+            if (entityRels.length > 0) {
+                const relId = 'rels-' + entity.id;
+                const operator = eoOperators[entityRels[0].predicate];
+                relsHTML = `
+                    <div class="tree-relationships-header" onclick="toggleRelationships('${relId}')">
+                        <span class="tree-expand-icon">▶</span>
+                        <span>${entityRels.length} connection${entityRels.length > 1 ? 's' : ''}</span>
+                    </div>
+                    <div id="${relId}" class="tree-relationships" style="display: none;">
+                `;
+                entityRels.forEach(rel => {
+                    const subj = findEntity(rel.subject);
+                    const obj = findEntity(rel.object);
+                    const op = eoOperators[rel.predicate];
+                    relsHTML += `
+                        <div class="tree-relationship-item" style="border-left-color: ${op.color}">
+                            <strong>${subj?.name || rel.subject}</strong> 
+                            <span style="color: ${op.color}; font-weight: 600;">${op.label}</span> 
+                            <strong>${obj?.name || rel.object}</strong>
+                        </div>
+                    `;
+                });
+                relsHTML += '</div>';
+            }
+
+            node.innerHTML = `
+                ${expandIcon}
+                <span style="font-size: 1.2rem;">${icon}</span>
+                <div class="tree-node-content">
+                    <div class="tree-node-name">${entity.name}</div>
+                    <div class="tree-node-meta">${entity.type}</div>
+                    ${peopleHTML}
+                </div>
+            `;
+
+            container.appendChild(node);
+            
+            if (relsHTML) {
+                const relsDiv = document.createElement('div');
+                relsDiv.innerHTML = relsHTML;
+                container.appendChild(relsDiv.firstChild);
+            }
+
+            // Add children
+            if (hasChildren) {
+                const childrenContainer = document.createElement('div');
+                childrenContainer.className = 'tree-children expanded';
+
+                if (entity.type === 'unit' && filters.entities.team) {
+                    connectedTeams.forEach(team => {
+                        const teamEl = createTreeNodeDetailed(team, filters);
+                        childrenContainer.appendChild(teamEl);
+                    });
+                }
+
+                if ((entity.type === 'team' || entity.type === 'unit') && filters.entities.role) {
+                    connectedRoles.forEach(role => {
+                        const roleEl = createTreeNodeDetailed(role, filters);
+                        childrenContainer.appendChild(roleEl);
+                    });
+                }
+
+                container.appendChild(childrenContainer);
+
+                // Add expand/collapse functionality
+                const expandBtn = node.querySelector('.tree-expand-icon');
+                if (expandBtn) {
+                    expandBtn.onclick = (e) => {
+                        e.stopPropagation();
+                        childrenContainer.classList.toggle('expanded');
+                        expandBtn.classList.toggle('expanded');
+                    };
+                }
+            }
+
+            return container;
+        }
+
+        // Graph visualization
+        const svg = d3.select('#graph');
+        const tooltip = d3.select('#tooltip');
+
+        function updateGraph() {
+            // Get dimensions
+            const container = document.getElementById('graph').parentElement;
+            if (!container) return;
+            
+            width = container.clientWidth;
+            height = container.clientHeight;
+
+            svg.attr('width', width).attr('height', height);
+
+            // Get active filters
+            const filters = getActiveFilters();
+
+            // Prepare data with filters applied
+            const nodes = [];
+            const types = ['unit', 'team', 'role', 'object']; // Exclude person from graph
+            types.forEach(type => {
+                if (filters.entities[type]) {
+                    entities[type].forEach(entity => {
+                        nodes.push({ ...entity });
+                    });
+                }
+            });
+
+            const links = relationships
+                .filter(rel => filters.relationships[rel.predicate])
+                .filter(rel => {
+                    // Only include links where both source and target are in filtered nodes
+                    const sourceNode = nodes.find(n => n.id === rel.subject);
+                    const targetNode = nodes.find(n => n.id === rel.object);
+                    return sourceNode && targetNode;
+                })
+                .map(rel => ({
+                    source: rel.subject,
+                    target: rel.object,
+                    predicate: rel.predicate,
+                    id: rel.id
+                }));
+
+            // Clear existing
+            svg.selectAll('*').remove();
+
+            // Define layers (no people in graph)
+            const layers = [
+                { type: 'unit', label: 'Units', y: 0.15, color: '#C88F4A', bgColor: '#FFF9F0' },
+                { type: 'team', label: 'Teams', y: 0.35, color: '#B87B5B', bgColor: '#FFF5EB' },
+                { type: 'role', label: 'Roles', y: 0.60, color: '#8B6F47', bgColor: '#FAF7F5' },
+                { type: 'object', label: 'Objects', y: 0.85, color: '#A89984', bgColor: '#FAFAF8' }
+            ];
+
+            // Create arrow markers for all EO operators
+            const defs = svg.append('defs');
+            
+            Object.keys(eoOperators).forEach(type => {
+                const opData = eoOperators[type];
+                defs.append('marker')
+                    .attr('id', `arrow-${type}`)
+                    .attr('viewBox', '0 -5 10 10')
+                    .attr('refX', 25)
+                    .attr('refY', 0)
+                    .attr('markerWidth', 6)
+                    .attr('markerHeight', 6)
+                    .attr('orient', 'auto')
+                    .append('path')
+                    .attr('d', 'M0,-5L10,0L0,5')
+                    .attr('fill', opData.color);
+            });
+
+            // Create container groups
+            const g = svg.append('g');
+
+            // Layer backgrounds removed for cleaner view
+            const layerHeight = height / layers.length;
+            
+            const linkGroup = g.append('g').attr('class', 'links');
+            const nodeGroup = g.append('g').attr('class', 'nodes');
+
+            // Create force simulation with very strong hierarchical layering
+            simulation = d3.forceSimulation(nodes)
+                .alphaDecay(0.01) // Slower decay for better settling
+                .velocityDecay(0.2) // Lower friction for smoother movement
+                .force('link', d3.forceLink(links).id(d => d.id).distance(d => {
+                    // Hierarchical links (DES) should be shorter
+                    return d.predicate === 'DES' ? 100 : 150;
+                }))
+                .force('charge', d3.forceManyBody().strength(-400))
+                .force('center', d3.forceCenter(width / 2, height / 2))
+                .force('collision', d3.forceCollide().radius(d => getNodeRadius(d.type) + 15))
+                .force('y', d3.forceY().y(d => {
+                    // Very strong Y positioning to lock entities in their layers
+                    if (d.type === 'unit') return layerHeight * 0.5;
+                    if (d.type === 'team') return layerHeight * 1.5;
+                    if (d.type === 'role') return layerHeight * 2.5;
+                    if (d.type === 'object') return layerHeight * 3.5;
+                    return height * 0.5;
+                }).strength(1.2)) // Very strong force to lock in layers
+                .force('x', d3.forceX().x(d => {
+                    // Spread entities horizontally within their layer
+                    const sameTypeNodes = nodes.filter(n => n.type === d.type);
+                    const index = sameTypeNodes.indexOf(d);
+                    const spacing = width / (sameTypeNodes.length + 1);
+                    return spacing * (index + 1);
+                }).strength(0.3));
+
+            // Create links with semantic styling
+            link = linkGroup.selectAll('line')
+                .data(links)
+                .enter().append('line')
+                .attr('stroke', d => getLinkColor(d.predicate))
+                .attr('stroke-width', d => {
+                    // Hierarchical and oversight get heavier lines
+                    const op = d.predicate;
+                    if (op === 'DES') return 3; // Hierarchical - bold
+                    if (op === 'SUP') return 3; // Oversight - bold
+                    if (op === 'NUL') return 3; // Removal - bold
+                    if (op === 'SYN' || op === 'REC') return 2.5; // Structural changes
+                    return 2; // Everything else
+                })
+                .attr('stroke-dasharray', d => {
+                    const op = d.predicate;
+                    if (op === 'SEG') return '8,4'; // Segmentation - dashed
+                    if (op === 'REC') return '6,3'; // Reconfiguration - dashed
+                    if (op === 'ALT') return '4,2'; // Alteration - dotted
+                    if (op === 'CON') return '1,0'; // Connection - solid
+                    return 'none'; // Solid by default
+                })
+                .attr('stroke-opacity', d => {
+                    const op = d.predicate;
+                    if (op === 'DES' || op === 'INS') return 0.8; // Strong structural
+                    if (op === 'NUL') return 0.6; // Removal
+                    return 0.7; // Everything else
+                })
+                .attr('marker-end', d => `url(#arrow-${d.predicate})`);
+
+            // Create nodes
+            node = nodeGroup.selectAll('g')
+                .data(nodes)
+                .enter().append('g')
+                .attr('class', 'node')
+                .call(d3.drag()
+                    .on('start', dragstarted)
+                    .on('drag', dragged)
+                    .on('end', dragended));
+
+            // Add node shapes
+            node.each(function(d) {
+                const g = d3.select(this);
+                const radius = getNodeRadius(d.type);
+                const color = getNodeColor(d.type);
+
+                if (d.type === 'role' || d.type === 'object') {
+                    g.append('rect')
+                        .attr('width', radius * 2)
+                        .attr('height', radius * 2)
+                        .attr('x', -radius)
+                        .attr('y', -radius)
+                        .attr('rx', 6)
+                        .attr('fill', color)
+                        .attr('stroke', '#fff')
+                        .attr('stroke-width', 2);
+                } else {
+                    g.append('circle')
+                        .attr('r', radius)
+                        .attr('fill', color)
+                        .attr('stroke', '#fff')
+                        .attr('stroke-width', 2);
+                }
+
+                // Add text
+                g.append('text')
+                    .text(d.type === 'person' ? getInitials(d.name) : getIcon(d.type))
+                    .attr('text-anchor', 'middle')
+                    .attr('dy', '.35em')
+                    .attr('fill', d.type === 'object' ? '#8B6F47' : 'white')
+                    .style('font-size', d.type === 'person' ? '12px' : '18px')
+                    .style('font-weight', 'bold')
+                    .style('pointer-events', 'none');
+
+                // Add label
+                g.append('text')
+                    .text(d.name)
+                    .attr('text-anchor', 'middle')
+                    .attr('dy', radius + 15)
+                    .attr('fill', '#3D2E1F')
+                    .style('font-size', '11px')
+                    .style('font-weight', '500')
+                    .style('pointer-events', 'none');
+            });
+
+            // Add interactions
+            node.on('click', function(event, d) {
+                event.stopPropagation();
+                openEntityModal(d.id, d.type);
+            })
+            .on('dblclick', function(event, d) {
+                event.stopPropagation();
+                focusNode(d);
+            })
+            .on('mouseover', function(event, d) {
+                showTooltip(event, d);
+            })
+            .on('mouseout', function() {
+                hideTooltip();
+            });
+
+            link.on('click', function(event, d) {
+                event.stopPropagation();
+                openRelationshipModal(d);
+            })
+            .on('mouseover', function(event, d) {
+                const subject = findEntity(d.source.id);
+                const object = findEntity(d.target.id);
+                tooltip.html(`
+                    <strong>${subject.name}</strong><br>
+                    ${d.predicate.toUpperCase()}<br>
+                    <strong>${object.name}</strong>
+                `);
+                tooltip.style('opacity', 1);
+            })
+            .on('mouseout', function() {
+                hideTooltip();
+            });
+
+            // Click background to unfocus
+            svg.on('click', function() {
+                unfocusAll();
+            });
+
+            // Add zoom
+            const zoom = d3.zoom()
+                .scaleExtent([0.3, 3])
+                .on('zoom', (event) => {
+                    g.attr('transform', event.transform);
+                });
+            
+            svg.call(zoom);
+
+            // Update positions on tick
+            simulation.on('tick', () => {
+                link
+                    .attr('x1', d => d.source.x)
+                    .attr('y1', d => d.source.y)
+                    .attr('x2', d => d.target.x)
+                    .attr('y2', d => d.target.y);
+
+                node.attr('transform', d => `translate(${d.x},${d.y})`);
+            });
+        }
+
+        function getNodeRadius(type) {
+            const sizes = {
+                unit: 30,
+                team: 25,
+                role: 20,
+                person: 22,
+                object: 18
+            };
+            return sizes[type] || 20;
+        }
+
+        function getNodeColor(type) {
+            const colors = {
+                unit: '#C88F4A',
+                team: '#B87B5B',
+                role: '#8B6F47',
+                person: '#6B5642',
+                object: '#F5E6D3'
+            };
+            return colors[type] || '#CCC';
+        }
+
+        function getLinkColor(predicate) {
+            return eoOperators[predicate]?.color || '#999';
+        }
+
+        function getIcon(type) {
+            const icons = {
+                unit: '<i class="ph ph-buildings"></i>',
+                team: '<i class="ph ph-users-three"></i>',
+                role: '<i class="ph ph-briefcase"></i>',
+                person: '<i class="ph ph-user"></i>',
+                object: '<i class="ph ph-package"></i>'
+            };
+            return icons[type] || '<i class="ph ph-question"></i>';
+        }
+
+        function getInitials(name) {
+            return name.split(' ').map(n => n[0]).join('').toUpperCase().slice(0, 2);
+        }
+
+        function focusNode(d) {
+            if (!d || !d.id) return; // Guard against undefined data
+            if (!node || !link) return; // Guard against undefined selections
+            if (!relationships) return; // Guard against undefined relationships
+            
+            focusedNode = d;
+            
+            // Get connected nodes
+            const connectedNodes = new Set([d.id]);
+            relationships.forEach(rel => {
+                if (rel && rel.subject === d.id) connectedNodes.add(rel.object);
+                if (rel && rel.object === d.id) connectedNodes.add(rel.subject);
+            });
+
+            // Dim everything except connected
+            node.style('opacity', n => connectedNodes.has(n.id) ? 1 : 0.2);
+            link.style('opacity', l => 
+                (l.source && l.target && (l.source.id === d.id || l.target.id === d.id)) ? 1 : 0.1
+            );
+        }
+
+        function unfocusAll() {
+            focusedNode = null;
+            if (node) node.style('opacity', 1);
+            if (link) link.style('opacity', 0.6);
+        }
+
+        function toggleNodeCollapse(d) {
+            // TODO: Implement collapse/expand logic
+            console.log('Toggle collapse for:', d.name);
+        }
+
+        function showTooltip(event, d) {
+            const connections = relationships.filter(r => 
+                r.subject === d.id || r.object === d.id
+            );
+            
+            tooltip.html(`
+                <strong>${d.name}</strong><br>
+                <em>${d.type}</em><br>
+                ${connections.length} connections
+            `);
+            tooltip.style('left', (event.pageX + 10) + 'px')
+                .style('top', (event.pageY - 10) + 'px')
+                .style('opacity', 1);
+        }
+
+        function hideTooltip() {
+            tooltip.style('opacity', 0);
+        }
+
+        function dragstarted(event, d) {
+            if (!simulation) return; // Guard against undefined simulation
+            if (!event.active) simulation.alphaTarget(0.05).restart(); // Reduced from 0.3 to 0.05
+            d.fx = d.x;
+            d.fy = d.y;
+            
+            // Store the original layer Y position
+            const layerHeight = height / 4;
+            if (d.type === 'unit') d.layerY = layerHeight * 0.5;
+            else if (d.type === 'team') d.layerY = layerHeight * 1.5;
+            else if (d.type === 'role') d.layerY = layerHeight * 2.5;
+            else if (d.type === 'object') d.layerY = layerHeight * 3.5;
+        }
+
+        function dragged(event, d) {
+            // Allow X movement but lock Y to layer
+            d.fx = event.x;
+            d.fy = d.layerY; // Lock to original layer
+        }
+
+        function dragended(event, d) {
+            if (!simulation) return; // Guard against undefined simulation
+            if (!event.active) simulation.alphaTarget(0);
+            d.fx = null;
+            d.fy = null; // Release but layer forces will keep it in place
+        }
+
+        function resetGraph() {
+            if (currentView === 'graph') {
+                unfocusAll();
+                if (simulation) {
+                    simulation.alpha(1).restart();
+                }
+            } else if (currentView === 'tree') {
+                renderTreeView();
+            }
+        }
+
+        function exportData() {
+            const workspaceName = document.getElementById('workspaceNameText').textContent;
+            const data = {
+                workspaceName,
+                entities,
+                relationships
+            };
+            const json = JSON.stringify(data, null, 2);
+            const blob = new Blob([json], { type: 'application/json' });
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = `${workspaceName.toLowerCase().replace(/\s+/g, '-')}-data.json`;
+            a.click();
+        }
+
+        function saveWorkspaceName() {
+            const nameText = document.getElementById('workspaceNameText').textContent.trim();
+            if (nameText) {
+                localStorage.setItem('workspaceName', nameText);
+            }
+        }
+
+        let hasSampleData = false;
+
+        function toggleSampleData() {
+            if (hasSampleData) {
+                // Clear sample data
+                if (!confirm('Remove all sample data? This cannot be undone.')) return;
+                
+                entities.unit = [];
+                entities.team = [];
+                entities.role = [];
+                entities.person = [];
+                entities.object = [];
+                relationships = [];
+                
+                hasSampleData = false;
+                document.getElementById('sampleDataText').textContent = 'Load Sample Data';
+                document.getElementById('sampleDataBtn').innerHTML = '<i class="ph ph-database"></i> <span id="sampleDataText">Load Sample Data</span>';
+            } else {
+                // Load sample data
+                initSampleData();
+                hasSampleData = true;
+                document.getElementById('sampleDataText').textContent = 'Clear Sample Data';
+                document.getElementById('sampleDataBtn').innerHTML = '<i class="ph ph-database"></i> <span id="sampleDataText">Clear Sample Data</span>';
+            }
+            
+            saveToLocalStorage();
+            renderEntityList();
+            updateSelects();
+            updateParentOptions();
+            renderActivityList();
+            
+            if (currentView === 'graph') {
+                updateGraph();
+            } else if (currentView === 'tree') {
+                renderTreeView();
+            } else if (currentView === 'card') {
+                renderCardView();
+            }
+        }
+
+        function clearAllData() {
+            if (!confirm('Clear ALL data including your custom entities? This cannot be undone.')) return;
+            
+            entities.unit = [];
+            entities.team = [];
+            entities.role = [];
+            entities.person = [];
+            entities.object = [];
+            relationships = [];
+            hasSampleData = false;
+            
+            document.getElementById('sampleDataText').textContent = 'Load Sample Data';
+            document.getElementById('sampleDataBtn').innerHTML = '<i class="ph ph-database"></i> <span id="sampleDataText">Load Sample Data</span>';
+            
+            saveToLocalStorage();
+            renderEntityList();
+            updateSelects();
+            updateParentOptions();
+            renderActivityList();
+            
+            if (currentView === 'graph') {
+                updateGraph();
+            } else if (currentView === 'tree') {
+                renderTreeView();
+            } else if (currentView === 'card') {
+                renderCardView();
+            }
+        }
+
+        function saveToLocalStorage() {
+            try {
+                const data = {
+                    entities,
+                    relationships,
+                    hasSampleData,
+                    workspaceName: document.getElementById('workspaceNameText').textContent
+                };
+                localStorage.setItem('holonicOrgData', JSON.stringify(data));
+            } catch (e) {
+                console.error('Failed to save to localStorage:', e);
+            }
+        }
+
+        function loadFromLocalStorage() {
+            try {
+                const saved = localStorage.getItem('holonicOrgData');
+                console.log('🔍 Checking localStorage...', saved ? 'Found data' : 'No data');
+                
+                if (saved) {
+                    const data = JSON.parse(saved);
+                    console.log('📦 Loaded data:', data);
+                    
+                    if (data.entities) {
+                        entities.unit = data.entities.unit || [];
+                        entities.team = data.entities.team || [];
+                        entities.role = data.entities.role || [];
+                        entities.person = data.entities.person || [];
+                        entities.object = data.entities.object || [];
+                    }
+                    if (data.relationships) {
+                        relationships = data.relationships;
+                    }
+                    if (data.workspaceName) {
+                        const nameEl = document.getElementById('workspaceNameText');
+                        if (nameEl) {
+                            nameEl.textContent = data.workspaceName;
+                        }
+                    }
+                    hasSampleData = data.hasSampleData || false;
+                    
+                    const btnText = document.getElementById('sampleDataText');
+                    if (btnText) {
+                        if (hasSampleData) {
+                            btnText.textContent = 'Clear Sample Data';
+                        } else {
+                            btnText.textContent = 'Load Sample Data';
+                        }
+                    }
+                    
+                    return true;
+                }
+            } catch (e) {
+                console.error('❌ Failed to load from localStorage:', e);
+            }
+            return false;
+        }
+
+        // Handle window resize
+        window.addEventListener('resize', () => {
+            if (currentView === 'graph') {
+                updateGraph();
+            }
+        });
+
+        // Initialize when page loads
+        window.addEventListener('DOMContentLoaded', () => {
+            console.log('🔧 Initializing Holonic Knowledge Graph...');
+            
+            // Close modal on outside click
+            document.getElementById('entityModal').addEventListener('click', (e) => {
+                if (e.target.id === 'entityModal') {
+                    closeEntityModal();
+                }
+            });
+
+            // Try to load from localStorage first
+            const hasStoredData = loadFromLocalStorage();
+            console.log('📦 Has stored data:', hasStoredData);
+            
+            // If no stored data, load sample data
+            if (!hasStoredData) {
+                console.log('📝 Loading sample data...');
+                initSampleData();
+                hasSampleData = true;
+                const btnText = document.getElementById('sampleDataText');
+                if (btnText) {
+                    btnText.textContent = 'Clear Sample Data';
+                }
+                console.log('✅ Sample data loaded. Entities:', {
+                    units: entities.unit.length,
+                    teams: entities.team.length,
+                    roles: entities.role.length,
+                    people: entities.person.length,
+                    objects: entities.object.length
+                });
+                console.log('✅ Relationships:', relationships.length);
+            } else {
+                console.log('✅ Loaded data from localStorage');
+            }
+            
+            renderEntityList();
+            updateSelects();
+            updateParentOptions();
+            renderActivityList();
+            updateFilterStatus();
+            
+            // Character counter for description
+            const descriptionField = document.getElementById('activityDescription');
+            const charCount = document.getElementById('charCount');
+            if (descriptionField && charCount) {
+                descriptionField.addEventListener('input', () => {
+                    charCount.textContent = descriptionField.value.length;
+                });
+            }
+            
+            // Show card view by default
+            switchView('card');
+            
+            console.log('🎉 Initialization complete!');
+        });
+    </script>
+</body>
+</html>
