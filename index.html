@@ -3516,11 +3516,11 @@
             try {
                 const saved = localStorage.getItem('holonicOrgData');
                 console.log('🔍 Checking localStorage...', saved ? 'Found data' : 'No data');
-                
+
                 if (saved) {
                     const data = JSON.parse(saved);
                     console.log('📦 Loaded data:', data);
-                    
+
                     if (data.entities) {
                         entities.unit = data.entities.unit || [];
                         entities.team = data.entities.team || [];
@@ -3538,7 +3538,7 @@
                         }
                     }
                     hasSampleData = data.hasSampleData || false;
-                    
+
                     const btnText = document.getElementById('sampleDataText');
                     if (btnText) {
                         if (hasSampleData) {
@@ -3547,8 +3547,17 @@
                             btnText.textContent = 'Load Sample Data';
                         }
                     }
-                    
-                    return true;
+
+                    // Check if there's actually meaningful data to display
+                    // If all arrays are empty, return false so sample data gets loaded
+                    const totalEntities = entities.unit.length + entities.team.length +
+                                         entities.role.length + entities.person.length +
+                                         entities.object.length;
+                    const hasActualData = totalEntities > 0 || relationships.length > 0;
+
+                    console.log('📊 Data check - Total entities:', totalEntities, 'Relationships:', relationships.length, 'Has actual data:', hasActualData);
+
+                    return hasActualData;
                 }
             } catch (e) {
                 console.error('❌ Failed to load from localStorage:', e);
