@@ -894,6 +894,11 @@
             background: #F0F4F7;
             color: #7B95A3;
         }
+
+        @keyframes spin {
+            from { transform: rotate(0deg); }
+            to { transform: rotate(360deg); }
+        }
     </style>
 </head>
 <body>
@@ -903,6 +908,9 @@
             <span id="workspaceNameText" contenteditable="true" style="cursor: text; outline: none; display: inline-block;" onblur="saveWorkspaceName()">My Organization</span>
         </h1>
         <div class="header-controls">
+            <div id="loadingStatus" style="color: rgba(255,255,255,0.9); font-size: 0.875rem; margin-right: 0.5rem; padding: 0.25rem 0.5rem; background: rgba(0,0,0,0.2); border-radius: 4px;">
+                <i class="ph ph-spinner" style="animation: spin 1s linear infinite;"></i> Loading...
+            </div>
             <div id="filterStatus" style="color: rgba(255,255,255,0.9); font-size: 0.875rem; margin-right: 0.5rem;"></div>
             <div class="view-toggle">
                 <button class="view-toggle-btn" data-view="tree" onclick="switchView('tree')">
@@ -1279,10 +1287,10 @@
         let focusedNode = null;
         let currentView = 'card';
 
-        // Graph variables
+        // Graph visualization variables
         let width = 800;
         let height = 600;
-        let simulation, link, node, linkText;
+        let graphSimulation, graphLink, graphNode, graphLinkText;
 
         // View switching
         function switchView(view) {
@@ -3105,7 +3113,7 @@
             const nodeGroup = g.append('g').attr('class', 'nodes');
 
             // Create force simulation with very strong hierarchical layering
-            simulation = d3.forceSimulation(nodes)
+            graphSimulation = d3.forceSimulation(nodes)
                 .alphaDecay(0.01) // Slower decay for better settling
                 .velocityDecay(0.2) // Lower friction for smoother movement
                 .force('link', d3.forceLink(links).id(d => d.id).distance(d => {
@@ -3132,7 +3140,7 @@
                 }).strength(0.3));
 
             // Create links with semantic styling
-            link = linkGroup.selectAll('line')
+            graphLink = linkGroup.selectAll('line')
                 .data(links)
                 .enter().append('line')
                 .attr('stroke', d => getLinkColor(d.predicate))
@@ -3162,7 +3170,7 @@
                 .attr('marker-end', d => `url(#arrow-${d.predicate})`);
 
             // Create nodes
-            node = nodeGroup.selectAll('g')
+            graphNode = nodeGroup.selectAll('g')
                 .data(nodes)
                 .enter().append('g')
                 .attr('class', 'node')
@@ -3217,7 +3225,7 @@
             });
 
             // Add interactions
-            node.on('click', function(event, d) {
+            graphNode.on('click', function(event, d) {
                 event.stopPropagation();
                 openEntityModal(d.id, d.type);
             })
@@ -3232,7 +3240,7 @@
                 hideTooltip();
             });
 
-            link.on('click', function(event, d) {
+            graphLink.on('click', function(event, d) {
                 event.stopPropagation();
                 openRelationshipModal(d);
             })
@@ -3265,14 +3273,14 @@
             svg.call(zoom);
 
             // Update positions on tick
-            simulation.on('tick', () => {
-                link
+            graphSimulation.on('tick', () => {
+                graphLink
                     .attr('x1', d => d.source.x)
                     .attr('y1', d => d.source.y)
                     .attr('x2', d => d.target.x)
                     .attr('y2', d => d.target.y);
 
-                node.attr('transform', d => `translate(${d.x},${d.y})`);
+                graphNode.attr('transform', d => `translate(${d.x},${d.y})`);
             });
         }
 
@@ -3319,7 +3327,7 @@
 
         function focusNode(d) {
             if (!d || !d.id) return; // Guard against undefined data
-            if (!node || !link) return; // Guard against undefined selections
+            if (!graphNode || !graphLink) return; // Guard against undefined selections
             if (!relationships) return; // Guard against undefined relationships
             
             focusedNode = d;
@@ -3332,16 +3340,16 @@
             });
 
             // Dim everything except connected
-            node.style('opacity', n => connectedNodes.has(n.id) ? 1 : 0.2);
-            link.style('opacity', l => 
+            graphNode.style('opacity', n => connectedNodes.has(n.id) ? 1 : 0.2);
+            graphLink.style('opacity', l => 
                 (l.source && l.target && (l.source.id === d.id || l.target.id === d.id)) ? 1 : 0.1
             );
         }
 
         function unfocusAll() {
             focusedNode = null;
-            if (node) node.style('opacity', 1);
-            if (link) link.style('opacity', 0.6);
+            if (graphNode) graphNode.style('opacity', 1);
+            if (graphLink) graphLink.style('opacity', 0.6);
         }
 
         function toggleNodeCollapse(d) {
@@ -3369,8 +3377,8 @@
         }
 
         function dragstarted(event, d) {
-            if (!simulation) return; // Guard against undefined simulation
-            if (!event.active) simulation.alphaTarget(0.05).restart(); // Reduced from 0.3 to 0.05
+            if (!graphSimulation) return; // Guard against undefined simulation
+            if (!event.active) graphSimulation.alphaTarget(0.05).restart(); // Reduced from 0.3 to 0.05
             d.fx = d.x;
             d.fy = d.y;
             
@@ -3389,8 +3397,8 @@
         }
 
         function dragended(event, d) {
-            if (!simulation) return; // Guard against undefined simulation
-            if (!event.active) simulation.alphaTarget(0);
+            if (!graphSimulation) return; // Guard against undefined simulation
+            if (!event.active) graphSimulation.alphaTarget(0);
             d.fx = null;
             d.fy = null; // Release but layer forces will keep it in place
         }
@@ -3398,8 +3406,8 @@
         function resetGraph() {
             if (currentView === 'graph') {
                 unfocusAll();
-                if (simulation) {
-                    simulation.alpha(1).restart();
+                if (graphSimulation) {
+                    graphSimulation.alpha(1).restart();
                 }
             } else if (currentView === 'tree') {
                 renderTreeView();
@@ -3447,14 +3455,7 @@
                 document.getElementById('sampleDataText').textContent = 'Load Sample Data';
                 document.getElementById('sampleDataBtn').innerHTML = '<i class="ph ph-database"></i> <span id="sampleDataText">Load Sample Data</span>';
             } else {
-                // Clear existing data first, then load sample data
-                entities.unit = [];
-                entities.team = [];
-                entities.role = [];
-                entities.person = [];
-                entities.object = [];
-                relationships = [];
-
+                // Load sample data
                 initSampleData();
                 hasSampleData = true;
                 document.getElementById('sampleDataText').textContent = 'Clear Sample Data';
@@ -3523,11 +3524,11 @@
             try {
                 const saved = localStorage.getItem('holonicOrgData');
                 console.log('🔍 Checking localStorage...', saved ? 'Found data' : 'No data');
-
+                
                 if (saved) {
                     const data = JSON.parse(saved);
                     console.log('📦 Loaded data:', data);
-
+                    
                     if (data.entities) {
                         entities.unit = data.entities.unit || [];
                         entities.team = data.entities.team || [];
@@ -3545,7 +3546,7 @@
                         }
                     }
                     hasSampleData = data.hasSampleData || false;
-
+                    
                     const btnText = document.getElementById('sampleDataText');
                     if (btnText) {
                         if (hasSampleData) {
@@ -3554,22 +3555,11 @@
                             btnText.textContent = 'Load Sample Data';
                         }
                     }
-
-                    // Check if there's actually meaningful data to display
-                    // If all arrays are empty, return false so sample data gets loaded
-                    const totalEntities = entities.unit.length + entities.team.length +
-                                         entities.role.length + entities.person.length +
-                                         entities.object.length;
-                    const hasActualData = totalEntities > 0 || relationships.length > 0;
-
-                    console.log('📊 Data check - Total entities:', totalEntities, 'Relationships:', relationships.length, 'Has actual data:', hasActualData);
-
-                    return hasActualData;
+                    
+                    return true;
                 }
             } catch (e) {
                 console.error('❌ Failed to load from localStorage:', e);
-                // Clear corrupted data so sample data can load fresh
-                localStorage.removeItem('holonicOrgData');
             }
             return false;
         }
@@ -3583,7 +3573,29 @@
 
         // Initialize when page loads
         window.addEventListener('DOMContentLoaded', () => {
+            const loadingStatus = document.getElementById('loadingStatus');
+            
+            function updateStatus(message, success = true) {
+                if (loadingStatus) {
+                    loadingStatus.innerHTML = success 
+                        ? `<i class="ph ph-check-circle"></i> ${message}`
+                        : `<i class="ph ph-warning-circle"></i> ${message}`;
+                    loadingStatus.style.background = success ? 'rgba(76, 175, 80, 0.3)' : 'rgba(244, 67, 54, 0.3)';
+                }
+                console.log(success ? '✅' : '❌', message);
+            }
+            
             console.log('🔧 Initializing Holonic Knowledge Graph...');
+            console.log('📍 Loading from:', window.location.protocol);
+            console.log('🌐 D3.js loaded:', typeof d3 !== 'undefined');
+            
+            // Check if essential libraries loaded
+            if (typeof d3 === 'undefined') {
+                updateStatus('D3.js failed to load - Internet required', false);
+                alert('⚠️ D3.js failed to load from CDN. Graph view will not work.\n\nPlease ensure you have an internet connection.');
+            } else {
+                updateStatus('Libraries loaded');
+            }
             
             // Close modal on outside click
             document.getElementById('entityModal').addEventListener('click', (e) => {
@@ -3593,45 +3605,65 @@
             });
 
             // Try to load from localStorage first
-            const hasStoredData = loadFromLocalStorage();
-            console.log('📦 Has stored data:', hasStoredData);
+            updateStatus('Checking saved data...');
+            let hasStoredData = false;
+            try {
+                hasStoredData = loadFromLocalStorage();
+                console.log('📦 Has stored data:', hasStoredData);
+            } catch (e) {
+                console.error('❌ localStorage error:', e);
+                if (window.location.protocol === 'file:') {
+                    updateStatus('localStorage restricted (file:// URL)', false);
+                    console.warn('⚠️ Note: Some browsers restrict localStorage for file:// URLs');
+                }
+            }
             
             // If no stored data, load sample data
             if (!hasStoredData) {
+                updateStatus('Loading sample data...');
                 console.log('📝 Loading sample data...');
-                // Ensure arrays are empty before loading sample data
-                entities.unit = [];
-                entities.team = [];
-                entities.role = [];
-                entities.person = [];
-                entities.object = [];
-                relationships = [];
-
-                initSampleData();
-                hasSampleData = true;
-                const btnText = document.getElementById('sampleDataText');
-                if (btnText) {
-                    btnText.textContent = 'Clear Sample Data';
+                try {
+                    initSampleData();
+                    hasSampleData = true;
+                    const btnText = document.getElementById('sampleDataText');
+                    if (btnText) {
+                        btnText.textContent = 'Clear Sample Data';
+                    }
+                    console.log('✅ Sample data loaded. Entities:', {
+                        units: entities.unit.length,
+                        teams: entities.team.length,
+                        roles: entities.role.length,
+                        people: entities.person.length,
+                        objects: entities.object.length
+                    });
+                    console.log('✅ Relationships:', relationships.length);
+                    updateStatus('Sample data loaded');
+                } catch (e) {
+                    console.error('❌ Error loading sample data:', e);
+                    updateStatus('Error loading sample data', false);
+                    alert('Error loading sample data. Check console for details.');
                 }
-                // Save sample data to localStorage so it persists
-                saveToLocalStorage();
-                console.log('✅ Sample data loaded and saved. Entities:', {
-                    units: entities.unit.length,
-                    teams: entities.team.length,
-                    roles: entities.role.length,
-                    people: entities.person.length,
-                    objects: entities.object.length
-                });
-                console.log('✅ Relationships:', relationships.length);
             } else {
+                updateStatus('Loaded from storage');
                 console.log('✅ Loaded data from localStorage');
             }
             
-            renderEntityList();
-            updateSelects();
-            updateParentOptions();
-            renderActivityList();
-            updateFilterStatus();
+            // Render everything
+            try {
+                updateStatus('Rendering interface...');
+                console.log('🎨 Rendering UI...');
+                renderEntityList();
+                updateSelects();
+                updateParentOptions();
+                renderActivityList();
+                updateFilterStatus();
+                console.log('✅ UI rendered');
+                updateStatus('Ready');
+            } catch (e) {
+                console.error('❌ Error rendering UI:', e);
+                updateStatus('Error rendering UI', false);
+                alert('Error rendering interface. Check console for details.');
+            }
             
             // Character counter for description
             const descriptionField = document.getElementById('activityDescription');
@@ -3643,9 +3675,33 @@
             }
             
             // Show card view by default
-            switchView('card');
+            try {
+                switchView('card');
+                console.log('✅ Card view activated');
+            } catch (e) {
+                console.error('❌ Error switching to card view:', e);
+                updateStatus('Error loading view', false);
+            }
             
             console.log('🎉 Initialization complete!');
+            console.log('📊 Current state:', {
+                entities: {
+                    units: entities.unit.length,
+                    teams: entities.team.length,
+                    roles: entities.role.length,
+                    people: entities.person.length,
+                    objects: entities.object.length
+                },
+                relationships: relationships.length,
+                hasSampleData: hasSampleData
+            });
+            
+            // Hide loading status after 3 seconds if successful
+            setTimeout(() => {
+                if (loadingStatus && loadingStatus.textContent.includes('Ready')) {
+                    loadingStatus.style.display = 'none';
+                }
+            }, 3000);
         });
     </script>
 </body>
