@@ -3447,7 +3447,14 @@
                 document.getElementById('sampleDataText').textContent = 'Load Sample Data';
                 document.getElementById('sampleDataBtn').innerHTML = '<i class="ph ph-database"></i> <span id="sampleDataText">Load Sample Data</span>';
             } else {
-                // Load sample data
+                // Clear existing data first, then load sample data
+                entities.unit = [];
+                entities.team = [];
+                entities.role = [];
+                entities.person = [];
+                entities.object = [];
+                relationships = [];
+
                 initSampleData();
                 hasSampleData = true;
                 document.getElementById('sampleDataText').textContent = 'Clear Sample Data';
@@ -3561,6 +3568,8 @@
                 }
             } catch (e) {
                 console.error('❌ Failed to load from localStorage:', e);
+                // Clear corrupted data so sample data can load fresh
+                localStorage.removeItem('holonicOrgData');
             }
             return false;
         }
@@ -3590,13 +3599,23 @@
             // If no stored data, load sample data
             if (!hasStoredData) {
                 console.log('📝 Loading sample data...');
+                // Ensure arrays are empty before loading sample data
+                entities.unit = [];
+                entities.team = [];
+                entities.role = [];
+                entities.person = [];
+                entities.object = [];
+                relationships = [];
+
                 initSampleData();
                 hasSampleData = true;
                 const btnText = document.getElementById('sampleDataText');
                 if (btnText) {
                     btnText.textContent = 'Clear Sample Data';
                 }
-                console.log('✅ Sample data loaded. Entities:', {
+                // Save sample data to localStorage so it persists
+                saveToLocalStorage();
+                console.log('✅ Sample data loaded and saved. Entities:', {
                     units: entities.unit.length,
                     teams: entities.team.length,
                     roles: entities.role.length,
