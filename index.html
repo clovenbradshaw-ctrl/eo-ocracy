@@ -1998,7 +1998,7 @@
 
                 console.log('📝 Logging activity to Xano:', payload);
 
-                const response = await fetch(`${XANO_BASE_URL}/activity_stores`, {
+                const response = await fetch(`${XANO_BASE_URL}/activity_store`, {
                     method: 'POST',
                     headers: {
                         'Content-Type': 'application/json'
@@ -2022,7 +2022,7 @@
 
         async function getActivitiesFromXano() {
             try {
-                const response = await fetch(`${XANO_BASE_URL}/activity_stores`);
+                const response = await fetch(`${XANO_BASE_URL}/activity_store`);
 
                 if (!response.ok) {
                     console.error('Failed to fetch activities:', response.statusText);
@@ -2086,7 +2086,7 @@
 
                 console.log('📝 Updating activity in Xano:', activityId, payload);
 
-                const response = await fetch(`${XANO_BASE_URL}/activity_stores/${activityId}`, {
+                const response = await fetch(`${XANO_BASE_URL}/activity_store/${activityId}`, {
                     method: 'PUT',
                     headers: {
                         'Content-Type': 'application/json'
