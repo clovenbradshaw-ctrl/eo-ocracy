@@ -2383,10 +2383,9 @@
         }
 
         .orbital-node-label {
-            font-size: 10px;
+            font-size: 11px;
             font-weight: 500;
             fill: #3D2E1F;
-            text-anchor: middle;
             pointer-events: none;
         }
 
@@ -4981,13 +4980,59 @@ John Doe,Engineering,john@example.com"
                     .attr('fill', 'white')
                     .text(getIconChar(conn.type));
 
-                // Label
-                const labelY = 38;
-                const labelText = conn.name.length > 15 ? conn.name.substring(0, 12) + '...' : conn.name;
+                // Label - position radially based on angle
+                const labelRadius = 40; // Distance from node center
+
+                // Normalize angle to 0-2π range
+                const normalizedAngle = ((angle % (2 * Math.PI)) + 2 * Math.PI) % (2 * Math.PI);
+
+                // Determine label position based on quadrant
+                // Right side: 315° to 45° (labels go right)
+                // Left side: 135° to 225° (labels go left)
+                // Top: 45° to 135° (labels go up)
+                // Bottom: 225° to 315° (labels go down)
+
+                const isRight = normalizedAngle < Math.PI / 4 || normalizedAngle > 7 * Math.PI / 4;
+                const isLeft = normalizedAngle > 3 * Math.PI / 4 && normalizedAngle < 5 * Math.PI / 4;
+                const isTop = normalizedAngle >= Math.PI / 4 && normalizedAngle <= 3 * Math.PI / 4;
+                const isBottom = normalizedAngle >= 5 * Math.PI / 4 && normalizedAngle <= 7 * Math.PI / 4;
+
+                let labelX = 0;
+                let labelY = 0;
+                let textAnchor = 'middle';
+
+                if (isRight) {
+                    labelX = labelRadius;
+                    labelY = 4;
+                    textAnchor = 'start';
+                } else if (isLeft) {
+                    labelX = -labelRadius;
+                    labelY = 4;
+                    textAnchor = 'end';
+                } else if (isTop) {
+                    labelX = 0;
+                    labelY = -labelRadius + 4;
+                    textAnchor = 'middle';
+                } else if (isBottom) {
+                    labelX = 0;
+                    labelY = labelRadius + 4;
+                    textAnchor = 'middle';
+                } else {
+                    // Diagonal positions - push outward at angle
+                    labelX = Math.cos(angle) * labelRadius;
+                    labelY = Math.sin(angle) * labelRadius + 4;
+                    textAnchor = Math.cos(angle) > 0 ? 'start' : 'end';
+                }
+
+                // Smarter truncation - longer limit for side labels
+                const maxChars = (isRight || isLeft) ? 18 : 14;
+                const labelText = conn.name.length > maxChars ? conn.name.substring(0, maxChars - 2) + '…' : conn.name;
 
                 nodeGroup.append('text')
                     .attr('class', 'orbital-node-label')
+                    .attr('x', labelX)
                     .attr('y', labelY)
+                    .attr('text-anchor', textAnchor)
                     .text(labelText);
 
                 // Nested count badge
