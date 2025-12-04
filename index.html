@@ -933,6 +933,79 @@
             border: 1px solid #E5DDD1;
         }
 
+        /* Drag and drop styles for role tagging */
+        .entity-card.person[draggable="true"] {
+            cursor: grab;
+        }
+
+        .entity-card.person[draggable="true"]:active {
+            cursor: grabbing;
+        }
+
+        .entity-card.dragging {
+            opacity: 0.5;
+            transform: scale(0.98);
+            border-color: #C88F4A;
+            box-shadow: 0 4px 12px rgba(200, 143, 74, 0.3);
+        }
+
+        .entity-card.role.drop-target {
+            border: 2px dashed #8B6F47;
+            background: linear-gradient(135deg, #F0EDE8 0%, #E5DDD1 100%);
+        }
+
+        .entity-card.role.drag-over {
+            border: 2px solid #8B6F47;
+            background: linear-gradient(135deg, #E5DDD1 0%, #D4C9B8 100%);
+            box-shadow: 0 4px 16px rgba(139, 111, 71, 0.3);
+            transform: scale(1.02);
+        }
+
+        /* Role tags on person cards */
+        .role-tags {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 0.375rem;
+            margin-top: 0.5rem;
+        }
+
+        .role-tag {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.25rem;
+            font-size: 0.7rem;
+            padding: 0.25rem 0.5rem;
+            background: linear-gradient(135deg, #8B6F47 0%, #6B5642 100%);
+            color: white;
+            border-radius: 12px;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .role-tag:hover {
+            background: linear-gradient(135deg, #6B5642 0%, #4A3C2A 100%);
+            transform: scale(1.05);
+        }
+
+        .role-tag .remove-tag {
+            font-size: 0.85rem;
+            opacity: 0.7;
+            margin-left: 0.125rem;
+        }
+
+        .role-tag .remove-tag:hover {
+            opacity: 1;
+        }
+
+        .drag-hint {
+            font-size: 0.7rem;
+            color: #A89984;
+            font-style: italic;
+            margin-top: auto;
+            padding-top: 0.5rem;
+        }
+
         .sentence-preview {
             padding: 1rem;
             background: #FAF7F5;
@@ -6250,6 +6323,162 @@ John Doe,Engineering,john@example.com"
             return null;
         }
 
+        // Drag and Drop for Role Tagging
+        let draggedPersonId = null;
+
+        function handlePersonDragStart(e, personId) {
+            draggedPersonId = personId;
+            e.target.classList.add('dragging');
+            e.dataTransfer.effectAllowed = 'link';
+            e.dataTransfer.setData('text/plain', personId);
+
+            // Highlight all role cards as potential drop targets
+            document.querySelectorAll('.entity-card.role').forEach(card => {
+                card.classList.add('drop-target');
+            });
+        }
+
+        function handlePersonDragEnd(e) {
+            draggedPersonId = null;
+            e.target.classList.remove('dragging');
+
+            // Remove drop target highlighting from all role cards
+            document.querySelectorAll('.entity-card.role').forEach(card => {
+                card.classList.remove('drop-target', 'drag-over');
+            });
+        }
+
+        function handleRoleDragOver(e) {
+            if (!draggedPersonId) return;
+            e.preventDefault();
+            e.dataTransfer.dropEffect = 'link';
+        }
+
+        function handleRoleDragEnter(e) {
+            if (!draggedPersonId) return;
+            e.target.closest('.entity-card.role')?.classList.add('drag-over');
+        }
+
+        function handleRoleDragLeave(e) {
+            const card = e.target.closest('.entity-card.role');
+            if (card && !card.contains(e.relatedTarget)) {
+                card.classList.remove('drag-over');
+            }
+        }
+
+        function handleRoleDrop(e, roleId) {
+            e.preventDefault();
+            if (!draggedPersonId) return;
+
+            const personId = draggedPersonId;
+            const person = findEntity(personId);
+            const role = findEntity(roleId);
+
+            if (!person || !role) {
+                console.error('Could not find person or role for drop');
+                return;
+            }
+
+            // Check if this relationship already exists
+            const existingRelationship = relationships.find(r =>
+                r.subject === personId &&
+                r.object === roleId &&
+                r.predicate === 'INS'
+            );
+
+            if (existingRelationship) {
+                // Already tagged to this role
+                return;
+            }
+
+            // Create the INS (Start) relationship - person starts/joins role
+            const relId = 'rel' + Date.now();
+            const relationship = {
+                id: relId,
+                subject: personId,
+                predicate: 'INS',
+                object: roleId,
+                description: ''
+            };
+
+            relationships.push(relationship);
+
+            // Log to Xano
+            const operatorData = eoOperators['INS'];
+            logActivityToXano({
+                event_verb: `${operatorData.label} Connection (Drag & Drop)`,
+                eo_operator: 'INS',
+                object_type: 'relationship',
+                object_id: relId,
+                object_label: `${person.name} ${operatorData.label} ${role.name}`,
+                data_json: {
+                    subject_id: personId,
+                    subject_type: 'person',
+                    subject_name: person.name,
+                    predicate: 'INS',
+                    predicate_label: operatorData.label,
+                    object_id: roleId,
+                    object_type: 'role',
+                    object_name: role.name
+                }
+            });
+
+            // Save and refresh views
+            saveToLocalStorage();
+            renderCardView();
+            renderActivityList();
+
+            if (currentView === 'graph') {
+                updateGraph();
+            } else if (currentView === 'tree') {
+                renderTreeView();
+            }
+        }
+
+        function removeRoleTag(e, relationshipId) {
+            e.stopPropagation(); // Don't open the person modal
+
+            const rel = relationships.find(r => r.id === relationshipId);
+            if (!rel) return;
+
+            // Remove the relationship
+            relationships = relationships.filter(r => r.id !== relationshipId);
+
+            // Log removal to Xano
+            logActivityToXano({
+                event_verb: 'Remove Role Tag',
+                eo_operator: 'NUL',
+                object_type: 'relationship',
+                object_id: relationshipId,
+                object_label: `Removed role assignment`,
+                data_json: {
+                    removed_relationship: rel
+                }
+            });
+
+            // Save and refresh views
+            saveToLocalStorage();
+            renderCardView();
+            renderActivityList();
+
+            if (currentView === 'graph') {
+                updateGraph();
+            } else if (currentView === 'tree') {
+                renderTreeView();
+            }
+        }
+
+        // Get role tags for a person (INS relationships where person is the subject)
+        function getPersonRoleTags(personId) {
+            return relationships
+                .filter(r => r.subject === personId && r.predicate === 'INS' && findEntity(r.object)?.type === 'role')
+                .map(r => ({
+                    relationshipId: r.id,
+                    role: findEntity(r.object)
+                }))
+                .filter(t => t.role); // Filter out any with missing roles
+        }
+
         // Card View Rendering
         function renderCardView() {
             const container = document.getElementById('cardView');
@@ -6290,29 +6519,51 @@ John Doe,Engineering,john@example.com"
             }
         }
 
-        function createCardRow(title, entities, icon) {
+        function createCardRow(title, entitiesList, icon) {
             const row = document.createElement('div');
             row.className = 'card-row';
 
             const header = document.createElement('div');
             header.className = 'card-row-header';
             header.innerHTML = `
-                <div class="card-row-title">${icon} ${title} (${entities.length})</div>
+                <div class="card-row-title">${icon} ${title} (${entitiesList.length})</div>
             `;
             row.appendChild(header);
 
             const grid = document.createElement('div');
             grid.className = 'card-grid';
 
-            entities.forEach(entity => {
+            entitiesList.forEach(entity => {
                 const card = document.createElement('div');
                 card.className = `entity-card ${entity.type}`;
+                card.dataset.entityId = entity.id;
                 card.onclick = () => openEntityModal(entity.id, entity.type);
 
-                // Get all activities this entity is involved in
-                const entityActivities = relationships.filter(r => 
-                    r.subject === entity.id || r.object === entity.id
-                );
+                // Make person cards draggable
+                if (entity.type === 'person') {
+                    card.draggable = true;
+                    card.ondragstart = (e) => handlePersonDragStart(e, entity.id);
+                    card.ondragend = handlePersonDragEnd;
+                }
+
+                // Make role cards droppable
+                if (entity.type === 'role') {
+                    card.ondragover = handleRoleDragOver;
+                    card.ondragenter = handleRoleDragEnter;
+                    card.ondragleave = handleRoleDragLeave;
+                    card.ondrop = (e) => handleRoleDrop(e, entity.id);
+                }
+
+                // Get all activities this entity is involved in (exclude INS for person role tags)
+                const entityActivities = relationships.filter(r => {
+                    const isInvolved = r.subject === entity.id || r.object === entity.id;
+                    // For people, exclude INS relationships to roles (shown as role tags instead)
+                    if (entity.type === 'person' && r.predicate === 'INS' && r.subject === entity.id) {
+                        const target = findEntity(r.object);
+                        if (target?.type === 'role') return false;
+                    }
+                    return isInvolved;
+                });
 
                 // Build activities HTML
                 let activitiesHTML = '';
@@ -6334,6 +6585,24 @@ John Doe,Engineering,john@example.com"
                     activitiesHTML += '</div>';
                 }
 
+                // Build role tags HTML for people
+                let roleTagsHTML = '';
+                if (entity.type === 'person') {
+                    const roleTags = getPersonRoleTags(entity.id);
+                    if (roleTags.length > 0) {
+                        roleTagsHTML = '<div class="role-tags">';
+                        roleTags.forEach(tag => {
+                            roleTagsHTML += `
+                                <span class="role-tag" onclick="removeRoleTag(event, '${tag.relationshipId}')" title="Click to remove">
+                                    ${getIcon('role')} ${tag.role.name}
+                                    <span class="remove-tag">×</span>
+                                </span>
+                            `;
+                        });
+                        roleTagsHTML += '</div>';
+                    }
+                }
+
                 // Build description HTML (truncate if too long)
                 let descriptionHTML = '';
                 if (entity.description && entity.description.trim()) {
@@ -6343,13 +6612,21 @@ John Doe,Engineering,john@example.com"
                     descriptionHTML = `<div class="card-description">${truncatedDesc}</div>`;
                 }
 
+                // Add drag hint for person cards without role tags
+                let dragHintHTML = '';
+                if (entity.type === 'person' && getPersonRoleTags(entity.id).length === 0) {
+                    dragHintHTML = '<div class="drag-hint">Drag to a role to assign</div>';
+                }
+
                 card.innerHTML = `
                     <div class="card-header">
                         <div class="card-icon">${icon}</div>
                         <div class="card-title">${entity.name}</div>
                     </div>
                     ${descriptionHTML}
+                    ${roleTagsHTML}
                     ${activitiesHTML}
+                    ${dragHintHTML}
                 `;
 
                 grid.appendChild(card);
