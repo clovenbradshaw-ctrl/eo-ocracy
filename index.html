@@ -2033,6 +2033,12 @@
             cursor: not-allowed;
         }
 
+        .nested-under-current {
+            margin-top: 0.5rem;
+            font-size: 0.85rem;
+            color: #5C4A3D;
+        }
+
         .entity-edit-modal-actions {
             display: flex;
             gap: 0.75rem;
@@ -3006,6 +3012,7 @@
             </div>
             <div class="modal-body">
                 <div class="modal-section" id="modalDescription"></div>
+                <div class="modal-section" id="modalNestedUnder"></div>
                 <div class="modal-section" id="modalNested"></div>
                 <div class="modal-section" id="modalAddNested"></div>
                 <div class="modal-section" id="modalActivities"></div>
@@ -3833,9 +3840,45 @@ John Doe,Engineering,john@example.com"
                 }
             });
 
+            // Render Nested Under section (what this entity is nested under)
+            const nestedUnderEl = document.getElementById('modalNestedUnder');
+            // Only show for entity types that can have a parent (units, teams, roles)
+            if (['unit', 'team', 'role'].includes(entityType)) {
+                // Find current parent entity
+                const parentEntity = nestedEntities.find(e => e.direction === 'parent');
+                const validParentOptions = getValidParentEntities(entityId, entityType);
+
+                nestedUnderEl.innerHTML = `
+                    <div class="modal-section-title"><i class="ph ph-folder-simple"></i> Nested Under</div>
+                    <div class="modal-add-connection">
+                        <div class="modal-add-connection-row">
+                            <select id="modalNestedUnderSelect" onchange="changeNestedUnder()">
+                                <option value="">None (unassigned)</option>
+                                ${validParentOptions}
+                            </select>
+                        </div>
+                        ${parentEntity ? `<div class="nested-under-current">Currently under: <strong>${parentEntity.name}</strong></div>` : '<div class="nested-under-current" style="color: #8B6F47;">Not nested under anything</div>'}
+                    </div>
+                `;
+
+                // Set the current parent as selected if exists
+                if (parentEntity) {
+                    setTimeout(() => {
+                        const select = document.getElementById('modalNestedUnderSelect');
+                        if (select) {
+                            select.value = parentEntity.id;
+                        }
+                    }, 0);
+                }
+            } else {
+                nestedUnderEl.innerHTML = '';
+            }
+
             // Render Nested section (DES relationships - hierarchical structure)
+            // Only show children (items nested under this entity), not parents
+            const childEntities = nestedEntities.filter(e => e.direction === 'child');
             const nestedEl = document.getElementById('modalNested');
-            if (nestedEntities.length > 0) {
+            if (childEntities.length > 0) {
                 // Create header with view toggle
                 nestedEl.innerHTML = `
                     <div class="connections-header">
@@ -3863,7 +3906,7 @@ John Doe,Engineering,john@example.com"
 
                 // Render orbital visualization after container is in DOM
                 setTimeout(() => {
-                    renderOrbitalConnections(orbitalContainer, entity, nestedEntities, 'nested');
+                    renderOrbitalConnections(orbitalContainer, entity, childEntities, 'nested');
                 }, 0);
             } else {
                 nestedEl.innerHTML = `
@@ -4285,22 +4328,15 @@ John Doe,Engineering,john@example.com"
             const entity = entities[entityType]?.find(e => e.id === entityId);
             if (!entity) return;
 
-            // Get nested entities (DES relationships only)
+            // Get nested entities (DES relationships only) - children only
             const nestedRelationships = relationships.filter(r =>
-                r.predicate === 'DES' && (r.subject === entityId || r.object === entityId)
+                r.predicate === 'DES' && r.subject === entityId
             );
-            const nestedEntities = [];
+            const childEntities = [];
             nestedRelationships.forEach(r => {
-                if (r.subject === entityId) {
-                    const conn = findEntity(r.object);
-                    if (conn && !nestedEntities.find(c => c.id === conn.id)) {
-                        nestedEntities.push({ ...conn, direction: 'child' });
-                    }
-                } else if (r.object === entityId) {
-                    const conn = findEntity(r.subject);
-                    if (conn && !nestedEntities.find(c => c.id === conn.id)) {
-                        nestedEntities.push({ ...conn, direction: 'parent' });
-                    }
+                const conn = findEntity(r.object);
+                if (conn && !childEntities.find(c => c.id === conn.id)) {
+                    childEntities.push({ ...conn, direction: 'child' });
                 }
             });
 
@@ -4320,10 +4356,10 @@ John Doe,Engineering,john@example.com"
                 orbitalContainer.className = 'orbital-container';
                 viewContainer.appendChild(orbitalContainer);
                 setTimeout(() => {
-                    renderOrbitalConnections(orbitalContainer, entity, nestedEntities, 'nested');
+                    renderOrbitalConnections(orbitalContainer, entity, childEntities, 'nested');
                 }, 0);
             } else {
-                renderGroupedConnections(viewContainer, nestedEntities, entityId);
+                renderGroupedConnections(viewContainer, childEntities, entityId);
             }
         }
 
@@ -4579,6 +4615,134 @@ John Doe,Engineering,john@example.com"
             });
 
             return options;
+        }
+
+        // Helper function to get valid parent entities for an entity
+        function getValidParentEntities(entityId, entityType) {
+            let options = '';
+            // Define what can be a parent for each entity type
+            const validParentTypes = {
+                unit: ['unit'],        // Units can be nested under other units
+                team: ['unit'],        // Teams can be nested under units
+                role: ['unit', 'team'] // Roles can be nested under units or teams
+            };
+
+            const typeLabels = {
+                unit: 'Units',
+                team: 'Teams'
+            };
+
+            const allowedTypes = validParentTypes[entityType] || [];
+
+            allowedTypes.forEach(type => {
+                const typeEntities = entities[type].filter(e => {
+                    // Exclude the current entity
+                    if (e.id === entityId) return false;
+                    // Exclude children of this entity (to prevent circular nesting)
+                    const isChild = relationships.some(r =>
+                        r.predicate === 'DES' && r.subject === entityId && r.object === e.id
+                    );
+                    return !isChild;
+                });
+                if (typeEntities.length > 0) {
+                    options += `<optgroup label="${typeLabels[type]}">`;
+                    typeEntities.forEach(e => {
+                        options += `<option value="${e.id}">${e.name}</option>`;
+                    });
+                    options += '</optgroup>';
+                }
+            });
+
+            return options;
+        }
+
+        // Change the parent entity (what this entity is nested under)
+        function changeNestedUnder() {
+            if (!currentModalEntity || !currentModalEntityType) return;
+
+            const newParentId = document.getElementById('modalNestedUnderSelect').value;
+
+            // Find and remove existing parent relationship
+            const existingParentRel = relationships.find(r =>
+                r.predicate === 'DES' && r.object === currentModalEntity.id
+            );
+
+            if (existingParentRel) {
+                const oldParent = findEntity(existingParentRel.subject);
+                relationships = relationships.filter(r => r.id !== existingParentRel.id);
+
+                // Log removal
+                logActivityToXano({
+                    event_verb: 'Remove Nesting',
+                    eo_operator: 'DES',
+                    object_type: 'relationship',
+                    object_id: existingParentRel.id,
+                    object_label: `${currentModalEntity.name} removed from ${oldParent ? oldParent.name : 'parent'}`,
+                    data_json: {
+                        subject_id: existingParentRel.subject,
+                        object_id: currentModalEntity.id,
+                        object_name: currentModalEntity.name,
+                        connection_type: 'nesting'
+                    }
+                });
+            }
+
+            // If a new parent was selected, create the relationship
+            if (newParentId) {
+                const newParent = findEntity(newParentId);
+                if (newParent) {
+                    const relId = 'rel' + Date.now();
+                    const relationship = {
+                        id: relId,
+                        subject: newParentId,
+                        predicate: 'DES',
+                        object: currentModalEntity.id,
+                        description: ''
+                    };
+
+                    relationships.push(relationship);
+
+                    // Log new nesting
+                    logActivityToXano({
+                        event_verb: 'Nest Entity',
+                        eo_operator: 'DES',
+                        object_type: 'relationship',
+                        object_id: relId,
+                        object_label: `${currentModalEntity.name} nested under ${newParent.name}`,
+                        data_json: {
+                            subject_id: newParentId,
+                            subject_type: newParent.type,
+                            subject_name: newParent.name,
+                            predicate: 'DES',
+                            object_id: currentModalEntity.id,
+                            object_type: currentModalEntityType,
+                            object_name: currentModalEntity.name,
+                            connection_type: 'nesting'
+                        }
+                    });
+
+                    showNotification(`Moved ${currentModalEntity.name} under ${newParent.name}`, 'success');
+                }
+            } else if (existingParentRel) {
+                showNotification(`${currentModalEntity.name} is now unassigned`, 'info');
+            }
+
+            // Save and refresh
+            saveToLocalStorage();
+
+            // Refresh the modal
+            openEntityModal(currentModalEntity.id, currentModalEntityType);
+
+            // Refresh views
+            if (currentView === 'graph') {
+                updateGraph();
+            } else if (currentView === 'tree') {
+                renderTreeView();
+            } else if (currentView === 'card') {
+                renderCardView();
+            }
+
+            renderActivityList();
         }
 
         // Add nested entity from modal (creates DES relationship)
