@@ -4567,6 +4567,541 @@
             cursor: not-allowed;
         }
 
+        /* Header Parent Badge */
+        .modal-header-badges {
+            display: flex;
+            gap: 0.5rem;
+            align-items: center;
+            flex-wrap: wrap;
+            margin-top: 0.5rem;
+        }
+
+        .modal-parent-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.4rem;
+            background: rgba(255,255,255,0.25);
+            padding: 0.35rem 0.75rem;
+            border-radius: 20px;
+            font-size: 0.75rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.2s;
+            border: 1px solid rgba(255,255,255,0.3);
+        }
+
+        .modal-parent-badge:hover {
+            background: rgba(255,255,255,0.35);
+            transform: translateY(-1px);
+        }
+
+        .modal-parent-badge i {
+            font-size: 0.9rem;
+        }
+
+        .modal-parent-badge .badge-arrow {
+            margin-left: 0.25rem;
+            font-size: 0.7rem;
+            opacity: 0.8;
+        }
+
+        .modal-parent-badge.add-parent {
+            background: rgba(255,255,255,0.1);
+            border-style: dashed;
+        }
+
+        .modal-parent-badge.add-parent:hover {
+            background: rgba(255,255,255,0.2);
+        }
+
+        /* Parent Dropdown */
+        .header-parent-dropdown-wrapper {
+            position: relative;
+            display: inline-block;
+        }
+
+        .header-parent-dropdown {
+            position: absolute;
+            top: 100%;
+            left: 0;
+            margin-top: 0.5rem;
+            background: white;
+            border-radius: 8px;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.25);
+            min-width: 220px;
+            max-height: 280px;
+            overflow-y: auto;
+            z-index: 100;
+            display: none;
+        }
+
+        .header-parent-dropdown.active {
+            display: block;
+        }
+
+        .header-parent-dropdown-item {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            padding: 0.75rem 1rem;
+            cursor: pointer;
+            color: #3D2E1F;
+            font-size: 0.875rem;
+            border-bottom: 1px solid #F0EBE4;
+            transition: background 0.15s;
+        }
+
+        .header-parent-dropdown-item:last-child {
+            border-bottom: none;
+        }
+
+        .header-parent-dropdown-item:hover {
+            background: #FAF7F5;
+        }
+
+        .header-parent-dropdown-item.remove-parent {
+            color: #C85450;
+        }
+
+        .header-parent-dropdown-item.remove-parent:hover {
+            background: #FEF2F2;
+        }
+
+        .header-parent-dropdown-item i {
+            font-size: 1rem;
+            color: #8B6F47;
+        }
+
+        .header-parent-dropdown-item.remove-parent i {
+            color: #C85450;
+        }
+
+        .header-parent-dropdown-divider {
+            height: 1px;
+            background: #E5DDD1;
+            margin: 0.25rem 0;
+        }
+
+        .header-parent-dropdown-label {
+            padding: 0.5rem 1rem 0.25rem;
+            font-size: 0.7rem;
+            color: #8B6F47;
+            text-transform: uppercase;
+            font-weight: 600;
+            letter-spacing: 0.5px;
+        }
+
+        /* Create Connection Panel - Restyled */
+        .create-connection-panel {
+            background: #FAF7F5;
+            border-radius: 12px;
+            padding: 1.25rem;
+            border: 1px solid #E5DDD1;
+        }
+
+        .create-connection-header {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            margin-bottom: 1rem;
+            color: #3D2E1F;
+            font-size: 0.9rem;
+            font-weight: 600;
+        }
+
+        .create-connection-header i {
+            color: #C88F4A;
+        }
+
+        /* Operator Buttons */
+        .operator-buttons {
+            display: flex;
+            gap: 0.5rem;
+            margin-bottom: 1rem;
+            flex-wrap: wrap;
+        }
+
+        .operator-btn {
+            padding: 0.5rem 1rem;
+            border: 2px solid #E5DDD1;
+            border-radius: 8px;
+            background: white;
+            color: #3D2E1F;
+            font-size: 0.8rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.2s;
+            display: flex;
+            align-items: center;
+            gap: 0.4rem;
+        }
+
+        .operator-btn:hover {
+            border-color: #C88F4A;
+            background: #FFF8F0;
+        }
+
+        .operator-btn.active {
+            border-color: #C88F4A;
+            background: linear-gradient(135deg, #C88F4A 0%, #B87B5B 100%);
+            color: white;
+        }
+
+        .operator-btn i {
+            font-size: 0.9rem;
+        }
+
+        /* More Operators Toggle */
+        .more-operators-toggle {
+            display: flex;
+            align-items: center;
+            gap: 0.4rem;
+            padding: 0.4rem 0.75rem;
+            background: transparent;
+            border: 1px dashed #D5C9BC;
+            border-radius: 6px;
+            color: #8B6F47;
+            font-size: 0.75rem;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .more-operators-toggle:hover {
+            background: #FAF7F5;
+            border-color: #C88F4A;
+            color: #C88F4A;
+        }
+
+        .more-operators-toggle i {
+            font-size: 0.8rem;
+            transition: transform 0.2s;
+        }
+
+        .more-operators-toggle.expanded i {
+            transform: rotate(180deg);
+        }
+
+        .advanced-operators {
+            display: none;
+            margin-top: 0.75rem;
+            padding-top: 0.75rem;
+            border-top: 1px dashed #E5DDD1;
+        }
+
+        .advanced-operators.visible {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 0.5rem;
+        }
+
+        /* Target Selector */
+        .target-selector-wrapper {
+            margin-bottom: 1rem;
+        }
+
+        .target-selector-label {
+            font-size: 0.75rem;
+            color: #8B6F47;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            margin-bottom: 0.5rem;
+            display: block;
+        }
+
+        .target-selector {
+            width: 100%;
+            padding: 0.75rem 1rem;
+            border: 2px solid #E5DDD1;
+            border-radius: 8px;
+            font-size: 0.875rem;
+            background: white;
+            color: #3D2E1F;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .target-selector:focus {
+            outline: none;
+            border-color: #C88F4A;
+        }
+
+        /* Sentence Preview */
+        .sentence-preview {
+            background: linear-gradient(135deg, #FFF8F0 0%, #FFF4E8 100%);
+            border: 1px solid #E8B86D;
+            border-radius: 8px;
+            padding: 0.875rem 1rem;
+            margin-bottom: 1rem;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .sentence-preview-icon {
+            font-size: 1.1rem;
+            color: #C88F4A;
+        }
+
+        .sentence-preview-text {
+            font-size: 0.875rem;
+            color: #5D4A36;
+        }
+
+        .sentence-preview-text .subject {
+            font-weight: 600;
+            color: #C88F4A;
+        }
+
+        .sentence-preview-text .operator {
+            font-weight: 600;
+            color: #8B6F47;
+            text-transform: lowercase;
+        }
+
+        .sentence-preview-text .object {
+            font-weight: 600;
+            color: #7B95A3;
+        }
+
+        .sentence-preview-placeholder {
+            color: #A89984;
+            font-style: italic;
+        }
+
+        /* Notes Collapsible Section */
+        .notes-collapsible {
+            margin-bottom: 1rem;
+        }
+
+        .notes-toggle {
+            display: flex;
+            align-items: center;
+            gap: 0.4rem;
+            padding: 0.5rem 0;
+            background: transparent;
+            border: none;
+            color: #8B6F47;
+            font-size: 0.8rem;
+            cursor: pointer;
+            transition: color 0.2s;
+        }
+
+        .notes-toggle:hover {
+            color: #C88F4A;
+        }
+
+        .notes-toggle i {
+            font-size: 0.9rem;
+            transition: transform 0.2s;
+        }
+
+        .notes-toggle.expanded i.chevron {
+            transform: rotate(90deg);
+        }
+
+        .notes-content {
+            display: none;
+            padding-top: 0.5rem;
+        }
+
+        .notes-content.visible {
+            display: block;
+        }
+
+        .notes-textarea {
+            width: 100%;
+            padding: 0.75rem;
+            border: 2px solid #E5DDD1;
+            border-radius: 8px;
+            font-size: 0.875rem;
+            font-family: inherit;
+            resize: vertical;
+            min-height: 60px;
+            background: white;
+            color: #3D2E1F;
+            transition: border-color 0.2s;
+        }
+
+        .notes-textarea:focus {
+            outline: none;
+            border-color: #C88F4A;
+        }
+
+        .notes-textarea::placeholder {
+            color: #A89984;
+        }
+
+        /* Work Product Quick Selector */
+        .work-product-section {
+            padding-top: 1rem;
+            border-top: 1px dashed #E5DDD1;
+            margin-top: 0.5rem;
+        }
+
+        .work-product-section-header {
+            display: flex;
+            align-items: center;
+            gap: 0.4rem;
+            font-size: 0.8rem;
+            color: #8B6F47;
+            font-weight: 600;
+            margin-bottom: 0.75rem;
+        }
+
+        .work-product-section-header i {
+            color: #C88F4A;
+        }
+
+        .work-product-quick-select {
+            display: flex;
+            gap: 0.5rem;
+            flex-wrap: wrap;
+            align-items: center;
+        }
+
+        .work-product-chip {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.35rem;
+            padding: 0.4rem 0.75rem;
+            background: white;
+            border: 2px solid #E5DDD1;
+            border-radius: 20px;
+            font-size: 0.8rem;
+            color: #5D4A36;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .work-product-chip:hover {
+            border-color: #C88F4A;
+            background: #FFF8F0;
+        }
+
+        .work-product-chip.selected {
+            border-color: #C88F4A;
+            background: linear-gradient(135deg, #C88F4A 0%, #D4A574 100%);
+            color: white;
+        }
+
+        .work-product-chip i {
+            font-size: 0.9rem;
+        }
+
+        .quick-create-work-product {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.35rem;
+            padding: 0.4rem 0.75rem;
+            background: transparent;
+            border: 2px dashed #D5C9BC;
+            border-radius: 20px;
+            font-size: 0.8rem;
+            color: #8B6F47;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .quick-create-work-product:hover {
+            border-color: #C88F4A;
+            background: #FFF8F0;
+            color: #C88F4A;
+        }
+
+        .quick-create-input-wrapper {
+            display: none;
+            flex: 1;
+            min-width: 150px;
+        }
+
+        .quick-create-input-wrapper.visible {
+            display: flex;
+            gap: 0.5rem;
+        }
+
+        .quick-create-input {
+            flex: 1;
+            padding: 0.4rem 0.75rem;
+            border: 2px solid #C88F4A;
+            border-radius: 20px;
+            font-size: 0.8rem;
+            background: white;
+            color: #3D2E1F;
+        }
+
+        .quick-create-input:focus {
+            outline: none;
+        }
+
+        .quick-create-confirm {
+            padding: 0.4rem 0.6rem;
+            background: #C88F4A;
+            border: none;
+            border-radius: 50%;
+            color: white;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .quick-create-confirm:hover {
+            background: #B87B5B;
+        }
+
+        /* Create Connection Actions */
+        .create-connection-actions {
+            display: flex;
+            gap: 0.75rem;
+            margin-top: 1rem;
+            padding-top: 1rem;
+            border-top: 1px solid #E5DDD1;
+        }
+
+        .create-connection-btn {
+            flex: 1;
+            padding: 0.75rem 1rem;
+            border-radius: 8px;
+            font-size: 0.875rem;
+            font-weight: 600;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 0.4rem;
+            transition: all 0.2s;
+        }
+
+        .create-connection-btn.primary {
+            background: linear-gradient(135deg, #C88F4A 0%, #B87B5B 100%);
+            border: none;
+            color: white;
+        }
+
+        .create-connection-btn.primary:hover {
+            transform: translateY(-1px);
+            box-shadow: 0 4px 12px rgba(200, 143, 74, 0.3);
+        }
+
+        .create-connection-btn.primary:disabled {
+            background: #E5DDD1;
+            transform: none;
+            box-shadow: none;
+            cursor: not-allowed;
+        }
+
+        .create-connection-btn.secondary {
+            background: white;
+            border: 2px solid #E5DDD1;
+            color: #5D4A36;
+        }
+
+        .create-connection-btn.secondary:hover {
+            border-color: #C88F4A;
+            color: #C88F4A;
+        }
+
         /* Work Product Selector Modal */
         .work-product-selector-overlay {
             display: none;
@@ -6112,7 +6647,10 @@
                                 </div>
                             </div>
                         </div>
-                        <div class="modal-type-badge" id="modalEntityType"></div>
+                        <div class="modal-header-badges">
+                            <div class="modal-type-badge" id="modalEntityType"></div>
+                            <div id="modalHeaderParent" class="header-parent-dropdown-wrapper"></div>
+                        </div>
                     </div>
                 </div>
             </div>
@@ -7285,6 +7823,56 @@ John Doe,Engineering,john@example.com"
             }
             document.getElementById('modalEntityType').innerHTML = typeBadgeContent;
 
+            // Add parent badge to header for units, teams, and roles
+            const headerParentEl = document.getElementById('modalHeaderParent');
+            if (['unit', 'team', 'role'].includes(entityType)) {
+                const currentParents = relationships
+                    .filter(r => r.predicate === 'DES' && r.subject !== entityId && r.object === entityId)
+                    .map(r => findEntity(r.subject))
+                    .filter(Boolean);
+
+                const parentDropdownItems = getParentDropdownItems(entityId, entityType);
+
+                if (currentParents.length > 0) {
+                    const parent = currentParents[0];
+                    headerParentEl.innerHTML = `
+                        <div class="modal-parent-badge" onclick="toggleHeaderParentDropdown(event)">
+                            <i class="ph ${getEntityIcon(parent.type)}"></i>
+                            ${parent.name}
+                            <i class="ph ph-caret-down badge-arrow"></i>
+                        </div>
+                        <div class="header-parent-dropdown" id="headerParentDropdown">
+                            <div class="header-parent-dropdown-item" onclick="closeHeaderParentDropdown(); openEntityModal('${parent.id}', '${parent.type}')">
+                                <i class="ph ph-arrow-square-out"></i>
+                                View ${parent.name}
+                            </div>
+                            <div class="header-parent-dropdown-divider"></div>
+                            <div class="header-parent-dropdown-label">Change parent</div>
+                            ${parentDropdownItems || '<div class="header-parent-dropdown-item" style="color: #A89984; cursor: default;">No available parents</div>'}
+                            <div class="header-parent-dropdown-divider"></div>
+                            <div class="header-parent-dropdown-item remove-parent" onclick="removeParentFromHeader('${entityId}', '${parent.id}')">
+                                <i class="ph ph-x-circle"></i>
+                                Remove parent
+                            </div>
+                        </div>
+                    `;
+                } else {
+                    headerParentEl.innerHTML = `
+                        <div class="modal-parent-badge add-parent" onclick="toggleHeaderParentDropdown(event)">
+                            <i class="ph ph-plus"></i>
+                            Add parent
+                            <i class="ph ph-caret-down badge-arrow"></i>
+                        </div>
+                        <div class="header-parent-dropdown" id="headerParentDropdown">
+                            <div class="header-parent-dropdown-label">Select parent</div>
+                            ${parentDropdownItems || '<div class="header-parent-dropdown-item" style="color: #A89984; cursor: default;">No available parents</div>'}
+                        </div>
+                    `;
+                }
+            } else {
+                headerParentEl.innerHTML = '';
+            }
+
             // Show edit and delete buttons for entities
             document.getElementById('modalEditButton').style.display = 'inline-flex';
             document.getElementById('modalDeleteButton').style.display = 'inline-flex';
@@ -7452,55 +8040,10 @@ John Doe,Engineering,john@example.com"
             const addNestedEl = document.getElementById('modalAddNested');
             addNestedEl.innerHTML = '';
 
-            // Parent UI - shows what this entity is nested inside
+            // Parent UI - now moved to header badge, hide this section
             const nestUnderEl = document.getElementById('modalNestUnder');
-            // Show for entity types that can have parents (units can nest under units, teams under units/teams, roles under units/teams)
-            const parentOptions = getParentOptionsForNesting(entityId, entityType);
-
-            // Find current parent(s) for this entity
-            const currentParents = relationships
-                .filter(r => r.predicate === 'DES' && r.subject === entityId)
-                .map(r => findEntity(r.object))
-                .filter(Boolean);
-
-            if (['unit', 'team', 'role'].includes(entityType)) {
-                nestUnderEl.innerHTML = `
-                    <div class="connections-header">
-                        <div class="modal-section-title" style="margin-bottom: 0;"><i class="ph ph-arrow-bend-up-left"></i> Parent</div>
-                        <button class="section-add-btn" onclick="toggleInlineParentForm()" title="Set parent"><i class="ph ph-plus"></i></button>
-                    </div>
-                    ${currentParents.length > 0 ? `
-                        <div class="nested-chips-container" style="margin-bottom: 0.75rem;">
-                            ${currentParents.map(parent => `
-                                <span class="entity-chip ${parent.type}" onclick="openEntityModal('${parent.id}')" style="cursor: pointer;">
-                                    <i class="ph ${getEntityIcon(parent.type)}"></i>
-                                    ${parent.name}
-                                    <button class="chip-remove-btn" onclick="event.stopPropagation(); removeParentRelationship('${entityId}', '${parent.id}')" title="Remove parent">
-                                        <i class="ph ph-x"></i>
-                                    </button>
-                                </span>
-                            `).join('')}
-                        </div>
-                    ` : ''}
-                    <div id="inlineParentForm" class="inline-add-form hidden">
-                        <div class="inline-add-row">
-                            <select id="modalNestUnderSelect">
-                                <option value="">Select parent...</option>
-                                ${parentOptions || ''}
-                            </select>
-                            <button class="inline-add-btn" onclick="nestUnderFromModal()"><i class="ph ph-plus"></i> Add</button>
-                        </div>
-                    </div>
-                    ${currentParents.length === 0 ? `
-                        <div class="modal-empty-state">
-                            <i class="ph ph-arrow-bend-up-left"></i>
-                            <div>No parent</div>
-                        </div>
-                    ` : ''}
-                `;
-            } else {
-                nestUnderEl.innerHTML = '';
-            }
+            nestUnderEl.innerHTML = '';
+            nestUnderEl.style.display = 'none';
 
             // Render Activities section (non-DES relationships) - hidden for persons
             const activitiesEl = document.getElementById('modalActivities');
@@ -7579,51 +8122,129 @@ John Doe,Engineering,john@example.com"
                 // Work products can only be linked to roles and teams
                 const canLinkWorkProduct = entityType === 'role' || entityType === 'team';
 
+                // Primary operators (most common)
+                const primaryOperators = ['DES', 'CON', 'ALT'];
+                // Advanced operators (less common)
+                const advancedOperators = ['SEG', 'SYN', 'SUP', 'REC', 'NUL'];
+
+                // Get work products for quick selection
+                const workProducts = entities.object || [];
+                const recentWorkProducts = workProducts.slice(0, 5);
+
                 addActivityEl.innerHTML = `
-                    <div class="modal-section-title"><i class="ph ph-plus-circle"></i> Add Activity</div>
-                    <div class="modal-add-connection">
-                        <div class="modal-add-connection-row">
-                            <select id="modalOperatorSelect" onchange="handleModalOperatorChange()">
-                                <option value="">Type...</option>
-                                ${Object.entries(eoOperators)
-                                    .filter(([code]) => code !== 'DES' && code !== 'INS') // Exclude DES (nesting) and INS (deprecated)
-                                    .map(([code, op]) => `<option value="${code}">${op.label}</option>`)
-                                    .join('')}
-                            </select>
-                            <select id="modalTargetSelect">
-                                <option value="">Connect to...</option>
-                                ${getAllEntitiesForModal(entityId, false)}
-                            </select>
-                            <button class="modal-add-connection-btn" onclick="addActivityFromModal()">
-                                <i class="ph ph-plus"></i> Add
+                    <div class="create-connection-panel">
+                        <div class="create-connection-header">
+                            <i class="ph ph-plus-circle"></i>
+                            Create Connection
+                        </div>
+
+                        <!-- Operator Buttons -->
+                        <div class="operator-buttons" id="operatorButtons">
+                            <button type="button" class="operator-btn" data-operator="DES" onclick="selectOperator('DES')">
+                                <i class="ph ph-tag"></i> Define
+                            </button>
+                            <button type="button" class="operator-btn" data-operator="CON" onclick="selectOperator('CON')">
+                                <i class="ph ph-link"></i> Link
+                            </button>
+                            <button type="button" class="operator-btn" data-operator="ALT" onclick="selectOperator('ALT')">
+                                <i class="ph ph-arrows-clockwise"></i> Shift
+                            </button>
+                            <button type="button" class="more-operators-toggle" onclick="toggleAdvancedOperators()">
+                                <span>More</span>
+                                <i class="ph ph-caret-down"></i>
                             </button>
                         </div>
-                        ${canLinkWorkProduct ? `
-                        <div style="margin-top: 0.75rem; padding-top: 0.75rem; border-top: 1px dashed #E5DDD1;">
-                            <div style="font-size: 0.8rem; color: #8B6F47; margin-bottom: 0.5rem; font-weight: 500;">
-                                <i class="ph ph-package"></i> Or link to a Work Product
-                            </div>
-                            <div class="modal-add-connection-row">
-                                <select id="modalWorkProductOperatorSelect">
-                                    <option value="">Type...</option>
-                                    ${Object.entries(eoOperators)
-                                        .filter(([code]) => code !== 'DES' && code !== 'INS')
-                                        .map(([code, op]) => `<option value="${code}">${op.label}</option>`)
-                                        .join('')}
-                                </select>
-                                <button type="button" class="modal-work-product-selector-btn" id="modalWorkProductBtn" onclick="openWorkProductSelectorForModal()">
-                                    <i class="ph ph-package btn-icon"></i>
-                                    <span id="modalWorkProductBtnText">Select work product...</span>
-                                </button>
-                                <input type="hidden" id="modalSelectedWorkProductId" value="">
-                                <button class="modal-add-connection-btn" onclick="addWorkProductActivityFromModal()">
-                                    <i class="ph ph-plus"></i> Add
-                                </button>
+
+                        <!-- Advanced Operators -->
+                        <div class="advanced-operators" id="advancedOperators">
+                            <button type="button" class="operator-btn" data-operator="SEG" onclick="selectOperator('SEG')">
+                                <i class="ph ph-scissors"></i> Divide
+                            </button>
+                            <button type="button" class="operator-btn" data-operator="SYN" onclick="selectOperator('SYN')">
+                                <i class="ph ph-git-merge"></i> Merge
+                            </button>
+                            <button type="button" class="operator-btn" data-operator="SUP" onclick="selectOperator('SUP')">
+                                <i class="ph ph-scales"></i> Balance
+                            </button>
+                            <button type="button" class="operator-btn" data-operator="REC" onclick="selectOperator('REC')">
+                                <i class="ph ph-arrow-clockwise"></i> Loop
+                            </button>
+                            <button type="button" class="operator-btn" data-operator="NUL" onclick="selectOperator('NUL')">
+                                <i class="ph ph-prohibit"></i> Notice
+                            </button>
+                        </div>
+
+                        <!-- Target Selector -->
+                        <div class="target-selector-wrapper">
+                            <label class="target-selector-label">Connect to</label>
+                            <select id="modalTargetSelect" class="target-selector" onchange="updateSentencePreview()">
+                                <option value="">Select entity...</option>
+                                ${getAllEntitiesForModal(entityId, false)}
+                            </select>
+                        </div>
+
+                        <!-- Sentence Preview -->
+                        <div class="sentence-preview" id="sentencePreview">
+                            <i class="ph ph-quotes sentence-preview-icon"></i>
+                            <div class="sentence-preview-text">
+                                <span class="sentence-preview-placeholder">Select an operator and target to preview</span>
                             </div>
                         </div>
+
+                        <!-- Notes Collapsible -->
+                        <div class="notes-collapsible">
+                            <button type="button" class="notes-toggle" onclick="toggleConnectionNotes()">
+                                <i class="ph ph-caret-right chevron"></i>
+                                <i class="ph ph-note-pencil"></i>
+                                Add notes or details
+                            </button>
+                            <div class="notes-content" id="connectionNotesContent">
+                                <textarea class="notes-textarea" id="connectionNotes" placeholder="Add optional notes about this connection..."></textarea>
+                            </div>
+                        </div>
+
+                        ${canLinkWorkProduct ? `
+                        <!-- Work Product Section -->
+                        <div class="work-product-section">
+                            <div class="work-product-section-header">
+                                <i class="ph ph-package"></i>
+                                Or link to a Work Product
+                            </div>
+                            <div class="work-product-quick-select" id="workProductQuickSelect">
+                                ${recentWorkProducts.map(wp => `
+                                    <button type="button" class="work-product-chip" data-wp-id="${wp.id}" onclick="selectWorkProduct('${wp.id}')">
+                                        <i class="ph ph-package"></i>
+                                        ${wp.name}
+                                    </button>
+                                `).join('')}
+                                <button type="button" class="quick-create-work-product" id="quickCreateWpBtn" onclick="showQuickCreateWorkProduct()">
+                                    <i class="ph ph-plus"></i>
+                                    Create new
+                                </button>
+                                <div class="quick-create-input-wrapper" id="quickCreateWpInput">
+                                    <input type="text" class="quick-create-input" id="newWpNameInput" placeholder="Work product name..." onkeypress="if(event.key==='Enter') confirmQuickCreateWorkProduct()">
+                                    <button type="button" class="quick-create-confirm" onclick="confirmQuickCreateWorkProduct()">
+                                        <i class="ph ph-check"></i>
+                                    </button>
+                                </div>
+                            </div>
+                            <input type="hidden" id="modalSelectedWorkProductId" value="">
+                        </div>
                         ` : ''}
+
+                        <!-- Action Button -->
+                        <div class="create-connection-actions">
+                            <button type="button" class="create-connection-btn primary" id="createConnectionBtn" onclick="createConnectionFromPanel()" disabled>
+                                <i class="ph ph-plus-circle"></i>
+                                Create Connection
+                            </button>
+                        </div>
                     </div>
+                    <input type="hidden" id="modalOperatorSelect" value="">
                 `;
+
+                // Initialize connection panel state
+                initConnectionPanel();
             }
 
             document.getElementById('entityModal').classList.add('active');
@@ -7631,6 +8252,303 @@ John Doe,Engineering,john@example.com"
 
         function closeEntityModal() {
             document.getElementById('entityModal').classList.remove('active');
+        }
+
+        // ==========================================
+        // CREATE CONNECTION PANEL FUNCTIONS
+        // ==========================================
+
+        // State for the connection panel
+        let connectionPanelState = {
+            selectedOperator: null,
+            selectedTarget: null,
+            selectedWorkProduct: null
+        };
+
+        // Initialize connection panel
+        function initConnectionPanel() {
+            connectionPanelState = {
+                selectedOperator: null,
+                selectedTarget: null,
+                selectedWorkProduct: null
+            };
+            updateCreateConnectionButton();
+        }
+
+        // Select an operator button
+        function selectOperator(operatorCode) {
+            connectionPanelState.selectedOperator = operatorCode;
+            connectionPanelState.selectedWorkProduct = null; // Clear work product when selecting entity operator
+
+            // Update button states
+            document.querySelectorAll('.operator-btn').forEach(btn => {
+                btn.classList.remove('active');
+                if (btn.dataset.operator === operatorCode) {
+                    btn.classList.add('active');
+                }
+            });
+
+            // Clear work product selections
+            document.querySelectorAll('.work-product-chip').forEach(chip => {
+                chip.classList.remove('selected');
+            });
+
+            // Store in hidden input for compatibility
+            const hiddenInput = document.getElementById('modalOperatorSelect');
+            if (hiddenInput) {
+                hiddenInput.value = operatorCode;
+            }
+
+            updateSentencePreview();
+            updateCreateConnectionButton();
+        }
+
+        // Toggle advanced operators visibility
+        function toggleAdvancedOperators() {
+            const toggle = document.querySelector('.more-operators-toggle');
+            const advancedOps = document.getElementById('advancedOperators');
+
+            if (toggle && advancedOps) {
+                toggle.classList.toggle('expanded');
+                advancedOps.classList.toggle('visible');
+            }
+        }
+
+        // Update sentence preview
+        function updateSentencePreview() {
+            const preview = document.getElementById('sentencePreview');
+            if (!preview) return;
+
+            const targetSelect = document.getElementById('modalTargetSelect');
+            const targetId = targetSelect ? targetSelect.value : null;
+            const targetName = targetSelect && targetId ? targetSelect.options[targetSelect.selectedIndex].text : null;
+
+            connectionPanelState.selectedTarget = targetId;
+
+            const operator = connectionPanelState.selectedOperator;
+            const opInfo = operator ? eoOperators[operator] : null;
+
+            const previewText = preview.querySelector('.sentence-preview-text');
+            if (!previewText) return;
+
+            if (!operator && !targetId) {
+                previewText.innerHTML = '<span class="sentence-preview-placeholder">Select an operator and target to preview</span>';
+            } else if (!operator) {
+                previewText.innerHTML = `<span class="sentence-preview-placeholder">Select an operator for</span> <span class="object">${targetName}</span>`;
+            } else if (!targetId) {
+                previewText.innerHTML = `<span class="subject">${currentModalEntity?.name || 'This'}</span> <span class="operator">${opInfo?.label || operator}</span> <span class="sentence-preview-placeholder">...</span>`;
+            } else {
+                previewText.innerHTML = `<span class="subject">${currentModalEntity?.name || 'This'}</span> <span class="operator">${opInfo?.label || operator}</span> <span class="object">${targetName}</span>`;
+            }
+
+            updateCreateConnectionButton();
+        }
+
+        // Toggle connection notes visibility
+        function toggleConnectionNotes() {
+            const toggle = document.querySelector('.notes-toggle');
+            const content = document.getElementById('connectionNotesContent');
+
+            if (toggle && content) {
+                toggle.classList.toggle('expanded');
+                content.classList.toggle('visible');
+            }
+        }
+
+        // Select a work product chip
+        function selectWorkProduct(workProductId) {
+            connectionPanelState.selectedWorkProduct = workProductId;
+            connectionPanelState.selectedOperator = null; // Clear entity operator when selecting work product
+            connectionPanelState.selectedTarget = null;
+
+            // Clear entity operator selections
+            document.querySelectorAll('.operator-btn').forEach(btn => {
+                btn.classList.remove('active');
+            });
+
+            // Clear target selection
+            const targetSelect = document.getElementById('modalTargetSelect');
+            if (targetSelect) {
+                targetSelect.value = '';
+            }
+
+            // Update work product chip states
+            document.querySelectorAll('.work-product-chip').forEach(chip => {
+                chip.classList.remove('selected');
+                if (chip.dataset.wpId === workProductId) {
+                    chip.classList.add('selected');
+                }
+            });
+
+            // Update hidden input
+            const hiddenWpInput = document.getElementById('modalSelectedWorkProductId');
+            if (hiddenWpInput) {
+                hiddenWpInput.value = workProductId;
+            }
+
+            // Update sentence preview for work product
+            const preview = document.getElementById('sentencePreview');
+            if (preview) {
+                const previewText = preview.querySelector('.sentence-preview-text');
+                const workProduct = findEntity(workProductId);
+                if (previewText && workProduct) {
+                    previewText.innerHTML = `<span class="subject">${currentModalEntity?.name || 'This'}</span> <span class="operator">links to</span> <span class="object">${workProduct.name}</span>`;
+                }
+            }
+
+            updateCreateConnectionButton();
+        }
+
+        // Show quick create work product input
+        function showQuickCreateWorkProduct() {
+            const btn = document.getElementById('quickCreateWpBtn');
+            const inputWrapper = document.getElementById('quickCreateWpInput');
+
+            if (btn && inputWrapper) {
+                btn.style.display = 'none';
+                inputWrapper.classList.add('visible');
+                const input = document.getElementById('newWpNameInput');
+                if (input) {
+                    input.focus();
+                }
+            }
+        }
+
+        // Confirm quick create work product
+        function confirmQuickCreateWorkProduct() {
+            const input = document.getElementById('newWpNameInput');
+            const name = input ? input.value.trim() : '';
+
+            if (!name) {
+                showToast('Please enter a work product name', 'error');
+                return;
+            }
+
+            // Create the work product
+            const newWp = {
+                id: 'obj' + Date.now(),
+                name: name,
+                type: 'object',
+                description: ''
+            };
+
+            if (!entities.object) {
+                entities.object = [];
+            }
+            entities.object.push(newWp);
+
+            // Record action for undo
+            recordAction('create', 'object', newWp, `Created work product ${name}`);
+
+            // Add to the quick select and select it
+            const quickSelect = document.getElementById('workProductQuickSelect');
+            if (quickSelect) {
+                const newChip = document.createElement('button');
+                newChip.type = 'button';
+                newChip.className = 'work-product-chip selected';
+                newChip.dataset.wpId = newWp.id;
+                newChip.onclick = () => selectWorkProduct(newWp.id);
+                newChip.innerHTML = `<i class="ph ph-package"></i> ${name}`;
+
+                // Insert before the create button
+                const createBtn = document.getElementById('quickCreateWpBtn');
+                if (createBtn) {
+                    quickSelect.insertBefore(newChip, createBtn);
+                }
+            }
+
+            // Select the new work product
+            selectWorkProduct(newWp.id);
+
+            // Reset the input
+            if (input) {
+                input.value = '';
+            }
+            const inputWrapper = document.getElementById('quickCreateWpInput');
+            const btn = document.getElementById('quickCreateWpBtn');
+            if (inputWrapper && btn) {
+                inputWrapper.classList.remove('visible');
+                btn.style.display = '';
+            }
+
+            showToast(`Created work product "${name}"`, 'success');
+        }
+
+        // Update create connection button state
+        function updateCreateConnectionButton() {
+            const btn = document.getElementById('createConnectionBtn');
+            if (!btn) return;
+
+            const hasValidEntityConnection = connectionPanelState.selectedOperator && connectionPanelState.selectedTarget;
+            const hasValidWorkProductConnection = connectionPanelState.selectedWorkProduct;
+
+            btn.disabled = !hasValidEntityConnection && !hasValidWorkProductConnection;
+        }
+
+        // Create connection from panel
+        function createConnectionFromPanel() {
+            if (!currentModalEntity || !currentModalEntityType) return;
+
+            const notes = document.getElementById('connectionNotes')?.value?.trim() || '';
+
+            // Check if it's a work product connection
+            if (connectionPanelState.selectedWorkProduct) {
+                const workProduct = findEntity(connectionPanelState.selectedWorkProduct);
+                if (!workProduct) {
+                    showToast('Work product not found', 'error');
+                    return;
+                }
+
+                // Create CON relationship to work product
+                const relId = 'rel' + Date.now();
+                const relationship = {
+                    id: relId,
+                    subject: currentModalEntity.id,
+                    predicate: 'CON',
+                    object: connectionPanelState.selectedWorkProduct,
+                    notes: notes
+                };
+
+                relationships.push(relationship);
+                recordAction('create', 'relationship', relationship, `Linked to ${workProduct.name}`);
+
+                showToast(`Linked to ${workProduct.name}`, 'success');
+            } else {
+                // Entity connection
+                const operator = connectionPanelState.selectedOperator;
+                const targetId = connectionPanelState.selectedTarget;
+
+                if (!operator || !targetId) {
+                    showToast('Please select an operator and target', 'error');
+                    return;
+                }
+
+                const targetEntity = findEntity(targetId);
+                if (!targetEntity) {
+                    showToast('Target entity not found', 'error');
+                    return;
+                }
+
+                // Create relationship
+                const relId = 'rel' + Date.now();
+                const relationship = {
+                    id: relId,
+                    subject: currentModalEntity.id,
+                    predicate: operator,
+                    object: targetId,
+                    notes: notes
+                };
+
+                relationships.push(relationship);
+                recordAction('create', 'relationship', relationship, `Connected to ${targetEntity.name}`);
+
+                const opLabel = eoOperators[operator]?.label || operator;
+                showToast(`${opLabel}: ${targetEntity.name}`, 'success');
+            }
+
+            // Refresh modal and views
+            openEntityModal(currentModalEntity.id, currentModalEntityType);
+            refreshCurrentView();
         }
 
         // Orbital visualization for connections
@@ -8547,6 +9465,119 @@ John Doe,Engineering,john@example.com"
             });
 
             return options;
+        }
+
+        // Get parent options as dropdown items for header dropdown
+        function getParentDropdownItems(entityId, entityType) {
+            let items = '';
+            const parentTypes = {
+                unit: ['unit'],
+                team: ['unit', 'team'],
+                role: ['unit', 'team'],
+                person: [],
+                object: []
+            };
+
+            const typeLabels = {
+                unit: 'Units',
+                team: 'Teams'
+            };
+
+            const allowedTypes = parentTypes[entityType] || [];
+
+            allowedTypes.forEach(type => {
+                const typeEntities = entities[type].filter(e => {
+                    if (e.id === entityId) return false;
+                    const alreadyNestedUnder = relationships.some(r =>
+                        r.predicate === 'DES' && r.subject === e.id && r.object === entityId
+                    );
+                    return !alreadyNestedUnder;
+                });
+                if (typeEntities.length > 0) {
+                    typeEntities.forEach(e => {
+                        items += `
+                            <div class="header-parent-dropdown-item" onclick="setParentFromHeader('${entityId}', '${e.id}')">
+                                <i class="ph ${getEntityIcon(type)}"></i>
+                                ${e.name}
+                            </div>
+                        `;
+                    });
+                }
+            });
+
+            return items;
+        }
+
+        // Toggle header parent dropdown
+        function toggleHeaderParentDropdown(event) {
+            event.stopPropagation();
+            const dropdown = document.getElementById('headerParentDropdown');
+            if (dropdown) {
+                dropdown.classList.toggle('active');
+                // Close dropdown when clicking outside
+                if (dropdown.classList.contains('active')) {
+                    setTimeout(() => {
+                        document.addEventListener('click', closeHeaderParentDropdown, { once: true });
+                    }, 0);
+                }
+            }
+        }
+
+        function closeHeaderParentDropdown() {
+            const dropdown = document.getElementById('headerParentDropdown');
+            if (dropdown) {
+                dropdown.classList.remove('active');
+            }
+        }
+
+        // Set parent from header dropdown
+        function setParentFromHeader(entityId, parentId) {
+            closeHeaderParentDropdown();
+
+            const parentEntity = findEntity(parentId);
+            if (!parentEntity) return;
+
+            // Create the DES relationship (parent defines/contains this entity)
+            const relId = 'rel' + Date.now();
+            const relationship = {
+                id: relId,
+                subject: parentId,
+                predicate: 'DES',
+                object: entityId
+            };
+
+            relationships.push(relationship);
+
+            // Record action for undo
+            recordAction('create', 'relationship', relationship, `Nested under ${parentEntity.name}`);
+
+            // Refresh the modal
+            openEntityModal(entityId, currentModalEntityType);
+            refreshCurrentView();
+            showToast(`Nested under ${parentEntity.name}`, 'success');
+        }
+
+        // Remove parent from header dropdown
+        function removeParentFromHeader(entityId, parentId) {
+            closeHeaderParentDropdown();
+
+            const parentEntity = findEntity(parentId);
+            if (!parentEntity) return;
+
+            // Find and remove the DES relationship
+            const relIndex = relationships.findIndex(r =>
+                r.predicate === 'DES' && r.subject === parentId && r.object === entityId
+            );
+
+            if (relIndex !== -1) {
+                const removedRel = relationships.splice(relIndex, 1)[0];
+                recordAction('delete', 'relationship', removedRel, `Removed from ${parentEntity.name}`);
+
+                // Refresh the modal
+                openEntityModal(entityId, currentModalEntityType);
+                refreshCurrentView();
+                showToast(`Removed from ${parentEntity.name}`, 'success');
+            }
         }
 
         // Nest this entity under a parent (creates DES relationship with parent as subject)
