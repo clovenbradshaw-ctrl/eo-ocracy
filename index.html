@@ -9923,9 +9923,9 @@ John Doe,Engineering,john@example.com"
                 card.className = `entity-card ${entity.type}`;
                 card.onclick = () => openEntityModal(entity.id, entity.type);
 
-                // For teams and roles, find what they're nested under (DES relationships where entity is the object)
+                // For units, teams and roles, find what they're nested under (DES relationships where entity is the object)
                 let nestedUnderHTML = '';
-                if (entity.type === 'team' || entity.type === 'role') {
+                if (entity.type === 'unit' || entity.type === 'team' || entity.type === 'role') {
                     const parentRelationships = relationships.filter(r =>
                         r.predicate === 'DES' && r.object === entity.id
                     );
