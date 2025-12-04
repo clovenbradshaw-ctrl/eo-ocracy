@@ -1763,6 +1763,188 @@
             text-align: center;
         }
 
+        /* Inline editing styles */
+        .inline-edit-wrapper {
+            position: relative;
+        }
+
+        .inline-edit-name {
+            font-size: 1.75rem;
+            font-weight: 700;
+            letter-spacing: -0.02em;
+            background: rgba(255, 255, 255, 0.15);
+            border: 2px solid transparent;
+            border-radius: 8px;
+            color: white;
+            padding: 0.25rem 0.5rem;
+            width: 100%;
+            transition: all 0.2s;
+        }
+
+        .inline-edit-name:hover {
+            background: rgba(255, 255, 255, 0.2);
+            border-color: rgba(255, 255, 255, 0.3);
+        }
+
+        .inline-edit-name:focus {
+            outline: none;
+            background: rgba(255, 255, 255, 0.25);
+            border-color: rgba(255, 255, 255, 0.5);
+        }
+
+        .inline-edit-name::placeholder {
+            color: rgba(255, 255, 255, 0.6);
+        }
+
+        .inline-edit-description {
+            width: 100%;
+            min-height: 80px;
+            padding: 1rem;
+            background: #FAF7F5;
+            border: 2px solid transparent;
+            border-radius: 8px;
+            border-left: 3px solid #C88F4A;
+            color: #6B5642;
+            font-size: 0.95rem;
+            line-height: 1.6;
+            resize: vertical;
+            font-family: inherit;
+            transition: all 0.2s;
+        }
+
+        .inline-edit-description:hover {
+            border-color: #E5DDD1;
+        }
+
+        .inline-edit-description:focus {
+            outline: none;
+            border-color: #C88F4A;
+            background: white;
+        }
+
+        .inline-edit-description::placeholder {
+            color: #8B6F47;
+            font-style: italic;
+        }
+
+        .inline-edit-hint {
+            font-size: 0.75rem;
+            color: rgba(255, 255, 255, 0.7);
+            margin-top: 0.25rem;
+            display: none;
+        }
+
+        .inline-edit-name:focus ~ .inline-edit-hint {
+            display: block;
+        }
+
+        .description-edit-hint {
+            font-size: 0.75rem;
+            color: #8B6F47;
+            margin-top: 0.5rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .description-char-count {
+            font-weight: 500;
+        }
+
+        /* Roles section in team modal */
+        .modal-roles-list {
+            display: flex;
+            flex-direction: column;
+            gap: 0.5rem;
+            margin-bottom: 1rem;
+        }
+
+        .modal-role-item {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 0.75rem 1rem;
+            background: white;
+            border: 2px solid #E5DDD1;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .modal-role-item:hover {
+            border-color: #7A8B6E;
+            background: #F5F7F3;
+        }
+
+        .modal-role-item-content {
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+        }
+
+        .modal-role-item-content i {
+            color: #7A8B6E;
+            font-size: 1.1rem;
+        }
+
+        .modal-role-item-name {
+            font-weight: 500;
+            color: #3D2E1F;
+        }
+
+        .modal-add-role-form {
+            display: flex;
+            gap: 0.5rem;
+            align-items: center;
+            padding: 0.75rem;
+            background: #FAF7F5;
+            border-radius: 8px;
+            border: 1px dashed #E5DDD1;
+        }
+
+        .modal-add-role-input {
+            flex: 1;
+            padding: 0.625rem 0.75rem;
+            border: 2px solid #E5DDD1;
+            border-radius: 6px;
+            font-size: 0.875rem;
+            background: white;
+            color: #3D2E1F;
+        }
+
+        .modal-add-role-input:focus {
+            outline: none;
+            border-color: #7A8B6E;
+        }
+
+        .modal-add-role-btn {
+            padding: 0.625rem 1rem;
+            background: #7A8B6E;
+            color: white;
+            border: none;
+            border-radius: 6px;
+            font-size: 0.875rem;
+            font-weight: 600;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            gap: 0.375rem;
+            transition: background 0.2s;
+            white-space: nowrap;
+        }
+
+        .modal-add-role-btn:hover {
+            background: #6A7B5E;
+        }
+
+        .modal-roles-empty {
+            text-align: center;
+            padding: 1rem;
+            color: #8B6F47;
+            font-size: 0.9rem;
+            font-style: italic;
+        }
+
         /* Add connection in modal */
         .modal-add-connection {
             background: #FAF7F5;
@@ -2781,11 +2963,8 @@
                 <div class="modal-header-top">
                     <span class="modal-header-icon" id="modalEntityIcon"></span>
                     <div class="modal-header-content">
-                        <div class="modal-title-wrapper">
-                            <div class="modal-title-text" id="modalEntityName"></div>
-                            <button class="modal-title-edit-btn" id="modalTitleEditBtn" onclick="openEntityEditModal()" title="Rename">
-                                <i class="ph ph-pencil-simple"></i>
-                            </button>
+                        <div class="inline-edit-wrapper">
+                            <input type="text" class="inline-edit-name" id="modalEntityName" placeholder="Enter name..." onblur="saveInlineName()" onkeydown="if(event.key==='Enter'){this.blur();}" />
                         </div>
                         <div class="modal-type-badge" id="modalEntityType"></div>
                     </div>
@@ -2793,6 +2972,7 @@
             </div>
             <div class="modal-body">
                 <div class="modal-section" id="modalDescription"></div>
+                <div class="modal-section" id="modalRoles" style="display: none;"></div>
                 <div class="modal-section" id="modalConnections"></div>
                 <div class="modal-section" id="modalAddConnection"></div>
                 <div class="modal-section" id="modalActivities"></div>
@@ -2805,10 +2985,6 @@
                 <div class="modal-action-spacer"></div>
                 <button class="modal-action-btn secondary" onclick="closeEntityModal()">
                     Close
-                </button>
-                <button class="modal-action-btn primary" id="modalEditButton" onclick="openEntityEditModal()">
-                    <i class="ph ph-pencil-simple"></i>
-                    Edit
                 </button>
             </div>
         </div>
@@ -3554,28 +3730,39 @@ John Doe,Engineering,john@example.com"
             currentModalEntity = entity;
             currentModalEntityType = entityType;
 
-            // Set header content
+            // Set header content with inline editable name
             document.getElementById('modalEntityIcon').innerHTML = getIcon(entityType);
-            document.getElementById('modalEntityName').textContent = entity.name;
+            const nameInput = document.getElementById('modalEntityName');
+            nameInput.value = entity.name;
+            nameInput.readOnly = false; // Ensure editable (might be read-only from relationship modal)
             document.getElementById('modalEntityType').innerHTML = `${getIcon(entityType)} ${entityType.toUpperCase()}`;
 
-            // Show edit and delete buttons for entities
-            document.getElementById('modalEditButton').style.display = 'inline-flex';
+            // Show delete button
             document.getElementById('modalDeleteButton').style.display = 'inline-flex';
-            document.getElementById('modalTitleEditBtn').style.display = 'flex';
 
-            // Display description
+            // Display inline editable description (ensure visible - might be hidden from relationship modal)
             const descriptionEl = document.getElementById('modalDescription');
-            if (entity.description && entity.description.trim()) {
-                descriptionEl.innerHTML = `
-                    <div class="modal-section-title"><i class="ph ph-text-align-left"></i> Description</div>
-                    <div class="modal-description-text">${entity.description}</div>
-                `;
+            descriptionEl.style.display = 'block';
+            const charCount = (entity.description || '').length;
+            descriptionEl.innerHTML = `
+                <div class="modal-section-title"><i class="ph ph-text-align-left"></i> Description</div>
+                <textarea class="inline-edit-description" id="modalDescriptionInput" placeholder="Add a description..." maxlength="240" onblur="saveInlineDescription()" oninput="updateInlineDescCharCount()">${entity.description || ''}</textarea>
+                <div class="description-edit-hint">
+                    <span>Click to edit • Changes save automatically</span>
+                    <span class="description-char-count"><span id="inlineDescCharCount">${charCount}</span>/240</span>
+                </div>
+            `;
+
+            // Ensure add connection section is visible
+            document.getElementById('modalAddConnection').style.display = 'block';
+
+            // Show roles section for teams
+            const rolesEl = document.getElementById('modalRoles');
+            if (entityType === 'team') {
+                rolesEl.style.display = 'block';
+                renderTeamRolesSection(entityId);
             } else {
-                descriptionEl.innerHTML = `
-                    <div class="modal-section-title"><i class="ph ph-text-align-left"></i> Description</div>
-                    <div class="modal-description-empty">No description yet. Click Edit to add one.</div>
-                `;
+                rolesEl.style.display = 'none';
             }
 
             // Get connected entities
@@ -3679,6 +3866,221 @@ John Doe,Engineering,john@example.com"
 
         function closeEntityModal() {
             document.getElementById('entityModal').classList.remove('active');
+        }
+
+        // Inline editing save functions
+        function saveInlineName() {
+            if (!currentModalEntity || !currentModalEntityType) return;
+
+            const newName = document.getElementById('modalEntityName').value.trim();
+            if (!newName || newName === currentModalEntity.name) return;
+
+            const currentName = currentModalEntity.name;
+            currentModalEntity.name = newName;
+
+            // Log to Xano
+            logActivityToXano({
+                event_verb: 'Shift Entity',
+                eo_operator: 'ALT',
+                object_type: currentModalEntityType,
+                object_id: currentModalEntity.id,
+                object_label: `${currentName} → ${newName}`,
+                data_json: {
+                    old_name: currentName,
+                    new_name: newName,
+                    entity_type: currentModalEntityType
+                }
+            });
+
+            // Save and refresh views
+            saveToLocalStorage();
+            renderEntityList();
+            updateSelects();
+            renderActivityList();
+
+            if (currentView === 'graph') {
+                updateGraph();
+            } else if (currentView === 'tree') {
+                renderTreeView();
+            } else if (currentView === 'card') {
+                renderCardView();
+            }
+        }
+
+        function saveInlineDescription() {
+            if (!currentModalEntity || !currentModalEntityType) return;
+
+            const newDesc = document.getElementById('modalDescriptionInput').value.trim();
+            const currentDesc = currentModalEntity.description || '';
+
+            if (newDesc === currentDesc) return;
+
+            currentModalEntity.description = newDesc;
+
+            // Log to Xano
+            logActivityToXano({
+                event_verb: 'Shift Description',
+                eo_operator: 'ALT',
+                object_type: currentModalEntityType,
+                object_id: currentModalEntity.id,
+                object_label: `Updated description for ${currentModalEntity.name}`,
+                data_json: {
+                    entity_name: currentModalEntity.name,
+                    old_description: currentDesc,
+                    new_description: newDesc,
+                    entity_type: currentModalEntityType
+                }
+            });
+
+            // Save and refresh views
+            saveToLocalStorage();
+            renderEntityList();
+
+            if (currentView === 'graph') {
+                updateGraph();
+            } else if (currentView === 'tree') {
+                renderTreeView();
+            } else if (currentView === 'card') {
+                renderCardView();
+            }
+        }
+
+        function updateInlineDescCharCount() {
+            const textarea = document.getElementById('modalDescriptionInput');
+            const count = document.getElementById('inlineDescCharCount');
+            if (textarea && count) {
+                count.textContent = textarea.value.length;
+            }
+        }
+
+        // Render roles section for teams
+        function renderTeamRolesSection(teamId) {
+            const rolesEl = document.getElementById('modalRoles');
+
+            // Find roles connected to this team via DES (Designate) relationship
+            const connectedRoles = relationships
+                .filter(r => r.subject === teamId && r.predicate === 'DES')
+                .map(r => findEntity(r.object))
+                .filter(e => e && e.type === 'role');
+
+            let rolesHtml = `
+                <div class="modal-section-title"><i class="ph ph-briefcase"></i> Roles</div>
+            `;
+
+            if (connectedRoles.length > 0) {
+                rolesHtml += '<div class="modal-roles-list">';
+                connectedRoles.forEach(role => {
+                    rolesHtml += `
+                        <div class="modal-role-item" onclick="openEntityModal('${role.id}', 'role')">
+                            <div class="modal-role-item-content">
+                                <i class="ph ph-briefcase"></i>
+                                <span class="modal-role-item-name">${role.name}</span>
+                            </div>
+                            <i class="ph ph-caret-right" style="color: #8B6F47;"></i>
+                        </div>
+                    `;
+                });
+                rolesHtml += '</div>';
+            } else {
+                rolesHtml += '<div class="modal-roles-empty">No roles assigned to this team yet</div>';
+            }
+
+            rolesHtml += `
+                <div class="modal-add-role-form">
+                    <input type="text" class="modal-add-role-input" id="modalAddRoleInput" placeholder="New role name..." onkeydown="if(event.key==='Enter') addRoleToTeam()">
+                    <button class="modal-add-role-btn" onclick="addRoleToTeam()">
+                        <i class="ph ph-plus"></i> Add Role
+                    </button>
+                </div>
+            `;
+
+            rolesEl.innerHTML = rolesHtml;
+        }
+
+        // Add a new role to the current team
+        function addRoleToTeam() {
+            if (!currentModalEntity || currentModalEntityType !== 'team') return;
+
+            const input = document.getElementById('modalAddRoleInput');
+            const roleName = input.value.trim();
+
+            if (!roleName) {
+                alert('Please enter a role name');
+                return;
+            }
+
+            // Create new role entity
+            const roleId = 'role' + Date.now();
+            const newRole = {
+                id: roleId,
+                name: roleName,
+                type: 'role',
+                description: ''
+            };
+            entities.role.push(newRole);
+
+            // Create relationship: Team DES (designates) Role
+            const relId = 'rel' + Date.now();
+            const relationship = {
+                id: relId,
+                subject: currentModalEntity.id,
+                predicate: 'DES',
+                object: roleId,
+                description: ''
+            };
+            relationships.push(relationship);
+
+            // Log to Xano - role creation
+            logActivityToXano({
+                event_verb: 'Start Entity',
+                eo_operator: 'INS',
+                object_type: 'role',
+                object_id: roleId,
+                object_label: roleName,
+                data_json: {
+                    entity_name: roleName,
+                    entity_type: 'role',
+                    parent_team: currentModalEntity.name,
+                    parent_team_id: currentModalEntity.id
+                }
+            });
+
+            // Log to Xano - relationship creation
+            logActivityToXano({
+                event_verb: 'Link Entities',
+                eo_operator: 'CON',
+                object_type: 'relationship',
+                object_id: relId,
+                object_label: `${currentModalEntity.name} → ${roleName}`,
+                data_json: {
+                    subject_id: currentModalEntity.id,
+                    subject_name: currentModalEntity.name,
+                    predicate: 'DES',
+                    object_id: roleId,
+                    object_name: roleName
+                }
+            });
+
+            // Clear input
+            input.value = '';
+
+            // Save and refresh
+            saveToLocalStorage();
+            renderEntityList();
+            updateSelects();
+            renderActivityList();
+
+            // Re-render the roles section
+            renderTeamRolesSection(currentModalEntity.id);
+
+            // Refresh views
+            if (currentView === 'graph') {
+                updateGraph();
+            } else if (currentView === 'tree') {
+                renderTreeView();
+            } else if (currentView === 'card') {
+                renderCardView();
+            }
         }
 
         // Helper function to get all entities for modal dropdown (excluding current entity)
@@ -3902,16 +4304,11 @@ John Doe,Engineering,john@example.com"
             }
         }
 
-        // Handle Enter key in edit modal
+        // Handle Escape key to close modals
         document.addEventListener('keydown', function(e) {
-            if (e.key === 'Enter' && document.getElementById('entityEditModal').classList.contains('open')) {
-                saveEntityEdit();
-            }
             if (e.key === 'Escape') {
                 if (document.getElementById('deleteConfirmModal').classList.contains('open')) {
                     closeDeleteConfirmModal();
-                } else if (document.getElementById('entityEditModal').classList.contains('open')) {
-                    closeEntityEditModal();
                 } else if (document.getElementById('entityModal').classList.contains('active')) {
                     closeEntityModal();
                 }
@@ -3991,11 +4388,6 @@ John Doe,Engineering,john@example.com"
             }
         }
 
-        // Legacy function - redirect to new modal
-        function editEntityFromModal() {
-            openEntityEditModal();
-        }
-
         function openRelationshipModal(relationshipData) {
             // Get the actual relationship object from the data
             const rel = relationships.find(r => r.id === relationshipData.id);
@@ -4006,9 +4398,7 @@ John Doe,Engineering,john@example.com"
             currentModalEntityType = null;
 
             // Hide entity-specific buttons for relationships
-            document.getElementById('modalEditButton').style.display = 'none';
             document.getElementById('modalDeleteButton').style.display = 'none';
-            document.getElementById('modalTitleEditBtn').style.display = 'none';
 
             const subject = findEntity(rel.subject);
             const object = findEntity(rel.object);
@@ -4018,12 +4408,20 @@ John Doe,Engineering,john@example.com"
 
             // Set header icon for connection
             document.getElementById('modalEntityIcon').innerHTML = '<i class="ph ph-arrows-left-right"></i>';
-            document.getElementById('modalEntityName').innerHTML = `
-                ${subject?.name}
-                <span style="color: ${operator.color}; font-weight: 600;">${operator.label}</span>
-                ${object?.name}
-            `;
+            // For relationships, set the name input as read-only with the connection title
+            const nameInput = document.getElementById('modalEntityName');
+            nameInput.value = `${subject?.name} ${operator.label} ${object?.name}`;
+            nameInput.readOnly = true;
             document.getElementById('modalEntityType').innerHTML = '<i class="ph ph-link"></i> CONNECTION';
+
+            // Hide roles section for relationships
+            document.getElementById('modalRoles').style.display = 'none';
+
+            // Hide description section for relationships
+            document.getElementById('modalDescription').style.display = 'none';
+
+            // Hide add connection section for relationships
+            document.getElementById('modalAddConnection').style.display = 'none';
 
             // Show connection details
             const connectionsEl = document.getElementById('modalConnections');
