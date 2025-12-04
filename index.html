@@ -12163,7 +12163,7 @@ John Doe,Engineering,john@example.com"
             return colors[type] || '#8B6F47';
         }
 
-        // Calculate auto-layout positions based on hierarchy
+        // Calculate auto-layout positions based on hierarchy using d3.tree()
         function calculateAutoLayout(nodes, width, height) {
             const positions = new Map();
             const nodeIds = new Set(nodes.map(n => n.id));
@@ -12195,7 +12195,9 @@ John Doe,Engineering,john@example.com"
             // For each visible node, find its nearest visible ancestor
             function findVisibleAncestor(nodeId) {
                 let current = fullParentMap.get(nodeId);
-                while (current) {
+                const visited = new Set();
+                while (current && !visited.has(current)) {
+                    visited.add(current);
                     if (nodeIds.has(current)) return current;
                     current = fullParentMap.get(current);
                 }
@@ -12214,70 +12216,94 @@ John Doe,Engineering,john@example.com"
                 }
             });
 
-            // Find root nodes (no visible parent in hierarchy)
-            const rootNodes = nodes.filter(n => !parentMap.has(n.id));
+            // Find root nodes (no visible parent in hierarchy) - these have children
+            const rootNodes = nodes.filter(n => !parentMap.has(n.id) && childrenMap.has(n.id));
 
-            // Calculate depths
-            const nodeDepths = new Map();
-            let maxDepth = 0;
+            // Find orphan nodes (no parent AND no children in hierarchy)
+            const orphanNodes = nodes.filter(n => !parentMap.has(n.id) && !childrenMap.has(n.id));
 
-            function calcDepth(nodeId, depth) {
-                nodeDepths.set(nodeId, depth);
-                maxDepth = Math.max(maxDepth, depth);
-                (childrenMap.get(nodeId) || []).forEach(childId => calcDepth(childId, depth + 1));
-            }
+            const VERTICAL_SPACING = 140;
+            const HORIZONTAL_SPACING = 180;
 
-            rootNodes.forEach(n => calcDepth(n.id, 0));
-            nodes.forEach(n => {
-                if (!nodeDepths.has(n.id)) nodeDepths.set(n.id, 0);
-            });
-
-            // Calculate subtree widths for better horizontal spacing
-            function getSubtreeWidth(nodeId) {
-                const children = childrenMap.get(nodeId) || [];
-                if (children.length === 0) return NODE_WIDTH + 40;
-                return children.reduce((sum, childId) => sum + getSubtreeWidth(childId), 0);
-            }
-
-            // Assign positions - vertical layout (top to bottom)
-            const VERTICAL_SPACING = 120;
-            const HORIZONTAL_PADDING = 60;
-
-            function assignPositions(nodeId, xStart, xEnd, depth) {
-                const y = 80 + depth * VERTICAL_SPACING;
-                const x = (xStart + xEnd) / 2;
-                positions.set(nodeId, { x, y });
-
-                const children = childrenMap.get(nodeId) || [];
-                if (children.length > 0) {
-                    let currentX = xStart;
-                    children.forEach(childId => {
-                        const childWidth = getSubtreeWidth(childId);
-                        assignPositions(childId, currentX, currentX + childWidth, depth + 1);
-                        currentX += childWidth;
-                    });
+            // Use d3.tree() for proper hierarchical layout
+            if (rootNodes.length > 0) {
+                // Build hierarchy data for d3
+                function buildHierarchyData(nodeId) {
+                    const children = (childrenMap.get(nodeId) || []).map(childId => buildHierarchyData(childId));
+                    return { id: nodeId, children: children.length > 0 ? children : undefined };
                 }
+
+                // Create a virtual root that contains all actual roots
+                const virtualRoot = {
+                    id: '__virtual_root__',
+                    children: rootNodes.map(n => buildHierarchyData(n.id))
+                };
+
+                // Create d3 hierarchy
+                const root = d3.hierarchy(virtualRoot);
+
+                // Calculate tree layout
+                const treeLayout = d3.tree()
+                    .nodeSize([HORIZONTAL_SPACING, VERTICAL_SPACING])
+                    .separation((a, b) => {
+                        // More separation between different subtrees
+                        return a.parent === b.parent ? 1 : 1.5;
+                    });
+
+                treeLayout(root);
+
+                // Extract positions from d3 tree (skip virtual root)
+                root.descendants().forEach(d => {
+                    if (d.data.id !== '__virtual_root__') {
+                        // d3.tree uses x for horizontal, y for vertical (depth)
+                        // We want top-to-bottom layout, so y becomes our vertical position
+                        positions.set(d.data.id, {
+                            x: d.x + width / 2,  // Center horizontally
+                            y: d.y + 80         // Offset from top
+                        });
+                    }
+                });
             }
 
-            // Position root nodes
-            let totalWidth = rootNodes.reduce((sum, n) => sum + getSubtreeWidth(n.id), 0);
-            let startX = Math.max(HORIZONTAL_PADDING, (width - totalWidth) / 2);
+            // Position orphan nodes in a grid below the hierarchy
+            if (orphanNodes.length > 0) {
+                // Find the maximum y position used so far
+                let maxY = 80;
+                positions.forEach(pos => {
+                    maxY = Math.max(maxY, pos.y);
+                });
 
-            rootNodes.forEach(node => {
-                const subtreeWidth = getSubtreeWidth(node.id);
-                assignPositions(node.id, startX, startX + subtreeWidth, 0);
-                startX += subtreeWidth;
-            });
+                // Calculate grid dimensions for orphans
+                const gridColumns = Math.ceil(Math.sqrt(orphanNodes.length * 1.5)); // Wider than tall
+                const gridRows = Math.ceil(orphanNodes.length / gridColumns);
 
-            // Handle orphan nodes (not in any hierarchy)
-            const orphans = nodes.filter(n => !positions.has(n.id));
-            if (orphans.length > 0) {
-                const orphanY = 80 + (maxDepth + 1) * VERTICAL_SPACING;
-                const orphanSpacing = Math.min(200, (width - 100) / (orphans.length + 1));
-                orphans.forEach((n, i) => {
+                const orphanStartY = maxY + VERTICAL_SPACING + 40;
+                const gridWidth = (gridColumns - 1) * HORIZONTAL_SPACING;
+                const gridStartX = (width - gridWidth) / 2;
+
+                orphanNodes.forEach((n, i) => {
+                    const col = i % gridColumns;
+                    const row = Math.floor(i / gridColumns);
                     positions.set(n.id, {
-                        x: 50 + (i + 1) * orphanSpacing,
-                        y: orphanY
+                        x: gridStartX + col * HORIZONTAL_SPACING,
+                        y: orphanStartY + row * VERTICAL_SPACING
+                    });
+                });
+            }
+
+            // Handle any nodes that still don't have positions
+            const remaining = nodes.filter(n => !positions.has(n.id));
+            if (remaining.length > 0) {
+                let maxY = 80;
+                positions.forEach(pos => {
+                    maxY = Math.max(maxY, pos.y);
+                });
+
+                const startY = maxY + VERTICAL_SPACING;
+                remaining.forEach((n, i) => {
+                    positions.set(n.id, {
+                        x: 100 + (i % 5) * HORIZONTAL_SPACING,
+                        y: startY + Math.floor(i / 5) * VERTICAL_SPACING
                     });
                 });
             }
@@ -12293,10 +12319,15 @@ John Doe,Engineering,john@example.com"
             const width = container.clientWidth;
             const height = container.clientHeight;
 
-            // Get all nodes
+            // Get active filters (same as updateGraph)
+            const filters = getActiveFilters();
+
+            // Get filtered nodes (same as updateGraph)
             const nodes = [];
             ['unit', 'team', 'role', 'object'].forEach(type => {
-                entities[type].forEach(entity => nodes.push(entity));
+                if (filters.entities[type]) {
+                    entities[type].forEach(entity => nodes.push(entity));
+                }
             });
 
             // Calculate new positions
