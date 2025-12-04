@@ -1051,6 +1051,265 @@
         .entity-card.object { background: linear-gradient(135deg, #FFFBF5 0%, white 100%); }
         .entity-card.activity { background: linear-gradient(135deg, #F5F8FA 0%, white 100%); }
 
+        /* Nested/Hierarchical Cards Styles */
+        .hierarchy-card-container {
+            background: white;
+            border: 2px solid #E5DDD1;
+            border-radius: 16px;
+            padding: 1.25rem;
+            margin-bottom: 1.25rem;
+            transition: all 0.2s;
+        }
+
+        .hierarchy-card-container:hover {
+            border-color: #C88F4A;
+            box-shadow: 0 4px 12px rgba(200, 143, 74, 0.15);
+        }
+
+        .hierarchy-card-container.unit {
+            background: linear-gradient(135deg, #FFF9F0 0%, #FFFBF7 100%);
+            border-color: #D4A574;
+        }
+
+        .hierarchy-card-container.team {
+            background: linear-gradient(135deg, #FAF7F5 0%, #FEFCFA 100%);
+            border-color: #E5DDD1;
+        }
+
+        .hierarchy-card-header {
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+            margin-bottom: 0.75rem;
+            cursor: pointer;
+        }
+
+        .hierarchy-card-header:hover .hierarchy-card-title {
+            color: #C88F4A;
+        }
+
+        .hierarchy-card-icon {
+            font-size: 2rem;
+            line-height: 1;
+        }
+
+        .hierarchy-card-title {
+            font-size: 1.15rem;
+            font-weight: 600;
+            color: #3D2E1F;
+            transition: color 0.2s;
+        }
+
+        .hierarchy-card-description {
+            font-size: 0.85rem;
+            color: #8B6F47;
+            line-height: 1.5;
+            font-style: italic;
+            margin-bottom: 0.75rem;
+            padding-left: 2.75rem;
+        }
+
+        .hierarchy-card-activities {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 0.375rem;
+            padding-left: 2.75rem;
+            margin-bottom: 1rem;
+        }
+
+        .nested-cards-section {
+            margin-top: 1rem;
+            padding-top: 1rem;
+            border-top: 1px dashed #E5DDD1;
+        }
+
+        .nested-cards-label {
+            font-size: 0.75rem;
+            color: #8B6F47;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            margin-bottom: 0.75rem;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .nested-cards-label::after {
+            content: '';
+            flex: 1;
+            height: 1px;
+            background: #E5DDD1;
+        }
+
+        .nested-cards-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
+            gap: 1rem;
+        }
+
+        .nested-entity-card {
+            background: white;
+            border: 2px solid #E5DDD1;
+            border-radius: 10px;
+            padding: 0.875rem;
+            cursor: pointer;
+            transition: all 0.2s;
+            display: flex;
+            flex-direction: column;
+            gap: 0.5rem;
+        }
+
+        .nested-entity-card:hover {
+            border-color: #C88F4A;
+            box-shadow: 0 2px 6px rgba(200, 143, 74, 0.2);
+        }
+
+        .nested-entity-card.team { background: linear-gradient(135deg, #FAF7F5 0%, white 100%); }
+        .nested-entity-card.role { background: linear-gradient(135deg, #F5F3F0 0%, white 100%); }
+        .nested-entity-card.person { background: linear-gradient(135deg, #F0EDE8 0%, white 100%); }
+
+        .nested-card-header {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .nested-card-icon {
+            font-size: 1.25rem;
+            line-height: 1;
+        }
+
+        .nested-card-title {
+            font-size: 0.95rem;
+            font-weight: 600;
+            color: #3D2E1F;
+        }
+
+        .nested-card-description {
+            font-size: 0.8rem;
+            color: #8B6F47;
+            line-height: 1.4;
+            font-style: italic;
+        }
+
+        .nested-card-connections {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 0.25rem;
+            margin-top: auto;
+        }
+
+        .nested-card-connections .connection-badge {
+            font-size: 0.7rem;
+            padding: 0.25rem 0.5rem;
+        }
+
+        /* Deep nesting - roles/people inside teams */
+        .deep-nested-section {
+            margin-top: 0.75rem;
+            padding-top: 0.75rem;
+            border-top: 1px dotted #E5DDD1;
+        }
+
+        .deep-nested-label {
+            font-size: 0.7rem;
+            color: #A89B8C;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            margin-bottom: 0.5rem;
+        }
+
+        .deep-nested-items {
+            display: flex;
+            flex-direction: column;
+            gap: 0.5rem;
+        }
+
+        .deep-nested-item {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            padding: 0.5rem 0.625rem;
+            background: rgba(255, 255, 255, 0.7);
+            border: 1px solid #E5DDD1;
+            border-radius: 8px;
+            font-size: 0.85rem;
+            color: #3D2E1F;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .deep-nested-item:hover {
+            background: white;
+            border-color: #C88F4A;
+        }
+
+        .deep-nested-item .item-icon {
+            font-size: 1rem;
+        }
+
+        .deep-nested-item .item-name {
+            font-weight: 500;
+        }
+
+        /* View mode toggle button */
+        .view-mode-toggle {
+            display: flex;
+            background: #E5DDD1;
+            border-radius: 8px;
+            padding: 3px;
+            gap: 2px;
+        }
+
+        .view-mode-btn {
+            padding: 0.5rem 0.875rem;
+            border: none;
+            background: transparent;
+            color: #6B5642;
+            font-size: 0.85rem;
+            font-weight: 500;
+            border-radius: 6px;
+            cursor: pointer;
+            transition: all 0.2s;
+            display: flex;
+            align-items: center;
+            gap: 0.375rem;
+        }
+
+        .view-mode-btn:hover {
+            color: #3D2E1F;
+        }
+
+        .view-mode-btn.active {
+            background: white;
+            color: #3D2E1F;
+            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+        }
+
+        /* Hierarchy row styling */
+        .hierarchy-grid {
+            display: flex;
+            flex-direction: column;
+            gap: 1.25rem;
+        }
+
+        /* Orphan entities section */
+        .orphan-entities-section {
+            margin-top: 2rem;
+            padding-top: 1.5rem;
+            border-top: 2px solid #E5DDD1;
+        }
+
+        .orphan-section-title {
+            font-size: 1rem;
+            color: #6B5642;
+            font-weight: 600;
+            margin-bottom: 1rem;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
         .card-header {
             display: flex;
             align-items: center;
@@ -7749,6 +8008,84 @@ John Doe,Engineering,john@example.com"
             object: true,
             activity: true
         };
+        let cardViewHierarchical = true; // Default to hierarchical view
+
+        function toggleCardViewMode(isHierarchical) {
+            cardViewHierarchical = isHierarchical;
+            renderCardView();
+        }
+
+        // Build hierarchy tree from DES relationships
+        function buildHierarchyTree() {
+            // Find all DES relationships (parent defines child)
+            const desRelationships = relationships.filter(r => r.predicate === 'DES');
+
+            // Track which entities have parents
+            const entitiesWithParents = new Set(desRelationships.map(r => r.object));
+
+            // Get children for a given parent entity
+            function getChildren(parentId) {
+                return desRelationships
+                    .filter(r => r.subject === parentId)
+                    .map(r => findEntity(r.object))
+                    .filter(e => e !== null);
+            }
+
+            // Get people who fill a role (INS relationships)
+            function getPeopleInRole(roleId) {
+                return relationships
+                    .filter(r => r.predicate === 'INS' && r.object === roleId)
+                    .map(r => findEntity(r.subject))
+                    .filter(e => e !== null && e.type === 'person');
+            }
+
+            // Build tree structure for units (top level)
+            const hierarchyTree = entities.unit.map(unit => {
+                const directTeams = getChildren(unit.id).filter(e => e.type === 'team');
+                const directRoles = getChildren(unit.id).filter(e => e.type === 'role');
+
+                return {
+                    entity: unit,
+                    teams: directTeams.map(team => {
+                        const teamRoles = getChildren(team.id).filter(e => e.type === 'role');
+                        return {
+                            entity: team,
+                            roles: teamRoles.map(role => ({
+                                entity: role,
+                                people: getPeopleInRole(role.id)
+                            }))
+                        };
+                    }),
+                    roles: directRoles.map(role => ({
+                        entity: role,
+                        people: getPeopleInRole(role.id)
+                    }))
+                };
+            });
+
+            // Find orphan entities (no DES parent)
+            const orphanTeams = entities.team.filter(t => !entitiesWithParents.has(t.id));
+            const orphanRoles = entities.role.filter(r => !entitiesWithParents.has(r.id));
+            const orphanPeople = entities.person.filter(p => {
+                // People are orphans if they don't fill any roles
+                return !relationships.some(r => r.predicate === 'INS' && r.subject === p.id);
+            });
+
+            return {
+                units: hierarchyTree,
+                orphanTeams,
+                orphanRoles,
+                orphanPeople,
+                objects: entities.object // Objects are always shown separately
+            };
+        }
+
+        // Get non-DES activities for an entity
+        function getEntityActivities(entityId) {
+            return relationships.filter(r =>
+                (r.subject === entityId || r.object === entityId) && r.predicate !== 'DES' && r.predicate !== 'INS'
+            );
+        }
 
         // Card View Filtering and Sorting Functions
         function filterEntitiesBySearch(entitiesArray, searchTerm) {
@@ -7837,6 +8174,21 @@ John Doe,Engineering,john@example.com"
             `;
             controls.appendChild(sortContainer);
 
+            // View mode toggle (flat vs hierarchical)
+            const viewModeToggle = document.createElement('div');
+            viewModeToggle.className = 'view-mode-toggle';
+            viewModeToggle.innerHTML = `
+                <button class="view-mode-btn ${cardViewHierarchical ? 'active' : ''}" onclick="toggleCardViewMode(true)">
+                    <i class="ph ph-tree-structure"></i>
+                    Nested
+                </button>
+                <button class="view-mode-btn ${!cardViewHierarchical ? 'active' : ''}" onclick="toggleCardViewMode(false)">
+                    <i class="ph ph-squares-four"></i>
+                    Flat
+                </button>
+            `;
+            controls.appendChild(viewModeToggle);
+
             // Type filter buttons
             const filterButtons = document.createElement('div');
             filterButtons.className = 'card-filter-buttons';
@@ -7884,6 +8236,29 @@ John Doe,Engineering,john@example.com"
             contentContainer.innerHTML = '';
 
             const sidebarFilters = getActiveFilters();
+            let hasContent = false;
+
+            if (cardViewHierarchical) {
+                // Hierarchical/nested view
+                hasContent = renderHierarchicalCardView(contentContainer, sidebarFilters);
+            } else {
+                // Flat view (original behavior)
+                hasContent = renderFlatCardView(contentContainer, sidebarFilters);
+            }
+
+            // Show no results message if nothing matches
+            if (!hasContent) {
+                const noResults = document.createElement('div');
+                noResults.className = 'card-no-results';
+                noResults.innerHTML = `
+                    <i class="ph ph-magnifying-glass"></i>
+                    <p>No entities match your search or filter criteria.</p>
+                `;
+                contentContainer.appendChild(noResults);
+            }
+        }
+
+        function renderFlatCardView(contentContainer, sidebarFilters) {
             let hasContent = false;
 
             // Units
@@ -7945,16 +8320,430 @@ John Doe,Engineering,john@example.com"
                 }
             }
 
-            // Show no results message if nothing matches
-            if (!hasContent) {
-                const noResults = document.createElement('div');
-                noResults.className = 'card-no-results';
-                noResults.innerHTML = `
-                    <i class="ph ph-magnifying-glass"></i>
-                    <p>No entities match your search or filter criteria.</p>
-                `;
-                contentContainer.appendChild(noResults);
+            return hasContent;
+        }
+
+        function renderHierarchicalCardView(contentContainer, sidebarFilters) {
+            const hierarchy = buildHierarchyTree();
+            let hasContent = false;
+
+            // Helper to check if entity passes search filter
+            function passesSearch(entity) {
+                if (!cardViewSearchTerm) return true;
+                const term = cardViewSearchTerm.toLowerCase();
+                return entity.name.toLowerCase().includes(term) ||
+                       (entity.description && entity.description.toLowerCase().includes(term));
             }
+
+            // Helper to check if any child entities pass the search
+            function hasMatchingDescendants(unitNode) {
+                // Check teams
+                for (const teamNode of unitNode.teams) {
+                    if (passesSearch(teamNode.entity)) return true;
+                    for (const roleNode of teamNode.roles) {
+                        if (passesSearch(roleNode.entity)) return true;
+                        for (const person of roleNode.people) {
+                            if (passesSearch(person)) return true;
+                        }
+                    }
+                }
+                // Check direct roles
+                for (const roleNode of unitNode.roles) {
+                    if (passesSearch(roleNode.entity)) return true;
+                    for (const person of roleNode.people) {
+                        if (passesSearch(person)) return true;
+                    }
+                }
+                return false;
+            }
+
+            // Render unit hierarchy section
+            if (cardViewTypeFilters.unit && sidebarFilters.entities.unit && hierarchy.units.length > 0) {
+                const hierarchySection = document.createElement('div');
+                hierarchySection.className = 'card-row';
+
+                const header = document.createElement('div');
+                header.className = 'card-row-header';
+                header.innerHTML = `<div class="card-row-title">${getIcon('unit')} Organizational Hierarchy</div>`;
+                hierarchySection.appendChild(header);
+
+                const grid = document.createElement('div');
+                grid.className = 'hierarchy-grid';
+
+                hierarchy.units.forEach(unitNode => {
+                    // Check if this unit or any descendants match the search
+                    if (!passesSearch(unitNode.entity) && !hasMatchingDescendants(unitNode)) {
+                        return;
+                    }
+
+                    const unitCard = createHierarchyUnitCard(unitNode, sidebarFilters);
+                    if (unitCard) {
+                        grid.appendChild(unitCard);
+                        hasContent = true;
+                    }
+                });
+
+                if (grid.children.length > 0) {
+                    hierarchySection.appendChild(grid);
+                    contentContainer.appendChild(hierarchySection);
+                }
+            }
+
+            // Render orphan teams (teams without a parent unit)
+            if (cardViewTypeFilters.team && sidebarFilters.entities.team && hierarchy.orphanTeams.length > 0) {
+                const filteredOrphanTeams = hierarchy.orphanTeams.filter(passesSearch);
+                if (filteredOrphanTeams.length > 0) {
+                    const orphanSection = document.createElement('div');
+                    orphanSection.className = 'orphan-entities-section';
+                    orphanSection.innerHTML = `<div class="orphan-section-title">${getIcon('team')} Teams (unassigned)</div>`;
+
+                    const grid = document.createElement('div');
+                    grid.className = 'card-grid';
+                    filteredOrphanTeams.forEach(team => {
+                        grid.appendChild(createSimpleEntityCard(team));
+                    });
+                    orphanSection.appendChild(grid);
+                    contentContainer.appendChild(orphanSection);
+                    hasContent = true;
+                }
+            }
+
+            // Render orphan roles (roles without a parent)
+            if (cardViewTypeFilters.role && sidebarFilters.entities.role && hierarchy.orphanRoles.length > 0) {
+                const filteredOrphanRoles = hierarchy.orphanRoles.filter(passesSearch);
+                if (filteredOrphanRoles.length > 0) {
+                    const orphanSection = document.createElement('div');
+                    orphanSection.className = 'orphan-entities-section';
+                    orphanSection.innerHTML = `<div class="orphan-section-title">${getIcon('role')} Roles (unassigned)</div>`;
+
+                    const grid = document.createElement('div');
+                    grid.className = 'card-grid';
+                    filteredOrphanRoles.forEach(role => {
+                        grid.appendChild(createSimpleEntityCard(role));
+                    });
+                    orphanSection.appendChild(grid);
+                    contentContainer.appendChild(orphanSection);
+                    hasContent = true;
+                }
+            }
+
+            // Render orphan people (people not filling any role)
+            if (cardViewTypeFilters.person && sidebarFilters.entities.person && hierarchy.orphanPeople.length > 0) {
+                const filteredOrphanPeople = hierarchy.orphanPeople.filter(passesSearch);
+                if (filteredOrphanPeople.length > 0) {
+                    const orphanSection = document.createElement('div');
+                    orphanSection.className = 'orphan-entities-section';
+                    orphanSection.innerHTML = `<div class="orphan-section-title">${getIcon('person')} People (unassigned)</div>`;
+
+                    const grid = document.createElement('div');
+                    grid.className = 'card-grid';
+                    filteredOrphanPeople.forEach(person => {
+                        grid.appendChild(createSimpleEntityCard(person));
+                    });
+                    orphanSection.appendChild(grid);
+                    contentContainer.appendChild(orphanSection);
+                    hasContent = true;
+                }
+            }
+
+            // Render work products (always flat, not part of hierarchy)
+            if (cardViewTypeFilters.object && sidebarFilters.entities.object && hierarchy.objects.length > 0) {
+                let filteredObjects = filterEntitiesBySearch(hierarchy.objects, cardViewSearchTerm);
+                filteredObjects = sortEntities(filteredObjects, cardViewSortOption);
+                if (filteredObjects.length > 0) {
+                    contentContainer.appendChild(createCardRow('Work Products', filteredObjects, getIcon('object')));
+                    hasContent = true;
+                }
+            }
+
+            // Activities
+            if (cardViewTypeFilters.activity && relationships.length > 0) {
+                const activityRow = createActivityCardRowFiltered();
+                if (activityRow) {
+                    contentContainer.appendChild(activityRow);
+                    hasContent = true;
+                }
+            }
+
+            return hasContent;
+        }
+
+        function createHierarchyUnitCard(unitNode, sidebarFilters) {
+            const unit = unitNode.entity;
+            const showTeams = cardViewTypeFilters.team && sidebarFilters.entities.team;
+            const showRoles = cardViewTypeFilters.role && sidebarFilters.entities.role;
+            const showPeople = cardViewTypeFilters.person && sidebarFilters.entities.person;
+
+            const card = document.createElement('div');
+            card.className = 'hierarchy-card-container unit';
+
+            // Unit header
+            const headerHTML = `
+                <div class="hierarchy-card-header" onclick="openEntityModal('${unit.id}', 'unit')">
+                    <div class="hierarchy-card-icon">${getIcon('unit')}</div>
+                    <div class="hierarchy-card-title">${unit.name}</div>
+                </div>
+            `;
+
+            // Unit description
+            const descHTML = unit.description ?
+                `<div class="hierarchy-card-description">${unit.description.length > 100 ? unit.description.substring(0, 100) + '...' : unit.description}</div>` : '';
+
+            // Unit activities
+            const unitActivities = getEntityActivities(unit.id);
+            let activitiesHTML = '';
+            if (unitActivities.length > 0) {
+                activitiesHTML = '<div class="hierarchy-card-activities">';
+                unitActivities.slice(0, 2).forEach(rel => {
+                    const operator = eoOperators[rel.predicate];
+                    const isSubject = rel.subject === unit.id;
+                    const otherEntity = findEntity(isSubject ? rel.object : rel.subject);
+                    activitiesHTML += `
+                        <span class="connection-badge" style="background: ${operator.color}; color: white; border-color: ${operator.color};">
+                            ${isSubject ? '→' : '←'} ${operator.label} ${otherEntity?.name || ''}
+                        </span>
+                    `;
+                });
+                if (unitActivities.length > 2) {
+                    activitiesHTML += `<span class="connection-badge">+${unitActivities.length - 2} more</span>`;
+                }
+                activitiesHTML += '</div>';
+            }
+
+            card.innerHTML = headerHTML + descHTML + activitiesHTML;
+
+            // Nested teams section
+            if (showTeams && unitNode.teams.length > 0) {
+                const teamsSection = document.createElement('div');
+                teamsSection.className = 'nested-cards-section';
+                teamsSection.innerHTML = `<div class="nested-cards-label">${getIcon('team')} Teams (${unitNode.teams.length})</div>`;
+
+                const teamsGrid = document.createElement('div');
+                teamsGrid.className = 'nested-cards-grid';
+
+                unitNode.teams.forEach(teamNode => {
+                    const teamCard = createNestedTeamCard(teamNode, showRoles, showPeople);
+                    teamsGrid.appendChild(teamCard);
+                });
+
+                teamsSection.appendChild(teamsGrid);
+                card.appendChild(teamsSection);
+            }
+
+            // Direct roles (roles that belong to unit, not to a team)
+            if (showRoles && unitNode.roles.length > 0) {
+                const rolesSection = document.createElement('div');
+                rolesSection.className = 'nested-cards-section';
+                rolesSection.innerHTML = `<div class="nested-cards-label">${getIcon('role')} Direct Roles (${unitNode.roles.length})</div>`;
+
+                const rolesGrid = document.createElement('div');
+                rolesGrid.className = 'nested-cards-grid';
+
+                unitNode.roles.forEach(roleNode => {
+                    const roleCard = createNestedRoleCard(roleNode, showPeople);
+                    rolesGrid.appendChild(roleCard);
+                });
+
+                rolesSection.appendChild(rolesGrid);
+                card.appendChild(rolesSection);
+            }
+
+            return card;
+        }
+
+        function createNestedTeamCard(teamNode, showRoles, showPeople) {
+            const team = teamNode.entity;
+            const card = document.createElement('div');
+            card.className = 'nested-entity-card team';
+            card.onclick = (e) => {
+                if (e.target.closest('.deep-nested-item')) return;
+                openEntityModal(team.id, 'team');
+            };
+
+            // Team header
+            let cardHTML = `
+                <div class="nested-card-header">
+                    <div class="nested-card-icon">${getIcon('team')}</div>
+                    <div class="nested-card-title">${team.name}</div>
+                </div>
+            `;
+
+            // Team description
+            if (team.description) {
+                cardHTML += `<div class="nested-card-description">${team.description.length > 60 ? team.description.substring(0, 60) + '...' : team.description}</div>`;
+            }
+
+            // Team activities
+            const teamActivities = getEntityActivities(team.id);
+            if (teamActivities.length > 0) {
+                cardHTML += '<div class="nested-card-connections">';
+                teamActivities.slice(0, 2).forEach(rel => {
+                    const operator = eoOperators[rel.predicate];
+                    const isSubject = rel.subject === team.id;
+                    const otherEntity = findEntity(isSubject ? rel.object : rel.subject);
+                    cardHTML += `
+                        <span class="connection-badge" style="background: ${operator.color}; color: white; font-size: 0.7rem; padding: 0.2rem 0.4rem;">
+                            ${isSubject ? '→' : '←'} ${operator.label}
+                        </span>
+                    `;
+                });
+                cardHTML += '</div>';
+            }
+
+            card.innerHTML = cardHTML;
+
+            // Nested roles within team
+            if (showRoles && teamNode.roles.length > 0) {
+                const rolesSection = document.createElement('div');
+                rolesSection.className = 'deep-nested-section';
+                rolesSection.innerHTML = `<div class="deep-nested-label">${getIcon('role')} Roles (${teamNode.roles.length})</div>`;
+
+                const rolesItems = document.createElement('div');
+                rolesItems.className = 'deep-nested-items';
+
+                teamNode.roles.forEach(roleNode => {
+                    const roleItem = document.createElement('div');
+                    roleItem.className = 'deep-nested-item';
+                    roleItem.onclick = (e) => {
+                        e.stopPropagation();
+                        openEntityModal(roleNode.entity.id, 'role');
+                    };
+
+                    let roleHTML = `
+                        <span class="item-icon">${getIcon('role')}</span>
+                        <span class="item-name">${roleNode.entity.name}</span>
+                    `;
+
+                    // Show people filling this role
+                    if (showPeople && roleNode.people.length > 0) {
+                        roleHTML += `<span style="margin-left: auto; color: #8B6F47; font-size: 0.75rem;">${getIcon('person')} ${roleNode.people.length}</span>`;
+                    }
+
+                    roleItem.innerHTML = roleHTML;
+                    rolesItems.appendChild(roleItem);
+                });
+
+                rolesSection.appendChild(rolesItems);
+                card.appendChild(rolesSection);
+            }
+
+            return card;
+        }
+
+        function createNestedRoleCard(roleNode, showPeople) {
+            const role = roleNode.entity;
+            const card = document.createElement('div');
+            card.className = 'nested-entity-card role';
+            card.onclick = (e) => {
+                if (e.target.closest('.deep-nested-item')) return;
+                openEntityModal(role.id, 'role');
+            };
+
+            // Role header
+            let cardHTML = `
+                <div class="nested-card-header">
+                    <div class="nested-card-icon">${getIcon('role')}</div>
+                    <div class="nested-card-title">${role.name}</div>
+                </div>
+            `;
+
+            // Role description
+            if (role.description) {
+                cardHTML += `<div class="nested-card-description">${role.description.length > 60 ? role.description.substring(0, 60) + '...' : role.description}</div>`;
+            }
+
+            // Role activities
+            const roleActivities = getEntityActivities(role.id);
+            if (roleActivities.length > 0) {
+                cardHTML += '<div class="nested-card-connections">';
+                roleActivities.slice(0, 2).forEach(rel => {
+                    const operator = eoOperators[rel.predicate];
+                    const isSubject = rel.subject === role.id;
+                    cardHTML += `
+                        <span class="connection-badge" style="background: ${operator.color}; color: white; font-size: 0.7rem; padding: 0.2rem 0.4rem;">
+                            ${isSubject ? '→' : '←'} ${operator.label}
+                        </span>
+                    `;
+                });
+                cardHTML += '</div>';
+            }
+
+            card.innerHTML = cardHTML;
+
+            // People filling this role
+            if (showPeople && roleNode.people.length > 0) {
+                const peopleSection = document.createElement('div');
+                peopleSection.className = 'deep-nested-section';
+                peopleSection.innerHTML = `<div class="deep-nested-label">${getIcon('person')} Filled by (${roleNode.people.length})</div>`;
+
+                const peopleItems = document.createElement('div');
+                peopleItems.className = 'deep-nested-items';
+
+                roleNode.people.forEach(person => {
+                    const personItem = document.createElement('div');
+                    personItem.className = 'deep-nested-item';
+                    personItem.onclick = (e) => {
+                        e.stopPropagation();
+                        openEntityModal(person.id, 'person');
+                    };
+                    personItem.innerHTML = `
+                        <span class="item-icon">${getIcon('person')}</span>
+                        <span class="item-name">${person.name}</span>
+                    `;
+                    peopleItems.appendChild(personItem);
+                });
+
+                peopleSection.appendChild(peopleItems);
+                card.appendChild(peopleSection);
+            }
+
+            return card;
+        }
+
+        function createSimpleEntityCard(entity) {
+            const card = document.createElement('div');
+            card.className = `entity-card ${entity.type}`;
+            card.onclick = () => openEntityModal(entity.id, entity.type);
+
+            const entityActivities = getEntityActivities(entity.id);
+
+            let activitiesHTML = '';
+            if (entityActivities.length > 0) {
+                activitiesHTML = '<div class="card-connections">';
+                entityActivities.slice(0, 3).forEach(rel => {
+                    const operator = eoOperators[rel.predicate];
+                    const isSubject = rel.subject === entity.id;
+                    const otherEntity = findEntity(isSubject ? rel.object : rel.subject);
+                    activitiesHTML += `
+                        <span class="connection-badge" style="background: ${operator.color}; color: white; border-color: ${operator.color};">
+                            ${isSubject ? '→' : '←'} ${operator.label} ${otherEntity?.name || ''}
+                        </span>
+                    `;
+                });
+                if (entityActivities.length > 3) {
+                    activitiesHTML += `<span class="connection-badge">+${entityActivities.length - 3} more</span>`;
+                }
+                activitiesHTML += '</div>';
+            }
+
+            let descriptionHTML = '';
+            if (entity.description && entity.description.trim()) {
+                const truncatedDesc = entity.description.length > 80
+                    ? entity.description.substring(0, 80) + '...'
+                    : entity.description;
+                descriptionHTML = `<div class="card-description">${truncatedDesc}</div>`;
+            }
+
+            card.innerHTML = `
+                <div class="card-header">
+                    <div class="card-icon">${getIcon(entity.type)}</div>
+                    <div class="card-title">${entity.name}</div>
+                </div>
+                ${descriptionHTML}
+                ${activitiesHTML}
+            `;
+
+            return card;
         }
 
         function createActivityCardRowFiltered() {
