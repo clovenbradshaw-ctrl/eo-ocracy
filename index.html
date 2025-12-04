@@ -2217,6 +2217,299 @@
             opacity: 1;
         }
 
+        /* Org Chart View Styles */
+        .orgchart-view {
+            display: none;
+            position: relative;
+            height: 100%;
+            background: white;
+            overflow: auto;
+        }
+
+        .orgchart-view.active {
+            display: block;
+        }
+
+        .orgchart-container {
+            padding: 2rem;
+            min-width: max-content;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+
+        .orgchart-level {
+            display: flex;
+            justify-content: center;
+            gap: 1rem;
+            margin-bottom: 0;
+            position: relative;
+        }
+
+        .orgchart-node-wrapper {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+
+        .orgchart-node {
+            background: white;
+            border: 2px solid #E5DDD1;
+            border-radius: 12px;
+            padding: 1rem;
+            min-width: 180px;
+            max-width: 220px;
+            text-align: center;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+            position: relative;
+        }
+
+        .orgchart-node:hover {
+            border-color: #C88F4A;
+            box-shadow: 0 4px 12px rgba(200, 143, 74, 0.2);
+            transform: translateY(-2px);
+        }
+
+        .orgchart-node.type-unit {
+            border-left: 4px solid #C88F4A;
+        }
+
+        .orgchart-node.type-team {
+            border-left: 4px solid #7B9E6B;
+        }
+
+        .orgchart-node.type-role {
+            border-left: 4px solid #8B6F47;
+        }
+
+        .orgchart-node.type-person {
+            border-left: 4px solid #6B8B9E;
+        }
+
+        .orgchart-node.type-object {
+            border-left: 4px solid #9E6B8B;
+        }
+
+        .orgchart-node-icon {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: 0 auto 0.75rem;
+            font-size: 1.25rem;
+            color: white;
+        }
+
+        .orgchart-node.type-unit .orgchart-node-icon {
+            background: linear-gradient(135deg, #C88F4A 0%, #B87B5B 100%);
+        }
+
+        .orgchart-node.type-team .orgchart-node-icon {
+            background: linear-gradient(135deg, #7B9E6B 0%, #5E8B5B 100%);
+        }
+
+        .orgchart-node.type-role .orgchart-node-icon {
+            background: linear-gradient(135deg, #8B6F47 0%, #6B5030 100%);
+        }
+
+        .orgchart-node.type-person .orgchart-node-icon {
+            background: linear-gradient(135deg, #6B8B9E 0%, #4B6B8E 100%);
+        }
+
+        .orgchart-node.type-object .orgchart-node-icon {
+            background: linear-gradient(135deg, #9E6B8B 0%, #8E4B6B 100%);
+        }
+
+        .orgchart-node-name {
+            font-weight: 600;
+            color: #3D2E1F;
+            font-size: 0.95rem;
+            margin-bottom: 0.25rem;
+            word-wrap: break-word;
+        }
+
+        .orgchart-node-type {
+            font-size: 0.7rem;
+            color: #8B6F47;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .orgchart-node-description {
+            font-size: 0.8rem;
+            color: #6B5642;
+            margin-top: 0.5rem;
+            display: -webkit-box;
+            -webkit-line-clamp: 2;
+            -webkit-box-orient: vertical;
+            overflow: hidden;
+        }
+
+        .orgchart-connector-vertical {
+            width: 2px;
+            height: 30px;
+            background: #D5C4B0;
+            margin: 0 auto;
+        }
+
+        .orgchart-connector-horizontal-container {
+            position: relative;
+            width: 100%;
+            height: 30px;
+            display: flex;
+            justify-content: center;
+        }
+
+        .orgchart-connector-horizontal {
+            position: absolute;
+            height: 2px;
+            background: #D5C4B0;
+            top: 0;
+        }
+
+        .orgchart-connector-branch {
+            width: 2px;
+            height: 30px;
+            background: #D5C4B0;
+            margin: 0 auto;
+        }
+
+        .orgchart-children {
+            display: flex;
+            justify-content: center;
+            gap: 1.5rem;
+            position: relative;
+            padding-top: 0;
+        }
+
+        .orgchart-child-branch {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            position: relative;
+        }
+
+        .orgchart-child-branch::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 50%;
+            width: 2px;
+            height: 15px;
+            background: #D5C4B0;
+            transform: translateX(-50%);
+        }
+
+        /* Horizontal connector line - spans from first to last child */
+        .orgchart-child-branch::after {
+            content: '';
+            position: absolute;
+            top: 0;
+            height: 2px;
+            background: #D5C4B0;
+            right: 50%;
+            width: calc(100% + 1.5rem);
+        }
+
+        .orgchart-child-branch:first-child::after {
+            display: none;
+        }
+
+        /* Single child - no horizontal line needed */
+        .orgchart-child-branch:only-child::after {
+            display: none;
+        }
+
+        .orgchart-child-connector {
+            display: none;
+        }
+
+        .orgchart-child-branch > .orgchart-node-wrapper {
+            margin-top: 15px;
+        }
+
+        .orgchart-people-list {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 0.5rem;
+            justify-content: center;
+            margin-top: 0.5rem;
+        }
+
+        .orgchart-person-badge {
+            display: flex;
+            align-items: center;
+            gap: 0.35rem;
+            padding: 0.35rem 0.6rem;
+            background: #F5F2ED;
+            border-radius: 16px;
+            font-size: 0.75rem;
+            color: #6B5642;
+            cursor: pointer;
+            transition: all 0.2s;
+            border: 1px solid transparent;
+        }
+
+        .orgchart-person-badge:hover {
+            background: white;
+            border-color: #6B8B9E;
+            color: #4B6B8E;
+        }
+
+        .orgchart-person-badge i {
+            font-size: 0.9rem;
+            color: #6B8B9E;
+        }
+
+        .orgchart-empty {
+            text-align: center;
+            padding: 4rem 2rem;
+            color: #8B6F47;
+        }
+
+        .orgchart-empty i {
+            font-size: 3rem;
+            margin-bottom: 1rem;
+            opacity: 0.5;
+        }
+
+        .orgchart-empty h3 {
+            font-size: 1.25rem;
+            margin-bottom: 0.5rem;
+        }
+
+        .orgchart-empty p {
+            font-size: 0.9rem;
+            opacity: 0.8;
+        }
+
+        .orgchart-section {
+            margin-bottom: 3rem;
+        }
+
+        .orgchart-section-title {
+            text-align: center;
+            font-size: 0.85rem;
+            color: #8B6F47;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            margin-bottom: 1.5rem;
+            padding: 0.5rem 1rem;
+            background: #F5F2ED;
+            border-radius: 20px;
+            display: inline-block;
+        }
+
+        .orgchart-section-header {
+            display: flex;
+            justify-content: center;
+            margin-bottom: 1rem;
+        }
+
         .tree-node-container {
             margin-bottom: 0.25rem;
             position: relative;
@@ -4622,6 +4915,9 @@
                 <button class="view-toggle-btn" data-view="venn" onclick="switchView('venn')">
                     <i class="ph ph-circles-three"></i> Venn
                 </button>
+                <button class="view-toggle-btn" data-view="orgchart" onclick="switchView('orgchart')">
+                    <i class="ph ph-flow-arrow"></i> Org Chart
+                </button>
             </div>
             <button class="undo-btn" id="undoBtn" onclick="undo()" disabled title="Nothing to undo">
                 <i class="ph ph-arrow-counter-clockwise"></i>
@@ -4802,6 +5098,9 @@
                     <div class="venn-overlap-content" id="vennOverlapContent"></div>
                 </div>
             </div>
+
+            <!-- Org Chart View -->
+            <div id="orgchartView" class="orgchart-view"></div>
         </div>
 
         <!-- Right Panel: Relationships -->
@@ -6150,6 +6449,7 @@ John Doe,Engineering,john@example.com"
             document.getElementById('cardView').classList.remove('active');
             document.getElementById('graphView').classList.remove('active');
             document.getElementById('vennView').classList.remove('active');
+            document.getElementById('orgchartView').classList.remove('active');
 
             if (view === 'tree') {
                 document.getElementById('treeView').classList.add('active');
@@ -6160,6 +6460,9 @@ John Doe,Engineering,john@example.com"
             } else if (view === 'venn') {
                 document.getElementById('vennView').classList.add('active');
                 setTimeout(() => renderVennView(), 100);
+            } else if (view === 'orgchart') {
+                document.getElementById('orgchartView').classList.add('active');
+                renderOrgChartView();
             } else {
                 document.getElementById('graphView').classList.add('active');
                 setTimeout(() => updateGraph(), 100);
@@ -9905,6 +10208,320 @@ John Doe,Engineering,john@example.com"
             }
 
             return entitiesAtLevel;
+        }
+
+        // Render the Org Chart view
+        function renderOrgChartView() {
+            const container = document.getElementById('orgchartView');
+            if (!container) return;
+
+            container.innerHTML = '';
+
+            // Build hierarchy tree
+            const hierarchy = buildHierarchyTree();
+
+            // Check if there's any data to display
+            const hasUnits = hierarchy.units && hierarchy.units.length > 0;
+            const hasOrphanTeams = hierarchy.orphanTeams && hierarchy.orphanTeams.length > 0;
+            const hasOrphanRoles = hierarchy.orphanRoles && hierarchy.orphanRoles.length > 0;
+            const hasOrphanPeople = hierarchy.orphanPeople && hierarchy.orphanPeople.length > 0;
+
+            if (!hasUnits && !hasOrphanTeams && !hasOrphanRoles && !hasOrphanPeople) {
+                container.innerHTML = `
+                    <div class="orgchart-empty">
+                        <i class="ph ph-flow-arrow"></i>
+                        <h3>No Organization Structure</h3>
+                        <p>Add units, teams, and roles to see the org chart</p>
+                    </div>
+                `;
+                return;
+            }
+
+            const chartContainer = document.createElement('div');
+            chartContainer.className = 'orgchart-container';
+
+            // Render main hierarchy (units with their children)
+            if (hasUnits) {
+                const mainSection = document.createElement('div');
+                mainSection.className = 'orgchart-section';
+
+                const sectionHeader = document.createElement('div');
+                sectionHeader.className = 'orgchart-section-header';
+                sectionHeader.innerHTML = '<span class="orgchart-section-title">Organization Structure</span>';
+                mainSection.appendChild(sectionHeader);
+
+                const rootLevel = document.createElement('div');
+                rootLevel.className = 'orgchart-level';
+
+                hierarchy.units.forEach(unitNode => {
+                    const nodeWrapper = renderOrgChartNode(unitNode);
+                    rootLevel.appendChild(nodeWrapper);
+                });
+
+                mainSection.appendChild(rootLevel);
+                chartContainer.appendChild(mainSection);
+            }
+
+            // Render orphan teams (teams not assigned to any unit)
+            if (hasOrphanTeams) {
+                const orphanSection = document.createElement('div');
+                orphanSection.className = 'orgchart-section';
+
+                const sectionHeader = document.createElement('div');
+                sectionHeader.className = 'orgchart-section-header';
+                sectionHeader.innerHTML = '<span class="orgchart-section-title">Unassigned Teams</span>';
+                orphanSection.appendChild(sectionHeader);
+
+                const orphanLevel = document.createElement('div');
+                orphanLevel.className = 'orgchart-level';
+
+                hierarchy.orphanTeams.forEach(team => {
+                    const nodeWrapper = document.createElement('div');
+                    nodeWrapper.className = 'orgchart-node-wrapper';
+                    nodeWrapper.appendChild(createOrgChartNodeElement(team));
+                    orphanLevel.appendChild(nodeWrapper);
+                });
+
+                orphanSection.appendChild(orphanLevel);
+                chartContainer.appendChild(orphanSection);
+            }
+
+            // Render orphan roles (roles not assigned to any team or unit)
+            if (hasOrphanRoles) {
+                const orphanSection = document.createElement('div');
+                orphanSection.className = 'orgchart-section';
+
+                const sectionHeader = document.createElement('div');
+                sectionHeader.className = 'orgchart-section-header';
+                sectionHeader.innerHTML = '<span class="orgchart-section-title">Unassigned Roles</span>';
+                orphanSection.appendChild(sectionHeader);
+
+                const orphanLevel = document.createElement('div');
+                orphanLevel.className = 'orgchart-level';
+
+                hierarchy.orphanRoles.forEach(role => {
+                    const nodeWrapper = document.createElement('div');
+                    nodeWrapper.className = 'orgchart-node-wrapper';
+                    const roleNode = createOrgChartNodeElement(role);
+                    // Add people who fill this role
+                    const people = getPeopleInRoleForOrgChart(role.id);
+                    if (people.length > 0) {
+                        const peopleList = document.createElement('div');
+                        peopleList.className = 'orgchart-people-list';
+                        people.forEach(person => {
+                            const badge = document.createElement('span');
+                            badge.className = 'orgchart-person-badge';
+                            badge.innerHTML = `<i class="ph ph-user"></i> ${person.name}`;
+                            badge.onclick = (e) => {
+                                e.stopPropagation();
+                                openEntityModal(person.id, 'person');
+                            };
+                            peopleList.appendChild(badge);
+                        });
+                        roleNode.appendChild(peopleList);
+                    }
+                    nodeWrapper.appendChild(roleNode);
+                    orphanLevel.appendChild(nodeWrapper);
+                });
+
+                orphanSection.appendChild(orphanLevel);
+                chartContainer.appendChild(orphanSection);
+            }
+
+            // Render orphan people (people not filling any role)
+            if (hasOrphanPeople) {
+                const orphanSection = document.createElement('div');
+                orphanSection.className = 'orgchart-section';
+
+                const sectionHeader = document.createElement('div');
+                sectionHeader.className = 'orgchart-section-header';
+                sectionHeader.innerHTML = '<span class="orgchart-section-title">Unassigned People</span>';
+                orphanSection.appendChild(sectionHeader);
+
+                const orphanLevel = document.createElement('div');
+                orphanLevel.className = 'orgchart-level';
+
+                hierarchy.orphanPeople.forEach(person => {
+                    const nodeWrapper = document.createElement('div');
+                    nodeWrapper.className = 'orgchart-node-wrapper';
+                    nodeWrapper.appendChild(createOrgChartNodeElement(person));
+                    orphanLevel.appendChild(nodeWrapper);
+                });
+
+                orphanSection.appendChild(orphanLevel);
+                chartContainer.appendChild(orphanSection);
+            }
+
+            container.appendChild(chartContainer);
+        }
+
+        // Helper function to get people who fill a role (for org chart)
+        function getPeopleInRoleForOrgChart(roleId) {
+            return relationships
+                .filter(r => r.predicate === 'INS' && r.object === roleId)
+                .map(r => findEntity(r.subject))
+                .filter(e => e !== null && e.type === 'person');
+        }
+
+        // Create an org chart node element
+        function createOrgChartNodeElement(entity) {
+            const node = document.createElement('div');
+            node.className = `orgchart-node type-${entity.type}`;
+            node.onclick = () => openEntityModal(entity.id, entity.type);
+
+            node.innerHTML = `
+                <div class="orgchart-node-icon">
+                    ${getIcon(entity.type)}
+                </div>
+                <div class="orgchart-node-name">${entity.name}</div>
+                <div class="orgchart-node-type">${entity.type}</div>
+                ${entity.description ? `<div class="orgchart-node-description">${entity.description}</div>` : ''}
+            `;
+
+            return node;
+        }
+
+        // Recursively render an org chart node with its children
+        function renderOrgChartNode(unitNode) {
+            const wrapper = document.createElement('div');
+            wrapper.className = 'orgchart-node-wrapper';
+
+            // Create the node element
+            const nodeEl = createOrgChartNodeElement(unitNode.entity);
+            wrapper.appendChild(nodeEl);
+
+            // Collect all children: sub-units, teams, and direct roles
+            const children = [];
+
+            // Add sub-units
+            if (unitNode.units && unitNode.units.length > 0) {
+                unitNode.units.forEach(subUnit => {
+                    children.push({ type: 'unit', data: subUnit });
+                });
+            }
+
+            // Add teams
+            if (unitNode.teams && unitNode.teams.length > 0) {
+                unitNode.teams.forEach(team => {
+                    children.push({ type: 'team', data: team });
+                });
+            }
+
+            // Add direct roles (roles attached directly to unit, not in a team)
+            if (unitNode.roles && unitNode.roles.length > 0) {
+                unitNode.roles.forEach(role => {
+                    children.push({ type: 'role', data: role });
+                });
+            }
+
+            // Render children if any
+            if (children.length > 0) {
+                // Add vertical connector
+                const connector = document.createElement('div');
+                connector.className = 'orgchart-connector-vertical';
+                wrapper.appendChild(connector);
+
+                // Create children container
+                const childrenContainer = document.createElement('div');
+                childrenContainer.className = 'orgchart-children';
+
+                children.forEach((child, index) => {
+                    const branch = document.createElement('div');
+                    branch.className = 'orgchart-child-branch';
+
+                    // Add top connector
+                    const topConnector = document.createElement('div');
+                    topConnector.className = 'orgchart-child-connector';
+                    branch.appendChild(topConnector);
+
+                    if (child.type === 'unit') {
+                        // Recursively render sub-units
+                        const subUnitWrapper = renderOrgChartNode(child.data);
+                        branch.appendChild(subUnitWrapper);
+                    } else if (child.type === 'team') {
+                        // Render team with its roles
+                        const teamWrapper = renderOrgChartTeamNode(child.data);
+                        branch.appendChild(teamWrapper);
+                    } else if (child.type === 'role') {
+                        // Render direct role with people
+                        const roleWrapper = renderOrgChartRoleNode(child.data);
+                        branch.appendChild(roleWrapper);
+                    }
+
+                    childrenContainer.appendChild(branch);
+                });
+
+                wrapper.appendChild(childrenContainer);
+            }
+
+            return wrapper;
+        }
+
+        // Render a team node with its roles
+        function renderOrgChartTeamNode(teamData) {
+            const wrapper = document.createElement('div');
+            wrapper.className = 'orgchart-node-wrapper';
+
+            // Create team node
+            const nodeEl = createOrgChartNodeElement(teamData.entity);
+            wrapper.appendChild(nodeEl);
+
+            // Render roles within the team
+            if (teamData.roles && teamData.roles.length > 0) {
+                const connector = document.createElement('div');
+                connector.className = 'orgchart-connector-vertical';
+                wrapper.appendChild(connector);
+
+                const rolesContainer = document.createElement('div');
+                rolesContainer.className = 'orgchart-children';
+
+                teamData.roles.forEach(role => {
+                    const branch = document.createElement('div');
+                    branch.className = 'orgchart-child-branch';
+
+                    const topConnector = document.createElement('div');
+                    topConnector.className = 'orgchart-child-connector';
+                    branch.appendChild(topConnector);
+
+                    const roleWrapper = renderOrgChartRoleNode(role);
+                    branch.appendChild(roleWrapper);
+
+                    rolesContainer.appendChild(branch);
+                });
+
+                wrapper.appendChild(rolesContainer);
+            }
+
+            return wrapper;
+        }
+
+        // Render a role node with people who fill it
+        function renderOrgChartRoleNode(roleData) {
+            const wrapper = document.createElement('div');
+            wrapper.className = 'orgchart-node-wrapper';
+
+            // Create role node
+            const nodeEl = createOrgChartNodeElement(roleData.entity);
+
+            // Add people badges directly on the role node
+            if (roleData.people && roleData.people.length > 0) {
+                const peopleList = document.createElement('div');
+                peopleList.className = 'orgchart-people-list';
+                roleData.people.forEach(person => {
+                    const badge = document.createElement('span');
+                    badge.className = 'orgchart-person-badge';
+                    badge.innerHTML = `<i class="ph ph-user"></i> ${person.name}`;
+                    badge.onclick = (e) => {
+                        e.stopPropagation();
+                        openEntityModal(person.id, 'person');
+                    };
+                    peopleList.appendChild(badge);
+                });
+                nodeEl.appendChild(peopleList);
+            }
+
+            wrapper.appendChild(nodeEl);
+            return wrapper;
         }
 
         // Render the Venn diagram
