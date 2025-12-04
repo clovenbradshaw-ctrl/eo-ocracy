@@ -424,10 +424,13 @@
         }
 
         .panel-title {
-            font-size: 1.125rem;
-            color: #6B5642;
-            margin-bottom: 1rem;
+            font-size: 0.8rem;
+            color: #8B6F47;
+            margin-bottom: 0.75rem;
             font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+            opacity: 0.7;
         }
 
         .btn {
@@ -563,65 +566,137 @@
         .entity-list {
             display: flex;
             flex-direction: column;
-            gap: 0.375rem;
+            gap: 0.25rem;
         }
 
         .entity-item {
             display: flex;
             justify-content: space-between;
             align-items: center;
-            padding: 0.625rem 0.75rem;
-            background: white;
-            border-radius: 6px;
-            border: 1px solid #E5DDD1;
+            padding: 0.5rem 0.625rem;
+            background: transparent;
+            border-radius: 8px;
+            border: none;
+            transition: all 0.15s ease;
         }
 
-        .entity-item.unit { border-left-color: #C88F4A; }
-        .entity-item.team { border-left-color: #B87B5B; }
-        .entity-item.role { border-left-color: #8B6F47; }
-        .entity-item.person { border-left-color: #6B5642; }
-        .entity-item.object { border-left-color: #F5E6D3; background: #FFFBF5; }
+        .entity-item:hover {
+            background: rgba(139, 111, 71, 0.06);
+        }
+
+        .entity-item .btn-icon {
+            opacity: 0;
+            transition: opacity 0.15s ease;
+        }
+
+        .entity-item:hover .btn-icon {
+            opacity: 0.6;
+        }
+
+        .entity-item:hover .btn-icon:hover {
+            opacity: 1;
+        }
+
+        .entity-item.team {
+            color: #5A4736;
+        }
+
+        .entity-item.role {
+            color: #6B5642;
+        }
+
+        .entity-item.person {
+            color: #5A4736;
+        }
+
+        .entity-item.object {
+            color: #8B6F47;
+        }
 
         .entity-name {
-            font-size: 0.9rem;
-            color: #3D2E1F;
+            font-size: 0.875rem;
+            color: inherit;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
         }
 
         .entity-type {
-            font-size: 0.75rem;
+            font-size: 0.7rem;
             color: #8B6F47;
             text-transform: uppercase;
             letter-spacing: 0.5px;
+            opacity: 0.7;
+        }
+
+        .entity-section-header {
+            font-size: 0.7rem;
+            color: #8B6F47;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+            margin-bottom: 0.375rem;
+            padding: 0.25rem 0.625rem;
+            opacity: 0.7;
+        }
+
+        .entity-section {
+            margin-top: 1.25rem;
         }
 
         .btn-icon {
             background: none;
             border: none;
-            color: #B87B5B;
+            color: #8B6F47;
             cursor: pointer;
-            padding: 0.375rem;
+            padding: 0.25rem;
             border-radius: 6px;
-            transition: all 0.2s;
-            font-size: 1rem;
+            transition: all 0.15s ease;
+            font-size: 0.875rem;
             display: inline-flex;
             align-items: center;
             justify-content: center;
-            width: 28px;
-            height: 28px;
+            width: 24px;
+            height: 24px;
+            opacity: 0.6;
         }
 
         .btn-icon:hover {
-            background: #F5E6D3;
-            color: #8B6F47;
+            background: rgba(139, 111, 71, 0.12);
+            color: #5A4736;
+            opacity: 1;
         }
 
         .btn-icon.add {
-            background: #C88F4A;
-            color: white;
+            background: rgba(200, 143, 74, 0.15);
+            color: #C88F4A;
+            opacity: 0.8;
         }
 
         .btn-icon.add:hover {
-            background: #B87B5B;
+            background: #C88F4A;
+            color: white;
+            opacity: 1;
+        }
+
+        .tree-node-item.unit .btn-icon {
+            color: rgba(255, 255, 255, 0.8);
+            opacity: 0.7;
+        }
+
+        .tree-node-item.unit .btn-icon:hover {
+            background: rgba(255, 255, 255, 0.2);
+            color: white;
+            opacity: 1;
+        }
+
+        .tree-node-item.unit .btn-icon.add {
+            background: rgba(255, 255, 255, 0.2);
+            color: white;
+        }
+
+        .tree-node-item.unit .btn-icon.add:hover {
+            background: rgba(255, 255, 255, 0.3);
         }
 
         #graph {
@@ -1434,48 +1509,77 @@
         }
 
         .tree-node-container {
-            margin-bottom: 0.5rem;
+            margin-bottom: 0.25rem;
+            position: relative;
         }
 
         .tree-node-item {
             display: flex;
             align-items: center;
-            padding: 0.625rem 0.75rem;
-            border-radius: 6px;
+            padding: 0.5rem 0.625rem;
+            border-radius: 8px;
             cursor: pointer;
-            transition: all 0.15s;
-            gap: 0.625rem;
-            background: white;
-            border: 1px solid #E5DDD1;
-            margin-bottom: 0.375rem;
+            transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+            gap: 0.5rem;
+            background: transparent;
+            border: none;
+            margin-bottom: 0.125rem;
+            position: relative;
         }
 
         .tree-node-item:hover {
-            background: #FAF7F5;
-            border-color: #C88F4A;
+            background: rgba(200, 143, 74, 0.08);
+        }
+
+        .tree-node-item .tree-node-actions {
+            opacity: 0;
+            transition: opacity 0.15s ease;
+        }
+
+        .tree-node-item:hover .tree-node-actions {
+            opacity: 1;
         }
 
         .tree-node-item.unit {
-            background: #C88F4A;
+            background: linear-gradient(135deg, #C88F4A 0%, #B87B5B 100%);
             color: white;
-            font-weight: 600;
-            border: none;
-            padding: 0.75rem 0.875rem;
+            font-weight: 500;
+            padding: 0.625rem 0.75rem;
+            box-shadow: 0 2px 8px rgba(200, 143, 74, 0.25);
+            margin-bottom: 0.375rem;
         }
 
         .tree-node-item.unit:hover {
-            background: #B87B5B;
+            background: linear-gradient(135deg, #D9A05B 0%, #C98C6C 100%);
+            box-shadow: 0 4px 12px rgba(200, 143, 74, 0.35);
+            transform: translateY(-1px);
+        }
+
+        .tree-node-item.unit .tree-node-actions {
+            opacity: 0.7;
+        }
+
+        .tree-node-item.unit:hover .tree-node-actions {
+            opacity: 1;
         }
 
         .tree-node-item.team {
-            background: #FAF7F5;
-            border-left: 3px solid #B87B5B;
+            background: rgba(184, 123, 91, 0.06);
             font-weight: 500;
+            color: #5A4736;
+        }
+
+        .tree-node-item.team:hover {
+            background: rgba(184, 123, 91, 0.12);
         }
 
         .tree-node-item.role {
-            background: white;
-            border-left: 3px solid #8B6F47;
+            background: transparent;
+            color: #6B5642;
+        }
+
+        .tree-node-item.role:hover {
+            background: rgba(139, 111, 71, 0.08);
         }
 
         .tree-node-item.dragging {
@@ -1486,22 +1590,32 @@
         .tree-node-item.drag-over {
             outline: 2px dashed #C88F4A;
             outline-offset: 2px;
-            background: #FFF8E7 !important;
+            background: rgba(255, 248, 231, 0.8) !important;
         }
 
         .tree-node-item.drag-over.unit {
-            background: #E8D5C0 !important;
+            background: rgba(232, 213, 192, 0.8) !important;
         }
 
         .tree-expand-icon {
-            width: 16px;
-            height: 16px;
+            width: 18px;
+            height: 18px;
             display: flex;
             align-items: center;
             justify-content: center;
-            font-size: 0.65rem;
-            transition: transform 0.2s;
-            opacity: 0.6;
+            font-size: 0.6rem;
+            transition: transform 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+            opacity: 0.5;
+            border-radius: 4px;
+        }
+
+        .tree-expand-icon:hover {
+            background: rgba(0, 0, 0, 0.05);
+            opacity: 0.8;
+        }
+
+        .tree-node-item.unit .tree-expand-icon:hover {
+            background: rgba(255, 255, 255, 0.15);
         }
 
         .tree-expand-icon.expanded {
@@ -1510,23 +1624,48 @@
 
         .tree-node-content {
             flex: 1;
+            min-width: 0;
         }
 
         .tree-node-name {
-            font-size: 0.9rem;
-            line-height: 1.3;
+            font-size: 0.875rem;
+            line-height: 1.4;
+            font-weight: inherit;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
         }
 
         .tree-node-meta {
-            font-size: 0.75rem;
+            font-size: 0.7rem;
+            opacity: 0.6;
+            margin-top: 0.125rem;
+        }
+
+        .tree-node-icon {
+            display: flex;
+            align-items: center;
+            justify-content: center;
             opacity: 0.7;
-            margin-top: 0.25rem;
+        }
+
+        .tree-node-item.unit .tree-node-icon {
+            opacity: 0.9;
+        }
+
+        .tree-node-actions {
+            display: flex;
+            align-items: center;
+            gap: 0.125rem;
         }
 
         .tree-children {
             max-height: 0;
             overflow: hidden;
             transition: max-height 0.3s ease-out;
+            padding-left: 1.25rem;
+            margin-left: 0.5rem;
+            border-left: 1px solid rgba(139, 111, 71, 0.15);
         }
 
         .tree-children.expanded {
@@ -6077,12 +6216,14 @@ John Doe,Engineering,john@example.com"
 
                 node.innerHTML = `
                     <span class="tree-expand-icon ${hasChildren ? 'expanded' : ''}" style="${hasChildren ? '' : 'visibility: hidden;'}">▶</span>
-                    <span style="font-size: ${depth === 0 ? '1.2rem' : '1rem'};">${icon}</span>
-                    <div style="flex: 1;">
+                    <span class="tree-node-icon" style="font-size: ${depth === 0 ? '1.1rem' : '0.95rem'};">${icon}</span>
+                    <div class="tree-node-content">
                         <div class="tree-node-name">${entity.name}</div>
                     </div>
-                    ${(entity.type === 'unit' || entity.type === 'team') ? `<button class="btn-icon add" onclick="event.stopPropagation(); quickAddChild('${entity.id}', '${entity.type}')" title="Add sub-entity"><i class="ph ph-plus"></i></button>` : ''}
-                    <button class="btn-icon" onclick="event.stopPropagation(); deleteEntity('${entity.id}', '${entity.type}')"><i class="ph ph-x"></i></button>
+                    <div class="tree-node-actions">
+                        ${(entity.type === 'unit' || entity.type === 'team') ? `<button class="btn-icon add" onclick="event.stopPropagation(); quickAddChild('${entity.id}', '${entity.type}')" title="Add sub-entity"><i class="ph ph-plus"></i></button>` : ''}
+                        <button class="btn-icon" onclick="event.stopPropagation(); deleteEntity('${entity.id}', '${entity.type}')" title="Delete"><i class="ph ph-x"></i></button>
+                    </div>
                 `;
 
                 container.appendChild(node);
@@ -6152,11 +6293,7 @@ John Doe,Engineering,john@example.com"
 
             if (orphanedTeams.length > 0 && (!searchTerm || orphanedTeams.some(t => t.name.toLowerCase().includes(searchTerm)))) {
                 const header = document.createElement('div');
-                header.style.fontSize = '0.75rem';
-                header.style.color = '#8B6F47';
-                header.style.fontWeight = '600';
-                header.style.textTransform = 'uppercase';
-                header.style.marginBottom = '0.5rem';
+                header.className = 'entity-section-header';
                 header.textContent = 'Unassigned Teams';
                 orphanedSection.appendChild(header);
 
@@ -6171,10 +6308,8 @@ John Doe,Engineering,john@example.com"
                         }
                     };
                     node.innerHTML = `
-                        <div>
-                            <div class="entity-name">👥 ${team.name}</div>
-                        </div>
-                        <button class="btn-icon" onclick="event.stopPropagation(); deleteEntity('${team.id}', 'team')">✕</button>
+                        <div class="entity-name"><i class="ph ph-users-three"></i> ${team.name}</div>
+                        <button class="btn-icon" onclick="event.stopPropagation(); deleteEntity('${team.id}', 'team')"><i class="ph ph-x"></i></button>
                     `;
                     orphanedSection.appendChild(node);
                 });
@@ -6190,15 +6325,12 @@ John Doe,Engineering,john@example.com"
             });
 
             if (orphanedRoles.length > 0 && (!searchTerm || orphanedRoles.some(r => r.name.toLowerCase().includes(searchTerm)))) {
+                const section = document.createElement('div');
+                section.className = 'entity-section';
                 const header = document.createElement('div');
-                header.style.fontSize = '0.75rem';
-                header.style.color = '#8B6F47';
-                header.style.fontWeight = '600';
-                header.style.textTransform = 'uppercase';
-                header.style.marginBottom = '0.5rem';
-                header.style.marginTop = '1rem';
+                header.className = 'entity-section-header';
                 header.textContent = 'Unassigned Roles';
-                orphanedSection.appendChild(header);
+                section.appendChild(header);
 
                 orphanedRoles.forEach(role => {
                     if (searchTerm && !role.name.toLowerCase().includes(searchTerm)) return;
@@ -6211,26 +6343,22 @@ John Doe,Engineering,john@example.com"
                         }
                     };
                     node.innerHTML = `
-                        <div>
-                            <div class="entity-name">📋 ${role.name}</div>
-                        </div>
-                        <button class="btn-icon" onclick="event.stopPropagation(); deleteEntity('${role.id}', 'role')">✕</button>
+                        <div class="entity-name"><i class="ph ph-identification-badge"></i> ${role.name}</div>
+                        <button class="btn-icon" onclick="event.stopPropagation(); deleteEntity('${role.id}', 'role')"><i class="ph ph-x"></i></button>
                     `;
-                    orphanedSection.appendChild(node);
+                    section.appendChild(node);
                 });
+                orphanedSection.appendChild(section);
             }
 
             // People
             if (entities.person.length > 0 && (!searchTerm || entities.person.some(p => p.name.toLowerCase().includes(searchTerm)))) {
+                const section = document.createElement('div');
+                section.className = 'entity-section';
                 const header = document.createElement('div');
-                header.style.fontSize = '0.75rem';
-                header.style.color = '#8B6F47';
-                header.style.fontWeight = '600';
-                header.style.textTransform = 'uppercase';
-                header.style.marginBottom = '0.5rem';
-                header.style.marginTop = '1rem';
+                header.className = 'entity-section-header';
                 header.textContent = 'People';
-                orphanedSection.appendChild(header);
+                section.appendChild(header);
 
                 entities.person.forEach(person => {
                     if (searchTerm && !person.name.toLowerCase().includes(searchTerm)) return;
@@ -6243,30 +6371,26 @@ John Doe,Engineering,john@example.com"
                         }
                     };
                     node.innerHTML = `
-                        <div>
-                            <div class="entity-name">👤 ${person.name}</div>
-                        </div>
-                        <button class="btn-icon" onclick="event.stopPropagation(); deleteEntity('${person.id}', 'person')">✕</button>
+                        <div class="entity-name"><i class="ph ph-user"></i> ${person.name}</div>
+                        <button class="btn-icon" onclick="event.stopPropagation(); deleteEntity('${person.id}', 'person')"><i class="ph ph-x"></i></button>
                     `;
-                    orphanedSection.appendChild(node);
+                    section.appendChild(node);
                 });
+                orphanedSection.appendChild(section);
             }
 
             // Objects (shown separately since they can connect to multiple roles)
             if (entities.object.length > 0 && (!searchTerm || entities.object.some(o => o.name.toLowerCase().includes(searchTerm)))) {
+                const section = document.createElement('div');
+                section.className = 'entity-section';
                 const header = document.createElement('div');
-                header.style.fontSize = '0.75rem';
-                header.style.color = '#8B6F47';
-                header.style.fontWeight = '600';
-                header.style.textTransform = 'uppercase';
-                header.style.marginBottom = '0.5rem';
-                header.style.marginTop = '1rem';
+                header.className = 'entity-section-header';
                 header.textContent = 'Work Products';
-                orphanedSection.appendChild(header);
+                section.appendChild(header);
 
                 entities.object.forEach(obj => {
                     if (searchTerm && !obj.name.toLowerCase().includes(searchTerm)) return;
-                    
+
                     // Find roles connected to this object
                     const connectedRoles = relationships
                         .filter(r => r.object === obj.id || r.subject === obj.id)
@@ -6275,7 +6399,7 @@ John Doe,Engineering,john@example.com"
                             return findEntity(entityId);
                         })
                         .filter(e => e && e.type === 'role');
-                    
+
                     const node = document.createElement('div');
                     node.className = 'entity-item object';
                     node.style.cursor = 'pointer';
@@ -6284,24 +6408,25 @@ John Doe,Engineering,john@example.com"
                             openEntityModal(obj.id, 'object');
                         }
                     };
-                    
-                    const connectionBadges = connectedRoles.length > 0 
+
+                    const connectionBadges = connectedRoles.length > 0
                         ? `<div style="display: flex; gap: 0.25rem; flex-wrap: wrap; margin-top: 0.25rem;">
-                            ${connectedRoles.map(role => 
-                                `<span style="font-size: 0.7rem; padding: 0.125rem 0.375rem; background: #F5E6D3; color: #8B6F47; border-radius: 10px;">📋 ${role.name}</span>`
+                            ${connectedRoles.map(role =>
+                                `<span style="font-size: 0.65rem; padding: 0.125rem 0.375rem; background: rgba(139, 111, 71, 0.1); color: #8B6F47; border-radius: 10px;"><i class="ph ph-identification-badge"></i> ${role.name}</span>`
                             ).join('')}
                            </div>`
                         : '';
-                    
+
                     node.innerHTML = `
                         <div style="flex: 1;">
-                            <div class="entity-name">📦 ${obj.name}</div>
+                            <div class="entity-name"><i class="ph ph-package"></i> ${obj.name}</div>
                             ${connectionBadges}
                         </div>
-                        <button class="btn-icon" onclick="event.stopPropagation(); deleteEntity('${obj.id}', 'object')">✕</button>
+                        <button class="btn-icon" onclick="event.stopPropagation(); deleteEntity('${obj.id}', 'object')"><i class="ph ph-x"></i></button>
                     `;
-                    orphanedSection.appendChild(node);
+                    section.appendChild(node);
                 });
+                orphanedSection.appendChild(section);
             }
 
             if (orphanedSection.children.length > 0) {
