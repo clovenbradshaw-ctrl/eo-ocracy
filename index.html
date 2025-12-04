@@ -1035,6 +1035,21 @@
             border-left: 3px solid #8B6F47;
         }
 
+        .tree-node-item.dragging {
+            opacity: 0.5;
+            transform: scale(0.98);
+        }
+
+        .tree-node-item.drag-over {
+            outline: 2px dashed #C88F4A;
+            outline-offset: 2px;
+            background: #FFF8E7 !important;
+        }
+
+        .tree-node-item.drag-over.unit {
+            background: #E8D5C0 !important;
+        }
+
         .tree-expand-icon {
             width: 16px;
             height: 16px;
@@ -1091,6 +1106,12 @@
             color: white;
             border-radius: 12px;
             font-size: 0.75rem;
+            transition: background 0.2s, transform 0.1s;
+        }
+
+        .tree-person-badge:hover {
+            background: #5A4736;
+            transform: scale(1.05);
         }
 
         .tree-relationships-header {
@@ -6053,12 +6074,69 @@ John Doe,Engineering,john@example.com"
             const relsDiv = document.getElementById(relId);
             const header = event.target.closest('.tree-relationships-header');
             const icon = header?.querySelector('.tree-expand-icon');
-            
+
             if (relsDiv && icon) {
                 const isHidden = relsDiv.style.display === 'none';
                 relsDiv.style.display = isHidden ? 'block' : 'none';
                 icon.classList.toggle('expanded', isHidden);
             }
+        }
+
+        function handleTreeDrop(draggedData, targetEntity) {
+            // Validate drop - can only drop team onto unit, or role onto team/unit
+            const validDrops = {
+                'team': ['unit'],           // teams can be dropped on units
+                'role': ['unit', 'team']    // roles can be dropped on units or teams
+            };
+
+            const allowedTargets = validDrops[draggedData.type];
+            if (!allowedTargets || !allowedTargets.includes(targetEntity.type)) {
+                showNotification(`Cannot move ${draggedData.type} to ${targetEntity.type}`, 'error');
+                return;
+            }
+
+            // Don't drop on self
+            if (draggedData.id === targetEntity.id) {
+                return;
+            }
+
+            // Check if already connected to target
+            const alreadyConnected = relationships.some(r =>
+                r.predicate === 'DES' &&
+                ((r.subject === draggedData.id && r.object === targetEntity.id) ||
+                 (r.subject === targetEntity.id && r.object === draggedData.id))
+            );
+
+            if (alreadyConnected) {
+                showNotification(`${draggedData.name} is already in ${targetEntity.name}`, 'info');
+                return;
+            }
+
+            // Remove existing DES parent relationships for the dragged entity
+            // (teams should only be in one unit, roles in one team/unit at hierarchy level)
+            const parentTypes = targetEntity.type === 'unit' ? ['unit'] : ['unit', 'team'];
+            relationships = relationships.filter(r => {
+                if (r.predicate !== 'DES') return true;
+                // Check if this relationship connects dragged entity to a parent of same type
+                const isParentRel = (r.subject === draggedData.id || r.object === draggedData.id);
+                if (!isParentRel) return true;
+                const otherId = r.subject === draggedData.id ? r.object : r.subject;
+                const otherEntity = findEntity(otherId);
+                // Keep relationships that aren't to parent types we're replacing
+                return !otherEntity || !parentTypes.includes(otherEntity.type);
+            });
+
+            // Create new DES relationship (target contains dragged)
+            relationships.push({
+                id: 'rel-' + Date.now(),
+                subject: targetEntity.id,
+                predicate: 'DES',
+                object: draggedData.id
+            });
+
+            saveState();
+            updateViews();
+            showNotification(`Moved ${draggedData.name} to ${targetEntity.name}`, 'success');
         }
 
         function renderTreeView() {
@@ -6214,7 +6292,7 @@ John Doe,Engineering,john@example.com"
                 if (assignedPeople.length > 0) {
                     peopleHTML = '<div class="tree-people-assigned">';
                     assignedPeople.forEach(person => {
-                        peopleHTML += `<span class="tree-person-badge">👤 ${person.name}</span>`;
+                        peopleHTML += `<span class="tree-person-badge" onclick="event.stopPropagation(); openEntityModal('${person.id}', 'person')" style="cursor: pointer;">👤 ${person.name}</span>`;
                     });
                     peopleHTML += '</div>';
                 }
@@ -6263,7 +6341,70 @@ John Doe,Engineering,john@example.com"
             `;
 
             container.appendChild(node);
-            
+
+            // Add click handler to open entity modal
+            node.onclick = (e) => {
+                if (!e.target.closest('.tree-expand-icon') && !e.target.closest('.tree-person-badge')) {
+                    openEntityModal(entity.id, entity.type);
+                }
+            };
+            node.style.cursor = 'pointer';
+
+            // Add drag-and-drop for nesting
+            node.draggable = true;
+            node.dataset.entityId = entity.id;
+            node.dataset.entityType = entity.type;
+
+            node.ondragstart = (e) => {
+                e.stopPropagation();
+                e.dataTransfer.setData('text/plain', JSON.stringify({
+                    id: entity.id,
+                    type: entity.type,
+                    name: entity.name
+                }));
+                e.dataTransfer.effectAllowed = 'move';
+                node.classList.add('dragging');
+            };
+
+            node.ondragend = (e) => {
+                node.classList.remove('dragging');
+                document.querySelectorAll('.tree-node-item.drag-over').forEach(el => {
+                    el.classList.remove('drag-over');
+                });
+            };
+
+            // Allow dropping on units (for teams) and teams (for roles)
+            if (entity.type === 'unit' || entity.type === 'team') {
+                node.ondragover = (e) => {
+                    e.preventDefault();
+                    e.stopPropagation();
+                    const dragData = e.dataTransfer.types.includes('text/plain');
+                    if (dragData) {
+                        node.classList.add('drag-over');
+                        e.dataTransfer.dropEffect = 'move';
+                    }
+                };
+
+                node.ondragleave = (e) => {
+                    if (!node.contains(e.relatedTarget)) {
+                        node.classList.remove('drag-over');
+                    }
+                };
+
+                node.ondrop = (e) => {
+                    e.preventDefault();
+                    e.stopPropagation();
+                    node.classList.remove('drag-over');
+
+                    try {
+                        const data = JSON.parse(e.dataTransfer.getData('text/plain'));
+                        handleTreeDrop(data, entity);
+                    } catch (err) {
+                        console.error('Drop error:', err);
+                    }
+                };
+            }
+
             if (relsHTML) {
                 const relsDiv = document.createElement('div');
                 relsDiv.innerHTML = relsHTML;
