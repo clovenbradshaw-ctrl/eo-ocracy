@@ -4366,12 +4366,18 @@ John Doe,Engineering,john@example.com"
         // Orbital visualization for connections
         // connectionType: 'nested' for DES relationships, 'activity' for non-DES, undefined for all
         function renderOrbitalConnections(container, centerEntity, connections, connectionType) {
-            const width = container.clientWidth || 400;
+            // Guard against invalid container
+            if (!container) return;
+
+            // Get dimensions with better fallback
+            const containerRect = container.getBoundingClientRect();
+            const width = containerRect.width > 0 ? containerRect.width : (container.clientWidth || 400);
             const height = 300;
             const centerX = width / 2;
             const centerY = height / 2;
 
-            // Clear container
+            // Clear container thoroughly - remove any existing SVG first
+            d3.select(container).selectAll('svg').remove();
             container.innerHTML = '';
 
             // Determine ring color based on connection type
@@ -6858,9 +6864,9 @@ John Doe,Engineering,john@example.com"
                 const nestedCount = nested.length + 1; // Include self
                 const baseRadius = Math.max(minRadius, Math.min(maxRadius, 40 + nestedCount * 8));
 
-                // Initial position in a circle
+                // Initial position in a circle - spread entities further apart
                 const angle = (2 * Math.PI * i) / n - Math.PI / 2;
-                const spread = Math.min(width, height) * 0.25;
+                const spread = Math.min(width, height) * 0.3;
 
                 return {
                     entity: entity,
@@ -6881,23 +6887,24 @@ John Doe,Engineering,john@example.com"
                     for (let j = i + 1; j < circles.length; j++) {
                         const weight = getOverlapWeight(circles[i].id, circles[j].id);
                         if (weight > 0) {
-                            // Stronger connection = closer circles
-                            const distance = circles[i].radius + circles[j].radius - Math.min(40, weight * 10);
+                            // Stronger connection = closer circles, but maintain minimum distance
+                            const minDistance = (circles[i].radius + circles[j].radius) * 0.6;
+                            const distance = Math.max(minDistance, circles[i].radius + circles[j].radius - Math.min(30, weight * 8));
                             links.push({
                                 source: i,
                                 target: j,
-                                distance: Math.max(circles[i].radius, distance)
+                                distance: distance
                             });
                         }
                     }
                 }
 
-                // Simple force-based positioning
+                // Simple force-based positioning with stronger separation
                 const simulation = d3.forceSimulation(circles)
                     .force('center', d3.forceCenter(centerX, centerY))
-                    .force('charge', d3.forceManyBody().strength(-200))
-                    .force('collision', d3.forceCollide().radius(d => d.radius * 0.7))
-                    .force('link', d3.forceLink(links).distance(d => d.distance).strength(0.5))
+                    .force('charge', d3.forceManyBody().strength(-300))
+                    .force('collision', d3.forceCollide().radius(d => d.radius * 0.9).strength(0.8))
+                    .force('link', d3.forceLink(links).distance(d => d.distance).strength(0.3))
                     .stop();
 
                 // Run simulation
