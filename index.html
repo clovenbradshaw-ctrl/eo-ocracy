@@ -5258,7 +5258,16 @@ John Doe,Engineering,john@example.com"
             // Set header content
             document.getElementById('modalEntityIcon').innerHTML = getIcon(entityType);
             document.getElementById('modalEntityName').textContent = entity.name;
-            document.getElementById('modalEntityType').innerHTML = `${getIcon(entityType)} ${entityType.toUpperCase()}`;
+
+            // For roles, show team context in the type badge for disambiguation
+            let typeBadgeContent = `${getIcon(entityType)} ${entityType.toUpperCase()}`;
+            if (entityType === 'role') {
+                const parentTeam = getRoleParentTeam(entityId);
+                if (parentTeam) {
+                    typeBadgeContent = `${getIcon(entityType)} ROLE in ${getIcon(parentTeam.type)} ${parentTeam.name}`;
+                }
+            }
+            document.getElementById('modalEntityType').innerHTML = typeBadgeContent;
 
             // Show edit and delete buttons for entities
             document.getElementById('modalEditButton').style.display = 'inline-flex';
@@ -6088,7 +6097,15 @@ John Doe,Engineering,john@example.com"
                 if (typeEntities.length > 0) {
                     options += `<optgroup label="${typeLabels[type]}">`;
                     typeEntities.forEach(e => {
-                        options += `<option value="${e.id}">${e.name}</option>`;
+                        // For roles, add team context for disambiguation
+                        let displayName = e.name;
+                        if (type === 'role') {
+                            const parentTeam = getRoleParentTeam(e.id);
+                            if (parentTeam) {
+                                displayName = `${e.name} (${parentTeam.name})`;
+                            }
+                        }
+                        options += `<option value="${e.id}">${displayName}</option>`;
                     });
                     options += '</optgroup>';
                 }
@@ -6205,7 +6222,15 @@ John Doe,Engineering,john@example.com"
                 if (typeEntities.length > 0) {
                     options += `<optgroup label="${typeLabels[type]}">`;
                     typeEntities.forEach(e => {
-                        options += `<option value="${e.id}">${e.name}</option>`;
+                        // For roles, add team context for disambiguation
+                        let displayName = e.name;
+                        if (type === 'role') {
+                            const parentTeam = getRoleParentTeam(e.id);
+                            if (parentTeam) {
+                                displayName = `${e.name} (${parentTeam.name})`;
+                            }
+                        }
+                        options += `<option value="${e.id}">${displayName}</option>`;
                     });
                     options += '</optgroup>';
                 }
@@ -9278,6 +9303,22 @@ John Doe,Engineering,john@example.com"
             return hasContent;
         }
 
+        // Get the parent team or unit that a role belongs to (for disambiguation)
+        function getRoleParentTeam(roleId) {
+            // Find DES relationship where role is the object (child)
+            const desRelationship = relationships.find(r =>
+                r.predicate === 'DES' && r.object === roleId
+            );
+            if (!desRelationship) return null;
+
+            const parentEntity = findEntity(desRelationship.subject);
+            // Return the parent if it's a team or unit
+            if (parentEntity && (parentEntity.type === 'team' || parentEntity.type === 'unit')) {
+                return parentEntity;
+            }
+            return null;
+        }
+
         // Get the parent entity of an entity based on the groupBy type
         function getParentEntity(entity, groupByType) {
             // Find DES relationship where entity is the object (child)
@@ -9960,11 +10001,29 @@ John Doe,Engineering,john@example.com"
                 descriptionHTML = `<div class="card-description">${truncatedDesc}</div>`;
             }
 
+            // For roles, show team context for disambiguation
+            let teamContextHTML = '';
+            if (entity.type === 'role') {
+                const parentTeam = getRoleParentTeam(entity.id);
+                if (parentTeam) {
+                    teamContextHTML = `
+                        <div class="card-nested-under">
+                            <span class="nested-label">In:</span>
+                            <span class="nested-parent-badge">
+                                <span class="parent-icon">${getIcon(parentTeam.type)}</span>
+                                ${parentTeam.name}
+                            </span>
+                        </div>
+                    `;
+                }
+            }
+
             card.innerHTML = `
                 <div class="card-header">
                     <div class="card-icon">${getIcon(entity.type)}</div>
                     <div class="card-title">${entity.name}</div>
                 </div>
+                ${teamContextHTML}
                 ${descriptionHTML}
                 ${activitiesHTML}
             `;
