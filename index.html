@@ -8094,6 +8094,11 @@ John Doe,Engineering,john@example.com"
 
             rootNodes.forEach(node => assignChildPositions(node.id));
 
+            // Stop any existing simulation before creating a new one
+            if (graphSimulation) {
+                graphSimulation.stop();
+            }
+
             // Create force simulation with stable hierarchical layering
             graphSimulation = d3.forceSimulation(nodes)
                 .alphaDecay(0.05) // Faster settling to reduce oscillation
