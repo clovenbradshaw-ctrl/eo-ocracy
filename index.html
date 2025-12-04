@@ -701,8 +701,168 @@
 
         #graph {
             width: 100%;
-            height: 100%;
+            height: calc(100% - 48px);
             background: #FAFAF8;
+            background-image:
+                radial-gradient(circle, #E5DDD1 1px, transparent 1px);
+            background-size: 20px 20px;
+        }
+
+        .graph-toolbar {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            padding: 0.5rem 1rem;
+            background: white;
+            border-bottom: 1px solid #E5DDD1;
+            height: 48px;
+            box-sizing: border-box;
+        }
+
+        .graph-tool-btn {
+            display: flex;
+            align-items: center;
+            gap: 0.375rem;
+            padding: 0.5rem 0.75rem;
+            border: 1px solid #E5DDD1;
+            background: white;
+            color: #6B5642;
+            font-size: 0.8rem;
+            font-weight: 500;
+            border-radius: 6px;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .graph-tool-btn:hover {
+            background: #FAF7F5;
+            border-color: #C88F4A;
+            color: #C88F4A;
+        }
+
+        .graph-tool-btn.small {
+            padding: 0.375rem 0.5rem;
+        }
+
+        .graph-zoom-controls {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            margin-left: auto;
+            padding-left: 1rem;
+            border-left: 1px solid #E5DDD1;
+        }
+
+        .graph-zoom-controls span {
+            font-size: 0.8rem;
+            color: #8B6F47;
+            min-width: 40px;
+            text-align: center;
+        }
+
+        /* n8n-style node styling */
+        .graph-node {
+            cursor: grab;
+        }
+
+        .graph-node:active {
+            cursor: grabbing;
+        }
+
+        .graph-node-body {
+            fill: white;
+            stroke: #E5DDD1;
+            stroke-width: 2;
+            filter: drop-shadow(0 2px 4px rgba(0,0,0,0.08));
+            transition: stroke 0.2s, filter 0.2s;
+        }
+
+        .graph-node:hover .graph-node-body {
+            stroke: #C88F4A;
+            filter: drop-shadow(0 4px 8px rgba(0,0,0,0.12));
+        }
+
+        .graph-node.selected .graph-node-body {
+            stroke: #C88F4A;
+            stroke-width: 3;
+        }
+
+        .graph-node-accent {
+            pointer-events: none;
+        }
+
+        .graph-node-icon {
+            pointer-events: none;
+        }
+
+        .graph-node-label {
+            font-size: 12px;
+            font-weight: 500;
+            fill: #3D2E1F;
+            pointer-events: none;
+        }
+
+        .graph-node-type {
+            font-size: 10px;
+            fill: #8B6F47;
+            text-transform: uppercase;
+            pointer-events: none;
+        }
+
+        .graph-port {
+            fill: white;
+            stroke: #C88F4A;
+            stroke-width: 2;
+            cursor: crosshair;
+            transition: fill 0.2s, r 0.2s;
+        }
+
+        .graph-port:hover {
+            fill: #C88F4A;
+            r: 7;
+        }
+
+        .graph-port.active {
+            fill: #C88F4A;
+        }
+
+        /* Edge styling */
+        .graph-edge {
+            fill: none;
+            stroke-width: 2;
+            cursor: pointer;
+            transition: stroke-width 0.2s;
+        }
+
+        .graph-edge:hover {
+            stroke-width: 4;
+        }
+
+        .graph-edge-hitbox {
+            fill: none;
+            stroke: transparent;
+            stroke-width: 20;
+            cursor: pointer;
+        }
+
+        .graph-edge-label {
+            font-size: 10px;
+            fill: #6B5642;
+            pointer-events: none;
+        }
+
+        .graph-edge-label-bg {
+            fill: white;
+            opacity: 0.9;
+        }
+
+        /* Drag preview line */
+        .graph-drag-line {
+            fill: none;
+            stroke: #C88F4A;
+            stroke-width: 2;
+            stroke-dasharray: 8, 4;
+            pointer-events: none;
         }
 
         .layer-bg {
@@ -3823,6 +3983,23 @@
             
             <!-- Graph View -->
             <div id="graphView" class="graph-view active">
+                <div class="graph-toolbar">
+                    <button class="graph-tool-btn" onclick="cleanGraphLayout()" title="Auto-arrange nodes">
+                        <i class="ph ph-magic-wand"></i> Clean Layout
+                    </button>
+                    <button class="graph-tool-btn" onclick="fitGraphToView()" title="Fit to view">
+                        <i class="ph ph-arrows-out"></i> Fit
+                    </button>
+                    <div class="graph-zoom-controls">
+                        <button class="graph-tool-btn small" onclick="zoomGraph(0.8)" title="Zoom out">
+                            <i class="ph ph-minus"></i>
+                        </button>
+                        <span id="graphZoomLevel">100%</span>
+                        <button class="graph-tool-btn small" onclick="zoomGraph(1.25)" title="Zoom in">
+                            <i class="ph ph-plus"></i>
+                        </button>
+                    </div>
+                </div>
                 <svg id="graph"></svg>
                 <div class="tooltip" id="tooltip"></div>
             </div>
@@ -6108,10 +6285,16 @@ John Doe,Engineering,john@example.com"
             openEntityEditModal();
         }
 
+        // Store current relationship being edited
+        let currentEditingRelationship = null;
+
         function openRelationshipModal(relationshipData) {
             // Get the actual relationship object from the data
             const rel = relationships.find(r => r.id === relationshipData.id);
             if (!rel) return;
+
+            // Store for editing
+            currentEditingRelationship = rel;
 
             // Clear entity data - this is a relationship, not an entity
             currentModalEntity = null;
@@ -6137,23 +6320,67 @@ John Doe,Engineering,john@example.com"
             `;
             document.getElementById('modalEntityType').innerHTML = '<i class="ph ph-link"></i> CONNECTION';
 
-            // Show connection details
+            // Clear description section (relationships don't have descriptions)
+            document.getElementById('modalDescription').innerHTML = '';
+            document.getElementById('modalNested').innerHTML = '';
+            document.getElementById('modalAddNested').innerHTML = '';
+
+            // Build entity options for dropdowns
+            const allEntities = [];
+            ['unit', 'team', 'role', 'object'].forEach(type => {
+                entities[type].forEach(e => allEntities.push({ ...e, type }));
+            });
+
+            const entityOptions = allEntities.map(e =>
+                `<option value="${e.id}" ${e.id === rel.subject ? 'selected' : ''}>${e.name} (${e.type})</option>`
+            ).join('');
+
+            const entityOptionsTarget = allEntities.map(e =>
+                `<option value="${e.id}" ${e.id === rel.object ? 'selected' : ''}>${e.name} (${e.type})</option>`
+            ).join('');
+
+            // Build operator options
+            const operatorOptions = Object.entries(eoOperators).map(([code, op]) =>
+                `<option value="${code}" ${code === rel.predicate ? 'selected' : ''} style="color: ${op.color};">
+                    ${op.label} (${code})
+                </option>`
+            ).join('');
+
+            // Show connection editing form
             const connectionsEl = document.getElementById('modalConnections');
             connectionsEl.innerHTML = `
-                <div class="modal-section-title"><i class="ph ph-info"></i> Connection Details</div>
-                <div style="background: #FAF7F5; padding: 1rem; border-radius: 8px; border-left: 3px solid ${operator.color};">
-                    <div style="margin-bottom: 0.75rem;">
-                        <strong>Operator:</strong> <span style="color: ${operator.color}; font-weight: 600;">${operator.label}</span> (${operator.code})
+                <div class="modal-section-title"><i class="ph ph-pencil-simple"></i> Edit Connection</div>
+                <div style="background: #FAF7F5; padding: 1rem; border-radius: 8px; border-left: 3px solid ${operator.color};" id="relationshipEditForm">
+                    <div style="margin-bottom: 1rem;">
+                        <label style="display: block; font-weight: 600; margin-bottom: 0.5rem; color: #3D2E1F;">
+                            <i class="ph ph-arrow-right"></i> From (Source)
+                        </label>
+                        <select id="relEditSubject" style="width: 100%; padding: 0.5rem; border: 1px solid #E5DDD1; border-radius: 6px; font-size: 0.9rem;">
+                            ${entityOptions}
+                        </select>
                     </div>
-                    <div style="margin-bottom: 0.75rem; color: #6B5642;">
-                        ${operator.description}
+                    <div style="margin-bottom: 1rem;">
+                        <label style="display: block; font-weight: 600; margin-bottom: 0.5rem; color: #3D2E1F;">
+                            <i class="ph ph-flow-arrow"></i> Relationship Type
+                        </label>
+                        <select id="relEditPredicate" style="width: 100%; padding: 0.5rem; border: 1px solid #E5DDD1; border-radius: 6px; font-size: 0.9rem;" onchange="updateRelEditPreview()">
+                            ${operatorOptions}
+                        </select>
+                        <div id="relEditOperatorDesc" style="margin-top: 0.5rem; font-size: 0.85rem; color: #6B5642;">
+                            ${operator.description}
+                        </div>
                     </div>
-                    <div style="margin-bottom: 0.75rem;">
-                        <strong>From:</strong> ${getIcon(subject.type)} ${subject.name} <span style="color: #8B6F47;">(${subject.type})</span>
+                    <div style="margin-bottom: 1rem;">
+                        <label style="display: block; font-weight: 600; margin-bottom: 0.5rem; color: #3D2E1F;">
+                            <i class="ph ph-arrow-left"></i> To (Target)
+                        </label>
+                        <select id="relEditObject" style="width: 100%; padding: 0.5rem; border: 1px solid #E5DDD1; border-radius: 6px; font-size: 0.9rem;">
+                            ${entityOptionsTarget}
+                        </select>
                     </div>
-                    <div>
-                        <strong>To:</strong> ${getIcon(object.type)} ${object.name} <span style="color: #8B6F47;">(${object.type})</span>
-                    </div>
+                    <button class="modal-action-btn" onclick="saveRelationshipEdit()" style="width: 100%; background: #C88F4A; color: white; margin-top: 0.5rem;">
+                        <i class="ph ph-check"></i> Save Changes
+                    </button>
                 </div>
             `;
 
@@ -6168,6 +6395,100 @@ John Doe,Engineering,john@example.com"
             `;
 
             modal.classList.add('active');
+        }
+
+        function updateRelEditPreview() {
+            const predicateSelect = document.getElementById('relEditPredicate');
+            const descEl = document.getElementById('relEditOperatorDesc');
+            if (predicateSelect && descEl) {
+                const selectedOp = eoOperators[predicateSelect.value];
+                if (selectedOp) {
+                    descEl.textContent = selectedOp.description;
+                    descEl.style.color = selectedOp.color;
+                }
+            }
+        }
+
+        function saveRelationshipEdit() {
+            if (!currentEditingRelationship) return;
+
+            const newSubject = document.getElementById('relEditSubject').value;
+            const newPredicate = document.getElementById('relEditPredicate').value;
+            const newObject = document.getElementById('relEditObject').value;
+
+            // Validate - can't connect to self
+            if (newSubject === newObject) {
+                alert('Cannot connect an entity to itself.');
+                return;
+            }
+
+            // Check for duplicate relationship
+            const duplicate = relationships.find(r =>
+                r.id !== currentEditingRelationship.id &&
+                r.subject === newSubject &&
+                r.predicate === newPredicate &&
+                r.object === newObject
+            );
+
+            if (duplicate) {
+                alert('This exact connection already exists.');
+                return;
+            }
+
+            // Track changes for logging
+            const oldSubject = currentEditingRelationship.subject;
+            const oldPredicate = currentEditingRelationship.predicate;
+            const oldObject = currentEditingRelationship.object;
+
+            const hasChanges = newSubject !== oldSubject ||
+                               newPredicate !== oldPredicate ||
+                               newObject !== oldObject;
+
+            if (!hasChanges) {
+                closeEntityModal();
+                return;
+            }
+
+            // Apply changes
+            currentEditingRelationship.subject = newSubject;
+            currentEditingRelationship.predicate = newPredicate;
+            currentEditingRelationship.object = newObject;
+
+            // Log to Xano
+            const oldSubjectEntity = findEntity(oldSubject);
+            const oldObjectEntity = findEntity(oldObject);
+            const newSubjectEntity = findEntity(newSubject);
+            const newObjectEntity = findEntity(newObject);
+
+            logActivityToXano({
+                event_verb: 'Shift Connection',
+                eo_operator: 'ALT',
+                object_type: 'relationship',
+                object_id: currentEditingRelationship.id,
+                object_label: `${newSubjectEntity?.name} ${newPredicate} ${newObjectEntity?.name}`,
+                data_json: {
+                    old_subject: oldSubject,
+                    new_subject: newSubject,
+                    old_predicate: oldPredicate,
+                    new_predicate: newPredicate,
+                    old_object: oldObject,
+                    new_object: newObject
+                }
+            });
+
+            // Save and refresh
+            saveToLocalStorage();
+            closeEntityModal();
+
+            if (currentView === 'graph') {
+                updateGraph();
+            } else if (currentView === 'tree') {
+                renderTreeView();
+            } else if (currentView === 'card') {
+                renderCardView();
+            }
+
+            renderActivityList();
         }
 
         let relationshipToDelete = null;
@@ -9613,15 +9934,260 @@ John Doe,Engineering,john@example.com"
             return container;
         }
 
-        // Graph visualization
+        // Graph visualization - n8n style
         const svg = d3.select('#graph');
         const tooltip = d3.select('#tooltip');
 
+        // Graph state
+        let graphZoom = null;
+        let currentZoomScale = 1;
+        let graphG = null; // Main graph group for transforms
+
+        // Node dimensions for n8n-style cards
+        const NODE_WIDTH = 140;
+        const NODE_HEIGHT = 56;
+        const PORT_RADIUS = 6;
+
+        // Get node accent color by type
+        function getNodeAccentColor(type) {
+            const colors = {
+                unit: '#C88F4A',
+                team: '#B87B5B',
+                role: '#8B6F47',
+                person: '#6B5642',
+                object: '#A89984'
+            };
+            return colors[type] || '#8B6F47';
+        }
+
+        // Calculate auto-layout positions based on hierarchy
+        function calculateAutoLayout(nodes, width, height) {
+            const positions = new Map();
+
+            // Build hierarchy from DES relationships
+            const parentMap = new Map();
+            const childrenMap = new Map();
+
+            relationships.filter(r => r.predicate === 'DES').forEach(rel => {
+                const parentNode = nodes.find(n => n.id === rel.subject);
+                const childNode = nodes.find(n => n.id === rel.object);
+                if (parentNode && childNode) {
+                    parentMap.set(rel.object, rel.subject);
+                    if (!childrenMap.has(rel.subject)) {
+                        childrenMap.set(rel.subject, []);
+                    }
+                    childrenMap.get(rel.subject).push(rel.object);
+                }
+            });
+
+            // Find root nodes (no parent)
+            const rootNodes = nodes.filter(n => !parentMap.has(n.id));
+
+            // Calculate depths
+            const nodeDepths = new Map();
+            let maxDepth = 0;
+
+            function calcDepth(nodeId, depth) {
+                nodeDepths.set(nodeId, depth);
+                maxDepth = Math.max(maxDepth, depth);
+                (childrenMap.get(nodeId) || []).forEach(childId => calcDepth(childId, depth + 1));
+            }
+
+            rootNodes.forEach(n => calcDepth(n.id, 0));
+            nodes.forEach(n => {
+                if (!nodeDepths.has(n.id)) nodeDepths.set(n.id, 0);
+            });
+
+            // Calculate subtree widths for better horizontal spacing
+            function getSubtreeWidth(nodeId) {
+                const children = childrenMap.get(nodeId) || [];
+                if (children.length === 0) return NODE_WIDTH + 40;
+                return children.reduce((sum, childId) => sum + getSubtreeWidth(childId), 0);
+            }
+
+            // Assign positions - vertical layout (top to bottom)
+            const VERTICAL_SPACING = 120;
+            const HORIZONTAL_PADDING = 60;
+
+            function assignPositions(nodeId, xStart, xEnd, depth) {
+                const y = 80 + depth * VERTICAL_SPACING;
+                const x = (xStart + xEnd) / 2;
+                positions.set(nodeId, { x, y });
+
+                const children = childrenMap.get(nodeId) || [];
+                if (children.length > 0) {
+                    let currentX = xStart;
+                    children.forEach(childId => {
+                        const childWidth = getSubtreeWidth(childId);
+                        assignPositions(childId, currentX, currentX + childWidth, depth + 1);
+                        currentX += childWidth;
+                    });
+                }
+            }
+
+            // Position root nodes
+            let totalWidth = rootNodes.reduce((sum, n) => sum + getSubtreeWidth(n.id), 0);
+            let startX = Math.max(HORIZONTAL_PADDING, (width - totalWidth) / 2);
+
+            rootNodes.forEach(node => {
+                const subtreeWidth = getSubtreeWidth(node.id);
+                assignPositions(node.id, startX, startX + subtreeWidth, 0);
+                startX += subtreeWidth;
+            });
+
+            // Handle orphan nodes (not in any hierarchy)
+            const orphans = nodes.filter(n => !positions.has(n.id));
+            if (orphans.length > 0) {
+                const orphanY = 80 + (maxDepth + 1) * VERTICAL_SPACING;
+                const orphanSpacing = Math.min(200, (width - 100) / (orphans.length + 1));
+                orphans.forEach((n, i) => {
+                    positions.set(n.id, {
+                        x: 50 + (i + 1) * orphanSpacing,
+                        y: orphanY
+                    });
+                });
+            }
+
+            return positions;
+        }
+
+        // Apply auto-layout and save positions
+        function cleanGraphLayout() {
+            const container = document.getElementById('graph');
+            if (!container) return;
+
+            const width = container.clientWidth;
+            const height = container.clientHeight;
+
+            // Get all nodes
+            const nodes = [];
+            ['unit', 'team', 'role', 'object'].forEach(type => {
+                entities[type].forEach(entity => nodes.push(entity));
+            });
+
+            // Calculate new positions
+            const positions = calculateAutoLayout(nodes, width, height);
+
+            // Apply positions to entities and save
+            positions.forEach((pos, nodeId) => {
+                for (const type of ['unit', 'team', 'role', 'object']) {
+                    const entity = entities[type].find(e => e.id === nodeId);
+                    if (entity) {
+                        entity.graphX = pos.x;
+                        entity.graphY = pos.y;
+                        break;
+                    }
+                }
+            });
+
+            // Save to localStorage
+            saveWorkspaces();
+
+            // Re-render graph
+            updateGraph();
+
+            // Reset zoom
+            if (graphZoom && svg) {
+                svg.call(graphZoom.transform, d3.zoomIdentity);
+                currentZoomScale = 1;
+                updateZoomDisplay();
+            }
+        }
+
+        // Fit graph to view
+        function fitGraphToView() {
+            if (!graphG || !graphZoom) return;
+
+            const container = document.getElementById('graph');
+            if (!container) return;
+
+            const width = container.clientWidth;
+            const height = container.clientHeight;
+
+            // Get bounds of all nodes
+            const bounds = graphG.node().getBBox();
+            if (bounds.width === 0 || bounds.height === 0) return;
+
+            const padding = 40;
+            const scale = Math.min(
+                (width - padding * 2) / bounds.width,
+                (height - padding * 2) / bounds.height,
+                1.5 // Max zoom
+            );
+
+            const tx = (width - bounds.width * scale) / 2 - bounds.x * scale;
+            const ty = (height - bounds.height * scale) / 2 - bounds.y * scale;
+
+            svg.transition().duration(300).call(
+                graphZoom.transform,
+                d3.zoomIdentity.translate(tx, ty).scale(scale)
+            );
+
+            currentZoomScale = scale;
+            updateZoomDisplay();
+        }
+
+        // Zoom controls
+        function zoomGraph(factor) {
+            if (!graphZoom) return;
+            currentZoomScale *= factor;
+            currentZoomScale = Math.max(0.3, Math.min(3, currentZoomScale));
+
+            svg.transition().duration(200).call(
+                graphZoom.scaleTo,
+                currentZoomScale
+            );
+
+            updateZoomDisplay();
+        }
+
+        function updateZoomDisplay() {
+            const display = document.getElementById('graphZoomLevel');
+            if (display) {
+                display.textContent = Math.round(currentZoomScale * 100) + '%';
+            }
+        }
+
+        // Generate bezier curve path for edges
+        function generateEdgePath(sourceX, sourceY, targetX, targetY) {
+            // Source exits from right port, target enters from left port
+            const sourcePortX = sourceX + NODE_WIDTH / 2;
+            const sourcePortY = sourceY;
+            const targetPortX = targetX - NODE_WIDTH / 2;
+            const targetPortY = targetY;
+
+            // Calculate control points for smooth bezier
+            const dx = targetPortX - sourcePortX;
+            const dy = targetPortY - sourcePortY;
+
+            // Adjust curve based on relative positions
+            let cp1x, cp1y, cp2x, cp2y;
+
+            if (dx > 0) {
+                // Normal left-to-right flow
+                const curveStrength = Math.min(Math.abs(dx) * 0.5, 100);
+                cp1x = sourcePortX + curveStrength;
+                cp1y = sourcePortY;
+                cp2x = targetPortX - curveStrength;
+                cp2y = targetPortY;
+            } else {
+                // Backwards connection - need to curve around
+                const curveStrength = Math.max(80, Math.abs(dx) * 0.3);
+                const verticalOffset = Math.sign(dy) * Math.max(60, Math.abs(dy) * 0.5);
+                cp1x = sourcePortX + curveStrength;
+                cp1y = sourcePortY + verticalOffset;
+                cp2x = targetPortX - curveStrength;
+                cp2y = targetPortY - verticalOffset;
+            }
+
+            return `M ${sourcePortX} ${sourcePortY} C ${cp1x} ${cp1y}, ${cp2x} ${cp2y}, ${targetPortX} ${targetPortY}`;
+        }
+
         function updateGraph() {
             // Get dimensions
-            const container = document.getElementById('graph').parentElement;
+            const container = document.getElementById('graph');
             if (!container) return;
-            
+
             width = container.clientWidth;
             height = container.clientHeight;
 
@@ -9632,7 +10198,7 @@ John Doe,Engineering,john@example.com"
 
             // Prepare data with filters applied
             const nodes = [];
-            const types = ['unit', 'team', 'role', 'object']; // Exclude person from graph
+            const types = ['unit', 'team', 'role', 'object'];
             types.forEach(type => {
                 if (filters.entities[type]) {
                     entities[type].forEach(entity => {
@@ -9644,7 +10210,6 @@ John Doe,Engineering,john@example.com"
             const links = relationships
                 .filter(rel => filters.relationships[rel.predicate])
                 .filter(rel => {
-                    // Only include links where both source and target are in filtered nodes
                     const sourceNode = nodes.find(n => n.id === rel.subject);
                     const targetNode = nodes.find(n => n.id === rel.object);
                     return sourceNode && targetNode;
@@ -9659,251 +10224,211 @@ John Doe,Engineering,john@example.com"
             // Clear existing
             svg.selectAll('*').remove();
 
-            // Define layers (no people in graph)
-            const layers = [
-                { type: 'unit', label: 'Units', y: 0.15, color: '#C88F4A', bgColor: '#FFF9F0' },
-                { type: 'team', label: 'Teams', y: 0.35, color: '#B87B5B', bgColor: '#FFF5EB' },
-                { type: 'role', label: 'Roles', y: 0.60, color: '#8B6F47', bgColor: '#FAF7F5' },
-                { type: 'object', label: 'Objects', y: 0.85, color: '#A89984', bgColor: '#FAFAF8' }
-            ];
-
-            // Create arrow markers for all EO operators
+            // Create defs for markers and filters
             const defs = svg.append('defs');
-            
+
+            // Arrow markers for each operator type
             Object.keys(eoOperators).forEach(type => {
                 const opData = eoOperators[type];
                 defs.append('marker')
                     .attr('id', `arrow-${type}`)
                     .attr('viewBox', '0 -5 10 10')
-                    .attr('refX', 25)
+                    .attr('refX', 8)
                     .attr('refY', 0)
-                    .attr('markerWidth', 6)
-                    .attr('markerHeight', 6)
+                    .attr('markerWidth', 8)
+                    .attr('markerHeight', 8)
                     .attr('orient', 'auto')
                     .append('path')
-                    .attr('d', 'M0,-5L10,0L0,5')
+                    .attr('d', 'M0,-4L10,0L0,4')
                     .attr('fill', opData.color);
             });
 
-            // Create container groups
-            const g = svg.append('g');
+            // Create main group for zoom/pan
+            graphG = svg.append('g').attr('class', 'graph-container');
 
-            // Layer backgrounds removed for cleaner view
-            const layerHeight = height / layers.length;
-            
-            const linkGroup = g.append('g').attr('class', 'links');
-            const nodeGroup = g.append('g').attr('class', 'nodes');
+            const linkGroup = graphG.append('g').attr('class', 'edges');
+            const nodeGroup = graphG.append('g').attr('class', 'nodes');
 
-            // Build hierarchy map for vertical alignment of nested entities
-            const parentMap = new Map(); // childId -> parentId
-            const childrenMap = new Map(); // parentId -> [childIds]
+            // Check if nodes need initial positions
+            const needsLayout = nodes.some(n => n.graphX === undefined || n.graphY === undefined);
 
-            // Find all DES relationships to build parent-child hierarchy
-            relationships.filter(r => r.predicate === 'DES').forEach(rel => {
-                const parentId = rel.subject;
-                const childId = rel.object;
-                const parentNode = nodes.find(n => n.id === parentId);
-                const childNode = nodes.find(n => n.id === childId);
-
-                if (parentNode && childNode) {
-                    parentMap.set(childId, parentId);
-                    if (!childrenMap.has(parentId)) {
-                        childrenMap.set(parentId, []);
+            if (needsLayout) {
+                const positions = calculateAutoLayout(nodes, width, height);
+                positions.forEach((pos, nodeId) => {
+                    const node = nodes.find(n => n.id === nodeId);
+                    if (node) {
+                        node.graphX = pos.x;
+                        node.graphY = pos.y;
+                        // Also update the source entity
+                        for (const type of types) {
+                            const entity = entities[type].find(e => e.id === nodeId);
+                            if (entity) {
+                                entity.graphX = pos.x;
+                                entity.graphY = pos.y;
+                                break;
+                            }
+                        }
                     }
-                    childrenMap.get(parentId).push(childId);
-                }
-            });
-
-            // Find root entities (those with no parent in the current view)
-            const rootNodes = nodes.filter(n => !parentMap.has(n.id));
-
-            // Calculate hierarchy depth for each node (root = 0, children = 1, etc.)
-            const nodeDepths = new Map();
-            let maxDepth = 0;
-
-            function calculateDepth(nodeId, depth) {
-                nodeDepths.set(nodeId, depth);
-                maxDepth = Math.max(maxDepth, depth);
-                const children = childrenMap.get(nodeId) || [];
-                children.forEach(childId => calculateDepth(childId, depth + 1));
-            }
-
-            // Start depth calculation from root nodes
-            rootNodes.forEach(node => calculateDepth(node.id, 0));
-
-            // For nodes not in hierarchy (orphans), assign depth 0
-            nodes.forEach(node => {
-                if (!nodeDepths.has(node.id)) {
-                    nodeDepths.set(node.id, 0);
-                }
-            });
-
-            // Calculate X positions: root entities spread evenly, children align under parents
-            const nodeXPositions = new Map();
-            const rootSpacing = width / (rootNodes.length + 1);
-
-            // Assign X positions to root nodes
-            rootNodes.forEach((node, index) => {
-                nodeXPositions.set(node.id, rootSpacing * (index + 1));
-            });
-
-            // Recursively assign X positions to children (centered under parent)
-            function assignChildPositions(parentId) {
-                const children = childrenMap.get(parentId) || [];
-                if (children.length === 0) return;
-
-                const parentX = nodeXPositions.get(parentId);
-                const childSpacing = 110; // Spacing between siblings
-                const totalWidth = (children.length - 1) * childSpacing;
-                const startX = parentX - totalWidth / 2;
-
-                children.forEach((childId, index) => {
-                    nodeXPositions.set(childId, startX + index * childSpacing);
-                    assignChildPositions(childId); // Recurse to grandchildren
                 });
+                saveWorkspaces();
             }
 
-            rootNodes.forEach(node => assignChildPositions(node.id));
+            // Create node lookup for edge rendering
+            const nodeMap = new Map(nodes.map(n => [n.id, n]));
 
-            // Stop any existing simulation before creating a new one
-            if (graphSimulation) {
-                graphSimulation.stop();
-            }
+            // Create edges with bezier curves
+            links.forEach(link => {
+                const sourceNode = nodeMap.get(link.source);
+                const targetNode = nodeMap.get(link.target);
+                if (!sourceNode || !targetNode) return;
 
-            // Create force simulation with stable hierarchical layering
-            graphSimulation = d3.forceSimulation(nodes)
-                .alphaDecay(0.05) // Faster settling to reduce oscillation
-                .velocityDecay(0.5) // Higher friction to reduce bouncing
-                .force('link', d3.forceLink(links).id(d => d.id).distance(d => {
-                    // Hierarchical links (DES) should be shorter
-                    return d.predicate === 'DES' ? 80 : 120;
-                }))
-                .force('charge', d3.forceManyBody().strength(-200))
-                .force('center', d3.forceCenter(width / 2, height / 2))
-                .force('collision', d3.forceCollide().radius(d => getNodeRadius(d.type) + 15))
-                .force('y', d3.forceY().y(d => {
-                    // Position based on hierarchy depth - parents higher, children lower
-                    const depth = nodeDepths.get(d.id) || 0;
-                    const effectiveMaxDepth = Math.max(maxDepth, 3); // Ensure reasonable spacing
-                    const depthSpacing = height / (effectiveMaxDepth + 2); // +2 for top/bottom margins
-                    return depthSpacing * (depth + 0.75); // +0.75 provides top margin
-                }).strength(0.8)) // Strong force to lock in layers
-                .force('x', d3.forceX().x(d => {
-                    // Use pre-calculated position for vertical nesting alignment
-                    return nodeXPositions.get(d.id) || width / 2;
-                }).strength(0.5)); // Moderate X force to maintain vertical alignment
+                const pathData = generateEdgePath(
+                    sourceNode.graphX, sourceNode.graphY,
+                    targetNode.graphX, targetNode.graphY
+                );
 
-            // Create links with semantic styling
-            graphLink = linkGroup.selectAll('line')
-                .data(links)
-                .enter().append('line')
-                .attr('stroke', d => getLinkColor(d.predicate))
-                .attr('stroke-width', d => {
-                    // Hierarchical and oversight get heavier lines
-                    const op = d.predicate;
-                    if (op === 'DES') return 3; // Hierarchical - bold
-                    if (op === 'SUP') return 3; // Oversight - bold
-                    if (op === 'NUL') return 3; // Removal - bold
-                    if (op === 'SYN' || op === 'REC') return 2.5; // Structural changes
-                    return 2; // Everything else
-                })
-                .attr('stroke-dasharray', d => {
-                    const op = d.predicate;
-                    if (op === 'SEG') return '8,4'; // Segmentation - dashed
-                    if (op === 'REC') return '6,3'; // Reconfiguration - dashed
-                    if (op === 'ALT') return '4,2'; // Alteration - dotted
-                    if (op === 'CON') return '1,0'; // Connection - solid
-                    return 'none'; // Solid by default
-                })
-                .attr('stroke-opacity', d => {
-                    const op = d.predicate;
-                    if (op === 'DES' || op === 'INS') return 0.8; // Strong structural
-                    if (op === 'NUL') return 0.6; // Removal
-                    return 0.7; // Everything else
-                })
-                .attr('marker-end', d => `url(#arrow-${d.predicate})`);
+                const opData = eoOperators[link.predicate] || {};
 
-            // Create nodes
-            graphNode = nodeGroup.selectAll('g')
+                // Invisible hitbox for easier clicking
+                linkGroup.append('path')
+                    .attr('class', 'graph-edge-hitbox')
+                    .attr('d', pathData)
+                    .attr('data-id', link.id)
+                    .on('click', function(event) {
+                        event.stopPropagation();
+                        openEdgeEditModal(link.id);
+                    });
+
+                // Visible edge
+                const edge = linkGroup.append('path')
+                    .attr('class', 'graph-edge')
+                    .attr('d', pathData)
+                    .attr('stroke', opData.color || '#999')
+                    .attr('stroke-dasharray', () => {
+                        if (link.predicate === 'SEG' || link.predicate === 'REC') return '8,4';
+                        if (link.predicate === 'ALT') return '4,2';
+                        return 'none';
+                    })
+                    .attr('marker-end', `url(#arrow-${link.predicate})`)
+                    .attr('data-id', link.id)
+                    .on('click', function(event) {
+                        event.stopPropagation();
+                        openEdgeEditModal(link.id);
+                    });
+
+                // Edge label at midpoint
+                const midX = (sourceNode.graphX + targetNode.graphX) / 2;
+                const midY = (sourceNode.graphY + targetNode.graphY) / 2;
+
+                // Label background
+                linkGroup.append('rect')
+                    .attr('class', 'graph-edge-label-bg')
+                    .attr('x', midX - 16)
+                    .attr('y', midY - 8)
+                    .attr('width', 32)
+                    .attr('height', 16)
+                    .attr('rx', 4);
+
+                // Label text
+                linkGroup.append('text')
+                    .attr('class', 'graph-edge-label')
+                    .attr('x', midX)
+                    .attr('y', midY + 3)
+                    .attr('text-anchor', 'middle')
+                    .attr('fill', opData.color || '#666')
+                    .style('font-weight', '600')
+                    .text(link.predicate);
+            });
+
+            // Create n8n-style card nodes
+            graphNode = nodeGroup.selectAll('g.graph-node')
                 .data(nodes)
                 .enter().append('g')
-                .attr('class', 'node')
+                .attr('class', 'graph-node')
+                .attr('transform', d => `translate(${d.graphX - NODE_WIDTH/2}, ${d.graphY - NODE_HEIGHT/2})`)
                 .call(d3.drag()
-                    .on('start', dragstarted)
-                    .on('drag', dragged)
-                    .on('end', dragended));
+                    .on('start', nodeDragStarted)
+                    .on('drag', nodeDragged)
+                    .on('end', nodeDragEnded));
 
-            // Add node shapes
-            graphNode.each(function(d) {
-                const g = d3.select(this);
-                const radius = getNodeRadius(d.type);
-                const color = getNodeColor(d.type);
+            // Node body (white rectangle with rounded corners)
+            graphNode.append('rect')
+                .attr('class', 'graph-node-body')
+                .attr('width', NODE_WIDTH)
+                .attr('height', NODE_HEIGHT)
+                .attr('rx', 8)
+                .attr('ry', 8);
 
-                if (d.type === 'role' || d.type === 'object') {
-                    g.append('rect')
-                        .attr('width', radius * 2)
-                        .attr('height', radius * 2)
-                        .attr('x', -radius)
-                        .attr('y', -radius)
-                        .attr('rx', 6)
-                        .attr('fill', color)
-                        .attr('stroke', '#fff')
-                        .attr('stroke-width', 2);
-                } else {
-                    g.append('circle')
-                        .attr('r', radius)
-                        .attr('fill', color)
-                        .attr('stroke', '#fff')
-                        .attr('stroke-width', 2);
-                }
+            // Accent bar on left side
+            graphNode.append('rect')
+                .attr('class', 'graph-node-accent')
+                .attr('width', 6)
+                .attr('height', NODE_HEIGHT)
+                .attr('rx', 8)
+                .attr('fill', d => getNodeAccentColor(d.type));
 
-                // Add icon/text
-                if (d.type === 'person') {
-                    g.append('text')
-                        .text(getInitials(d.name))
-                        .attr('text-anchor', 'middle')
-                        .attr('dy', '.35em')
-                        .attr('fill', 'white')
-                        .style('font-size', '12px')
-                        .style('font-weight', 'bold')
-                        .style('pointer-events', 'none');
-                } else {
-                    const iconSize = 24;
-                    g.append('foreignObject')
-                        .attr('width', iconSize)
-                        .attr('height', iconSize)
-                        .attr('x', -iconSize / 2)
-                        .attr('y', -iconSize / 2)
-                        .style('pointer-events', 'none')
-                        .append('xhtml:div')
-                        .style('display', 'flex')
-                        .style('align-items', 'center')
-                        .style('justify-content', 'center')
-                        .style('width', '100%')
-                        .style('height', '100%')
-                        .style('color', d.type === 'object' ? '#8B6F47' : 'white')
-                        .style('font-size', '18px')
-                        .html(getIcon(d.type));
-                }
+            // Clip the accent bar to just show on left
+            graphNode.append('rect')
+                .attr('class', 'graph-node-accent')
+                .attr('x', 3)
+                .attr('width', 3)
+                .attr('height', NODE_HEIGHT)
+                .attr('fill', d => getNodeAccentColor(d.type));
 
-                // Add label with truncation for long names
-                const maxLabelLength = 18;
-                const displayName = d.name.length > maxLabelLength
-                    ? d.name.substring(0, maxLabelLength - 1) + '…'
-                    : d.name;
-                g.append('text')
-                    .text(displayName)
-                    .attr('text-anchor', 'middle')
-                    .attr('dy', radius + 18)
-                    .attr('fill', '#3D2E1F')
-                    .style('font-size', '13px')
-                    .style('font-weight', '500')
-                    .style('pointer-events', 'none');
-            });
+            // Icon
+            graphNode.append('foreignObject')
+                .attr('class', 'graph-node-icon')
+                .attr('x', 14)
+                .attr('y', (NODE_HEIGHT - 24) / 2)
+                .attr('width', 24)
+                .attr('height', 24)
+                .append('xhtml:div')
+                .style('display', 'flex')
+                .style('align-items', 'center')
+                .style('justify-content', 'center')
+                .style('width', '100%')
+                .style('height', '100%')
+                .style('color', d => getNodeAccentColor(d.type))
+                .style('font-size', '20px')
+                .html(d => getIcon(d.type));
 
-            // Add interactions
+            // Node label (name)
+            graphNode.append('text')
+                .attr('class', 'graph-node-label')
+                .attr('x', 44)
+                .attr('y', NODE_HEIGHT / 2 - 4)
+                .text(d => {
+                    const maxLen = 12;
+                    return d.name.length > maxLen ? d.name.substring(0, maxLen - 1) + '…' : d.name;
+                });
+
+            // Node type label
+            graphNode.append('text')
+                .attr('class', 'graph-node-type')
+                .attr('x', 44)
+                .attr('y', NODE_HEIGHT / 2 + 12)
+                .text(d => d.type);
+
+            // Input port (left side)
+            graphNode.append('circle')
+                .attr('class', 'graph-port input-port')
+                .attr('cx', 0)
+                .attr('cy', NODE_HEIGHT / 2)
+                .attr('r', PORT_RADIUS);
+
+            // Output port (right side)
+            graphNode.append('circle')
+                .attr('class', 'graph-port output-port')
+                .attr('cx', NODE_WIDTH)
+                .attr('cy', NODE_HEIGHT / 2)
+                .attr('r', PORT_RADIUS);
+
+            // Node interactions
             graphNode.on('click', function(event, d) {
                 event.stopPropagation();
+                // Deselect all, select this one
+                graphNode.classed('selected', false);
+                d3.select(this).classed('selected', true);
                 openEntityModal(d.id, d.type);
             })
             .on('dblclick', function(event, d) {
@@ -9917,70 +10442,111 @@ John Doe,Engineering,john@example.com"
                 hideTooltip();
             });
 
-            graphLink.on('click', function(event, d) {
-                event.stopPropagation();
-                openRelationshipModal(d);
-            })
-            .on('mouseover', function(event, d) {
-                const subject = findEntity(d.source.id);
-                const object = findEntity(d.target.id);
-                tooltip.html(`
-                    <strong>${subject.name}</strong><br>
-                    ${d.predicate.toUpperCase()}<br>
-                    <strong>${object.name}</strong>
-                `);
-                tooltip.style('opacity', 1);
-            })
-            .on('mouseout', function() {
-                hideTooltip();
-            });
-
-            // Click background to unfocus
+            // Click background to deselect
             svg.on('click', function() {
+                graphNode.classed('selected', false);
                 unfocusAll();
             });
 
-            // Add zoom
-            const zoom = d3.zoom()
+            // Setup zoom
+            graphZoom = d3.zoom()
                 .scaleExtent([0.3, 3])
                 .on('zoom', (event) => {
-                    g.attr('transform', event.transform);
+                    graphG.attr('transform', event.transform);
+                    currentZoomScale = event.transform.k;
+                    updateZoomDisplay();
                 });
-            
-            svg.call(zoom);
 
-            // Update positions on tick
-            graphSimulation.on('tick', () => {
-                graphLink
-                    .attr('x1', d => d.source.x)
-                    .attr('y1', d => d.source.y)
-                    .attr('x2', d => d.target.x)
-                    .attr('y2', d => d.target.y);
+            svg.call(graphZoom);
 
-                graphNode.attr('transform', d => `translate(${d.x},${d.y})`);
+            // Store link data for updating
+            graphLink = linkGroup;
+        }
+
+        // Node drag handlers - free movement with position persistence
+        function nodeDragStarted(event, d) {
+            d3.select(this).raise().classed('dragging', true);
+        }
+
+        function nodeDragged(event, d) {
+            // Update position
+            d.graphX = event.x + NODE_WIDTH / 2;
+            d.graphY = event.y + NODE_HEIGHT / 2;
+
+            // Move node
+            d3.select(this).attr('transform', `translate(${event.x}, ${event.y})`);
+
+            // Update connected edges
+            updateEdgesForNode(d);
+        }
+
+        function nodeDragEnded(event, d) {
+            d3.select(this).classed('dragging', false);
+
+            // Save position to entity
+            for (const type of ['unit', 'team', 'role', 'object']) {
+                const entity = entities[type].find(e => e.id === d.id);
+                if (entity) {
+                    entity.graphX = d.graphX;
+                    entity.graphY = d.graphY;
+                    break;
+                }
+            }
+
+            // Persist to storage
+            saveWorkspaces();
+        }
+
+        // Update edges connected to a node during drag
+        function updateEdgesForNode(node) {
+            if (!graphLink) return;
+
+            // Get all nodes for position lookup
+            const nodePositions = new Map();
+            d3.selectAll('.graph-node').each(function(d) {
+                nodePositions.set(d.id, { x: d.graphX, y: d.graphY });
+            });
+
+            // Update paths that connect to this node
+            relationships.forEach(rel => {
+                if (rel.subject === node.id || rel.object === node.id) {
+                    const sourcePos = nodePositions.get(rel.subject);
+                    const targetPos = nodePositions.get(rel.object);
+                    if (!sourcePos || !targetPos) return;
+
+                    const pathData = generateEdgePath(
+                        sourcePos.x, sourcePos.y,
+                        targetPos.x, targetPos.y
+                    );
+
+                    // Update visible edge and hitbox
+                    graphLink.selectAll(`path[data-id="${rel.id}"]`)
+                        .attr('d', pathData);
+
+                    // Update label position
+                    const midX = (sourcePos.x + targetPos.x) / 2;
+                    const midY = (sourcePos.y + targetPos.y) / 2;
+
+                    // This is simplified - in production you'd need to track label elements
+                }
             });
         }
 
+        // Edge edit modal
+        function openEdgeEditModal(relationshipId) {
+            const rel = relationships.find(r => r.id === relationshipId);
+            if (!rel) return;
+
+            openRelationshipModal({ id: relationshipId, ...rel });
+        }
+
         function getNodeRadius(type) {
-            const sizes = {
-                unit: 30,
-                team: 25,
-                role: 20,
-                person: 22,
-                object: 18
-            };
-            return sizes[type] || 20;
+            // Legacy function - kept for compatibility
+            return NODE_WIDTH / 4;
         }
 
         function getNodeColor(type) {
-            const colors = {
-                unit: '#C88F4A',
-                team: '#B87B5B',
-                role: '#8B6F47',
-                person: '#6B5642',
-                object: '#F5E6D3'
-            };
-            return colors[type] || '#CCC';
+            return getNodeAccentColor(type);
         }
 
         function getLinkColor(predicate) {
@@ -10003,12 +10569,12 @@ John Doe,Engineering,john@example.com"
         }
 
         function focusNode(d) {
-            if (!d || !d.id) return; // Guard against undefined data
-            if (!graphNode || !graphLink) return; // Guard against undefined selections
-            if (!relationships) return; // Guard against undefined relationships
-            
+            if (!d || !d.id) return;
+            if (!graphNode || !graphLink) return;
+            if (!relationships) return;
+
             focusedNode = d;
-            
+
             // Get connected nodes
             const connectedNodes = new Set([d.id]);
             relationships.forEach(rel => {
@@ -10016,29 +10582,30 @@ John Doe,Engineering,john@example.com"
                 if (rel && rel.object === d.id) connectedNodes.add(rel.subject);
             });
 
-            // Dim everything except connected
+            // Dim unconnected nodes
             graphNode.style('opacity', n => connectedNodes.has(n.id) ? 1 : 0.2);
-            graphLink.style('opacity', l => 
-                (l.source && l.target && (l.source.id === d.id || l.target.id === d.id)) ? 1 : 0.1
-            );
+            graphLink.selectAll('.graph-edge').style('opacity', function() {
+                const id = d3.select(this).attr('data-id');
+                const rel = relationships.find(r => r.id === id);
+                return rel && (rel.subject === d.id || rel.object === d.id) ? 1 : 0.1;
+            });
         }
 
         function unfocusAll() {
             focusedNode = null;
             if (graphNode) graphNode.style('opacity', 1);
-            if (graphLink) graphLink.style('opacity', 0.6);
+            if (graphLink) graphLink.selectAll('.graph-edge').style('opacity', 1);
         }
 
         function toggleNodeCollapse(d) {
-            // TODO: Implement collapse/expand logic
             console.log('Toggle collapse for:', d.name);
         }
 
         function showTooltip(event, d) {
-            const connections = relationships.filter(r => 
+            const connections = relationships.filter(r =>
                 r.subject === d.id || r.object === d.id
             );
-            
+
             tooltip.html(`
                 <strong>${d.name}</strong><br>
                 <em>${d.type}</em><br>
@@ -10053,39 +10620,23 @@ John Doe,Engineering,john@example.com"
             tooltip.style('opacity', 0);
         }
 
+        // Legacy drag functions (for compatibility)
         function dragstarted(event, d) {
-            if (!graphSimulation) return; // Guard against undefined simulation
-            if (!event.active) graphSimulation.alphaTarget(0.05).restart(); // Reduced from 0.3 to 0.05
-            d.fx = d.x;
-            d.fy = d.y;
-            
-            // Store the original layer Y position
-            const layerHeight = height / 4;
-            if (d.type === 'unit') d.layerY = layerHeight * 0.5;
-            else if (d.type === 'team') d.layerY = layerHeight * 1.5;
-            else if (d.type === 'role') d.layerY = layerHeight * 2.5;
-            else if (d.type === 'object') d.layerY = layerHeight * 3.5;
+            nodeDragStarted(event, d);
         }
 
         function dragged(event, d) {
-            // Allow X movement but lock Y to layer
-            d.fx = event.x;
-            d.fy = d.layerY; // Lock to original layer
+            nodeDragged(event, d);
         }
 
         function dragended(event, d) {
-            if (!graphSimulation) return; // Guard against undefined simulation
-            if (!event.active) graphSimulation.alphaTarget(0);
-            d.fx = null;
-            d.fy = null; // Release but layer forces will keep it in place
+            nodeDragEnded(event, d);
         }
 
         function resetGraph() {
             if (currentView === 'graph') {
                 unfocusAll();
-                if (graphSimulation) {
-                    graphSimulation.alpha(1).restart();
-                }
+                cleanGraphLayout();
             } else if (currentView === 'tree') {
                 renderTreeView();
             }
