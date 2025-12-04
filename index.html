@@ -2651,6 +2651,202 @@
             margin: 1rem 0;
         }
 
+        /* Mobile modal optimizations */
+        @media (max-width: 640px) {
+            .modal-dialog {
+                width: 100%;
+                max-width: 100%;
+                height: 100%;
+                max-height: 100%;
+                border-radius: 0;
+                margin: 0;
+            }
+
+            .modal-header-section {
+                padding: 1rem 1.25rem;
+            }
+
+            .modal-header-icon {
+                font-size: 2rem;
+                margin-right: 0.75rem;
+            }
+
+            .modal-title-text {
+                font-size: 1.35rem;
+            }
+
+            .modal-section {
+                padding: 1rem 1.25rem;
+            }
+
+            .modal-actions {
+                padding: 1rem 1.25rem;
+            }
+
+            /* Hide orbital view on mobile - always use list */
+            .orbital-container {
+                display: none !important;
+            }
+
+            /* Hide view toggle on mobile since we only show list */
+            .view-toggle {
+                display: none;
+            }
+
+            /* Compact empty states */
+            .modal-empty-state {
+                padding: 0.75rem;
+                display: flex;
+                align-items: center;
+                gap: 0.5rem;
+            }
+
+            .modal-empty-state i {
+                font-size: 1rem;
+                margin-bottom: 0;
+            }
+
+            /* Compact description empty state */
+            .modal-description-empty {
+                padding: 0.75rem;
+                font-size: 0.85rem;
+            }
+
+            /* Stack connection badges vertically for easier tapping */
+            .connection-group-items {
+                flex-direction: column;
+                gap: 0.5rem;
+            }
+
+            .connection-badge {
+                width: 100%;
+                padding: 0.75rem 1rem;
+                margin: 0;
+                justify-content: space-between;
+            }
+
+            /* Add action sections more compact */
+            .modal-add-connection {
+                padding: 0.75rem;
+            }
+
+            .modal-add-connection-row {
+                flex-direction: column;
+                gap: 0.5rem;
+            }
+
+            .modal-add-connection-row select {
+                width: 100%;
+            }
+
+            .modal-add-connection-btn {
+                width: 100%;
+                justify-content: center;
+            }
+
+            /* Hide separate add sections on mobile - use inline buttons instead */
+            #modalAddNested,
+            #modalAddActivity {
+                display: none !important;
+            }
+
+            /* Hide delete from footer on mobile */
+            #modalDeleteButton {
+                display: none !important;
+            }
+
+            /* Make footer simpler on mobile */
+            .modal-actions {
+                justify-content: space-between;
+            }
+
+            .modal-action-spacer {
+                display: none;
+            }
+        }
+
+        /* Inline add button for section headers */
+        .section-add-btn {
+            background: rgba(200, 143, 74, 0.15);
+            border: none;
+            color: #C88F4A;
+            width: 28px;
+            height: 28px;
+            border-radius: 6px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1rem;
+            transition: all 0.2s;
+        }
+
+        .section-add-btn:hover {
+            background: rgba(200, 143, 74, 0.25);
+        }
+
+        /* Inline add form that expands in section */
+        .inline-add-form {
+            margin-top: 0.75rem;
+            padding: 0.75rem;
+            background: #FAF7F5;
+            border-radius: 8px;
+            border: 1px dashed #E5DDD1;
+        }
+
+        .inline-add-form.hidden {
+            display: none;
+        }
+
+        .inline-add-row {
+            display: flex;
+            gap: 0.5rem;
+            flex-wrap: wrap;
+        }
+
+        .inline-add-row select {
+            flex: 1;
+            min-width: 100px;
+            padding: 0.5rem;
+            border: 2px solid #E5DDD1;
+            border-radius: 6px;
+            font-size: 0.875rem;
+            background: white;
+        }
+
+        .inline-add-row select:focus {
+            outline: none;
+            border-color: #C88F4A;
+        }
+
+        .inline-add-btn {
+            padding: 0.5rem 0.75rem;
+            background: #C88F4A;
+            color: white;
+            border: none;
+            border-radius: 6px;
+            font-weight: 600;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            gap: 0.25rem;
+        }
+
+        .inline-add-btn:hover {
+            background: #B87B5B;
+        }
+
+        /* Hide mobile-only delete button on desktop */
+        .mobile-only-delete {
+            display: none;
+        }
+
+        @media (max-width: 640px) {
+            .mobile-only-delete {
+                display: flex;
+            }
+        }
+
         .orbital-svg {
             width: 100%;
             height: 100%;
@@ -4148,6 +4344,10 @@
                 </div>
             </div>
             <div class="entity-edit-modal-actions">
+                <button class="modal-action-btn danger mobile-only-delete" onclick="openDeleteConfirmModal()">
+                    <i class="ph ph-trash"></i> Delete
+                </button>
+                <div style="flex: 1;"></div>
                 <button class="modal-action-btn secondary" onclick="closeEntityEditModal()">Cancel</button>
                 <button class="modal-action-btn primary" onclick="saveEntityEdit()">Save Changes</button>
             </div>
@@ -4827,6 +5027,11 @@ John Doe,Engineering,john@example.com"
         let focusedNode = null;
         let currentView = 'card';
 
+        // Mobile detection helper
+        function isMobile() {
+            return window.innerWidth <= 640;
+        }
+
         // Graph visualization variables
         let width = 800;
         let height = 600;
@@ -4890,18 +5095,25 @@ John Doe,Engineering,john@example.com"
             document.getElementById('modalDeleteButton').style.display = 'inline-flex';
             document.getElementById('modalTitleEditBtn').style.display = 'flex';
 
-            // Display description
+            // Display description - compact on mobile when empty
             const descriptionEl = document.getElementById('modalDescription');
             if (entity.description && entity.description.trim()) {
                 descriptionEl.innerHTML = `
                     <div class="modal-section-title"><i class="ph ph-text-align-left"></i> Description</div>
                     <div class="modal-description-text">${entity.description}</div>
                 `;
+                descriptionEl.style.display = '';
             } else {
-                descriptionEl.innerHTML = `
-                    <div class="modal-section-title"><i class="ph ph-text-align-left"></i> Description</div>
-                    <div class="modal-description-empty">No description yet. Click Edit to add one.</div>
-                `;
+                // On mobile, hide empty description section entirely
+                if (isMobile()) {
+                    descriptionEl.style.display = 'none';
+                } else {
+                    descriptionEl.innerHTML = `
+                        <div class="modal-section-title"><i class="ph ph-text-align-left"></i> Description</div>
+                        <div class="modal-description-empty">No description yet. Click Edit to add one.</div>
+                    `;
+                    descriptionEl.style.display = '';
+                }
             }
 
             // Separate relationships into Nesting (DES) and Activities (non-DES)
@@ -4946,20 +5158,39 @@ John Doe,Engineering,john@example.com"
 
             // Render Nested section (DES relationships - hierarchical structure)
             const nestedEl = document.getElementById('modalNested');
+            const useMobileView = isMobile();
+
+            // Check if entity can have nested items
+            const canHaveNested = ['unit', 'team'].includes(entityType);
+
             if (nestedEntities.length > 0) {
-                // Create header with view toggle
+                // Create header with view toggle (hidden on mobile via CSS) and inline add button
                 nestedEl.innerHTML = `
                     <div class="connections-header">
                         <div class="modal-section-title" style="margin-bottom: 0;"><i class="ph ph-tree-structure"></i> Nested</div>
-                        <div class="view-toggle">
-                            <button class="view-toggle-btn active" data-view="orbital" onclick="switchNestedView('orbital', '${entityId}', '${entityType}')">
-                                <i class="ph ph-planet"></i>
-                            </button>
-                            <button class="view-toggle-btn" data-view="list" onclick="switchNestedView('list', '${entityId}', '${entityType}')">
-                                <i class="ph ph-list"></i>
-                            </button>
+                        <div style="display: flex; gap: 0.5rem; align-items: center;">
+                            ${canHaveNested && useMobileView ? `<button class="section-add-btn" onclick="toggleInlineNestedForm()" title="Add nested"><i class="ph ph-plus"></i></button>` : ''}
+                            <div class="view-toggle">
+                                <button class="view-toggle-btn ${useMobileView ? '' : 'active'}" data-view="orbital" onclick="switchNestedView('orbital', '${entityId}', '${entityType}')">
+                                    <i class="ph ph-planet"></i>
+                                </button>
+                                <button class="view-toggle-btn ${useMobileView ? 'active' : ''}" data-view="list" onclick="switchNestedView('list', '${entityId}', '${entityType}')">
+                                    <i class="ph ph-list"></i>
+                                </button>
+                            </div>
                         </div>
                     </div>
+                    ${canHaveNested && useMobileView ? `
+                    <div id="inlineNestedForm" class="inline-add-form hidden">
+                        <div class="inline-add-row">
+                            <select id="inlineNestedSelect">
+                                <option value="">Nest under this...</option>
+                                ${getAllEntitiesForNesting(entityId, entityType)}
+                            </select>
+                            <button class="inline-add-btn" onclick="addNestedFromInline()"><i class="ph ph-plus"></i> Add</button>
+                        </div>
+                    </div>
+                    ` : ''}
                 `;
 
                 // Container for the view content
@@ -4967,18 +5198,34 @@ John Doe,Engineering,john@example.com"
                 viewContainer.id = 'nestedViewContainer';
                 nestedEl.appendChild(viewContainer);
 
-                // Default to orbital view
-                const orbitalContainer = document.createElement('div');
-                orbitalContainer.className = 'orbital-container';
-                viewContainer.appendChild(orbitalContainer);
-
-                // Render orbital visualization after container is in DOM
-                setTimeout(() => {
-                    renderOrbitalConnections(orbitalContainer, entity, nestedEntities, 'nested');
-                }, 0);
+                // Mobile: list view, Desktop: orbital view
+                if (useMobileView) {
+                    renderGroupedConnections(viewContainer, nestedEntities, entityId);
+                } else {
+                    const orbitalContainer = document.createElement('div');
+                    orbitalContainer.className = 'orbital-container';
+                    viewContainer.appendChild(orbitalContainer);
+                    setTimeout(() => {
+                        renderOrbitalConnections(orbitalContainer, entity, nestedEntities, 'nested');
+                    }, 0);
+                }
             } else {
                 nestedEl.innerHTML = `
-                    <div class="modal-section-title"><i class="ph ph-tree-structure"></i> Nested</div>
+                    <div class="connections-header">
+                        <div class="modal-section-title" style="margin-bottom: 0;"><i class="ph ph-tree-structure"></i> Nested</div>
+                        ${canHaveNested && useMobileView ? `<button class="section-add-btn" onclick="toggleInlineNestedForm()" title="Add nested"><i class="ph ph-plus"></i></button>` : ''}
+                    </div>
+                    ${canHaveNested && useMobileView ? `
+                    <div id="inlineNestedForm" class="inline-add-form hidden">
+                        <div class="inline-add-row">
+                            <select id="inlineNestedSelect">
+                                <option value="">Nest under this...</option>
+                                ${getAllEntitiesForNesting(entityId, entityType)}
+                            </select>
+                            <button class="inline-add-btn" onclick="addNestedFromInline()"><i class="ph ph-plus"></i> Add</button>
+                        </div>
+                    </div>
+                    ` : ''}
                     <div class="modal-empty-state">
                         <i class="ph ph-tree-structure"></i>
                         <div>No nested items</div>
@@ -5010,20 +5257,44 @@ John Doe,Engineering,john@example.com"
 
             // Render Activities section (non-DES relationships)
             const activitiesEl = document.getElementById('modalActivities');
+            // Build inline add form HTML for activities (used in both filled and empty states on mobile)
+            const inlineActivityFormHtml = useMobileView ? `
+                <div id="inlineActivityForm" class="inline-add-form hidden">
+                    <div class="inline-add-row">
+                        <select id="inlineOperatorSelect">
+                            <option value="">Type...</option>
+                            ${Object.entries(eoOperators)
+                                .filter(([code]) => code !== 'DES')
+                                .map(([code, op]) => `<option value="${code}">${op.label}</option>`)
+                                .join('')}
+                        </select>
+                        <select id="inlineTargetSelect">
+                            <option value="">Connect to...</option>
+                            ${getAllEntitiesForModal(entityId)}
+                        </select>
+                        <button class="inline-add-btn" onclick="addActivityFromInline()"><i class="ph ph-plus"></i> Add</button>
+                    </div>
+                </div>
+            ` : '';
+
             if (activityEntities.length > 0) {
-                // Create header with view toggle
+                // Create header with view toggle (hidden on mobile via CSS) and inline add button
                 activitiesEl.innerHTML = `
                     <div class="connections-header">
                         <div class="modal-section-title" style="margin-bottom: 0;"><i class="ph ph-arrows-left-right"></i> Activities</div>
-                        <div class="view-toggle">
-                            <button class="view-toggle-btn active" data-view="orbital" onclick="switchActivitiesView('orbital', '${entityId}', '${entityType}')">
-                                <i class="ph ph-planet"></i>
-                            </button>
-                            <button class="view-toggle-btn" data-view="list" onclick="switchActivitiesView('list', '${entityId}', '${entityType}')">
-                                <i class="ph ph-list"></i>
-                            </button>
+                        <div style="display: flex; gap: 0.5rem; align-items: center;">
+                            ${useMobileView ? `<button class="section-add-btn" onclick="toggleInlineActivityForm()" title="Add activity"><i class="ph ph-plus"></i></button>` : ''}
+                            <div class="view-toggle">
+                                <button class="view-toggle-btn ${useMobileView ? '' : 'active'}" data-view="orbital" onclick="switchActivitiesView('orbital', '${entityId}', '${entityType}')">
+                                    <i class="ph ph-planet"></i>
+                                </button>
+                                <button class="view-toggle-btn ${useMobileView ? 'active' : ''}" data-view="list" onclick="switchActivitiesView('list', '${entityId}', '${entityType}')">
+                                    <i class="ph ph-list"></i>
+                                </button>
+                            </div>
                         </div>
                     </div>
+                    ${inlineActivityFormHtml}
                 `;
 
                 // Container for the view content
@@ -5031,18 +5302,24 @@ John Doe,Engineering,john@example.com"
                 viewContainer.id = 'activitiesViewContainer';
                 activitiesEl.appendChild(viewContainer);
 
-                // Default to orbital view
-                const orbitalContainer = document.createElement('div');
-                orbitalContainer.className = 'orbital-container';
-                viewContainer.appendChild(orbitalContainer);
-
-                // Render orbital visualization after container is in DOM
-                setTimeout(() => {
-                    renderOrbitalConnections(orbitalContainer, entity, activityEntities, 'activity');
-                }, 0);
+                // Mobile: list view, Desktop: orbital view
+                if (useMobileView) {
+                    renderGroupedConnections(viewContainer, activityEntities, entityId);
+                } else {
+                    const orbitalContainer = document.createElement('div');
+                    orbitalContainer.className = 'orbital-container';
+                    viewContainer.appendChild(orbitalContainer);
+                    setTimeout(() => {
+                        renderOrbitalConnections(orbitalContainer, entity, activityEntities, 'activity');
+                    }, 0);
+                }
             } else {
                 activitiesEl.innerHTML = `
-                    <div class="modal-section-title"><i class="ph ph-arrows-left-right"></i> Activities</div>
+                    <div class="connections-header">
+                        <div class="modal-section-title" style="margin-bottom: 0;"><i class="ph ph-arrows-left-right"></i> Activities</div>
+                        ${useMobileView ? `<button class="section-add-btn" onclick="toggleInlineActivityForm()" title="Add activity"><i class="ph ph-plus"></i></button>` : ''}
+                    </div>
+                    ${inlineActivityFormHtml}
                     <div class="modal-empty-state">
                         <i class="ph ph-arrows-left-right"></i>
                         <div>No activities yet</div>
@@ -5745,6 +6022,137 @@ John Doe,Engineering,john@example.com"
         }
 
         // Add nested entity from modal (creates DES relationship)
+        // Toggle inline nested form visibility
+        function toggleInlineNestedForm() {
+            const form = document.getElementById('inlineNestedForm');
+            if (form) {
+                form.classList.toggle('hidden');
+            }
+        }
+
+        // Toggle inline activity form visibility
+        function toggleInlineActivityForm() {
+            const form = document.getElementById('inlineActivityForm');
+            if (form) {
+                form.classList.toggle('hidden');
+            }
+        }
+
+        // Add nested from inline form (mobile)
+        function addNestedFromInline() {
+            if (!currentModalEntity || !currentModalEntityType) return;
+
+            const targetId = document.getElementById('inlineNestedSelect')?.value;
+            if (!targetId) {
+                alert('Please select an entity to nest');
+                return;
+            }
+
+            const targetEntity = findEntity(targetId);
+            if (!targetEntity) {
+                alert('Target entity not found');
+                return;
+            }
+
+            // Create the DES relationship
+            const relId = 'rel' + Date.now();
+            const relationship = {
+                id: relId,
+                subject: currentModalEntity.id,
+                predicate: 'DES',
+                object: targetId,
+                description: ''
+            };
+
+            relationships.push(relationship);
+
+            // Log to Xano
+            const operatorData = eoOperators['DES'];
+            logActivityToXano({
+                event_verb: 'Nest Entity',
+                eo_operator: 'DES',
+                object_type: 'relationship',
+                object_id: relId,
+                object_label: `${currentModalEntity.name} contains ${targetEntity.name}`,
+                data_json: {
+                    subject_id: currentModalEntity.id,
+                    subject_type: currentModalEntityType,
+                    subject_name: currentModalEntity.name,
+                    predicate: 'DES',
+                    predicate_label: operatorData.label,
+                    object_id: targetId,
+                    object_type: targetEntity.type,
+                    object_name: targetEntity.name,
+                    connection_type: 'nesting'
+                }
+            });
+
+            saveToLocalStorage();
+            openEntityModal(currentModalEntity.id, currentModalEntityType);
+
+            if (currentView === 'graph') {
+                updateGraph();
+            } else if (currentView === 'tree') {
+                renderTreeView();
+            }
+        }
+
+        // Add activity from inline form (mobile)
+        function addActivityFromInline() {
+            if (!currentModalEntity || !currentModalEntityType) return;
+
+            const operatorCode = document.getElementById('inlineOperatorSelect')?.value;
+            const targetId = document.getElementById('inlineTargetSelect')?.value;
+
+            if (!operatorCode || !targetId) {
+                alert('Please select both a type and target');
+                return;
+            }
+
+            const targetEntity = findEntity(targetId);
+            if (!targetEntity) {
+                alert('Target entity not found');
+                return;
+            }
+
+            const relId = 'rel' + Date.now();
+            const relationship = {
+                id: relId,
+                subject: currentModalEntity.id,
+                predicate: operatorCode,
+                object: targetId,
+                description: ''
+            };
+
+            relationships.push(relationship);
+
+            const operatorData = eoOperators[operatorCode];
+            logActivityToXano({
+                event_verb: 'Create Relationship',
+                eo_operator: operatorCode,
+                object_type: 'relationship',
+                object_id: relId,
+                object_label: `${currentModalEntity.name} ${operatorData.label} ${targetEntity.name}`,
+                data_json: {
+                    subject_id: currentModalEntity.id,
+                    subject_type: currentModalEntityType,
+                    subject_name: currentModalEntity.name,
+                    predicate: operatorCode,
+                    predicate_label: operatorData.label,
+                    object_id: targetId,
+                    object_type: targetEntity.type,
+                    object_name: targetEntity.name
+                }
+            });
+
+            saveToLocalStorage();
+            openEntityModal(currentModalEntity.id, currentModalEntityType);
+
+            if (currentView === 'graph') {
+                updateGraph();
+            }
+        }
+
         function addNestedFromModal() {
             if (!currentModalEntity || !currentModalEntityType) return;
 
