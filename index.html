@@ -1152,9 +1152,11 @@
         .card-view {
             display: none;
             padding: 2rem;
+            padding-bottom: 4rem;
             overflow-y: auto;
-            max-height: 100vh;
+            height: 100%;
             background: white;
+            box-sizing: border-box;
         }
 
         .card-view.active {
@@ -1874,12 +1876,20 @@
             border-style: solid;
         }
 
+        .panel-center {
+            position: relative;
+            overflow: hidden;
+            height: 100%;
+        }
+
         .tree-view {
             display: none;
             padding: 2rem;
+            padding-bottom: 4rem;
             overflow-y: auto;
             height: 100%;
             background: white;
+            box-sizing: border-box;
         }
 
         .tree-view.active {
@@ -2744,6 +2754,151 @@
         .tree-relationship-item.shares {
             background: #F0F4F7;
             color: #7B95A3;
+        }
+
+        /* Tree Section Headers - Collapsible */
+        .tree-section {
+            margin-top: 2rem;
+        }
+
+        .tree-section-header {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            padding: 0.75rem 1rem;
+            background: linear-gradient(135deg, #FAF7F5 0%, #F5EFE6 100%);
+            border: 1px solid #E5DDD1;
+            border-radius: 8px;
+            cursor: pointer;
+            user-select: none;
+            transition: all 0.2s;
+        }
+
+        .tree-section-header:hover {
+            background: linear-gradient(135deg, #F5EFE6 0%, #EDE4D6 100%);
+            border-color: #C88F4A;
+        }
+
+        .tree-section-header .tree-expand-icon {
+            font-size: 0.7rem;
+            transition: transform 0.25s;
+        }
+
+        .tree-section-header .tree-expand-icon.expanded {
+            transform: rotate(90deg);
+        }
+
+        .tree-section-title {
+            font-size: 1.1rem;
+            color: #8B6F47;
+            font-weight: 600;
+            flex: 1;
+        }
+
+        .tree-section-count {
+            background: #6B5642;
+            color: white;
+            padding: 0.125rem 0.5rem;
+            border-radius: 10px;
+            font-size: 0.75rem;
+            font-weight: 500;
+        }
+
+        .tree-section-content {
+            max-height: 0;
+            overflow: hidden;
+            transition: max-height 0.3s ease-out;
+            padding-left: 0.5rem;
+        }
+
+        .tree-section-content.expanded {
+            max-height: 10000px;
+        }
+
+        /* Grouping Controls */
+        .tree-group-controls {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            margin-left: auto;
+            margin-right: 0.5rem;
+        }
+
+        .tree-group-label {
+            font-size: 0.75rem;
+            color: #8B6F47;
+            font-weight: 500;
+        }
+
+        .tree-group-select {
+            padding: 0.25rem 0.5rem;
+            border: 1px solid #E5DDD1;
+            border-radius: 4px;
+            background: white;
+            color: #6B5642;
+            font-size: 0.75rem;
+            cursor: pointer;
+            outline: none;
+        }
+
+        .tree-group-select:hover {
+            border-color: #C88F4A;
+        }
+
+        .tree-group-select:focus {
+            border-color: #C88F4A;
+            box-shadow: 0 0 0 2px rgba(200, 143, 74, 0.2);
+        }
+
+        /* Subgroup Headers */
+        .tree-subgroup {
+            margin-top: 0.75rem;
+        }
+
+        .tree-subgroup-header {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            padding: 0.5rem 0.75rem;
+            background: #F5EFE6;
+            border-radius: 6px;
+            cursor: pointer;
+            margin-bottom: 0.5rem;
+            transition: background 0.2s;
+        }
+
+        .tree-subgroup-header:hover {
+            background: #EDE4D6;
+        }
+
+        .tree-subgroup-header .tree-expand-icon {
+            font-size: 0.6rem;
+        }
+
+        .tree-subgroup-title {
+            font-size: 0.9rem;
+            color: #6B5642;
+            font-weight: 500;
+            flex: 1;
+        }
+
+        .tree-subgroup-count {
+            background: rgba(107, 86, 66, 0.2);
+            color: #6B5642;
+            padding: 0.125rem 0.375rem;
+            border-radius: 8px;
+            font-size: 0.7rem;
+        }
+
+        .tree-subgroup-content {
+            max-height: 0;
+            overflow: hidden;
+            transition: max-height 0.3s ease-out;
+            padding-left: 1rem;
+        }
+
+        .tree-subgroup-content.expanded {
+            max-height: 5000px;
         }
 
         @keyframes spin {
@@ -5654,7 +5809,7 @@
         </div>
 
         <!-- Center Panel: Multiple Views -->
-        <div>
+        <div class="panel-center">
             <!-- Tree View -->
             <div id="treeView" class="tree-view"></div>
             
@@ -6917,6 +7072,17 @@ John Doe,Engineering,john@example.com"
         // Modal state - stores current entity being viewed
         let currentModalEntity = null;
         let currentModalEntityType = null;
+
+        // Tree view state - grouping and section expansion
+        let treeViewState = {
+            peopleGroupBy: 'role', // 'role', 'alphabetical', 'none'
+            sectionsExpanded: {
+                people: true,
+                objects: true,
+                unassignedTeams: true,
+                unassignedRoles: true
+            }
+        };
 
         // EO Operators - Emergence Operators for activity modeling
         // Internal codes used for data store, friendly labels for UI
@@ -13920,19 +14086,33 @@ John Doe,Engineering,john@example.com"
 
             if (unassignedTeams.length > 0 && filters.entities.team) {
                 const section = document.createElement('div');
-                section.style.marginTop = '2rem';
+                section.className = 'tree-section';
+
                 const header = document.createElement('div');
-                header.style.fontSize = '1.1rem';
-                header.style.color = '#8B6F47';
-                header.style.fontWeight = '600';
-                header.style.marginBottom = '1rem';
-                header.textContent = '📁 Unassigned Teams';
+                header.className = 'tree-section-header';
+                header.innerHTML = `
+                    <span class="tree-expand-icon ${treeViewState.sectionsExpanded.unassignedTeams ? 'expanded' : ''}">▶</span>
+                    <span style="font-size: 1.2rem;">📁</span>
+                    <span class="tree-section-title">Unassigned Teams</span>
+                    <span class="tree-section-count">${unassignedTeams.length}</span>
+                `;
                 section.appendChild(header);
+
+                const content = document.createElement('div');
+                content.className = `tree-section-content ${treeViewState.sectionsExpanded.unassignedTeams ? 'expanded' : ''}`;
 
                 unassignedTeams.forEach(team => {
                     const teamEl = createTreeNodeDetailed(team, filters);
-                    section.appendChild(teamEl);
+                    content.appendChild(teamEl);
                 });
+
+                section.appendChild(content);
+
+                header.onclick = () => {
+                    treeViewState.sectionsExpanded.unassignedTeams = !treeViewState.sectionsExpanded.unassignedTeams;
+                    content.classList.toggle('expanded');
+                    header.querySelector('.tree-expand-icon').classList.toggle('expanded');
+                };
 
                 container.appendChild(section);
             }
@@ -13949,61 +14129,279 @@ John Doe,Engineering,john@example.com"
 
             if (unassignedRoles.length > 0 && filters.entities.role) {
                 const section = document.createElement('div');
-                section.style.marginTop = '2rem';
+                section.className = 'tree-section';
+
                 const header = document.createElement('div');
-                header.style.fontSize = '1.1rem';
-                header.style.color = '#8B6F47';
-                header.style.fontWeight = '600';
-                header.style.marginBottom = '1rem';
-                header.textContent = '📁 Unassigned Roles';
+                header.className = 'tree-section-header';
+                header.innerHTML = `
+                    <span class="tree-expand-icon ${treeViewState.sectionsExpanded.unassignedRoles ? 'expanded' : ''}">▶</span>
+                    <span style="font-size: 1.2rem;">📁</span>
+                    <span class="tree-section-title">Unassigned Roles</span>
+                    <span class="tree-section-count">${unassignedRoles.length}</span>
+                `;
                 section.appendChild(header);
+
+                const content = document.createElement('div');
+                content.className = `tree-section-content ${treeViewState.sectionsExpanded.unassignedRoles ? 'expanded' : ''}`;
 
                 unassignedRoles.forEach(role => {
                     const roleEl = createTreeNodeDetailed(role, filters);
-                    section.appendChild(roleEl);
+                    content.appendChild(roleEl);
                 });
+
+                section.appendChild(content);
+
+                header.onclick = () => {
+                    treeViewState.sectionsExpanded.unassignedRoles = !treeViewState.sectionsExpanded.unassignedRoles;
+                    content.classList.toggle('expanded');
+                    header.querySelector('.tree-expand-icon').classList.toggle('expanded');
+                };
 
                 container.appendChild(section);
             }
 
-            // Show all people
+            // Show all people with collapsible grouping
             if (entities.person.length > 0 && filters.entities.person) {
                 const section = document.createElement('div');
-                section.style.marginTop = '2rem';
+                section.className = 'tree-section';
+
+                // Create collapsible header with grouping controls
                 const header = document.createElement('div');
-                header.style.fontSize = '1.1rem';
-                header.style.color = '#8B6F47';
-                header.style.fontWeight = '600';
-                header.style.marginBottom = '1rem';
-                header.textContent = '👥 People';
+                header.className = 'tree-section-header';
+                header.innerHTML = `
+                    <span class="tree-expand-icon ${treeViewState.sectionsExpanded.people ? 'expanded' : ''}">▶</span>
+                    <span style="font-size: 1.2rem;">👥</span>
+                    <span class="tree-section-title">People</span>
+                    <div class="tree-group-controls" onclick="event.stopPropagation();">
+                        <span class="tree-group-label">Group by:</span>
+                        <select class="tree-group-select" id="peopleGroupSelect" onchange="changePeopleGrouping(this.value)">
+                            <option value="role" ${treeViewState.peopleGroupBy === 'role' ? 'selected' : ''}>Role</option>
+                            <option value="alphabetical" ${treeViewState.peopleGroupBy === 'alphabetical' ? 'selected' : ''}>A-Z</option>
+                            <option value="none" ${treeViewState.peopleGroupBy === 'none' ? 'selected' : ''}>None</option>
+                        </select>
+                    </div>
+                    <span class="tree-section-count">${entities.person.length}</span>
+                `;
                 section.appendChild(header);
 
-                entities.person.forEach(person => {
-                    const personEl = createTreeNodeDetailed(person, filters);
-                    section.appendChild(personEl);
-                });
+                // Create content container
+                const content = document.createElement('div');
+                content.className = `tree-section-content ${treeViewState.sectionsExpanded.people ? 'expanded' : ''}`;
+                content.id = 'peopleTreeContent';
+
+                // Render people based on grouping
+                renderPeopleGrouped(content, filters);
+
+                section.appendChild(content);
+
+                // Add click handler for collapse/expand
+                header.onclick = (e) => {
+                    if (e.target.closest('.tree-group-controls')) return;
+                    treeViewState.sectionsExpanded.people = !treeViewState.sectionsExpanded.people;
+                    content.classList.toggle('expanded');
+                    header.querySelector('.tree-expand-icon').classList.toggle('expanded');
+                };
 
                 container.appendChild(section);
             }
 
-            // Show all objects
+            // Show all objects with collapsible section
             if (entities.object.length > 0 && filters.entities.object) {
                 const section = document.createElement('div');
-                section.style.marginTop = '2rem';
+                section.className = 'tree-section';
+
                 const header = document.createElement('div');
-                header.style.fontSize = '1.1rem';
-                header.style.color = '#8B6F47';
-                header.style.fontWeight = '600';
-                header.style.marginBottom = '1rem';
-                header.textContent = '📦 Objects';
+                header.className = 'tree-section-header';
+                header.innerHTML = `
+                    <span class="tree-expand-icon ${treeViewState.sectionsExpanded.objects ? 'expanded' : ''}">▶</span>
+                    <span style="font-size: 1.2rem;">📦</span>
+                    <span class="tree-section-title">Objects</span>
+                    <span class="tree-section-count">${entities.object.length}</span>
+                `;
                 section.appendChild(header);
+
+                const content = document.createElement('div');
+                content.className = `tree-section-content ${treeViewState.sectionsExpanded.objects ? 'expanded' : ''}`;
 
                 entities.object.forEach(obj => {
                     const objEl = createTreeNodeDetailed(obj, filters);
-                    section.appendChild(objEl);
+                    content.appendChild(objEl);
                 });
 
+                section.appendChild(content);
+
+                header.onclick = () => {
+                    treeViewState.sectionsExpanded.objects = !treeViewState.sectionsExpanded.objects;
+                    content.classList.toggle('expanded');
+                    header.querySelector('.tree-expand-icon').classList.toggle('expanded');
+                };
+
                 container.appendChild(section);
+            }
+        }
+
+        // Helper function to get roles assigned to a person
+        function getPersonRoles(personId) {
+            const roles = [];
+            relationships.forEach(r => {
+                let roleId = null;
+                if (r.subject === personId) {
+                    roleId = r.object;
+                } else if (r.object === personId) {
+                    roleId = r.subject;
+                }
+                if (roleId) {
+                    const role = entities.role.find(ro => ro.id === roleId);
+                    if (role) {
+                        roles.push(role);
+                    }
+                }
+            });
+            return roles;
+        }
+
+        // Render people grouped by the selected grouping option
+        function renderPeopleGrouped(container, filters) {
+            container.innerHTML = '';
+            const groupBy = treeViewState.peopleGroupBy;
+
+            if (groupBy === 'none') {
+                // No grouping - just list all people
+                entities.person.forEach(person => {
+                    const personEl = createTreeNodeDetailed(person, filters);
+                    container.appendChild(personEl);
+                });
+            } else if (groupBy === 'alphabetical') {
+                // Group alphabetically by first letter
+                const grouped = {};
+                entities.person.forEach(person => {
+                    const letter = (person.name || 'Unknown').charAt(0).toUpperCase();
+                    if (!grouped[letter]) grouped[letter] = [];
+                    grouped[letter].push(person);
+                });
+
+                const sortedLetters = Object.keys(grouped).sort();
+                sortedLetters.forEach(letter => {
+                    const subgroup = document.createElement('div');
+                    subgroup.className = 'tree-subgroup';
+
+                    const subheader = document.createElement('div');
+                    subheader.className = 'tree-subgroup-header';
+                    subheader.innerHTML = `
+                        <span class="tree-expand-icon expanded">▶</span>
+                        <span class="tree-subgroup-title">${letter}</span>
+                        <span class="tree-subgroup-count">${grouped[letter].length}</span>
+                    `;
+
+                    const subcontent = document.createElement('div');
+                    subcontent.className = 'tree-subgroup-content expanded';
+
+                    grouped[letter].sort((a, b) => a.name.localeCompare(b.name)).forEach(person => {
+                        const personEl = createTreeNodeDetailed(person, filters);
+                        subcontent.appendChild(personEl);
+                    });
+
+                    subheader.onclick = () => {
+                        subcontent.classList.toggle('expanded');
+                        subheader.querySelector('.tree-expand-icon').classList.toggle('expanded');
+                    };
+
+                    subgroup.appendChild(subheader);
+                    subgroup.appendChild(subcontent);
+                    container.appendChild(subgroup);
+                });
+            } else if (groupBy === 'role') {
+                // Group by role
+                const roleGroups = {};
+                const unassigned = [];
+
+                entities.person.forEach(person => {
+                    const roles = getPersonRoles(person.id);
+                    if (roles.length === 0) {
+                        unassigned.push(person);
+                    } else {
+                        roles.forEach(role => {
+                            if (!roleGroups[role.id]) {
+                                roleGroups[role.id] = { role: role, people: [] };
+                            }
+                            roleGroups[role.id].people.push(person);
+                        });
+                    }
+                });
+
+                // Render role groups
+                Object.values(roleGroups).sort((a, b) => a.role.name.localeCompare(b.role.name)).forEach(group => {
+                    const subgroup = document.createElement('div');
+                    subgroup.className = 'tree-subgroup';
+
+                    const subheader = document.createElement('div');
+                    subheader.className = 'tree-subgroup-header';
+                    subheader.innerHTML = `
+                        <span class="tree-expand-icon expanded">▶</span>
+                        <span style="font-size: 1rem;">🎭</span>
+                        <span class="tree-subgroup-title">${group.role.name}</span>
+                        <span class="tree-subgroup-count">${group.people.length}</span>
+                    `;
+
+                    const subcontent = document.createElement('div');
+                    subcontent.className = 'tree-subgroup-content expanded';
+
+                    group.people.sort((a, b) => a.name.localeCompare(b.name)).forEach(person => {
+                        const personEl = createTreeNodeDetailed(person, filters);
+                        subcontent.appendChild(personEl);
+                    });
+
+                    subheader.onclick = () => {
+                        subcontent.classList.toggle('expanded');
+                        subheader.querySelector('.tree-expand-icon').classList.toggle('expanded');
+                    };
+
+                    subgroup.appendChild(subheader);
+                    subgroup.appendChild(subcontent);
+                    container.appendChild(subgroup);
+                });
+
+                // Render unassigned people
+                if (unassigned.length > 0) {
+                    const subgroup = document.createElement('div');
+                    subgroup.className = 'tree-subgroup';
+
+                    const subheader = document.createElement('div');
+                    subheader.className = 'tree-subgroup-header';
+                    subheader.innerHTML = `
+                        <span class="tree-expand-icon expanded">▶</span>
+                        <span style="font-size: 1rem; opacity: 0.6;">👤</span>
+                        <span class="tree-subgroup-title" style="color: #999;">Unassigned</span>
+                        <span class="tree-subgroup-count">${unassigned.length}</span>
+                    `;
+
+                    const subcontent = document.createElement('div');
+                    subcontent.className = 'tree-subgroup-content expanded';
+
+                    unassigned.sort((a, b) => a.name.localeCompare(b.name)).forEach(person => {
+                        const personEl = createTreeNodeDetailed(person, filters);
+                        subcontent.appendChild(personEl);
+                    });
+
+                    subheader.onclick = () => {
+                        subcontent.classList.toggle('expanded');
+                        subheader.querySelector('.tree-expand-icon').classList.toggle('expanded');
+                    };
+
+                    subgroup.appendChild(subheader);
+                    subgroup.appendChild(subcontent);
+                    container.appendChild(subgroup);
+                }
+            }
+        }
+
+        // Change people grouping mode
+        function changePeopleGrouping(value) {
+            treeViewState.peopleGroupBy = value;
+            const container = document.getElementById('peopleTreeContent');
+            if (container) {
+                const filters = getActiveFilters();
+                renderPeopleGrouped(container, filters);
             }
         }
 
