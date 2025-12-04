@@ -4473,6 +4473,7 @@
                 <div class="modal-section" id="modalDescription"></div>
                 <div class="modal-section" id="modalNested"></div>
                 <div class="modal-section" id="modalAddNested"></div>
+                <div class="modal-section" id="modalNestUnder"></div>
                 <div class="modal-section" id="modalActivities"></div>
                 <div class="modal-section" id="modalAddActivity"></div>
             </div>
@@ -5424,6 +5425,29 @@ John Doe,Engineering,john@example.com"
                 addNestedEl.innerHTML = '';
             }
 
+            // Nest Under UI - allows entity to choose its parent
+            const nestUnderEl = document.getElementById('modalNestUnder');
+            // Show for entity types that can have parents (units can nest under units, teams under units/teams, roles under units/teams)
+            const parentOptions = getParentOptionsForNesting(entityId, entityType);
+            if (['unit', 'team', 'role'].includes(entityType) && parentOptions) {
+                nestUnderEl.innerHTML = `
+                    <div class="modal-section-title"><i class="ph ph-arrow-bend-up-left"></i> Nest Under</div>
+                    <div class="modal-add-connection">
+                        <div class="modal-add-connection-row">
+                            <select id="modalNestUnderSelect">
+                                <option value="">Choose parent...</option>
+                                ${parentOptions}
+                            </select>
+                            <button class="modal-add-connection-btn" onclick="nestUnderFromModal()">
+                                <i class="ph ph-plus"></i> Add
+                            </button>
+                        </div>
+                    </div>
+                `;
+            } else {
+                nestUnderEl.innerHTML = '';
+            }
+
             // Render Activities section (non-DES relationships)
             const activitiesEl = document.getElementById('modalActivities');
             // Build inline add form HTML for activities (used in both filled and empty states on mobile)
@@ -6190,6 +6214,115 @@ John Doe,Engineering,john@example.com"
             return options;
         }
 
+        // Get valid parent entities that this entity can be nested under
+        function getParentOptionsForNesting(entityId, entityType) {
+            let options = '';
+            // Define what can contain each entity type (inverse of nestableTypes)
+            const parentTypes = {
+                unit: ['unit'],          // Units can be nested under other units
+                team: ['unit', 'team'],  // Teams can be nested under units or other teams
+                role: ['unit', 'team'],  // Roles can be nested under units or teams
+                person: [],              // People don't get nested
+                object: []               // Objects don't get nested
+            };
+
+            const typeLabels = {
+                unit: 'Units',
+                team: 'Teams'
+            };
+
+            const allowedTypes = parentTypes[entityType] || [];
+
+            allowedTypes.forEach(type => {
+                const typeEntities = entities[type].filter(e => {
+                    // Exclude the current entity
+                    if (e.id === entityId) return false;
+                    // Exclude entities that this is already nested under
+                    const alreadyNestedUnder = relationships.some(r =>
+                        r.predicate === 'DES' && r.subject === e.id && r.object === entityId
+                    );
+                    return !alreadyNestedUnder;
+                });
+                if (typeEntities.length > 0) {
+                    options += `<optgroup label="${typeLabels[type]}">`;
+                    typeEntities.forEach(e => {
+                        options += `<option value="${e.id}">${e.name}</option>`;
+                    });
+                    options += '</optgroup>';
+                }
+            });
+
+            return options;
+        }
+
+        // Nest this entity under a parent (creates DES relationship with parent as subject)
+        function nestUnderFromModal() {
+            if (!currentModalEntity || !currentModalEntityType) return;
+
+            const parentId = document.getElementById('modalNestUnderSelect').value;
+
+            if (!parentId) {
+                alert('Please select a parent to nest under');
+                return;
+            }
+
+            const parentEntity = findEntity(parentId);
+            if (!parentEntity) {
+                alert('Parent entity not found');
+                return;
+            }
+
+            // Create the DES relationship (parent defines/contains this entity)
+            const relId = 'rel' + Date.now();
+            const relationship = {
+                id: relId,
+                subject: parentId,
+                predicate: 'DES',
+                object: currentModalEntity.id,
+                description: ''
+            };
+
+            relationships.push(relationship);
+
+            // Log to Xano
+            const operatorData = eoOperators['DES'];
+            logActivityToXano({
+                event_verb: 'Nest Entity',
+                eo_operator: 'DES',
+                object_type: 'relationship',
+                object_id: relId,
+                object_label: `${parentEntity.name} contains ${currentModalEntity.name}`,
+                data_json: {
+                    subject_id: parentId,
+                    subject_type: parentEntity.type,
+                    subject_name: parentEntity.name,
+                    predicate: 'DES',
+                    predicate_label: operatorData.label,
+                    object_id: currentModalEntity.id,
+                    object_type: currentModalEntityType,
+                    object_name: currentModalEntity.name,
+                    connection_type: 'nesting'
+                }
+            });
+
+            // Save and refresh
+            saveToLocalStorage();
+
+            // Refresh the modal to show new nesting
+            openEntityModal(currentModalEntity.id, currentModalEntityType);
+
+            // Refresh views
+            if (currentView === 'graph') {
+                updateGraph();
+            } else if (currentView === 'tree') {
+                renderTreeView();
+            } else if (currentView === 'card') {
+                renderCardView();
+            }
+
+            renderActivityList();
+        }
+
         // Add nested entity from modal (creates DES relationship)
         // Toggle inline nested form visibility
         function toggleInlineNestedForm() {
@@ -6724,6 +6857,7 @@ John Doe,Engineering,john@example.com"
             document.getElementById('modalDescription').innerHTML = '';
             document.getElementById('modalNested').innerHTML = '';
             document.getElementById('modalAddNested').innerHTML = '';
+            document.getElementById('modalNestUnder').innerHTML = '';
 
             // Build entity options for dropdowns
             const allEntities = [];
