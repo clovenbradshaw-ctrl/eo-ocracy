@@ -1130,6 +1130,161 @@
             font-size: 0.85rem;
         }
 
+        /* Card View Filter/Sort Controls */
+        .card-view-controls {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 1rem;
+            padding: 1rem 1.5rem;
+            background: #FAF7F5;
+            border-bottom: 2px solid #E5DDD1;
+            position: sticky;
+            top: 0;
+            z-index: 10;
+            align-items: center;
+        }
+
+        .card-search-container {
+            flex: 1;
+            min-width: 200px;
+            max-width: 400px;
+            position: relative;
+        }
+
+        .card-search-input {
+            width: 100%;
+            padding: 0.625rem 1rem 0.625rem 2.5rem;
+            border: 2px solid #E5DDD1;
+            border-radius: 8px;
+            font-size: 0.9rem;
+            color: #3D2E1F;
+            background: white;
+            transition: all 0.2s;
+        }
+
+        .card-search-input:focus {
+            outline: none;
+            border-color: #C88F4A;
+            box-shadow: 0 0 0 3px rgba(200, 143, 74, 0.15);
+        }
+
+        .card-search-input::placeholder {
+            color: #A89B8C;
+        }
+
+        .card-search-icon {
+            position: absolute;
+            left: 0.75rem;
+            top: 50%;
+            transform: translateY(-50%);
+            color: #8B6F47;
+            font-size: 1rem;
+            pointer-events: none;
+        }
+
+        .card-sort-container {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .card-sort-label {
+            font-size: 0.85rem;
+            color: #6B5642;
+            font-weight: 500;
+        }
+
+        .card-sort-select {
+            padding: 0.5rem 2rem 0.5rem 0.75rem;
+            border: 2px solid #E5DDD1;
+            border-radius: 8px;
+            font-size: 0.85rem;
+            color: #3D2E1F;
+            background: white url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 12 12'%3E%3Cpath fill='%236B5642' d='M6 8L2 4h8z'/%3E%3C/svg%3E") no-repeat right 0.75rem center;
+            cursor: pointer;
+            appearance: none;
+            -webkit-appearance: none;
+            -moz-appearance: none;
+            transition: all 0.2s;
+        }
+
+        .card-sort-select:focus {
+            outline: none;
+            border-color: #C88F4A;
+        }
+
+        .card-sort-select:hover {
+            border-color: #C88F4A;
+        }
+
+        .card-filter-buttons {
+            display: flex;
+            gap: 0.5rem;
+            flex-wrap: wrap;
+        }
+
+        .card-filter-btn {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.375rem;
+            padding: 0.5rem 0.875rem;
+            border: 2px solid #E5DDD1;
+            border-radius: 20px;
+            font-size: 0.8rem;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.2s;
+            background: white;
+            color: #6B5642;
+        }
+
+        .card-filter-btn:hover {
+            border-color: #C88F4A;
+            background: #FFF9F0;
+        }
+
+        .card-filter-btn.active {
+            background: linear-gradient(135deg, #C88F4A 0%, #D4A574 100%);
+            color: white;
+            border-color: #C88F4A;
+        }
+
+        .card-filter-btn .filter-icon {
+            font-size: 1rem;
+        }
+
+        .card-filter-btn .filter-count {
+            background: rgba(0, 0, 0, 0.1);
+            padding: 0.125rem 0.375rem;
+            border-radius: 10px;
+            font-size: 0.7rem;
+        }
+
+        .card-filter-btn.active .filter-count {
+            background: rgba(255, 255, 255, 0.25);
+        }
+
+        .card-view-content {
+            padding: 2rem;
+        }
+
+        .card-no-results {
+            text-align: center;
+            padding: 3rem;
+            color: #8B6F47;
+        }
+
+        .card-no-results i {
+            font-size: 3rem;
+            margin-bottom: 1rem;
+            opacity: 0.5;
+        }
+
+        .card-no-results p {
+            font-size: 1rem;
+            margin: 0;
+        }
+
         .sentence-preview {
             padding: 1rem;
             background: #FAF7F5;
@@ -7529,44 +7684,289 @@ John Doe,Engineering,john@example.com"
             }
         }
 
+        // Card View State
+        let cardViewSearchTerm = '';
+        let cardViewSortOption = 'name-asc';
+        let cardViewTypeFilters = {
+            unit: true,
+            team: true,
+            role: true,
+            person: true,
+            object: true,
+            activity: true
+        };
+
+        // Card View Filtering and Sorting Functions
+        function filterEntitiesBySearch(entitiesArray, searchTerm) {
+            if (!searchTerm) return entitiesArray;
+            const term = searchTerm.toLowerCase();
+            return entitiesArray.filter(entity =>
+                entity.name.toLowerCase().includes(term) ||
+                (entity.description && entity.description.toLowerCase().includes(term))
+            );
+        }
+
+        function sortEntities(entitiesArray, sortOption) {
+            const sorted = [...entitiesArray];
+            switch (sortOption) {
+                case 'name-asc':
+                    return sorted.sort((a, b) => a.name.localeCompare(b.name));
+                case 'name-desc':
+                    return sorted.sort((a, b) => b.name.localeCompare(a.name));
+                case 'connections-desc':
+                    return sorted.sort((a, b) => {
+                        const aConnections = relationships.filter(r => r.subject === a.id || r.object === a.id).length;
+                        const bConnections = relationships.filter(r => r.subject === b.id || r.object === b.id).length;
+                        return bConnections - aConnections;
+                    });
+                case 'connections-asc':
+                    return sorted.sort((a, b) => {
+                        const aConnections = relationships.filter(r => r.subject === a.id || r.object === a.id).length;
+                        const bConnections = relationships.filter(r => r.subject === b.id || r.object === b.id).length;
+                        return aConnections - bConnections;
+                    });
+                default:
+                    return sorted;
+            }
+        }
+
+        function handleCardViewSearch(event) {
+            cardViewSearchTerm = event.target.value;
+            renderCardViewContent();
+        }
+
+        function handleCardViewSort(event) {
+            cardViewSortOption = event.target.value;
+            renderCardViewContent();
+        }
+
+        function toggleCardViewTypeFilter(type) {
+            cardViewTypeFilters[type] = !cardViewTypeFilters[type];
+            renderCardView();
+        }
+
         // Card View Rendering
         function renderCardView() {
             const container = document.getElementById('cardView');
-            if (!container) return; // Safety check
-            
+            if (!container) return;
+
             container.innerHTML = '';
 
-            const filters = getActiveFilters();
+            // Create controls toolbar
+            const controls = document.createElement('div');
+            controls.className = 'card-view-controls';
+
+            // Search input
+            const searchContainer = document.createElement('div');
+            searchContainer.className = 'card-search-container';
+            searchContainer.innerHTML = `
+                <i class="ph ph-magnifying-glass card-search-icon"></i>
+                <input type="text"
+                       class="card-search-input"
+                       placeholder="Search entities..."
+                       value="${cardViewSearchTerm}"
+                       oninput="handleCardViewSearch(event)">
+            `;
+            controls.appendChild(searchContainer);
+
+            // Sort dropdown
+            const sortContainer = document.createElement('div');
+            sortContainer.className = 'card-sort-container';
+            sortContainer.innerHTML = `
+                <span class="card-sort-label">Sort by:</span>
+                <select class="card-sort-select" onchange="handleCardViewSort(event)">
+                    <option value="name-asc" ${cardViewSortOption === 'name-asc' ? 'selected' : ''}>Name (A-Z)</option>
+                    <option value="name-desc" ${cardViewSortOption === 'name-desc' ? 'selected' : ''}>Name (Z-A)</option>
+                    <option value="connections-desc" ${cardViewSortOption === 'connections-desc' ? 'selected' : ''}>Most Connections</option>
+                    <option value="connections-asc" ${cardViewSortOption === 'connections-asc' ? 'selected' : ''}>Fewest Connections</option>
+                </select>
+            `;
+            controls.appendChild(sortContainer);
+
+            // Type filter buttons
+            const filterButtons = document.createElement('div');
+            filterButtons.className = 'card-filter-buttons';
+
+            const typeConfigs = [
+                { type: 'unit', label: 'Units', icon: getIcon('unit'), count: entities.unit.length },
+                { type: 'team', label: 'Teams', icon: getIcon('team'), count: entities.team.length },
+                { type: 'role', label: 'Roles', icon: getIcon('role'), count: entities.role.length },
+                { type: 'person', label: 'People', icon: getIcon('person'), count: entities.person.length },
+                { type: 'object', label: 'Work Products', icon: getIcon('object'), count: entities.object.length },
+                { type: 'activity', label: 'Activities', icon: '⚡', count: relationships.length }
+            ];
+
+            typeConfigs.forEach(config => {
+                if (config.count > 0) {
+                    const btn = document.createElement('button');
+                    btn.className = `card-filter-btn ${cardViewTypeFilters[config.type] ? 'active' : ''}`;
+                    btn.onclick = () => toggleCardViewTypeFilter(config.type);
+                    btn.innerHTML = `
+                        <span class="filter-icon">${config.icon}</span>
+                        <span>${config.label}</span>
+                        <span class="filter-count">${config.count}</span>
+                    `;
+                    filterButtons.appendChild(btn);
+                }
+            });
+            controls.appendChild(filterButtons);
+
+            container.appendChild(controls);
+
+            // Create content container
+            const contentContainer = document.createElement('div');
+            contentContainer.className = 'card-view-content';
+            contentContainer.id = 'cardViewContent';
+            container.appendChild(contentContainer);
+
+            // Render the actual cards
+            renderCardViewContent();
+        }
+
+        function renderCardViewContent() {
+            const contentContainer = document.getElementById('cardViewContent');
+            if (!contentContainer) return;
+
+            contentContainer.innerHTML = '';
+
+            const sidebarFilters = getActiveFilters();
+            let hasContent = false;
 
             // Units
-            if (filters.entities.unit && entities.unit.length > 0) {
-                container.appendChild(createCardRow('Units', entities.unit, getIcon('unit')));
+            if (cardViewTypeFilters.unit && sidebarFilters.entities.unit && entities.unit.length > 0) {
+                let filteredUnits = filterEntitiesBySearch(entities.unit, cardViewSearchTerm);
+                filteredUnits = sortEntities(filteredUnits, cardViewSortOption);
+                if (filteredUnits.length > 0) {
+                    contentContainer.appendChild(createCardRow('Units', filteredUnits, getIcon('unit')));
+                    hasContent = true;
+                }
             }
 
             // Teams
-            if (filters.entities.team && entities.team.length > 0) {
-                container.appendChild(createCardRow('Teams', entities.team, getIcon('team')));
+            if (cardViewTypeFilters.team && sidebarFilters.entities.team && entities.team.length > 0) {
+                let filteredTeams = filterEntitiesBySearch(entities.team, cardViewSearchTerm);
+                filteredTeams = sortEntities(filteredTeams, cardViewSortOption);
+                if (filteredTeams.length > 0) {
+                    contentContainer.appendChild(createCardRow('Teams', filteredTeams, getIcon('team')));
+                    hasContent = true;
+                }
             }
 
             // Roles
-            if (filters.entities.role && entities.role.length > 0) {
-                container.appendChild(createCardRow('Roles', entities.role, getIcon('role')));
+            if (cardViewTypeFilters.role && sidebarFilters.entities.role && entities.role.length > 0) {
+                let filteredRoles = filterEntitiesBySearch(entities.role, cardViewSearchTerm);
+                filteredRoles = sortEntities(filteredRoles, cardViewSortOption);
+                if (filteredRoles.length > 0) {
+                    contentContainer.appendChild(createCardRow('Roles', filteredRoles, getIcon('role')));
+                    hasContent = true;
+                }
             }
 
             // People
-            if (filters.entities.person && entities.person.length > 0) {
-                container.appendChild(createCardRow('People', entities.person, getIcon('person')));
+            if (cardViewTypeFilters.person && sidebarFilters.entities.person && entities.person.length > 0) {
+                let filteredPeople = filterEntitiesBySearch(entities.person, cardViewSearchTerm);
+                filteredPeople = sortEntities(filteredPeople, cardViewSortOption);
+                if (filteredPeople.length > 0) {
+                    contentContainer.appendChild(createCardRow('People', filteredPeople, getIcon('person')));
+                    hasContent = true;
+                }
             }
 
             // Work Products
-            if (filters.entities.object && entities.object.length > 0) {
-                container.appendChild(createCardRow('Work Products', entities.object, getIcon('object')));
+            if (cardViewTypeFilters.object && sidebarFilters.entities.object && entities.object.length > 0) {
+                let filteredObjects = filterEntitiesBySearch(entities.object, cardViewSearchTerm);
+                filteredObjects = sortEntities(filteredObjects, cardViewSortOption);
+                if (filteredObjects.length > 0) {
+                    contentContainer.appendChild(createCardRow('Work Products', filteredObjects, getIcon('object')));
+                    hasContent = true;
+                }
             }
 
             // Activities
-            if (relationships.length > 0) {
-                container.appendChild(createActivityCardRow());
+            if (cardViewTypeFilters.activity && relationships.length > 0) {
+                const activityRow = createActivityCardRowFiltered();
+                if (activityRow) {
+                    contentContainer.appendChild(activityRow);
+                    hasContent = true;
+                }
             }
+
+            // Show no results message if nothing matches
+            if (!hasContent) {
+                const noResults = document.createElement('div');
+                noResults.className = 'card-no-results';
+                noResults.innerHTML = `
+                    <i class="ph ph-magnifying-glass"></i>
+                    <p>No entities match your search or filter criteria.</p>
+                `;
+                contentContainer.appendChild(noResults);
+            }
+        }
+
+        function createActivityCardRowFiltered() {
+            const sidebarFilters = getActiveFilters();
+            let filteredActivities = relationships.filter(r => sidebarFilters.relationships[r.predicate]);
+
+            // Apply search filter to activities
+            if (cardViewSearchTerm) {
+                const term = cardViewSearchTerm.toLowerCase();
+                filteredActivities = filteredActivities.filter(rel => {
+                    const subj = findEntity(rel.subject);
+                    const obj = findEntity(rel.object);
+                    const operator = eoOperators[rel.predicate];
+                    return (
+                        (subj && subj.name.toLowerCase().includes(term)) ||
+                        (obj && obj.name.toLowerCase().includes(term)) ||
+                        operator.label.toLowerCase().includes(term) ||
+                        (rel.description && rel.description.toLowerCase().includes(term))
+                    );
+                });
+            }
+
+            if (filteredActivities.length === 0) return null;
+
+            const row = document.createElement('div');
+            row.className = 'card-row';
+
+            const header = document.createElement('div');
+            header.className = 'card-row-header';
+            header.innerHTML = `
+                <div class="card-row-title">⚡ Activities (${filteredActivities.length})</div>
+            `;
+            row.appendChild(header);
+
+            const grid = document.createElement('div');
+            grid.className = 'card-grid';
+
+            filteredActivities.forEach(rel => {
+                const subj = findEntity(rel.subject);
+                const obj = findEntity(rel.object);
+                const operator = eoOperators[rel.predicate];
+
+                const card = document.createElement('div');
+                card.className = `entity-card activity`;
+                card.onclick = () => openRelationshipModal(rel);
+
+                card.innerHTML = `
+                    <div class="card-header">
+                        <div class="card-icon" style="background: ${operator.color}; color: white; padding: 0.5rem; border-radius: 8px; font-size: 1.25rem;">⚡</div>
+                        <div class="card-title">${operator.label}</div>
+                    </div>
+                    <div class="card-meta">
+                        <strong>${subj?.name || rel.subject}</strong> → <strong>${obj?.name || rel.object}</strong>
+                    </div>
+                    ${rel.description ? `<div class="card-description">${rel.description}</div>` : ''}
+                    <div class="card-connections">
+                        <span class="connection-badge" style="cursor: pointer;" onclick="event.stopPropagation(); openEntityModal('${rel.subject}', '${subj?.type}')">${getIcon(subj?.type)} ${subj?.name}</span>
+                        <span class="connection-badge" style="cursor: pointer;" onclick="event.stopPropagation(); openEntityModal('${rel.object}', '${obj?.type}')">${getIcon(obj?.type)} ${obj?.name}</span>
+                    </div>
+                `;
+
+                grid.appendChild(card);
+            });
+
+            row.appendChild(grid);
+            return row;
         }
 
         function createCardRow(title, entities, icon) {
@@ -7654,54 +8054,6 @@ John Doe,Engineering,john@example.com"
                     ${nestedUnderHTML}
                     ${descriptionHTML}
                     ${activitiesHTML}
-                `;
-
-                grid.appendChild(card);
-            });
-
-            row.appendChild(grid);
-            return row;
-        }
-
-        function createActivityCardRow() {
-            const filters = getActiveFilters();
-            const filteredActivities = relationships.filter(r => filters.relationships[r.predicate]);
-
-            const row = document.createElement('div');
-            row.className = 'card-row';
-
-            const header = document.createElement('div');
-            header.className = 'card-row-header';
-            header.innerHTML = `
-                <div class="card-row-title">⚡ Activities (${filteredActivities.length})</div>
-            `;
-            row.appendChild(header);
-
-            const grid = document.createElement('div');
-            grid.className = 'card-grid';
-
-            filteredActivities.forEach(rel => {
-                const subj = findEntity(rel.subject);
-                const obj = findEntity(rel.object);
-                const operator = eoOperators[rel.predicate];
-
-                const card = document.createElement('div');
-                card.className = `entity-card activity`;
-                card.onclick = () => openRelationshipModal(rel);
-
-                card.innerHTML = `
-                    <div class="card-header">
-                        <div class="card-icon" style="background: ${operator.color}; color: white; padding: 0.5rem; border-radius: 8px; font-size: 1.25rem;">⚡</div>
-                        <div class="card-title">${operator.label}</div>
-                    </div>
-                    <div class="card-meta">
-                        <strong>${subj?.name || rel.subject}</strong> → <strong>${obj?.name || rel.object}</strong>
-                    </div>
-                    ${rel.description ? `<div class="card-description">${rel.description}</div>` : ''}
-                    <div class="card-connections">
-                        <span class="connection-badge" style="cursor: pointer;" onclick="event.stopPropagation(); openEntityModal('${rel.subject}', '${subj?.type}')">${getIcon(subj?.type)} ${subj?.name}</span>
-                        <span class="connection-badge" style="cursor: pointer;" onclick="event.stopPropagation(); openEntityModal('${rel.object}', '${obj?.type}')">${getIcon(obj?.type)} ${obj?.name}</span>
-                    </div>
                 `;
 
                 grid.appendChild(card);
