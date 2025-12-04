@@ -8063,6 +8063,27 @@ John Doe,Engineering,john@example.com"
             // Find root entities (those with no parent in the current view)
             const rootNodes = nodes.filter(n => !parentMap.has(n.id));
 
+            // Calculate hierarchy depth for each node (root = 0, children = 1, etc.)
+            const nodeDepths = new Map();
+            let maxDepth = 0;
+
+            function calculateDepth(nodeId, depth) {
+                nodeDepths.set(nodeId, depth);
+                maxDepth = Math.max(maxDepth, depth);
+                const children = childrenMap.get(nodeId) || [];
+                children.forEach(childId => calculateDepth(childId, depth + 1));
+            }
+
+            // Start depth calculation from root nodes
+            rootNodes.forEach(node => calculateDepth(node.id, 0));
+
+            // For nodes not in hierarchy (orphans), assign depth 0
+            nodes.forEach(node => {
+                if (!nodeDepths.has(node.id)) {
+                    nodeDepths.set(node.id, 0);
+                }
+            });
+
             // Calculate X positions: root entities spread evenly, children align under parents
             const nodeXPositions = new Map();
             const rootSpacing = width / (rootNodes.length + 1);
@@ -8102,12 +8123,11 @@ John Doe,Engineering,john@example.com"
                 .force('center', d3.forceCenter(width / 2, height / 2))
                 .force('collision', d3.forceCollide().radius(d => getNodeRadius(d.type) + 15))
                 .force('y', d3.forceY().y(d => {
-                    // Very strong Y positioning to lock entities in their layers
-                    if (d.type === 'unit') return layerHeight * 0.5;
-                    if (d.type === 'team') return layerHeight * 1.5;
-                    if (d.type === 'role') return layerHeight * 2.5;
-                    if (d.type === 'object') return layerHeight * 3.5;
-                    return height * 0.5;
+                    // Position based on hierarchy depth - parents higher, children lower
+                    const depth = nodeDepths.get(d.id) || 0;
+                    const effectiveMaxDepth = Math.max(maxDepth, 3); // Ensure reasonable spacing
+                    const depthSpacing = height / (effectiveMaxDepth + 2); // +2 for top/bottom margins
+                    return depthSpacing * (depth + 0.75); // +0.75 provides top margin
                 }).strength(0.8)) // Strong force to lock in layers
                 .force('x', d3.forceX().x(d => {
                     // Use pre-calculated position for vertical nesting alignment
