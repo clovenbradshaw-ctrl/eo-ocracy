@@ -3466,6 +3466,102 @@
             background: #1D5A3D;
         }
 
+        /* Artwork Space Assignment Section */
+        .artwork-space-assignment {
+            margin-top: 1.5rem;
+            padding-top: 1.5rem;
+            border-top: 1px solid #E5DDD1;
+        }
+
+        .space-assignment-header {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            font-size: 0.875rem;
+            font-weight: 600;
+            color: #6B5642;
+            margin-bottom: 0.75rem;
+        }
+
+        .space-assignment-header i {
+            color: #C88F4A;
+        }
+
+        .space-assignment-selectors {
+            display: flex;
+            gap: 0.75rem;
+            margin-bottom: 0.75rem;
+        }
+
+        .space-selector {
+            flex: 1;
+            padding: 0.625rem 0.875rem;
+            border: 1px solid #E5DDD1;
+            border-radius: 6px;
+            background: white;
+            color: #3D2E1F;
+            font-size: 0.875rem;
+            cursor: pointer;
+            transition: border-color 0.2s, box-shadow 0.2s;
+        }
+
+        .space-selector:hover:not(:disabled) {
+            border-color: #C88F4A;
+        }
+
+        .space-selector:focus {
+            outline: none;
+            border-color: #C88F4A;
+            box-shadow: 0 0 0 3px rgba(200, 143, 74, 0.15);
+        }
+
+        .space-selector:disabled {
+            background: #F5F2ED;
+            color: #9A8B7A;
+            cursor: not-allowed;
+        }
+
+        .assign-space-btn {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+            padding: 0.625rem 1.25rem;
+            background: #C88F4A;
+            color: white;
+            border: none;
+            border-radius: 6px;
+            font-size: 0.875rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: background 0.2s, opacity 0.2s;
+        }
+
+        .assign-space-btn:hover:not(:disabled) {
+            background: #B87B5B;
+        }
+
+        .assign-space-btn:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+        }
+
+        .current-assignment {
+            margin-top: 0.75rem;
+            padding: 0.625rem 0.875rem;
+            background: #F5F2ED;
+            border-radius: 6px;
+            font-size: 0.8rem;
+            color: #6B5642;
+        }
+
+        .current-assignment:empty {
+            display: none;
+        }
+
+        .current-assignment strong {
+            color: #3D2E1F;
+        }
+
         /* Role Assignment Section - High Visual Priority for Persons */
         .role-assignment-section {
             background: linear-gradient(135deg, #FFF8F0 0%, #FFF4E8 100%);
@@ -7345,6 +7441,25 @@ John Doe,Engineering,john@example.com"
                         <i class="ph ph-shopping-cart"></i> View Product
                     </a>
                 </div>
+                <!-- Space Assignment Section -->
+                <div class="artwork-space-assignment">
+                    <div class="space-assignment-header">
+                        <i class="ph ph-map-pin"></i>
+                        <span>Assign to Space</span>
+                    </div>
+                    <div class="space-assignment-selectors">
+                        <select id="roomSelector" class="space-selector" onchange="onRoomChange()">
+                            <option value="">Select Room...</option>
+                        </select>
+                        <select id="spaceSelector" class="space-selector" disabled>
+                            <option value="">Select Space...</option>
+                        </select>
+                    </div>
+                    <button id="assignSpaceBtn" class="assign-space-btn" onclick="assignArtworkToSpace()" disabled>
+                        <i class="ph ph-check"></i> Assign to Space
+                    </button>
+                    <div id="currentAssignment" class="current-assignment"></div>
+                </div>
             </div>
         </div>
     </div>
@@ -8086,7 +8201,102 @@ John Doe,Engineering,john@example.com"
 
         // Artworks storage - populated from events API
         let artworks = [];
-        
+
+        // Room and Space configuration with permanent GUIDs
+        // Each room has a unique GUID and contains spaces with their own GUIDs
+        const ROOMS = [
+            {
+                id: 'room_a1b2c3d4-e5f6-7890-abcd-ef1234567890',
+                name: 'Living Room',
+                spaces: [
+                    { id: 'space_11111111-1111-1111-1111-111111111111', name: 'North Wall' },
+                    { id: 'space_22222222-2222-2222-2222-222222222222', name: 'South Wall' },
+                    { id: 'space_33333333-3333-3333-3333-333333333333', name: 'East Wall' },
+                    { id: 'space_44444444-4444-4444-4444-444444444444', name: 'West Wall' },
+                    { id: 'space_55555555-5555-5555-5555-555555555555', name: 'Above Fireplace' }
+                ]
+            },
+            {
+                id: 'room_b2c3d4e5-f6a7-8901-bcde-f23456789012',
+                name: 'Dining Room',
+                spaces: [
+                    { id: 'space_66666666-6666-6666-6666-666666666666', name: 'Main Wall' },
+                    { id: 'space_77777777-7777-7777-7777-777777777777', name: 'Accent Wall' },
+                    { id: 'space_88888888-8888-8888-8888-888888888888', name: 'Buffet Area' }
+                ]
+            },
+            {
+                id: 'room_c3d4e5f6-a7b8-9012-cdef-345678901234',
+                name: 'Bedroom',
+                spaces: [
+                    { id: 'space_99999999-9999-9999-9999-999999999999', name: 'Above Bed' },
+                    { id: 'space_aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa', name: 'Dresser Wall' },
+                    { id: 'space_bbbbbbbb-bbbb-bbbb-bbbb-bbbbbbbbbbbb', name: 'Reading Nook' }
+                ]
+            },
+            {
+                id: 'room_d4e5f6a7-b8c9-0123-defa-456789012345',
+                name: 'Office',
+                spaces: [
+                    { id: 'space_cccccccc-cccc-cccc-cccc-cccccccccccc', name: 'Behind Desk' },
+                    { id: 'space_dddddddd-dddd-dddd-dddd-dddddddddddd', name: 'Side Wall' },
+                    { id: 'space_eeeeeeee-eeee-eeee-eeee-eeeeeeeeeeee', name: 'Entry Wall' }
+                ]
+            },
+            {
+                id: 'room_e5f6a7b8-c9d0-1234-efab-567890123456',
+                name: 'Hallway',
+                spaces: [
+                    { id: 'space_ffffffff-ffff-ffff-ffff-ffffffffffff', name: 'Gallery Wall 1' },
+                    { id: 'space_00000000-0000-0000-0000-000000000001', name: 'Gallery Wall 2' },
+                    { id: 'space_00000000-0000-0000-0000-000000000002', name: 'Gallery Wall 3' },
+                    { id: 'space_00000000-0000-0000-0000-000000000003', name: 'End of Hall' }
+                ]
+            }
+        ];
+
+        // Helper function to find room by ID
+        function findRoomById(roomId) {
+            return ROOMS.find(room => room.id === roomId);
+        }
+
+        // Helper function to find space by ID (searches all rooms)
+        function findSpaceById(spaceId) {
+            for (const room of ROOMS) {
+                const space = room.spaces.find(s => s.id === spaceId);
+                if (space) {
+                    return { room, space };
+                }
+            }
+            return null;
+        }
+
+        // Helper function to get room name by space ID
+        function getRoomNameBySpaceId(spaceId) {
+            const result = findSpaceById(spaceId);
+            return result ? result.room.name : null;
+        }
+
+        // Helper function to get space name by ID
+        function getSpaceNameById(spaceId) {
+            const result = findSpaceById(spaceId);
+            return result ? result.space.name : null;
+        }
+
+        // Helper function to get full location string (Room - Space)
+        function getFullLocationName(roomId, spaceId) {
+            const room = findRoomById(roomId);
+            const spaceResult = findSpaceById(spaceId);
+            if (room && spaceResult) {
+                return `${room.name} - ${spaceResult.space.name}`;
+            } else if (room) {
+                return room.name;
+            } else if (spaceResult) {
+                return `${spaceResult.room.name} - ${spaceResult.space.name}`;
+            }
+            return 'Unassigned';
+        }
+
         let selectedEntityType = 'unit';
         let selectedPredicate = 'DES'; // Default to Define operator
         let focusedNode = null;
@@ -9246,9 +9456,17 @@ John Doe,Engineering,john@example.com"
             artworkSection.innerHTML = galleryHtml;
         }
 
+        // Track currently selected artwork in lightbox
+        let currentLightboxArtwork = null;
+        let currentLightboxArtworkIndex = null;
+
         function openArtworkLightbox(index) {
             const artwork = artworks[index];
             if (!artwork) return;
+
+            // Store current artwork for space assignment
+            currentLightboxArtwork = artwork;
+            currentLightboxArtworkIndex = index;
 
             document.getElementById('lightboxImage').src = artwork.imageUrl;
             document.getElementById('lightboxImage').alt = artwork.title;
@@ -9289,11 +9507,221 @@ John Doe,Engineering,john@example.com"
                 buyLink.style.display = 'none';
             }
 
+            // Populate room selector with GUIDs
+            populateRoomSelector(artwork);
+
+            // Show current assignment if exists
+            updateCurrentAssignmentDisplay(artwork);
+
             document.getElementById('artworkLightbox').classList.add('active');
         }
 
         function closeArtworkLightbox() {
             document.getElementById('artworkLightbox').classList.remove('active');
+            currentLightboxArtwork = null;
+            currentLightboxArtworkIndex = null;
+        }
+
+        // Populate room selector dropdown with GUID-based rooms
+        function populateRoomSelector(artwork) {
+            const roomSelector = document.getElementById('roomSelector');
+            const spaceSelector = document.getElementById('spaceSelector');
+            const assignBtn = document.getElementById('assignSpaceBtn');
+
+            // Reset selectors
+            roomSelector.innerHTML = '<option value="">Select Room...</option>';
+            spaceSelector.innerHTML = '<option value="">Select Space...</option>';
+            spaceSelector.disabled = true;
+            assignBtn.disabled = true;
+
+            // Add rooms from GUID-based configuration
+            ROOMS.forEach(room => {
+                const option = document.createElement('option');
+                option.value = room.id;  // Use GUID
+                option.textContent = room.name;
+                // Pre-select if artwork has this room assigned
+                if (artwork.roomId === room.id) {
+                    option.selected = true;
+                }
+                roomSelector.appendChild(option);
+            });
+
+            // If artwork has a room assigned, populate spaces
+            if (artwork.roomId) {
+                populateSpaceSelector(artwork.roomId, artwork.spaceId);
+            }
+        }
+
+        // Handle room selection change
+        function onRoomChange() {
+            const roomSelector = document.getElementById('roomSelector');
+            const selectedRoomId = roomSelector.value;
+
+            if (selectedRoomId) {
+                populateSpaceSelector(selectedRoomId, null);
+            } else {
+                const spaceSelector = document.getElementById('spaceSelector');
+                spaceSelector.innerHTML = '<option value="">Select Space...</option>';
+                spaceSelector.disabled = true;
+                document.getElementById('assignSpaceBtn').disabled = true;
+            }
+        }
+
+        // Populate space selector based on selected room
+        function populateSpaceSelector(roomId, currentSpaceId) {
+            const spaceSelector = document.getElementById('spaceSelector');
+            const assignBtn = document.getElementById('assignSpaceBtn');
+            const room = findRoomById(roomId);
+
+            spaceSelector.innerHTML = '<option value="">Select Space...</option>';
+
+            if (room && room.spaces) {
+                room.spaces.forEach(space => {
+                    const option = document.createElement('option');
+                    option.value = space.id;  // Use GUID
+                    option.textContent = space.name;
+                    // Pre-select if this space is currently assigned
+                    if (currentSpaceId === space.id) {
+                        option.selected = true;
+                    }
+                    spaceSelector.appendChild(option);
+                });
+                spaceSelector.disabled = false;
+
+                // Enable assign button if space is selected
+                spaceSelector.onchange = function() {
+                    assignBtn.disabled = !this.value;
+                };
+
+                // If a space was pre-selected, enable the button
+                if (currentSpaceId) {
+                    assignBtn.disabled = false;
+                }
+            } else {
+                spaceSelector.disabled = true;
+                assignBtn.disabled = true;
+            }
+        }
+
+        // Update the current assignment display
+        function updateCurrentAssignmentDisplay(artwork) {
+            const currentAssignmentEl = document.getElementById('currentAssignment');
+
+            if (artwork.roomId && artwork.spaceId) {
+                const locationName = getFullLocationName(artwork.roomId, artwork.spaceId);
+                currentAssignmentEl.innerHTML = `<strong>Currently assigned:</strong> ${locationName}`;
+            } else if (artwork.locationName) {
+                // Show legacy location name if no GUID-based assignment
+                currentAssignmentEl.innerHTML = `<strong>Legacy location:</strong> ${artwork.locationName} <em>(needs GUID assignment)</em>`;
+            } else {
+                currentAssignmentEl.innerHTML = '';
+            }
+        }
+
+        // Assign artwork to selected space using GUIDs
+        async function assignArtworkToSpace() {
+            const roomSelector = document.getElementById('roomSelector');
+            const spaceSelector = document.getElementById('spaceSelector');
+            const assignBtn = document.getElementById('assignSpaceBtn');
+
+            const roomId = roomSelector.value;
+            const spaceId = spaceSelector.value;
+
+            if (!roomId || !spaceId || !currentLightboxArtwork) {
+                console.error('Missing room, space, or artwork for assignment');
+                return;
+            }
+
+            // Disable button while processing
+            assignBtn.disabled = true;
+            assignBtn.innerHTML = '<i class="ph ph-spinner"></i> Assigning...';
+
+            try {
+                // Get full location name for display
+                const locationName = getFullLocationName(roomId, spaceId);
+
+                // Update artwork in local array
+                currentLightboxArtwork.roomId = roomId;
+                currentLightboxArtwork.spaceId = spaceId;
+                currentLightboxArtwork.locationName = locationName;
+
+                // Post update to Xano Events API
+                await postArtworkSpaceAssignment(currentLightboxArtwork, roomId, spaceId, locationName);
+
+                // Update display
+                updateCurrentAssignmentDisplay(currentLightboxArtwork);
+
+                // Update meta display in lightbox
+                const metaItems = [];
+                metaItems.push(`<span class="artwork-lightbox-meta-item"><i class="ph ph-map-pin"></i> ${locationName}</span>`);
+                if (currentLightboxArtwork.widthInches && currentLightboxArtwork.heightInches) {
+                    metaItems.push(`<span class="artwork-lightbox-meta-item"><i class="ph ph-ruler"></i> ${Math.round(currentLightboxArtwork.widthInches)}" x ${Math.round(currentLightboxArtwork.heightInches)}"</span>`);
+                }
+                document.getElementById('lightboxMeta').innerHTML = metaItems.join('');
+
+                console.log(`✅ Assigned "${currentLightboxArtwork.title}" to ${locationName}`);
+
+                // Show success briefly
+                assignBtn.innerHTML = '<i class="ph ph-check"></i> Assigned!';
+                setTimeout(() => {
+                    assignBtn.innerHTML = '<i class="ph ph-check"></i> Assign to Space';
+                    assignBtn.disabled = false;
+                }, 2000);
+
+            } catch (error) {
+                console.error('❌ Failed to assign artwork to space:', error);
+                assignBtn.innerHTML = '<i class="ph ph-x"></i> Failed';
+                setTimeout(() => {
+                    assignBtn.innerHTML = '<i class="ph ph-check"></i> Assign to Space';
+                    assignBtn.disabled = false;
+                }, 2000);
+            }
+        }
+
+        // Post artwork space assignment to Xano Events API
+        async function postArtworkSpaceAssignment(artwork, roomId, spaceId, locationName) {
+            const eventPayload = {
+                object_type: 'artwork',
+                object_id: artwork.id,
+                op: 'update',
+                data: {
+                    title: artwork.title,
+                    artist: artwork.artist,
+                    imageUrl: artwork.imageUrl,
+                    price: artwork.price,
+                    currency: artwork.currency,
+                    description: artwork.description,
+                    productUrl: artwork.productUrl,
+                    roomId: roomId,           // GUID for room
+                    spaceId: spaceId,         // GUID for space
+                    galleryId: artwork.galleryId,
+                    locationId: artwork.locationId,
+                    locationName: locationName,  // Human-readable name
+                    aspectRatio: artwork.aspectRatio,
+                    heightInches: artwork.heightInches,
+                    widthInches: artwork.widthInches,
+                    heightMeters: artwork.heightMeters,
+                    displayMode: artwork.displayMode
+                }
+            };
+
+            console.log('📝 Posting artwork space assignment to Xano:', eventPayload);
+
+            const response = await fetch(XANO_EVENTS_URL, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify(eventPayload)
+            });
+
+            if (!response.ok) {
+                throw new Error(`Failed to post event: ${response.statusText}`);
+            }
+
+            const result = await response.json();
+            console.log('✅ Event posted successfully:', result);
+            return result;
         }
 
         // Orbital visualization for connections
@@ -11725,7 +12153,8 @@ John Doe,Engineering,john@example.com"
                                 currency: event.data.currency || 'USD',
                                 description: event.data.description || '',
                                 productUrl: event.data.productUrl,
-                                roomId: event.data.roomId,
+                                roomId: event.data.roomId,       // GUID for room
+                                spaceId: event.data.spaceId,     // GUID for space within room
                                 galleryId: event.data.galleryId,
                                 locationId: event.data.locationId,
                                 locationName: event.data.locationName,
