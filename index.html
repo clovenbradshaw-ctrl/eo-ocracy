@@ -4818,6 +4818,626 @@
             cursor: not-allowed;
         }
 
+        /* ========================================== */
+        /* Modal Header Parent Badge Styles */
+        /* ========================================== */
+
+        .modal-header-parent {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            margin-top: 0.5rem;
+        }
+
+        .modal-parent-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.35rem;
+            padding: 0.35rem 0.65rem;
+            background: rgba(255, 255, 255, 0.2);
+            border-radius: 20px;
+            font-size: 0.75rem;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.2s;
+            border: 1px solid rgba(255, 255, 255, 0.3);
+        }
+
+        .modal-parent-badge:hover {
+            background: rgba(255, 255, 255, 0.35);
+            border-color: rgba(255, 255, 255, 0.5);
+        }
+
+        .modal-parent-badge .parent-type-icon {
+            font-size: 0.85rem;
+            opacity: 0.9;
+        }
+
+        .modal-parent-badge .parent-name {
+            max-width: 150px;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            white-space: nowrap;
+        }
+
+        .modal-parent-badge .dropdown-arrow {
+            font-size: 0.7rem;
+            opacity: 0.8;
+            transition: transform 0.2s;
+        }
+
+        .modal-parent-badge.dropdown-open .dropdown-arrow {
+            transform: rotate(180deg);
+        }
+
+        .modal-parent-badge-empty {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.35rem;
+            padding: 0.35rem 0.65rem;
+            background: rgba(255, 255, 255, 0.1);
+            border: 1px dashed rgba(255, 255, 255, 0.4);
+            border-radius: 20px;
+            font-size: 0.75rem;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.2s;
+            opacity: 0.8;
+        }
+
+        .modal-parent-badge-empty:hover {
+            background: rgba(255, 255, 255, 0.2);
+            opacity: 1;
+        }
+
+        /* Parent Dropdown in Header */
+        .modal-parent-dropdown {
+            position: absolute;
+            top: calc(100% + 4px);
+            left: 0;
+            min-width: 220px;
+            max-width: 280px;
+            background: white;
+            border-radius: 8px;
+            box-shadow: 0 6px 24px rgba(61, 46, 31, 0.2);
+            z-index: 100;
+            display: none;
+            overflow: hidden;
+        }
+
+        .modal-parent-dropdown.visible {
+            display: block;
+        }
+
+        .modal-parent-dropdown-header {
+            padding: 0.75rem 1rem;
+            background: #FAF7F5;
+            border-bottom: 1px solid #E5DDD1;
+            font-size: 0.75rem;
+            font-weight: 600;
+            color: #8B6F47;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .modal-parent-dropdown-list {
+            max-height: 200px;
+            overflow-y: auto;
+        }
+
+        .modal-parent-dropdown-item {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            padding: 0.65rem 1rem;
+            font-size: 0.875rem;
+            color: #3D2E1F;
+            cursor: pointer;
+            transition: background 0.15s;
+        }
+
+        .modal-parent-dropdown-item:hover {
+            background: #FAF7F5;
+        }
+
+        .modal-parent-dropdown-item.current {
+            background: #FFF9F0;
+            font-weight: 600;
+        }
+
+        .modal-parent-dropdown-item .item-icon {
+            font-size: 1rem;
+            color: #8B6F47;
+        }
+
+        .modal-parent-dropdown-item.remove-parent {
+            color: #B87B5B;
+            border-top: 1px solid #E5DDD1;
+        }
+
+        .modal-parent-dropdown-item.remove-parent .item-icon {
+            color: #B87B5B;
+        }
+
+        /* ========================================== */
+        /* Create Connection Panel Styles */
+        /* ========================================== */
+
+        .create-connection-panel {
+            background: linear-gradient(135deg, #FAF7F5 0%, #FFF9F0 100%);
+            border-radius: 12px;
+            border: 2px solid #E5DDD1;
+            overflow: hidden;
+        }
+
+        .create-connection-header {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            padding: 0.875rem 1rem;
+            background: linear-gradient(135deg, #C88F4A 0%, #B87B5B 100%);
+            color: white;
+            font-weight: 600;
+            font-size: 0.9rem;
+        }
+
+        .create-connection-header i {
+            font-size: 1.1rem;
+        }
+
+        .create-connection-body {
+            padding: 1rem;
+        }
+
+        /* Operator Buttons - Primary Row */
+        .operator-buttons-row {
+            display: flex;
+            gap: 0.5rem;
+            margin-bottom: 0.75rem;
+        }
+
+        .operator-button {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 0.25rem;
+            padding: 0.75rem 0.5rem;
+            background: white;
+            border: 2px solid #E5DDD1;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: all 0.2s;
+            text-align: center;
+        }
+
+        .operator-button:hover {
+            border-color: #C88F4A;
+            background: #FFF9F0;
+        }
+
+        .operator-button.active {
+            border-color: var(--operator-color, #C88F4A);
+            background: var(--operator-bg, #FFF9F0);
+            box-shadow: 0 2px 8px rgba(200, 143, 74, 0.2);
+        }
+
+        .operator-button-icon {
+            font-size: 1.25rem;
+            color: #8B6F47;
+            transition: color 0.2s;
+        }
+
+        .operator-button.active .operator-button-icon {
+            color: var(--operator-color, #C88F4A);
+        }
+
+        .operator-button-label {
+            font-size: 0.8rem;
+            font-weight: 600;
+            color: #3D2E1F;
+        }
+
+        .operator-button-sublabel {
+            font-size: 0.65rem;
+            color: #8B6F47;
+            font-weight: 400;
+        }
+
+        /* Operator specific colors */
+        .operator-button[data-operator="DES"] {
+            --operator-color: #C88F4A;
+            --operator-bg: #FFF9F0;
+        }
+
+        .operator-button[data-operator="CON"] {
+            --operator-color: #7B95A3;
+            --operator-bg: #F0F4F7;
+        }
+
+        .operator-button[data-operator="ALT"] {
+            --operator-color: #B87B5B;
+            --operator-bg: #FFF5F0;
+        }
+
+        /* More Operators Toggle */
+        .more-operators-toggle {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 0.5rem;
+            padding: 0.5rem;
+            margin-bottom: 0.75rem;
+            color: #8B6F47;
+            font-size: 0.8rem;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.2s;
+            border-radius: 6px;
+        }
+
+        .more-operators-toggle:hover {
+            background: rgba(200, 143, 74, 0.1);
+            color: #C88F4A;
+        }
+
+        .more-operators-toggle i {
+            transition: transform 0.2s;
+        }
+
+        .more-operators-toggle.expanded i {
+            transform: rotate(180deg);
+        }
+
+        /* Advanced Operators Grid */
+        .advanced-operators-grid {
+            display: none;
+            grid-template-columns: repeat(5, 1fr);
+            gap: 0.4rem;
+            margin-bottom: 0.75rem;
+            padding: 0.75rem;
+            background: rgba(255, 255, 255, 0.5);
+            border-radius: 8px;
+            border: 1px dashed #E5DDD1;
+        }
+
+        .advanced-operators-grid.visible {
+            display: grid;
+        }
+
+        .advanced-operator-btn {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 0.15rem;
+            padding: 0.5rem 0.25rem;
+            background: white;
+            border: 1px solid #E5DDD1;
+            border-radius: 6px;
+            cursor: pointer;
+            transition: all 0.2s;
+            font-size: 0.7rem;
+        }
+
+        .advanced-operator-btn:hover {
+            border-color: var(--adv-op-color, #8B6F47);
+            background: var(--adv-op-bg, #FAF7F5);
+        }
+
+        .advanced-operator-btn.active {
+            border-color: var(--adv-op-color, #8B6F47);
+            background: var(--adv-op-bg, #FAF7F5);
+            box-shadow: 0 1px 4px rgba(0, 0, 0, 0.1);
+        }
+
+        .advanced-operator-btn i {
+            font-size: 1rem;
+            color: var(--adv-op-color, #8B6F47);
+        }
+
+        .advanced-operator-btn span {
+            font-weight: 500;
+            color: #3D2E1F;
+        }
+
+        /* Advanced operator colors */
+        .advanced-operator-btn[data-operator="SEG"] {
+            --adv-op-color: #A89984;
+            --adv-op-bg: #F5F3F0;
+        }
+
+        .advanced-operator-btn[data-operator="SYN"] {
+            --adv-op-color: #D4A574;
+            --adv-op-bg: #FFF9F0;
+        }
+
+        .advanced-operator-btn[data-operator="SUP"] {
+            --adv-op-color: #9B6F47;
+            --adv-op-bg: #FAF5F0;
+        }
+
+        .advanced-operator-btn[data-operator="REC"] {
+            --adv-op-color: #C8997F;
+            --adv-op-bg: #FFF8F5;
+        }
+
+        .advanced-operator-btn[data-operator="NUL"] {
+            --adv-op-color: #6B5642;
+            --adv-op-bg: #F5F0EB;
+        }
+
+        /* Target Entity Selector */
+        .target-entity-section {
+            margin-bottom: 0.75rem;
+        }
+
+        .target-entity-label {
+            font-size: 0.75rem;
+            font-weight: 600;
+            color: #8B6F47;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            margin-bottom: 0.5rem;
+        }
+
+        .target-entity-select {
+            width: 100%;
+            padding: 0.75rem;
+            border: 2px solid #E5DDD1;
+            border-radius: 8px;
+            font-size: 0.9rem;
+            background: white;
+            color: #3D2E1F;
+            cursor: pointer;
+        }
+
+        .target-entity-select:focus {
+            outline: none;
+            border-color: #C88F4A;
+        }
+
+        /* Sentence Preview */
+        .connection-sentence-preview {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            flex-wrap: wrap;
+            gap: 0.4rem;
+            padding: 0.875rem 1rem;
+            background: white;
+            border: 2px solid #E5DDD1;
+            border-radius: 8px;
+            margin-bottom: 0.75rem;
+            min-height: 50px;
+        }
+
+        .connection-sentence-preview.has-content {
+            border-color: #C88F4A;
+            background: #FFF9F0;
+        }
+
+        .sentence-placeholder {
+            color: #A89984;
+            font-size: 0.875rem;
+            font-style: italic;
+        }
+
+        .sentence-subject,
+        .sentence-object {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.35rem;
+            padding: 0.35rem 0.65rem;
+            border-radius: 16px;
+            font-size: 0.85rem;
+            font-weight: 500;
+        }
+
+        .sentence-subject {
+            background: linear-gradient(135deg, #C88F4A 0%, #D4A574 100%);
+            color: white;
+        }
+
+        .sentence-operator {
+            padding: 0.25rem 0.5rem;
+            background: var(--sentence-op-color, #8B6F47);
+            color: white;
+            border-radius: 4px;
+            font-size: 0.75rem;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .sentence-object {
+            background: linear-gradient(135deg, #7B95A3 0%, #9BB5C3 100%);
+            color: white;
+        }
+
+        .sentence-object.work-product {
+            background: linear-gradient(135deg, #D4A574 0%, #E8C9A8 100%);
+        }
+
+        /* Collapsible Notes Section */
+        .notes-section {
+            margin-bottom: 0.75rem;
+        }
+
+        .notes-section-toggle {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            padding: 0.65rem 0.75rem;
+            background: white;
+            border: 1px solid #E5DDD1;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: all 0.2s;
+            font-size: 0.85rem;
+            color: #8B6F47;
+        }
+
+        .notes-section-toggle:hover {
+            background: #FAF7F5;
+            border-color: #C88F4A;
+        }
+
+        .notes-section-toggle.has-content {
+            background: #FFF9F0;
+            border-color: #C88F4A;
+            color: #3D2E1F;
+        }
+
+        .notes-section-toggle i.toggle-icon {
+            transition: transform 0.2s;
+        }
+
+        .notes-section-toggle.expanded i.toggle-icon {
+            transform: rotate(90deg);
+        }
+
+        .notes-section-content {
+            display: none;
+            margin-top: 0.5rem;
+        }
+
+        .notes-section-content.visible {
+            display: block;
+        }
+
+        .notes-textarea {
+            width: 100%;
+            min-height: 80px;
+            padding: 0.75rem;
+            border: 2px solid #E5DDD1;
+            border-radius: 8px;
+            font-size: 0.875rem;
+            font-family: inherit;
+            resize: vertical;
+            background: white;
+            color: #3D2E1F;
+        }
+
+        .notes-textarea:focus {
+            outline: none;
+            border-color: #C88F4A;
+        }
+
+        .notes-char-count {
+            font-size: 0.7rem;
+            color: #A89984;
+            text-align: right;
+            margin-top: 0.25rem;
+        }
+
+        /* Work Product Section */
+        .work-product-section {
+            padding-top: 0.75rem;
+            border-top: 1px dashed #E5DDD1;
+            margin-bottom: 0.75rem;
+        }
+
+        .work-product-section-header {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            font-size: 0.8rem;
+            color: #8B6F47;
+            margin-bottom: 0.5rem;
+        }
+
+        .work-product-selector-btn {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            width: 100%;
+            padding: 0.75rem;
+            background: white;
+            border: 2px dashed #E5DDD1;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: all 0.2s;
+            font-size: 0.875rem;
+            color: #8B6F47;
+        }
+
+        .work-product-selector-btn:hover {
+            border-color: #D4A574;
+            background: #FFF9F0;
+        }
+
+        .work-product-selector-btn.selected {
+            border-style: solid;
+            border-color: #D4A574;
+            background: #FFF9F0;
+            color: #3D2E1F;
+        }
+
+        .work-product-selector-btn i.package-icon {
+            color: #D4A574;
+            font-size: 1.1rem;
+        }
+
+        .quick-create-btn {
+            display: flex;
+            align-items: center;
+            gap: 0.35rem;
+            padding: 0.5rem 0.75rem;
+            margin-top: 0.5rem;
+            background: transparent;
+            border: none;
+            color: #7B95A3;
+            font-size: 0.8rem;
+            cursor: pointer;
+            transition: color 0.2s;
+        }
+
+        .quick-create-btn:hover {
+            color: #5A7A8A;
+        }
+
+        /* Create Connection Action Button */
+        .create-connection-actions {
+            display: flex;
+            justify-content: flex-end;
+            gap: 0.5rem;
+            padding-top: 0.75rem;
+            border-top: 1px solid #E5DDD1;
+        }
+
+        .create-connection-btn {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            padding: 0.75rem 1.25rem;
+            background: linear-gradient(135deg, #C88F4A 0%, #B87B5B 100%);
+            color: white;
+            border: none;
+            border-radius: 8px;
+            font-size: 0.9rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .create-connection-btn:hover {
+            background: linear-gradient(135deg, #B87B5B 0%, #A66A4A 100%);
+            transform: translateY(-1px);
+            box-shadow: 0 4px 12px rgba(200, 143, 74, 0.3);
+        }
+
+        .create-connection-btn:disabled {
+            background: #E5DDD1;
+            color: #A89984;
+            cursor: not-allowed;
+            transform: none;
+            box-shadow: none;
+        }
+
+        .create-connection-btn i {
+            font-size: 1rem;
+        }
+
         /* Work Product Selector Modal */
         .work-product-selector-overlay {
             display: none;
@@ -6368,6 +6988,7 @@
                             </div>
                         </div>
                         <div class="modal-type-badge" id="modalEntityType"></div>
+                        <div class="modal-header-parent" id="modalHeaderParent"></div>
                     </div>
                 </div>
             </div>
@@ -7567,6 +8188,9 @@ John Doe,Engineering,john@example.com"
             }
             document.getElementById('modalEntityType').innerHTML = typeBadgeContent;
 
+            // Render parent badge in header for entities that can have parents
+            renderModalHeaderParent(entityId, entityType);
+
             // Show edit and delete buttons for entities
             document.getElementById('modalEditButton').style.display = 'inline-flex';
             document.getElementById('modalDeleteButton').style.display = 'inline-flex';
@@ -7884,7 +8508,7 @@ John Doe,Engineering,john@example.com"
                 }
             }
 
-            // Add activity UI
+            // Add activity UI - now uses the new Create Connection panel
             const addActivityEl = document.getElementById('modalAddActivity');
 
             if (isPerson) {
@@ -7904,54 +8528,8 @@ John Doe,Engineering,john@example.com"
                     </div>
                 `;
             } else {
-                // Work products can only be linked to roles and teams
-                const canLinkWorkProduct = entityType === 'role' || entityType === 'team';
-
-                addActivityEl.innerHTML = `
-                    <div class="modal-section-title"><i class="ph ph-plus-circle"></i> Add Activity</div>
-                    <div class="modal-add-connection">
-                        <div class="modal-add-connection-row">
-                            <select id="modalOperatorSelect" onchange="handleModalOperatorChange()">
-                                <option value="">Type...</option>
-                                ${Object.entries(eoOperators)
-                                    .filter(([code]) => code !== 'DES' && code !== 'INS') // Exclude DES (nesting) and INS (deprecated)
-                                    .map(([code, op]) => `<option value="${code}">${op.label}</option>`)
-                                    .join('')}
-                            </select>
-                            <select id="modalTargetSelect">
-                                <option value="">Connect to...</option>
-                                ${getAllEntitiesForModal(entityId, false)}
-                            </select>
-                            <button class="modal-add-connection-btn" onclick="addActivityFromModal()">
-                                <i class="ph ph-plus"></i> Add
-                            </button>
-                        </div>
-                        ${canLinkWorkProduct ? `
-                        <div style="margin-top: 0.75rem; padding-top: 0.75rem; border-top: 1px dashed #E5DDD1;">
-                            <div style="font-size: 0.8rem; color: #8B6F47; margin-bottom: 0.5rem; font-weight: 500;">
-                                <i class="ph ph-package"></i> Or link to a Work Product
-                            </div>
-                            <div class="modal-add-connection-row">
-                                <select id="modalWorkProductOperatorSelect">
-                                    <option value="">Type...</option>
-                                    ${Object.entries(eoOperators)
-                                        .filter(([code]) => code !== 'DES' && code !== 'INS')
-                                        .map(([code, op]) => `<option value="${code}">${op.label}</option>`)
-                                        .join('')}
-                                </select>
-                                <button type="button" class="modal-work-product-selector-btn" id="modalWorkProductBtn" onclick="openWorkProductSelectorForModal()">
-                                    <i class="ph ph-package btn-icon"></i>
-                                    <span id="modalWorkProductBtnText">Select work product...</span>
-                                </button>
-                                <input type="hidden" id="modalSelectedWorkProductId" value="">
-                                <button class="modal-add-connection-btn" onclick="addWorkProductActivityFromModal()">
-                                    <i class="ph ph-plus"></i> Add
-                                </button>
-                            </div>
-                        </div>
-                        ` : ''}
-                    </div>
-                `;
+                // Use the new Create Connection panel for non-person entities
+                addActivityEl.innerHTML = renderCreateConnectionPanel(entityId, entityType);
             }
 
             // Render artwork gallery section
@@ -7962,6 +8540,678 @@ John Doe,Engineering,john@example.com"
 
         function closeEntityModal() {
             document.getElementById('entityModal').classList.remove('active');
+            // Close any open dropdowns
+            closeModalParentDropdown();
+        }
+
+        // ========================================
+        // Modal Header Parent Badge Functions
+        // ========================================
+
+        // State for Create Connection UI
+        let createConnectionState = {
+            operator: null,
+            targetId: null,
+            notes: '',
+            workProductId: null,
+            advancedOperatorsVisible: false,
+            notesExpanded: false
+        };
+
+        function renderModalHeaderParent(entityId, entityType) {
+            const headerParentEl = document.getElementById('modalHeaderParent');
+            if (!headerParentEl) return;
+
+            // Only show for entity types that can have parents
+            if (!['unit', 'team', 'role'].includes(entityType)) {
+                headerParentEl.innerHTML = '';
+                return;
+            }
+
+            // Find current parent (entity that has DES relationship with this as object)
+            const parentRelationship = relationships.find(r =>
+                r.predicate === 'DES' && r.object === entityId
+            );
+            const parent = parentRelationship ? findEntity(parentRelationship.subject) : null;
+
+            // Get available parent options
+            const parentOptions = getParentOptionsForNestingArray(entityId, entityType);
+
+            if (parent) {
+                // Show parent badge with dropdown
+                headerParentEl.innerHTML = `
+                    <div style="position: relative; display: inline-block;">
+                        <div class="modal-parent-badge" id="modalParentBadge" onclick="toggleModalParentDropdown(event)">
+                            <i class="ph ${getEntityIcon(parent.type)} parent-type-icon"></i>
+                            <span class="parent-name">${parent.name}</span>
+                            <i class="ph ph-caret-down dropdown-arrow"></i>
+                        </div>
+                        <div class="modal-parent-dropdown" id="modalParentDropdown">
+                            <div class="modal-parent-dropdown-header">Change Parent</div>
+                            <div class="modal-parent-dropdown-list">
+                                ${parentOptions.map(opt => `
+                                    <div class="modal-parent-dropdown-item ${opt.id === parent.id ? 'current' : ''}"
+                                         onclick="changeModalParent('${opt.id}')">
+                                        <i class="ph ${getEntityIcon(opt.type)} item-icon"></i>
+                                        <span>${opt.name}</span>
+                                    </div>
+                                `).join('')}
+                                <div class="modal-parent-dropdown-item remove-parent" onclick="removeModalParent()">
+                                    <i class="ph ph-x-circle item-icon"></i>
+                                    <span>Remove parent</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                `;
+            } else {
+                // Show empty state with option to add parent
+                headerParentEl.innerHTML = `
+                    <div style="position: relative; display: inline-block;">
+                        <div class="modal-parent-badge-empty" id="modalParentBadge" onclick="toggleModalParentDropdown(event)">
+                            <i class="ph ph-plus"></i>
+                            <span>Add parent</span>
+                        </div>
+                        <div class="modal-parent-dropdown" id="modalParentDropdown">
+                            <div class="modal-parent-dropdown-header">Set Parent</div>
+                            <div class="modal-parent-dropdown-list">
+                                ${parentOptions.length > 0 ? parentOptions.map(opt => `
+                                    <div class="modal-parent-dropdown-item" onclick="changeModalParent('${opt.id}')">
+                                        <i class="ph ${getEntityIcon(opt.type)} item-icon"></i>
+                                        <span>${opt.name}</span>
+                                    </div>
+                                `).join('') : '<div class="modal-parent-dropdown-item" style="color: #A89984; cursor: default;">No available parents</div>'}
+                            </div>
+                        </div>
+                    </div>
+                `;
+            }
+        }
+
+        function getParentOptionsForNestingArray(entityId, entityType) {
+            const options = [];
+
+            // Units can be nested under other units
+            if (entityType === 'unit') {
+                entities.unit.forEach(unit => {
+                    if (unit.id !== entityId && !wouldCreateCircularReference(unit.id, entityId)) {
+                        options.push({ id: unit.id, name: unit.name, type: 'unit' });
+                    }
+                });
+            }
+
+            // Teams can be nested under units or other teams
+            if (entityType === 'team') {
+                entities.unit.forEach(unit => {
+                    options.push({ id: unit.id, name: unit.name, type: 'unit' });
+                });
+                entities.team.forEach(team => {
+                    if (team.id !== entityId && !wouldCreateCircularReference(team.id, entityId)) {
+                        options.push({ id: team.id, name: team.name, type: 'team' });
+                    }
+                });
+            }
+
+            // Roles can be nested under units or teams
+            if (entityType === 'role') {
+                entities.unit.forEach(unit => {
+                    options.push({ id: unit.id, name: unit.name, type: 'unit' });
+                });
+                entities.team.forEach(team => {
+                    options.push({ id: team.id, name: team.name, type: 'team' });
+                });
+            }
+
+            return options;
+        }
+
+        function wouldCreateCircularReference(potentialParentId, entityId) {
+            // Check if making potentialParentId the parent of entityId would create a cycle
+            const visited = new Set();
+            let current = potentialParentId;
+
+            while (current) {
+                if (current === entityId) return true;
+                if (visited.has(current)) return false;
+                visited.add(current);
+
+                // Find parent of current
+                const parentRel = relationships.find(r => r.predicate === 'DES' && r.object === current);
+                current = parentRel ? parentRel.subject : null;
+            }
+
+            return false;
+        }
+
+        function toggleModalParentDropdown(event) {
+            event.stopPropagation();
+            const dropdown = document.getElementById('modalParentDropdown');
+            const badge = document.getElementById('modalParentBadge');
+
+            if (dropdown.classList.contains('visible')) {
+                closeModalParentDropdown();
+            } else {
+                dropdown.classList.add('visible');
+                badge.classList.add('dropdown-open');
+
+                // Close dropdown when clicking outside
+                setTimeout(() => {
+                    document.addEventListener('click', closeModalParentDropdownOnOutsideClick);
+                }, 0);
+            }
+        }
+
+        function closeModalParentDropdownOnOutsideClick(event) {
+            const dropdown = document.getElementById('modalParentDropdown');
+            if (dropdown && !dropdown.contains(event.target)) {
+                closeModalParentDropdown();
+            }
+        }
+
+        function closeModalParentDropdown() {
+            const dropdown = document.getElementById('modalParentDropdown');
+            const badge = document.getElementById('modalParentBadge');
+            if (dropdown) dropdown.classList.remove('visible');
+            if (badge) badge.classList.remove('dropdown-open');
+            document.removeEventListener('click', closeModalParentDropdownOnOutsideClick);
+        }
+
+        function changeModalParent(newParentId) {
+            if (!currentModalEntity || !currentModalEntityType) return;
+
+            const entityId = currentModalEntity.id;
+            const newParent = findEntity(newParentId);
+            if (!newParent) return;
+
+            // Remove existing parent relationship if any
+            const existingParentIdx = relationships.findIndex(r =>
+                r.predicate === 'DES' && r.object === entityId
+            );
+
+            if (existingParentIdx >= 0) {
+                const oldRel = relationships[existingParentIdx];
+                relationships.splice(existingParentIdx, 1);
+
+                // Log removal
+                logActivityToXano({
+                    event_verb: 'Remove Parent',
+                    eo_operator: 'NUL',
+                    object_type: 'relationship',
+                    object_id: oldRel.id,
+                    object_label: `Removed parent from ${currentModalEntity.name}`,
+                    data_json: {
+                        entity_id: entityId,
+                        entity_name: currentModalEntity.name,
+                        old_parent_id: oldRel.subject
+                    }
+                });
+            }
+
+            // Create new parent relationship
+            const relId = 'rel' + Date.now();
+            const relationship = {
+                id: relId,
+                subject: newParentId,
+                predicate: 'DES',
+                object: entityId,
+                description: ''
+            };
+
+            relationships.push(relationship);
+
+            // Log to Xano
+            logActivityToXano({
+                event_verb: 'Set Parent',
+                eo_operator: 'DES',
+                object_type: 'relationship',
+                object_id: relId,
+                object_label: `${currentModalEntity.name} nested under ${newParent.name}`,
+                data_json: {
+                    subject_id: newParentId,
+                    subject_name: newParent.name,
+                    subject_type: newParent.type,
+                    object_id: entityId,
+                    object_name: currentModalEntity.name,
+                    object_type: currentModalEntityType
+                }
+            });
+
+            saveToLocalStorage();
+            closeModalParentDropdown();
+
+            // Refresh modal
+            openEntityModal(entityId, currentModalEntityType);
+
+            // Refresh views
+            if (currentView === 'graph') updateGraph();
+            else if (currentView === 'tree') renderTreeView();
+            else if (currentView === 'card') renderCardView();
+        }
+
+        function removeModalParent() {
+            if (!currentModalEntity || !currentModalEntityType) return;
+
+            const entityId = currentModalEntity.id;
+
+            // Find and remove parent relationship
+            const parentIdx = relationships.findIndex(r =>
+                r.predicate === 'DES' && r.object === entityId
+            );
+
+            if (parentIdx >= 0) {
+                const oldRel = relationships[parentIdx];
+                const oldParent = findEntity(oldRel.subject);
+                relationships.splice(parentIdx, 1);
+
+                // Log removal
+                logActivityToXano({
+                    event_verb: 'Remove Parent',
+                    eo_operator: 'NUL',
+                    object_type: 'relationship',
+                    object_id: oldRel.id,
+                    object_label: `Removed ${currentModalEntity.name} from ${oldParent?.name || 'parent'}`,
+                    data_json: {
+                        entity_id: entityId,
+                        entity_name: currentModalEntity.name,
+                        old_parent_id: oldRel.subject,
+                        old_parent_name: oldParent?.name
+                    }
+                });
+
+                saveToLocalStorage();
+                closeModalParentDropdown();
+
+                // Refresh modal
+                openEntityModal(entityId, currentModalEntityType);
+
+                // Refresh views
+                if (currentView === 'graph') updateGraph();
+                else if (currentView === 'tree') renderTreeView();
+                else if (currentView === 'card') renderCardView();
+            }
+        }
+
+        // ========================================
+        // Create Connection Panel Functions
+        // ========================================
+
+        function renderCreateConnectionPanel(entityId, entityType) {
+            // Reset state
+            createConnectionState = {
+                operator: null,
+                targetId: null,
+                notes: '',
+                workProductId: null,
+                advancedOperatorsVisible: false,
+                notesExpanded: false
+            };
+
+            const entity = findEntity(entityId);
+            if (!entity) return '';
+
+            const canLinkWorkProduct = entityType === 'role' || entityType === 'team';
+
+            return `
+                <div class="create-connection-panel">
+                    <div class="create-connection-header">
+                        <i class="ph ph-git-branch"></i>
+                        Create Connection
+                    </div>
+                    <div class="create-connection-body">
+                        <!-- Primary Operator Buttons -->
+                        <div class="operator-buttons-row">
+                            <button class="operator-button" data-operator="DES" onclick="selectConnectionOperator('DES', this)">
+                                <i class="ph ph-tree-structure operator-button-icon"></i>
+                                <span class="operator-button-label">Define</span>
+                                <span class="operator-button-sublabel">contains</span>
+                            </button>
+                            <button class="operator-button" data-operator="CON" onclick="selectConnectionOperator('CON', this)">
+                                <i class="ph ph-link operator-button-icon"></i>
+                                <span class="operator-button-label">Link</span>
+                                <span class="operator-button-sublabel">connects</span>
+                            </button>
+                            <button class="operator-button" data-operator="ALT" onclick="selectConnectionOperator('ALT', this)">
+                                <i class="ph ph-arrows-left-right operator-button-icon"></i>
+                                <span class="operator-button-label">Shift</span>
+                                <span class="operator-button-sublabel">alternates</span>
+                            </button>
+                        </div>
+
+                        <!-- More Operators Toggle -->
+                        <div class="more-operators-toggle" id="moreOperatorsToggle" onclick="toggleAdvancedOperatorsPanel()">
+                            <span>More operators</span>
+                            <i class="ph ph-caret-down"></i>
+                        </div>
+
+                        <!-- Advanced Operators Grid -->
+                        <div class="advanced-operators-grid" id="advancedOperatorsGrid">
+                            <button class="advanced-operator-btn" data-operator="SEG" onclick="selectConnectionOperator('SEG', this)">
+                                <i class="ph ph-scissors"></i>
+                                <span>Divide</span>
+                            </button>
+                            <button class="advanced-operator-btn" data-operator="SYN" onclick="selectConnectionOperator('SYN', this)">
+                                <i class="ph ph-arrows-merge"></i>
+                                <span>Merge</span>
+                            </button>
+                            <button class="advanced-operator-btn" data-operator="SUP" onclick="selectConnectionOperator('SUP', this)">
+                                <i class="ph ph-scales"></i>
+                                <span>Balance</span>
+                            </button>
+                            <button class="advanced-operator-btn" data-operator="REC" onclick="selectConnectionOperator('REC', this)">
+                                <i class="ph ph-arrow-clockwise"></i>
+                                <span>Loop</span>
+                            </button>
+                            <button class="advanced-operator-btn" data-operator="NUL" onclick="selectConnectionOperator('NUL', this)">
+                                <i class="ph ph-eye"></i>
+                                <span>Notice</span>
+                            </button>
+                        </div>
+
+                        <!-- Target Entity Selector -->
+                        <div class="target-entity-section">
+                            <div class="target-entity-label">Connect to</div>
+                            <select class="target-entity-select" id="connectionTargetSelect" onchange="updateConnectionSentencePreview()">
+                                <option value="">Select an entity...</option>
+                                ${getAllEntitiesForModal(entityId, false)}
+                            </select>
+                        </div>
+
+                        <!-- Sentence Preview -->
+                        <div class="connection-sentence-preview" id="connectionSentencePreview">
+                            <span class="sentence-placeholder">Select an operator and target to preview connection</span>
+                        </div>
+
+                        <!-- Collapsible Notes Section -->
+                        <div class="notes-section">
+                            <div class="notes-section-toggle" id="notesToggle" onclick="toggleConnectionNotes()">
+                                <i class="ph ph-caret-right toggle-icon"></i>
+                                <i class="ph ph-note-pencil"></i>
+                                <span>Add notes or details</span>
+                            </div>
+                            <div class="notes-section-content" id="notesContent">
+                                <textarea class="notes-textarea" id="connectionNotes"
+                                    placeholder="Add any additional notes about this connection..."
+                                    maxlength="500"
+                                    oninput="updateConnectionNotesState()"></textarea>
+                                <div class="notes-char-count"><span id="notesCharCount">0</span>/500</div>
+                            </div>
+                        </div>
+
+                        ${canLinkWorkProduct ? `
+                        <!-- Work Product Section -->
+                        <div class="work-product-section">
+                            <div class="work-product-section-header">
+                                <i class="ph ph-package"></i>
+                                <span>Or link to Work Product</span>
+                            </div>
+                            <button class="work-product-selector-btn" id="connectionWorkProductBtn" onclick="openWorkProductSelectorForConnection()">
+                                <i class="ph ph-package package-icon"></i>
+                                <span id="connectionWorkProductText">Select work product...</span>
+                            </button>
+                            <input type="hidden" id="connectionSelectedWorkProductId" value="">
+                            <button class="quick-create-btn" onclick="quickCreateWorkProduct()">
+                                <i class="ph ph-plus-circle"></i>
+                                <span>Quick create new work product</span>
+                            </button>
+                        </div>
+                        ` : ''}
+
+                        <!-- Create Button -->
+                        <div class="create-connection-actions">
+                            <button class="create-connection-btn" id="createConnectionBtn" onclick="createConnectionFromPanel()" disabled>
+                                <i class="ph ph-plus-circle"></i>
+                                <span>Create Connection</span>
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            `;
+        }
+
+        function selectConnectionOperator(operatorCode, btn) {
+            // Clear all active states
+            document.querySelectorAll('.operator-button, .advanced-operator-btn').forEach(b => {
+                b.classList.remove('active');
+            });
+
+            // Set active state
+            btn.classList.add('active');
+            createConnectionState.operator = operatorCode;
+
+            // Update sentence preview
+            updateConnectionSentencePreview();
+            updateCreateConnectionButtonState();
+        }
+
+        function toggleAdvancedOperatorsPanel() {
+            const grid = document.getElementById('advancedOperatorsGrid');
+            const toggle = document.getElementById('moreOperatorsToggle');
+
+            createConnectionState.advancedOperatorsVisible = !createConnectionState.advancedOperatorsVisible;
+
+            if (createConnectionState.advancedOperatorsVisible) {
+                grid.classList.add('visible');
+                toggle.classList.add('expanded');
+            } else {
+                grid.classList.remove('visible');
+                toggle.classList.remove('expanded');
+            }
+        }
+
+        function updateConnectionSentencePreview() {
+            const preview = document.getElementById('connectionSentencePreview');
+            if (!preview) return;
+
+            const targetSelect = document.getElementById('connectionTargetSelect');
+            const targetId = targetSelect?.value;
+
+            createConnectionState.targetId = targetId || null;
+
+            if (!createConnectionState.operator || !targetId) {
+                preview.innerHTML = '<span class="sentence-placeholder">Select an operator and target to preview connection</span>';
+                preview.classList.remove('has-content');
+                return;
+            }
+
+            const target = findEntity(targetId);
+            if (!target || !currentModalEntity) return;
+
+            const operatorData = eoOperators[createConnectionState.operator];
+
+            preview.innerHTML = `
+                <span class="sentence-subject">
+                    <i class="ph ${getEntityIcon(currentModalEntityType)}"></i>
+                    ${currentModalEntity.name}
+                </span>
+                <span class="sentence-operator" style="--sentence-op-color: ${operatorData.color}">
+                    ${operatorData.label}
+                </span>
+                <span class="sentence-object ${target.type === 'work_product' ? 'work-product' : ''}">
+                    <i class="ph ${getEntityIcon(target.type)}"></i>
+                    ${target.name}
+                </span>
+            `;
+            preview.classList.add('has-content');
+
+            updateCreateConnectionButtonState();
+        }
+
+        function toggleConnectionNotes() {
+            const toggle = document.getElementById('notesToggle');
+            const content = document.getElementById('notesContent');
+
+            createConnectionState.notesExpanded = !createConnectionState.notesExpanded;
+
+            if (createConnectionState.notesExpanded) {
+                toggle.classList.add('expanded');
+                content.classList.add('visible');
+            } else {
+                toggle.classList.remove('expanded');
+                content.classList.remove('visible');
+            }
+        }
+
+        function updateConnectionNotesState() {
+            const textarea = document.getElementById('connectionNotes');
+            const charCount = document.getElementById('notesCharCount');
+            const toggle = document.getElementById('notesToggle');
+
+            if (textarea && charCount) {
+                const len = textarea.value.length;
+                charCount.textContent = len;
+                createConnectionState.notes = textarea.value;
+
+                // Update toggle visual state
+                if (toggle) {
+                    if (len > 0) {
+                        toggle.classList.add('has-content');
+                    } else {
+                        toggle.classList.remove('has-content');
+                    }
+                }
+            }
+        }
+
+        function updateCreateConnectionButtonState() {
+            const btn = document.getElementById('createConnectionBtn');
+            if (!btn) return;
+
+            const hasOperator = !!createConnectionState.operator;
+            const hasTarget = !!createConnectionState.targetId;
+
+            btn.disabled = !(hasOperator && hasTarget);
+        }
+
+        function openWorkProductSelectorForConnection() {
+            // Open the work product selector with callback for connection panel
+            openWorkProductSelectorModal((workProduct) => {
+                if (workProduct) {
+                    // Update the connection panel work product button
+                    const btn = document.getElementById('connectionWorkProductBtn');
+                    const text = document.getElementById('connectionWorkProductText');
+                    const hiddenInput = document.getElementById('connectionSelectedWorkProductId');
+
+                    if (btn && text && hiddenInput) {
+                        btn.classList.add('selected');
+                        text.textContent = workProduct.name;
+                        hiddenInput.value = workProduct.id;
+                        createConnectionState.workProductId = workProduct.id;
+                    }
+                }
+            });
+        }
+
+        function quickCreateWorkProduct() {
+            const name = prompt('Enter work product name:');
+            if (!name || !name.trim()) return;
+
+            const newWorkProduct = {
+                id: 'work_product' + Date.now(),
+                name: name.trim(),
+                description: '',
+                type: 'work_product'
+            };
+
+            entities.work_product.push(newWorkProduct);
+
+            // Log to Xano
+            logActivityToXano({
+                event_verb: 'Quick Create',
+                eo_operator: 'DES',
+                object_type: 'work_product',
+                object_id: newWorkProduct.id,
+                object_label: newWorkProduct.name,
+                data_json: {
+                    entity_type: 'work_product',
+                    entity_name: newWorkProduct.name,
+                    created_from: 'connection_panel'
+                }
+            });
+
+            saveToLocalStorage();
+
+            // Update the work product button
+            const btn = document.getElementById('connectionWorkProductBtn');
+            const text = document.getElementById('connectionWorkProductText');
+            const hiddenInput = document.getElementById('connectionSelectedWorkProductId');
+
+            if (btn && text && hiddenInput) {
+                btn.classList.add('selected');
+                text.textContent = newWorkProduct.name;
+                hiddenInput.value = newWorkProduct.id;
+                createConnectionState.workProductId = newWorkProduct.id;
+            }
+        }
+
+        function createConnectionFromPanel() {
+            if (!currentModalEntity || !currentModalEntityType) return;
+
+            const operatorCode = createConnectionState.operator;
+            const targetId = createConnectionState.targetId;
+            const notes = createConnectionState.notes;
+
+            if (!operatorCode || !targetId) {
+                alert('Please select both an operator and target entity');
+                return;
+            }
+
+            const targetEntity = findEntity(targetId);
+            if (!targetEntity) {
+                alert('Target entity not found');
+                return;
+            }
+
+            // Create the relationship
+            const relId = 'rel' + Date.now();
+            const relationship = {
+                id: relId,
+                subject: currentModalEntity.id,
+                predicate: operatorCode,
+                object: targetId,
+                description: notes
+            };
+
+            relationships.push(relationship);
+
+            // Track in undo history
+            const operatorData = eoOperators[operatorCode];
+            pushToUndoHistory({
+                type: 'create_relationship',
+                data: JSON.parse(JSON.stringify(relationship)),
+                description: `${operatorData.label}: ${currentModalEntity.name} → ${targetEntity.name}`
+            });
+
+            // Log to Xano
+            logActivityToXano({
+                event_verb: 'Create Connection',
+                eo_operator: operatorCode,
+                object_type: 'relationship',
+                object_id: relId,
+                object_label: `${currentModalEntity.name} ${operatorData.label} ${targetEntity.name}`,
+                data_json: {
+                    subject_id: currentModalEntity.id,
+                    subject_type: currentModalEntityType,
+                    subject_name: currentModalEntity.name,
+                    predicate: operatorCode,
+                    predicate_label: operatorData.label,
+                    object_id: targetId,
+                    object_type: targetEntity.type,
+                    object_name: targetEntity.name,
+                    notes: notes
+                }
+            });
+
+            saveToLocalStorage();
+
+            // Refresh modal
+            openEntityModal(currentModalEntity.id, currentModalEntityType);
+
+            // Refresh views
+            if (currentView === 'graph') updateGraph();
+            else if (currentView === 'tree') renderTreeView();
+            else if (currentView === 'card') renderCardView();
+
+            renderActivityList();
         }
 
         // Artwork Gallery Functions
