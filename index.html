@@ -3186,7 +3186,7 @@
                     .on('end', dragended));
 
             // Add node shapes
-            node.each(function(d) {
+            graphNode.each(function(d) {
                 const g = d3.select(this);
                 const radius = getNodeRadius(d.type);
                 const color = getNodeColor(d.type);
