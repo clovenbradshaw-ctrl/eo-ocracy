@@ -1264,6 +1264,99 @@
             background: rgba(255, 255, 255, 0.25);
         }
 
+        /* Filter Mode Toggle Button */
+        .card-filter-mode-btn {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+            padding: 0.5rem 1rem;
+            border: 2px solid #7B95A3;
+            background: white;
+            border-radius: 8px;
+            font-size: 0.85rem;
+            font-weight: 500;
+            color: #3D2E1F;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            margin-left: auto;
+        }
+
+        .card-filter-mode-btn:hover {
+            border-color: #5A7A8A;
+            background: #F5F8FA;
+        }
+
+        .card-filter-mode-btn.active {
+            background: linear-gradient(135deg, #7B95A3 0%, #5A7A8A 100%);
+            color: white;
+            border-color: #5A7A8A;
+        }
+
+        .card-filter-mode-btn i {
+            font-size: 1.1rem;
+        }
+
+        /* Focus Filter Banner */
+        .card-focus-filter-banner {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 0.75rem 1rem;
+            background: linear-gradient(135deg, #7B95A3 0%, #5A7A8A 100%);
+            border-radius: 8px;
+            margin-bottom: 1.5rem;
+            color: white;
+        }
+
+        .focus-filter-info {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            font-size: 0.9rem;
+        }
+
+        .focus-filter-info i {
+            font-size: 1.1rem;
+        }
+
+        .focus-filter-info strong {
+            font-weight: 600;
+        }
+
+        .focus-filter-clear {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.375rem;
+            padding: 0.375rem 0.75rem;
+            background: rgba(255, 255, 255, 0.2);
+            border: 1px solid rgba(255, 255, 255, 0.3);
+            border-radius: 6px;
+            color: white;
+            font-size: 0.8rem;
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+
+        .focus-filter-clear:hover {
+            background: rgba(255, 255, 255, 0.3);
+        }
+
+        /* Filter mode cursor style on cards */
+        .entity-card.filter-mode {
+            cursor: crosshair;
+        }
+
+        .entity-card.filter-mode:hover {
+            box-shadow: 0 4px 12px rgba(123, 149, 163, 0.3);
+            border-color: #7B95A3;
+        }
+
+        /* Highlight the focused entity card */
+        .entity-card.focus-entity {
+            border: 2px solid #7B95A3;
+            box-shadow: 0 0 0 3px rgba(123, 149, 163, 0.2);
+        }
+
         .card-view-content {
             padding: 2rem;
         }
@@ -7747,6 +7840,8 @@ John Doe,Engineering,john@example.com"
             object: true,
             activity: true
         };
+        let cardFilterModeEnabled = false;  // When true, clicking a card filters to show related cards
+        let cardFilterFocusEntityId = null; // The entity ID to filter by (null = no filter active)
 
         // Card View Filtering and Sorting Functions
         function filterEntitiesBySearch(entitiesArray, searchTerm) {
@@ -7797,6 +7892,51 @@ John Doe,Engineering,john@example.com"
             renderCardView();
         }
 
+        // Get all entity IDs related to a given entity through relationships
+        function getRelatedEntityIds(entityId) {
+            const relatedIds = new Set();
+            relatedIds.add(entityId); // Include the entity itself
+
+            relationships.forEach(rel => {
+                if (rel.subject === entityId) {
+                    relatedIds.add(rel.object);
+                }
+                if (rel.object === entityId) {
+                    relatedIds.add(rel.subject);
+                }
+            });
+
+            return relatedIds;
+        }
+
+        // Filter entities by focus entity (when card filter mode is active)
+        function filterEntitiesByFocus(entitiesArray) {
+            if (!cardFilterFocusEntityId) return entitiesArray;
+            const relatedIds = getRelatedEntityIds(cardFilterFocusEntityId);
+            return entitiesArray.filter(entity => relatedIds.has(entity.id));
+        }
+
+        // Toggle card filter mode
+        function toggleCardFilterMode() {
+            cardFilterModeEnabled = !cardFilterModeEnabled;
+            if (!cardFilterModeEnabled) {
+                cardFilterFocusEntityId = null;
+            }
+            renderCardView();
+        }
+
+        // Set focus entity filter (called when clicking a card in filter mode)
+        function setCardFocusFilter(entityId) {
+            cardFilterFocusEntityId = entityId;
+            renderCardViewContent();
+        }
+
+        // Clear focus entity filter
+        function clearCardFocusFilter() {
+            cardFilterFocusEntityId = null;
+            renderCardViewContent();
+        }
+
         // Card View Rendering
         function renderCardView() {
             const container = document.getElementById('cardView');
@@ -7834,6 +7974,19 @@ John Doe,Engineering,john@example.com"
                 </select>
             `;
             controls.appendChild(sortContainer);
+
+            // Filter mode toggle button
+            const filterModeBtn = document.createElement('button');
+            filterModeBtn.className = `card-filter-mode-btn ${cardFilterModeEnabled ? 'active' : ''}`;
+            filterModeBtn.onclick = toggleCardFilterMode;
+            filterModeBtn.innerHTML = `
+                <i class="ph ${cardFilterModeEnabled ? 'ph-cursor-click' : 'ph-cursor-click'}"></i>
+                <span>${cardFilterModeEnabled ? 'Click Mode: Filter' : 'Click Mode: Details'}</span>
+            `;
+            filterModeBtn.title = cardFilterModeEnabled
+                ? 'Click a card to filter to its related entities. Click again to switch back to details mode.'
+                : 'Click a card to view details. Click to switch to filter mode.';
+            controls.appendChild(filterModeBtn);
 
             // Type filter buttons
             const filterButtons = document.createElement('div');
@@ -7884,9 +8037,29 @@ John Doe,Engineering,john@example.com"
             const sidebarFilters = getActiveFilters();
             let hasContent = false;
 
+            // Show active focus filter banner if filtering by a specific entity
+            if (cardFilterFocusEntityId) {
+                const focusEntity = findEntity(cardFilterFocusEntityId);
+                const relatedCount = getRelatedEntityIds(cardFilterFocusEntityId).size - 1;
+                const banner = document.createElement('div');
+                banner.className = 'card-focus-filter-banner';
+                banner.innerHTML = `
+                    <div class="focus-filter-info">
+                        <i class="ph ph-funnel"></i>
+                        <span>Showing <strong>${focusEntity?.name || cardFilterFocusEntityId}</strong> and ${relatedCount} related ${relatedCount === 1 ? 'entity' : 'entities'}</span>
+                    </div>
+                    <button class="focus-filter-clear" onclick="clearCardFocusFilter()">
+                        <i class="ph ph-x"></i>
+                        Clear Filter
+                    </button>
+                `;
+                contentContainer.appendChild(banner);
+            }
+
             // Units
             if (cardViewTypeFilters.unit && sidebarFilters.entities.unit && entities.unit.length > 0) {
                 let filteredUnits = filterEntitiesBySearch(entities.unit, cardViewSearchTerm);
+                filteredUnits = filterEntitiesByFocus(filteredUnits);
                 filteredUnits = sortEntities(filteredUnits, cardViewSortOption);
                 if (filteredUnits.length > 0) {
                     contentContainer.appendChild(createCardRow('Units', filteredUnits, getIcon('unit')));
@@ -7897,6 +8070,7 @@ John Doe,Engineering,john@example.com"
             // Teams
             if (cardViewTypeFilters.team && sidebarFilters.entities.team && entities.team.length > 0) {
                 let filteredTeams = filterEntitiesBySearch(entities.team, cardViewSearchTerm);
+                filteredTeams = filterEntitiesByFocus(filteredTeams);
                 filteredTeams = sortEntities(filteredTeams, cardViewSortOption);
                 if (filteredTeams.length > 0) {
                     contentContainer.appendChild(createCardRow('Teams', filteredTeams, getIcon('team')));
@@ -7907,6 +8081,7 @@ John Doe,Engineering,john@example.com"
             // Roles
             if (cardViewTypeFilters.role && sidebarFilters.entities.role && entities.role.length > 0) {
                 let filteredRoles = filterEntitiesBySearch(entities.role, cardViewSearchTerm);
+                filteredRoles = filterEntitiesByFocus(filteredRoles);
                 filteredRoles = sortEntities(filteredRoles, cardViewSortOption);
                 if (filteredRoles.length > 0) {
                     contentContainer.appendChild(createCardRow('Roles', filteredRoles, getIcon('role')));
@@ -7917,6 +8092,7 @@ John Doe,Engineering,john@example.com"
             // People
             if (cardViewTypeFilters.person && sidebarFilters.entities.person && entities.person.length > 0) {
                 let filteredPeople = filterEntitiesBySearch(entities.person, cardViewSearchTerm);
+                filteredPeople = filterEntitiesByFocus(filteredPeople);
                 filteredPeople = sortEntities(filteredPeople, cardViewSortOption);
                 if (filteredPeople.length > 0) {
                     contentContainer.appendChild(createCardRow('People', filteredPeople, getIcon('person')));
@@ -7927,6 +8103,7 @@ John Doe,Engineering,john@example.com"
             // Work Products
             if (cardViewTypeFilters.object && sidebarFilters.entities.object && entities.object.length > 0) {
                 let filteredObjects = filterEntitiesBySearch(entities.object, cardViewSearchTerm);
+                filteredObjects = filterEntitiesByFocus(filteredObjects);
                 filteredObjects = sortEntities(filteredObjects, cardViewSortOption);
                 if (filteredObjects.length > 0) {
                     contentContainer.appendChild(createCardRow('Work Products', filteredObjects, getIcon('object')));
@@ -7973,6 +8150,13 @@ John Doe,Engineering,john@example.com"
                         (rel.description && rel.description.toLowerCase().includes(term))
                     );
                 });
+            }
+
+            // Apply focus filter to activities (show only activities involving the focus entity)
+            if (cardFilterFocusEntityId) {
+                filteredActivities = filteredActivities.filter(rel =>
+                    rel.subject === cardFilterFocusEntityId || rel.object === cardFilterFocusEntityId
+                );
             }
 
             if (filteredActivities.length === 0) return null;
@@ -8038,7 +8222,21 @@ John Doe,Engineering,john@example.com"
             entities.forEach(entity => {
                 const card = document.createElement('div');
                 card.className = `entity-card ${entity.type}`;
-                card.onclick = () => openEntityModal(entity.id, entity.type);
+                // Add filter-mode class if enabled
+                if (cardFilterModeEnabled) {
+                    card.classList.add('filter-mode');
+                }
+                // Add focused class if this is the focus entity
+                if (cardFilterFocusEntityId === entity.id) {
+                    card.classList.add('focus-entity');
+                }
+                card.onclick = () => {
+                    if (cardFilterModeEnabled) {
+                        setCardFocusFilter(entity.id);
+                    } else {
+                        openEntityModal(entity.id, entity.type);
+                    }
+                };
 
                 // For teams and roles, find what they're nested under (DES relationships where entity is the object)
                 let nestedUnderHTML = '';
