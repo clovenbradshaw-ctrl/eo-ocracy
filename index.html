@@ -2811,6 +2811,139 @@
             border-bottom: none;
         }
 
+        /* Role Assignment Section - High Visual Priority for Persons */
+        .role-assignment-section {
+            background: linear-gradient(135deg, #FFF8F0 0%, #FFF4E8 100%);
+            border: 2px solid #E8B86D;
+            border-radius: 12px;
+            margin: 1rem 1rem 0 1rem;
+            padding: 1.25rem 1.5rem !important;
+            box-shadow: 0 2px 8px rgba(200, 143, 74, 0.15);
+        }
+
+        .role-assignment-section:empty {
+            display: none;
+        }
+
+        .role-assignment-section .modal-section-title {
+            font-size: 0.9rem;
+            color: #8B5A2B;
+            font-weight: 700;
+            margin-bottom: 1rem;
+        }
+
+        .role-assignment-section .modal-section-title i {
+            font-size: 1.2rem;
+            color: #C88F4A;
+        }
+
+        .role-assignment-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 0.75rem;
+        }
+
+        .role-assignment-list {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 0.5rem;
+            margin-bottom: 1rem;
+        }
+
+        .role-assignment-chip {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+            padding: 0.6rem 1rem;
+            background: white;
+            border: 2px solid #C88F4A;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: all 0.2s;
+            font-size: 0.9rem;
+            font-weight: 600;
+            color: #5A4A3A;
+        }
+
+        .role-assignment-chip:hover {
+            background: #FFF4E8;
+            transform: translateY(-1px);
+            box-shadow: 0 2px 6px rgba(200, 143, 74, 0.2);
+        }
+
+        .role-assignment-chip i {
+            color: #C88F4A;
+        }
+
+        .role-assignment-chip .chip-remove-btn {
+            margin-left: 0.25rem;
+            padding: 0.2rem;
+            border: none;
+            background: transparent;
+            color: #8B6F47;
+            cursor: pointer;
+            border-radius: 4px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .role-assignment-chip .chip-remove-btn:hover {
+            background: rgba(200, 143, 74, 0.2);
+            color: #8B5A2B;
+        }
+
+        .role-assignment-add-form {
+            display: flex;
+            gap: 0.5rem;
+            align-items: center;
+            padding-top: 0.75rem;
+            border-top: 1px dashed #E8B86D;
+        }
+
+        .role-assignment-add-form select {
+            flex: 1;
+            padding: 0.6rem 0.75rem;
+            border: 2px solid #E5DDD1;
+            border-radius: 8px;
+            font-size: 0.875rem;
+            background: white;
+            color: #3D2E1F;
+        }
+
+        .role-assignment-add-form select:focus {
+            outline: none;
+            border-color: #C88F4A;
+        }
+
+        .role-assignment-add-btn {
+            padding: 0.6rem 1rem;
+            background: linear-gradient(135deg, #C88F4A 0%, #B87B5B 100%);
+            color: white;
+            border: none;
+            border-radius: 8px;
+            font-size: 0.875rem;
+            font-weight: 600;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            gap: 0.35rem;
+            transition: all 0.2s;
+        }
+
+        .role-assignment-add-btn:hover {
+            transform: translateY(-1px);
+            box-shadow: 0 2px 6px rgba(200, 143, 74, 0.3);
+        }
+
+        .role-assignment-empty {
+            color: #8B6F47;
+            font-size: 0.9rem;
+            padding: 0.5rem 0 1rem 0;
+            font-style: italic;
+        }
+
         .modal-section-title {
             font-size: 0.8rem;
             color: #8B6F47;
@@ -5048,6 +5181,7 @@
             </div>
             <div class="modal-body">
                 <div class="modal-section" id="modalDescription"></div>
+                <div class="modal-section role-assignment-section" id="modalRoleAssignment"></div>
                 <div class="modal-section" id="modalNested"></div>
                 <div class="modal-section" id="modalAddNested"></div>
                 <div class="modal-section" id="modalNestUnder"></div>
@@ -6214,6 +6348,68 @@ John Doe,Engineering,john@example.com"
                     `;
                     descriptionEl.style.display = '';
                 }
+            }
+
+            // Role Assignment Section - prominently displayed for persons only
+            const roleAssignmentEl = document.getElementById('modalRoleAssignment');
+            if (entityType === 'person') {
+                // Get roles this person is assigned to (Person INS Role relationships)
+                const assignedRoles = relationships
+                    .filter(r => r.predicate === 'INS' && r.subject === entityId)
+                    .map(r => {
+                        const role = findEntity(r.object);
+                        if (role && role.type === 'role') {
+                            return { ...role, relationshipId: r.id };
+                        }
+                        return null;
+                    })
+                    .filter(Boolean);
+
+                // Get all available roles for assignment dropdown
+                const availableRoles = entities.role.filter(r =>
+                    !assignedRoles.find(ar => ar.id === r.id)
+                );
+
+                // Build role options with team context
+                const roleOptionsHtml = availableRoles.map(role => {
+                    const parentTeam = getRoleParentTeam(role.id);
+                    const teamContext = parentTeam ? ` (in ${parentTeam.name})` : '';
+                    return `<option value="${role.id}">${role.name}${teamContext}</option>`;
+                }).join('');
+
+                roleAssignmentEl.innerHTML = `
+                    <div class="modal-section-title"><i class="ph ph-identification-badge"></i> Role Assignments</div>
+                    ${assignedRoles.length > 0 ? `
+                        <div class="role-assignment-list">
+                            ${assignedRoles.map(role => {
+                                const parentTeam = getRoleParentTeam(role.id);
+                                const teamContext = parentTeam ? ` <span style="opacity: 0.7; font-weight: 400; font-size: 0.8rem;">in ${parentTeam.name}</span>` : '';
+                                return `
+                                    <span class="role-assignment-chip" onclick="openEntityModal('${role.id}')">
+                                        <i class="ph ph-briefcase"></i>
+                                        ${role.name}${teamContext}
+                                        <button class="chip-remove-btn" onclick="event.stopPropagation(); removeRoleAssignment('${entityId}', '${role.id}')" title="Remove from role">
+                                            <i class="ph ph-x"></i>
+                                        </button>
+                                    </span>
+                                `;
+                            }).join('')}
+                        </div>
+                    ` : `
+                        <div class="role-assignment-empty">No roles assigned yet</div>
+                    `}
+                    <div class="role-assignment-add-form">
+                        <select id="roleAssignmentSelect">
+                            <option value="">Assign to a role...</option>
+                            ${roleOptionsHtml}
+                        </select>
+                        <button class="role-assignment-add-btn" onclick="addRoleAssignment('${entityId}')">
+                            <i class="ph ph-plus"></i> Assign
+                        </button>
+                    </div>
+                `;
+            } else {
+                roleAssignmentEl.innerHTML = '';
             }
 
             // Separate relationships into Nesting (DES) and Activities (non-DES)
@@ -7546,6 +7742,150 @@ John Doe,Engineering,john@example.com"
 
             // Refresh the modal to show new nesting
             openEntityModal(currentModalEntity.id, currentModalEntityType);
+
+            // Refresh views
+            if (currentView === 'graph') {
+                updateGraph();
+            } else if (currentView === 'tree') {
+                renderTreeView();
+            } else if (currentView === 'card') {
+                renderCardView();
+            }
+
+            renderActivityList();
+        }
+
+        // Role Assignment functions for persons
+        function addRoleAssignment(personId) {
+            const roleId = document.getElementById('roleAssignmentSelect').value;
+            if (!roleId) {
+                alert('Please select a role to assign');
+                return;
+            }
+
+            const person = findEntity(personId);
+            const role = findEntity(roleId);
+            if (!person || !role) {
+                alert('Person or role not found');
+                return;
+            }
+
+            // Check if already assigned
+            const existingAssignment = relationships.find(r =>
+                r.predicate === 'INS' && r.subject === personId && r.object === roleId
+            );
+            if (existingAssignment) {
+                alert('This person is already assigned to this role');
+                return;
+            }
+
+            // Create the INS relationship (Person INS Role)
+            const relId = 'rel' + Date.now();
+            const relationship = {
+                id: relId,
+                subject: personId,
+                predicate: 'INS',
+                object: roleId,
+                description: ''
+            };
+
+            relationships.push(relationship);
+
+            // Track in undo history
+            pushToUndoHistory({
+                type: 'create_relationship',
+                data: JSON.parse(JSON.stringify(relationship)),
+                description: `Assign: ${person.name} → ${role.name}`
+            });
+
+            // Log to Xano
+            logActivityToXano({
+                event_verb: 'Role Assignment',
+                eo_operator: 'INS',
+                object_type: 'relationship',
+                object_id: relId,
+                object_label: `${person.name} assigned to ${role.name}`,
+                data_json: {
+                    subject_id: personId,
+                    subject_type: 'person',
+                    subject_name: person.name,
+                    predicate: 'INS',
+                    predicate_label: 'Insert/Start',
+                    object_id: roleId,
+                    object_type: 'role',
+                    object_name: role.name,
+                    connection_type: 'role_assignment'
+                }
+            });
+
+            // Save and refresh
+            saveToLocalStorage();
+
+            // Refresh the modal to show new assignment
+            openEntityModal(personId, 'person');
+
+            // Refresh views
+            if (currentView === 'graph') {
+                updateGraph();
+            } else if (currentView === 'tree') {
+                renderTreeView();
+            } else if (currentView === 'card') {
+                renderCardView();
+            }
+
+            renderActivityList();
+        }
+
+        function removeRoleAssignment(personId, roleId) {
+            const person = findEntity(personId);
+            const role = findEntity(roleId);
+            if (!person || !role) return;
+
+            // Find the relationship
+            const relIndex = relationships.findIndex(r =>
+                r.predicate === 'INS' && r.subject === personId && r.object === roleId
+            );
+
+            if (relIndex === -1) return;
+
+            // Store for undo
+            const removedRelationship = JSON.parse(JSON.stringify(relationships[relIndex]));
+
+            // Remove the relationship
+            relationships.splice(relIndex, 1);
+
+            // Track in undo history
+            pushToUndoHistory({
+                type: 'delete_relationship',
+                data: removedRelationship,
+                description: `Unassign: ${person.name} from ${role.name}`
+            });
+
+            // Log to Xano
+            logActivityToXano({
+                event_verb: 'Role Unassignment',
+                eo_operator: 'INS',
+                object_type: 'relationship',
+                object_id: removedRelationship.id,
+                object_label: `${person.name} unassigned from ${role.name}`,
+                data_json: {
+                    subject_id: personId,
+                    subject_type: 'person',
+                    subject_name: person.name,
+                    predicate: 'INS',
+                    predicate_label: 'Insert/Start',
+                    object_id: roleId,
+                    object_type: 'role',
+                    object_name: role.name,
+                    connection_type: 'role_unassignment'
+                }
+            });
+
+            // Save and refresh
+            saveToLocalStorage();
+
+            // Refresh the modal
+            openEntityModal(personId, 'person');
 
             // Refresh views
             if (currentView === 'graph') {
