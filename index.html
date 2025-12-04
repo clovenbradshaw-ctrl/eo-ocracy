@@ -1555,6 +1555,199 @@
             color: #8B6F47;
         }
 
+        /* Orbital Connections Visualization */
+        .orbital-container {
+            position: relative;
+            width: 100%;
+            height: 300px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            margin: 1rem 0;
+        }
+
+        .orbital-svg {
+            width: 100%;
+            height: 100%;
+        }
+
+        .orbital-center {
+            cursor: default;
+        }
+
+        .orbital-center-circle {
+            fill: #C88F4A;
+            stroke: #B87B5B;
+            stroke-width: 3;
+        }
+
+        .orbital-center-icon {
+            fill: white;
+            font-size: 24px;
+        }
+
+        .orbital-center-label {
+            fill: #3D2E1F;
+            font-size: 11px;
+            font-weight: 600;
+            text-anchor: middle;
+        }
+
+        .orbital-ring {
+            fill: none;
+            stroke: #E5DDD1;
+            stroke-width: 1;
+            stroke-dasharray: 4,4;
+        }
+
+        .orbital-node {
+            cursor: pointer;
+            transition: transform 0.2s;
+        }
+
+        .orbital-node:hover {
+            transform: scale(1.1);
+        }
+
+        .orbital-node-circle {
+            stroke-width: 2;
+            stroke: white;
+            filter: drop-shadow(0 2px 4px rgba(0,0,0,0.1));
+        }
+
+        .orbital-node-icon {
+            fill: white;
+            font-size: 14px;
+            pointer-events: none;
+        }
+
+        .orbital-node-label {
+            font-size: 10px;
+            font-weight: 500;
+            fill: #3D2E1F;
+            text-anchor: middle;
+            pointer-events: none;
+        }
+
+        .orbital-link {
+            stroke: #E5DDD1;
+            stroke-width: 1.5;
+            fill: none;
+        }
+
+        .orbital-link.has-children {
+            stroke: #C88F4A;
+            stroke-width: 2;
+            stroke-dasharray: none;
+        }
+
+        /* Grouped connections fallback */
+        .connections-grouped {
+            display: flex;
+            flex-direction: column;
+            gap: 1rem;
+        }
+
+        .connection-group {
+            background: #FAF7F5;
+            border-radius: 8px;
+            padding: 0.75rem;
+        }
+
+        .connection-group-title {
+            font-size: 0.75rem;
+            font-weight: 600;
+            color: #8B6F47;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            margin-bottom: 0.5rem;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .connection-group-items {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 0.5rem;
+        }
+
+        /* Nested indicator */
+        .connection-badge.has-nested {
+            border-color: #C88F4A;
+            position: relative;
+        }
+
+        .connection-badge.has-nested::after {
+            content: '';
+            position: absolute;
+            top: -4px;
+            right: -4px;
+            width: 12px;
+            height: 12px;
+            background: #C88F4A;
+            border-radius: 50%;
+            border: 2px solid white;
+        }
+
+        .nested-count {
+            position: absolute;
+            top: -4px;
+            right: -4px;
+            min-width: 18px;
+            height: 18px;
+            background: #C88F4A;
+            border-radius: 9px;
+            border: 2px solid white;
+            color: white;
+            font-size: 10px;
+            font-weight: 600;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 0 4px;
+        }
+
+        /* View toggle for connections */
+        .connections-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 0.75rem;
+        }
+
+        .view-toggle {
+            display: flex;
+            gap: 0.25rem;
+            background: #F5F2ED;
+            border-radius: 6px;
+            padding: 2px;
+        }
+
+        .view-toggle-btn {
+            padding: 0.35rem 0.5rem;
+            border: none;
+            background: transparent;
+            color: #8B6F47;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 0.875rem;
+            transition: all 0.2s;
+            display: flex;
+            align-items: center;
+            gap: 0.25rem;
+        }
+
+        .view-toggle-btn:hover {
+            background: #E5DDD1;
+        }
+
+        .view-toggle-btn.active {
+            background: white;
+            color: #C88F4A;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+        }
+
         .activity-item {
             display: flex;
             align-items: center;
@@ -3596,20 +3789,35 @@ John Doe,Engineering,john@example.com"
 
             const connectionsEl = document.getElementById('modalConnections');
             if (connections.length > 0) {
-                connectionsEl.innerHTML = '<div class="modal-section-title"><i class="ph ph-link"></i> Connected To</div>';
-                const wrapper = document.createElement('div');
-                wrapper.style.display = 'flex';
-                wrapper.style.flexWrap = 'wrap';
-                wrapper.style.gap = '0.5rem';
+                // Create header with view toggle
+                connectionsEl.innerHTML = `
+                    <div class="connections-header">
+                        <div class="modal-section-title" style="margin-bottom: 0;"><i class="ph ph-link"></i> Connected To</div>
+                        <div class="view-toggle">
+                            <button class="view-toggle-btn active" data-view="orbital" onclick="switchConnectionsView('orbital', '${entityId}', '${entityType}')">
+                                <i class="ph ph-planet"></i>
+                            </button>
+                            <button class="view-toggle-btn" data-view="list" onclick="switchConnectionsView('list', '${entityId}', '${entityType}')">
+                                <i class="ph ph-list"></i>
+                            </button>
+                        </div>
+                    </div>
+                `;
 
-                connections.forEach(conn => {
-                    const badge = document.createElement('div');
-                    badge.className = 'connection-badge';
-                    badge.innerHTML = `${getIcon(conn.type)} ${conn.name}`;
-                    badge.onclick = () => openEntityModal(conn.id, conn.type);
-                    wrapper.appendChild(badge);
-                });
-                connectionsEl.appendChild(wrapper);
+                // Container for the view content
+                const viewContainer = document.createElement('div');
+                viewContainer.id = 'connectionsViewContainer';
+                connectionsEl.appendChild(viewContainer);
+
+                // Default to orbital view
+                const orbitalContainer = document.createElement('div');
+                orbitalContainer.className = 'orbital-container';
+                viewContainer.appendChild(orbitalContainer);
+
+                // Render orbital visualization after container is in DOM
+                setTimeout(() => {
+                    renderOrbitalConnections(orbitalContainer, entity, connections);
+                }, 0);
             } else {
                 connectionsEl.innerHTML = `
                     <div class="modal-section-title"><i class="ph ph-link"></i> Connected To</div>
@@ -3679,6 +3887,367 @@ John Doe,Engineering,john@example.com"
 
         function closeEntityModal() {
             document.getElementById('entityModal').classList.remove('active');
+        }
+
+        // Orbital visualization for connections
+        function renderOrbitalConnections(container, centerEntity, connections) {
+            const width = container.clientWidth || 400;
+            const height = 300;
+            const centerX = width / 2;
+            const centerY = height / 2;
+
+            // Clear container
+            container.innerHTML = '';
+
+            // Group connections by type for better organization
+            const groupedConnections = {};
+            const typeOrder = ['team', 'unit', 'role', 'person', 'object'];
+
+            connections.forEach(conn => {
+                if (!groupedConnections[conn.type]) {
+                    groupedConnections[conn.type] = [];
+                }
+                groupedConnections[conn.type].push(conn);
+            });
+
+            // Flatten maintaining type grouping
+            const sortedConnections = [];
+            typeOrder.forEach(type => {
+                if (groupedConnections[type]) {
+                    sortedConnections.push(...groupedConnections[type]);
+                }
+            });
+
+            // Get nested connections for each item (items that THEY connect to)
+            const nestedMap = new Map();
+            sortedConnections.forEach(conn => {
+                const nested = [];
+                relationships.forEach(r => {
+                    if (r.subject === conn.id || r.object === conn.id) {
+                        const otherId = r.subject === conn.id ? r.object : r.subject;
+                        if (otherId !== centerEntity.id) {
+                            const otherEntity = findEntity(otherId);
+                            if (otherEntity && !nested.find(n => n.id === otherEntity.id)) {
+                                nested.push(otherEntity);
+                            }
+                        }
+                    }
+                });
+                nestedMap.set(conn.id, nested);
+            });
+
+            // Create SVG
+            const svg = d3.select(container)
+                .append('svg')
+                .attr('class', 'orbital-svg')
+                .attr('viewBox', `0 0 ${width} ${height}`)
+                .attr('preserveAspectRatio', 'xMidYMid meet');
+
+            // Draw orbital rings
+            const maxConnections = sortedConnections.length;
+            const innerRadius = 70;
+            const outerRadius = Math.min(width, height) / 2 - 40;
+
+            // Primary orbit ring
+            svg.append('circle')
+                .attr('class', 'orbital-ring')
+                .attr('cx', centerX)
+                .attr('cy', centerY)
+                .attr('r', innerRadius);
+
+            // Secondary orbit ring (for nested items preview)
+            if (Array.from(nestedMap.values()).some(arr => arr.length > 0)) {
+                svg.append('circle')
+                    .attr('class', 'orbital-ring')
+                    .attr('cx', centerX)
+                    .attr('cy', centerY)
+                    .attr('r', outerRadius);
+            }
+
+            // Calculate positions for orbital nodes
+            const angleStep = (2 * Math.PI) / Math.max(sortedConnections.length, 1);
+            const startAngle = -Math.PI / 2; // Start from top
+
+            // Draw connections lines first (behind nodes)
+            sortedConnections.forEach((conn, i) => {
+                const angle = startAngle + (i * angleStep);
+                const x = centerX + innerRadius * Math.cos(angle);
+                const y = centerY + innerRadius * Math.sin(angle);
+
+                svg.append('line')
+                    .attr('class', 'orbital-link')
+                    .attr('x1', centerX)
+                    .attr('y1', centerY)
+                    .attr('x2', x)
+                    .attr('y2', y);
+
+                // Draw lines to nested items (faded)
+                const nested = nestedMap.get(conn.id) || [];
+                if (nested.length > 0) {
+                    // Show up to 3 nested preview dots
+                    const previewCount = Math.min(nested.length, 3);
+                    const nestedAngleSpread = Math.PI / 6;
+
+                    for (let j = 0; j < previewCount; j++) {
+                        const nestedAngle = angle + (j - (previewCount - 1) / 2) * (nestedAngleSpread / previewCount);
+                        const nestedX = centerX + outerRadius * Math.cos(nestedAngle);
+                        const nestedY = centerY + outerRadius * Math.sin(nestedAngle);
+
+                        svg.append('line')
+                            .attr('class', 'orbital-link')
+                            .attr('x1', x)
+                            .attr('y1', y)
+                            .attr('x2', nestedX)
+                            .attr('y2', nestedY)
+                            .style('stroke', '#E5DDD1')
+                            .style('stroke-width', 1)
+                            .style('opacity', 0.5);
+
+                        // Small preview dot for nested item
+                        const nestedEntity = nested[j];
+                        const previewGroup = svg.append('g')
+                            .attr('class', 'orbital-node')
+                            .attr('transform', `translate(${nestedX}, ${nestedY})`)
+                            .style('cursor', 'pointer')
+                            .on('click', () => openEntityModal(nestedEntity.id, nestedEntity.type));
+
+                        previewGroup.append('circle')
+                            .attr('r', 12)
+                            .attr('class', 'orbital-node-circle')
+                            .style('fill', getNodeColor(nestedEntity.type))
+                            .style('opacity', 0.7);
+
+                        // Add tiny icon
+                        previewGroup.append('text')
+                            .attr('text-anchor', 'middle')
+                            .attr('dominant-baseline', 'central')
+                            .attr('font-size', '10px')
+                            .attr('fill', 'white')
+                            .text(getIconChar(nestedEntity.type));
+                    }
+
+                    // If more nested items, show count
+                    if (nested.length > 3) {
+                        const countAngle = angle;
+                        const countX = centerX + (outerRadius + 15) * Math.cos(countAngle);
+                        const countY = centerY + (outerRadius + 15) * Math.sin(countAngle);
+
+                        svg.append('text')
+                            .attr('x', countX)
+                            .attr('y', countY)
+                            .attr('text-anchor', 'middle')
+                            .attr('dominant-baseline', 'central')
+                            .attr('font-size', '9px')
+                            .attr('fill', '#8B6F47')
+                            .text(`+${nested.length - 3}`);
+                    }
+                }
+            });
+
+            // Draw center node
+            const centerGroup = svg.append('g')
+                .attr('class', 'orbital-center')
+                .attr('transform', `translate(${centerX}, ${centerY})`);
+
+            centerGroup.append('circle')
+                .attr('r', 32)
+                .attr('class', 'orbital-center-circle');
+
+            // Center icon (using text for simplicity with Phosphor)
+            centerGroup.append('text')
+                .attr('text-anchor', 'middle')
+                .attr('dominant-baseline', 'central')
+                .attr('font-size', '20px')
+                .attr('fill', 'white')
+                .text(getIconChar(centerEntity.type));
+
+            // Draw orbital nodes
+            sortedConnections.forEach((conn, i) => {
+                const angle = startAngle + (i * angleStep);
+                const x = centerX + innerRadius * Math.cos(angle);
+                const y = centerY + innerRadius * Math.sin(angle);
+                const nested = nestedMap.get(conn.id) || [];
+                const hasNested = nested.length > 0;
+
+                const nodeGroup = svg.append('g')
+                    .attr('class', 'orbital-node')
+                    .attr('transform', `translate(${x}, ${y})`)
+                    .style('cursor', 'pointer')
+                    .on('click', () => openEntityModal(conn.id, conn.type));
+
+                // Node circle
+                nodeGroup.append('circle')
+                    .attr('r', 22)
+                    .attr('class', 'orbital-node-circle')
+                    .style('fill', getNodeColor(conn.type));
+
+                // Nested indicator ring
+                if (hasNested) {
+                    nodeGroup.append('circle')
+                        .attr('r', 26)
+                        .style('fill', 'none')
+                        .style('stroke', '#C88F4A')
+                        .style('stroke-width', 2)
+                        .style('stroke-dasharray', '3,2');
+                }
+
+                // Icon
+                nodeGroup.append('text')
+                    .attr('text-anchor', 'middle')
+                    .attr('dominant-baseline', 'central')
+                    .attr('font-size', '14px')
+                    .attr('fill', 'white')
+                    .text(getIconChar(conn.type));
+
+                // Label
+                const labelY = 38;
+                const labelText = conn.name.length > 15 ? conn.name.substring(0, 12) + '...' : conn.name;
+
+                nodeGroup.append('text')
+                    .attr('class', 'orbital-node-label')
+                    .attr('y', labelY)
+                    .text(labelText);
+
+                // Nested count badge
+                if (hasNested) {
+                    nodeGroup.append('circle')
+                        .attr('cx', 16)
+                        .attr('cy', -16)
+                        .attr('r', 9)
+                        .style('fill', '#C88F4A')
+                        .style('stroke', 'white')
+                        .style('stroke-width', 2);
+
+                    nodeGroup.append('text')
+                        .attr('x', 16)
+                        .attr('y', -16)
+                        .attr('text-anchor', 'middle')
+                        .attr('dominant-baseline', 'central')
+                        .attr('font-size', '9px')
+                        .attr('font-weight', '600')
+                        .attr('fill', 'white')
+                        .text(nested.length);
+                }
+            });
+        }
+
+        // Helper to get icon character for SVG text
+        function getIconChar(type) {
+            const icons = {
+                unit: '🏢',
+                team: '👥',
+                role: '💼',
+                person: '👤',
+                object: '📦'
+            };
+            return icons[type] || '•';
+        }
+
+        // Switch between orbital and list views for connections
+        function switchConnectionsView(view, entityId, entityType) {
+            const entity = entities[entityType]?.find(e => e.id === entityId);
+            if (!entity) return;
+
+            // Get connections
+            const connections = [];
+            relationships.forEach(r => {
+                if (r.subject === entityId) {
+                    const conn = findEntity(r.object);
+                    if (conn && !connections.find(c => c.id === conn.id)) {
+                        connections.push(conn);
+                    }
+                } else if (r.object === entityId) {
+                    const conn = findEntity(r.subject);
+                    if (conn && !connections.find(c => c.id === conn.id)) {
+                        connections.push(conn);
+                    }
+                }
+            });
+
+            // Update toggle buttons
+            document.querySelectorAll('.view-toggle-btn').forEach(btn => {
+                btn.classList.toggle('active', btn.dataset.view === view);
+            });
+
+            // Get container and clear it
+            const viewContainer = document.getElementById('connectionsViewContainer');
+            if (!viewContainer) return;
+            viewContainer.innerHTML = '';
+
+            if (view === 'orbital') {
+                const orbitalContainer = document.createElement('div');
+                orbitalContainer.className = 'orbital-container';
+                viewContainer.appendChild(orbitalContainer);
+                setTimeout(() => {
+                    renderOrbitalConnections(orbitalContainer, entity, connections);
+                }, 0);
+            } else {
+                renderGroupedConnections(viewContainer, connections, entityId);
+            }
+        }
+
+        // Render grouped connections (fallback for many items)
+        function renderGroupedConnections(container, connections, centerEntityId) {
+            const typeLabels = {
+                unit: { label: 'Units', icon: 'ph-buildings' },
+                team: { label: 'Teams', icon: 'ph-users-three' },
+                role: { label: 'Roles', icon: 'ph-briefcase' },
+                person: { label: 'People', icon: 'ph-user' },
+                object: { label: 'Work Products', icon: 'ph-package' }
+            };
+
+            // Group by type
+            const grouped = {};
+            connections.forEach(conn => {
+                if (!grouped[conn.type]) grouped[conn.type] = [];
+                grouped[conn.type].push(conn);
+            });
+
+            const wrapper = document.createElement('div');
+            wrapper.className = 'connections-grouped';
+
+            Object.keys(typeLabels).forEach(type => {
+                if (grouped[type] && grouped[type].length > 0) {
+                    const group = document.createElement('div');
+                    group.className = 'connection-group';
+
+                    const title = document.createElement('div');
+                    title.className = 'connection-group-title';
+                    title.innerHTML = `<i class="ph ${typeLabels[type].icon}"></i> ${typeLabels[type].label}`;
+                    group.appendChild(title);
+
+                    const items = document.createElement('div');
+                    items.className = 'connection-group-items';
+
+                    grouped[type].forEach(conn => {
+                        // Check for nested connections
+                        const nestedCount = relationships.filter(r =>
+                            (r.subject === conn.id || r.object === conn.id) &&
+                            r.subject !== centerEntityId && r.object !== centerEntityId
+                        ).length;
+
+                        const badge = document.createElement('div');
+                        badge.className = 'connection-badge' + (nestedCount > 0 ? ' has-nested' : '');
+                        badge.style.position = 'relative';
+                        badge.innerHTML = `${getIcon(conn.type)} ${conn.name}`;
+
+                        if (nestedCount > 0) {
+                            const countEl = document.createElement('span');
+                            countEl.className = 'nested-count';
+                            countEl.textContent = nestedCount;
+                            badge.appendChild(countEl);
+                        }
+
+                        badge.onclick = () => openEntityModal(conn.id, conn.type);
+                        items.appendChild(badge);
+                    });
+
+                    group.appendChild(items);
+                    wrapper.appendChild(group);
+                }
+            });
+
+            container.appendChild(wrapper);
         }
 
         // Helper function to get all entities for modal dropdown (excluding current entity)
