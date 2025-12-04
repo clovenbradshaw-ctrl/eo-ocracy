@@ -5931,7 +5931,14 @@ John Doe,Engineering,john@example.com"
             list.innerHTML = '';
 
             // Helper function to recursively render entity tree
-            function renderEntityNode(entity, depth = 0, searchTerm = '') {
+            // Use visited set to prevent infinite recursion from bidirectional relationships
+            function renderEntityNode(entity, depth = 0, searchTerm = '', visited = new Set()) {
+                // Prevent infinite recursion - skip if already rendered in this branch
+                if (visited.has(entity.id)) {
+                    return null;
+                }
+                visited.add(entity.id);
+
                 const marginLeft = depth * 1;
                 
                 // Skip if doesn't match search
@@ -5993,7 +6000,7 @@ John Doe,Engineering,john@example.com"
                             if (!hasMatchingGrandchildren) return;
                         }
                         
-                        const childNode = renderEntityNode(child, depth + 1, searchTerm);
+                        const childNode = renderEntityNode(child, depth + 1, searchTerm, visited);
                         if (childNode) {
                             childrenContainer.appendChild(childNode);
                         }
