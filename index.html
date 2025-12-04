@@ -10470,29 +10470,44 @@ John Doe,Engineering,john@example.com"
                                 op: event.op,
                                 title: event.data.title || 'Untitled',
                                 artist: event.data.artist || 'Unknown Artist',
-                                imageUrl: event.data.imageUrl,
+                                // Support both camelCase and snake_case from API
+                                imageUrl: event.data.image_url || event.data.imageUrl,
                                 price: event.data.price,
                                 currency: event.data.currency || 'USD',
                                 description: event.data.description || '',
-                                productUrl: event.data.productUrl,
-                                roomId: event.data.roomId,
-                                galleryId: event.data.galleryId,
-                                locationId: event.data.locationId,
-                                locationName: event.data.locationName,
-                                aspectRatio: event.data.aspectRatio,
-                                heightInches: event.data.heightInches,
-                                widthInches: event.data.widthInches,
-                                heightMeters: event.data.heightMeters,
-                                frame: event.frame,
-                                displayMode: event.data.displayMode
+                                productUrl: event.data.product_url || event.data.productUrl,
+                                roomId: event.data.room_id || event.data.roomId,
+                                galleryId: event.data.gallery_id || event.data.galleryId,
+                                locationId: event.data.location_id || event.data.locationId,
+                                locationName: event.data.location_name || event.data.locationName,
+                                aspectRatio: event.data.aspect_ratio || event.data.aspectRatio,
+                                heightInches: event.data.height_inches || event.data.heightInches,
+                                widthInches: event.data.width_inches || event.data.widthInches,
+                                heightMeters: event.data.height_meters || event.data.heightMeters,
+                                frame: event.data.frame || event.frame,
+                                displayMode: event.data.display_mode || event.data.displayMode
                             });
                         }
                     }
                 });
 
+                // Debug: Log first artwork event data to check field names
+                const allArtworks = Array.from(artworkMap.values());
+                if (allArtworks.length > 0) {
+                    console.log('🔍 Sample artwork data:', allArtworks[0]);
+                    console.log('🔍 Total artworks before image filter:', allArtworks.length);
+                }
+
+                // Also check raw event data for first artwork
+                const firstArtworkEvent = events.find(e => e.object_type === 'artwork');
+                if (firstArtworkEvent) {
+                    console.log('🔍 Raw artwork event data keys:', Object.keys(firstArtworkEvent.data || {}));
+                    console.log('🔍 Raw artwork event.data:', firstArtworkEvent.data);
+                }
+
                 // Convert map to array and filter out artworks without images
                 artworks = Array.from(artworkMap.values()).filter(a => a.imageUrl);
-                console.log('🖼️ Loaded artworks:', artworks.length);
+                console.log('🖼️ Loaded artworks with images:', artworks.length);
 
                 return artworks;
             } catch (error) {
