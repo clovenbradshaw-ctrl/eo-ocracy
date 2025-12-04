@@ -2575,6 +2575,85 @@
             color: #8B6F47;
         }
 
+        /* Relationships List */
+        .relationships-list {
+            display: flex;
+            flex-direction: column;
+            gap: 0.5rem;
+        }
+
+        .relationship-item {
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+            padding: 0.75rem 1rem;
+            background: white;
+            border: 1px solid #E5DDD1;
+            border-radius: 8px;
+            transition: all 0.2s;
+        }
+
+        .relationship-item:hover {
+            border-color: #C88F4A;
+            background: #FFF9F0;
+            transform: translateX(2px);
+        }
+
+        .relationship-operator {
+            font-size: 0.7rem;
+            font-weight: 700;
+            padding: 0.25rem 0.5rem;
+            border-radius: 4px;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            white-space: nowrap;
+        }
+
+        .relationship-direction {
+            display: flex;
+            align-items: center;
+            gap: 0.25rem;
+            color: #999;
+            font-size: 0.75rem;
+            min-width: 45px;
+        }
+
+        .relationship-direction i {
+            font-size: 0.875rem;
+        }
+
+        .relationship-target {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            flex: 1;
+            min-width: 0;
+        }
+
+        .relationship-target-icon {
+            font-size: 1rem;
+            color: #8B6F47;
+        }
+
+        .relationship-target-name {
+            font-weight: 500;
+            color: #3D2E1F;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            white-space: nowrap;
+        }
+
+        .relationship-target-type {
+            font-size: 0.7rem;
+            color: #999;
+            text-transform: uppercase;
+            padding: 0.15rem 0.4rem;
+            background: #F5F0E8;
+            border-radius: 3px;
+            margin-left: auto;
+            flex-shrink: 0;
+        }
+
         /* Orbital Connections Visualization */
         .orbital-container {
             position: relative;
@@ -4839,162 +4918,72 @@ John Doe,Engineering,john@example.com"
                 `;
             }
 
-            // Separate relationships into Nesting (DES) and Activities (non-DES)
-            const nestedRelationships = relationships.filter(r =>
-                r.predicate === 'DES' && (r.subject === entityId || r.object === entityId)
-            );
-            const activityRelationships = relationships.filter(r =>
-                r.predicate !== 'DES' && (r.subject === entityId || r.object === entityId)
-            );
-
-            // Get nested entities (DES relationships - hierarchical)
-            const nestedEntities = [];
-            nestedRelationships.forEach(r => {
-                if (r.subject === entityId) {
-                    const conn = findEntity(r.object);
-                    if (conn && !nestedEntities.find(c => c.id === conn.id)) {
-                        nestedEntities.push({ ...conn, direction: 'child' }); // This entity defines/contains the connected one
-                    }
-                } else if (r.object === entityId) {
-                    const conn = findEntity(r.subject);
-                    if (conn && !nestedEntities.find(c => c.id === conn.id)) {
-                        nestedEntities.push({ ...conn, direction: 'parent' }); // The connected entity defines/contains this one
-                    }
-                }
-            });
-
-            // Get activity entities (non-DES relationships)
-            const activityEntities = [];
-            activityRelationships.forEach(r => {
-                if (r.subject === entityId) {
-                    const conn = findEntity(r.object);
-                    if (conn && !activityEntities.find(c => c.id === conn.id)) {
-                        activityEntities.push(conn);
-                    }
-                } else if (r.object === entityId) {
-                    const conn = findEntity(r.subject);
-                    if (conn && !activityEntities.find(c => c.id === conn.id)) {
-                        activityEntities.push(conn);
-                    }
-                }
-            });
-
-            // Render Nested section (DES relationships - hierarchical structure)
+            // Render Relationships section - combining all relationships with clear info
             const nestedEl = document.getElementById('modalNested');
-            if (nestedEntities.length > 0) {
-                // Create header with view toggle
+            const allRelationshipsForEntity = relationships.filter(r =>
+                r.subject === entityId || r.object === entityId
+            );
+
+            if (allRelationshipsForEntity.length > 0) {
                 nestedEl.innerHTML = `
-                    <div class="connections-header">
-                        <div class="modal-section-title" style="margin-bottom: 0;"><i class="ph ph-tree-structure"></i> Nested</div>
-                        <div class="view-toggle">
-                            <button class="view-toggle-btn active" data-view="orbital" onclick="switchNestedView('orbital', '${entityId}', '${entityType}')">
-                                <i class="ph ph-planet"></i>
-                            </button>
-                            <button class="view-toggle-btn" data-view="list" onclick="switchNestedView('list', '${entityId}', '${entityType}')">
-                                <i class="ph ph-list"></i>
-                            </button>
-                        </div>
+                    <div class="modal-section-title"><i class="ph ph-git-branch"></i> Relationships</div>
+                    <div class="relationships-list">
+                        ${allRelationshipsForEntity.map(rel => {
+                            const operator = eoOperators[rel.predicate];
+                            const isSubject = rel.subject === entityId;
+                            const connectedEntityId = isSubject ? rel.object : rel.subject;
+                            const connectedEntity = findEntity(connectedEntityId);
+
+                            if (!connectedEntity) return '';
+
+                            const directionText = isSubject ? 'to' : 'from';
+                            const arrowIcon = isSubject ? 'ph-arrow-right' : 'ph-arrow-left';
+
+                            return `
+                                <div class="relationship-item" onclick="openEntityModal('${connectedEntity.id}', '${connectedEntity.type}')" style="cursor: pointer;">
+                                    <div class="relationship-operator" style="background-color: ${operator?.color || '#999'}20; color: ${operator?.color || '#999'}; border: 1px solid ${operator?.color || '#999'}40;">
+                                        ${operator?.label || rel.predicate}
+                                    </div>
+                                    <div class="relationship-direction">
+                                        <i class="ph ${arrowIcon}"></i>
+                                        <span>${directionText}</span>
+                                    </div>
+                                    <div class="relationship-target">
+                                        <span class="relationship-target-icon">${getIcon(connectedEntity.type)}</span>
+                                        <span class="relationship-target-name">${connectedEntity.name}</span>
+                                        <span class="relationship-target-type">${connectedEntity.type}</span>
+                                    </div>
+                                </div>
+                            `;
+                        }).join('')}
                     </div>
                 `;
-
-                // Container for the view content
-                const viewContainer = document.createElement('div');
-                viewContainer.id = 'nestedViewContainer';
-                nestedEl.appendChild(viewContainer);
-
-                // Default to orbital view
-                const orbitalContainer = document.createElement('div');
-                orbitalContainer.className = 'orbital-container';
-                viewContainer.appendChild(orbitalContainer);
-
-                // Render orbital visualization after container is in DOM
-                setTimeout(() => {
-                    renderOrbitalConnections(orbitalContainer, entity, nestedEntities, 'nested');
-                }, 0);
             } else {
                 nestedEl.innerHTML = `
-                    <div class="modal-section-title"><i class="ph ph-tree-structure"></i> Nested</div>
+                    <div class="modal-section-title"><i class="ph ph-git-branch"></i> Relationships</div>
                     <div class="modal-empty-state">
-                        <i class="ph ph-tree-structure"></i>
-                        <div>No nested items</div>
+                        <i class="ph ph-git-branch"></i>
+                        <div>No relationships yet</div>
                     </div>
                 `;
             }
 
-            // Add nested UI
+            // Hide the nested and activities sections since we combined them into Relationships
             const addNestedEl = document.getElementById('modalAddNested');
-            // Only show add nested for entity types that can have children (units, teams)
-            if (['unit', 'team'].includes(entityType)) {
-                addNestedEl.innerHTML = `
-                    <div class="modal-section-title"><i class="ph ph-plus-circle"></i> Add Nested</div>
-                    <div class="modal-add-connection">
-                        <div class="modal-add-connection-row">
-                            <select id="modalNestedTargetSelect">
-                                <option value="">Nest under this...</option>
-                                ${getAllEntitiesForNesting(entityId, entityType)}
-                            </select>
-                            <button class="modal-add-connection-btn" onclick="addNestedFromModal()">
-                                <i class="ph ph-plus"></i> Add
-                            </button>
-                        </div>
-                    </div>
-                `;
-            } else {
-                addNestedEl.innerHTML = '';
-            }
+            addNestedEl.innerHTML = '';
 
-            // Render Activities section (non-DES relationships)
             const activitiesEl = document.getElementById('modalActivities');
-            if (activityEntities.length > 0) {
-                // Create header with view toggle
-                activitiesEl.innerHTML = `
-                    <div class="connections-header">
-                        <div class="modal-section-title" style="margin-bottom: 0;"><i class="ph ph-arrows-left-right"></i> Activities</div>
-                        <div class="view-toggle">
-                            <button class="view-toggle-btn active" data-view="orbital" onclick="switchActivitiesView('orbital', '${entityId}', '${entityType}')">
-                                <i class="ph ph-planet"></i>
-                            </button>
-                            <button class="view-toggle-btn" data-view="list" onclick="switchActivitiesView('list', '${entityId}', '${entityType}')">
-                                <i class="ph ph-list"></i>
-                            </button>
-                        </div>
-                    </div>
-                `;
+            activitiesEl.innerHTML = '';
 
-                // Container for the view content
-                const viewContainer = document.createElement('div');
-                viewContainer.id = 'activitiesViewContainer';
-                activitiesEl.appendChild(viewContainer);
-
-                // Default to orbital view
-                const orbitalContainer = document.createElement('div');
-                orbitalContainer.className = 'orbital-container';
-                viewContainer.appendChild(orbitalContainer);
-
-                // Render orbital visualization after container is in DOM
-                setTimeout(() => {
-                    renderOrbitalConnections(orbitalContainer, entity, activityEntities, 'activity');
-                }, 0);
-            } else {
-                activitiesEl.innerHTML = `
-                    <div class="modal-section-title"><i class="ph ph-arrows-left-right"></i> Activities</div>
-                    <div class="modal-empty-state">
-                        <i class="ph ph-arrows-left-right"></i>
-                        <div>No activities yet</div>
-                    </div>
-                `;
-            }
-
-            // Add activity UI
+            // Add relationship UI - now includes all operator types
             const addActivityEl = document.getElementById('modalAddActivity');
             addActivityEl.innerHTML = `
-                <div class="modal-section-title"><i class="ph ph-plus-circle"></i> Add Activity</div>
+                <div class="modal-section-title"><i class="ph ph-plus-circle"></i> Add Relationship</div>
                 <div class="modal-add-connection">
                     <div class="modal-add-connection-row">
                         <select id="modalOperatorSelect">
                             <option value="">Type...</option>
                             ${Object.entries(eoOperators)
-                                .filter(([code]) => code !== 'DES') // Exclude DES since that's for nesting
                                 .map(([code, op]) => `<option value="${code}">${op.label}</option>`)
                                 .join('')}
                         </select>
