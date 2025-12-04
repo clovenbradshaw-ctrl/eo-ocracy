@@ -1018,6 +1018,71 @@
             font-size: 1.25rem;
             color: #3D2E1F;
             font-weight: 700;
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+        }
+
+        .card-row-count {
+            font-size: 0.85rem;
+            color: #6B5642;
+            font-weight: 500;
+            background: #F5F0E8;
+            padding: 0.25rem 0.5rem;
+            border-radius: 12px;
+        }
+
+        .grouped-by-label {
+            font-size: 0.85rem;
+            color: #8B7355;
+            font-weight: 400;
+            font-style: italic;
+        }
+
+        /* Entity Group Styles (for grouped view) */
+        .entity-group {
+            margin-bottom: 1.5rem;
+            padding: 1rem;
+            background: #FDFCFA;
+            border-radius: 12px;
+            border: 1px solid #E5DDD1;
+        }
+
+        .entity-group.ungrouped {
+            background: #F8F5F0;
+            border-style: dashed;
+        }
+
+        .entity-group-header {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            margin-bottom: 1rem;
+            padding-bottom: 0.5rem;
+            border-bottom: 1px solid #E5DDD1;
+        }
+
+        .entity-group-icon {
+            font-size: 1.1rem;
+        }
+
+        .entity-group-name {
+            font-size: 1rem;
+            font-weight: 600;
+            color: #3D2E1F;
+        }
+
+        .entity-group-count {
+            font-size: 0.8rem;
+            color: #6B5642;
+            background: #EAE4DA;
+            padding: 0.15rem 0.4rem;
+            border-radius: 10px;
+            margin-left: auto;
+        }
+
+        .grouped-section {
+            margin-bottom: 2.5rem;
         }
 
         .card-grid {
@@ -8009,6 +8074,7 @@ John Doe,Engineering,john@example.com"
             activity: true
         };
         let cardViewHierarchical = true; // Default to hierarchical view
+        let cardViewGroupBy = 'none'; // Group by: 'none', 'unit', 'team', 'role'
 
         function toggleCardViewMode(isHierarchical) {
             cardViewHierarchical = isHierarchical;
@@ -8131,6 +8197,11 @@ John Doe,Engineering,john@example.com"
             renderCardViewContent();
         }
 
+        function handleCardViewGroupBy(event) {
+            cardViewGroupBy = event.target.value;
+            renderCardViewContent();
+        }
+
         function toggleCardViewTypeFilter(type) {
             cardViewTypeFilters[type] = !cardViewTypeFilters[type];
             renderCardView();
@@ -8173,6 +8244,20 @@ John Doe,Engineering,john@example.com"
                 </select>
             `;
             controls.appendChild(sortContainer);
+
+            // Group By dropdown
+            const groupByContainer = document.createElement('div');
+            groupByContainer.className = 'card-sort-container';
+            groupByContainer.innerHTML = `
+                <span class="card-sort-label">Group by:</span>
+                <select class="card-sort-select" onchange="handleCardViewGroupBy(event)">
+                    <option value="none" ${cardViewGroupBy === 'none' ? 'selected' : ''}>None</option>
+                    <option value="unit" ${cardViewGroupBy === 'unit' ? 'selected' : ''}>Unit</option>
+                    <option value="team" ${cardViewGroupBy === 'team' ? 'selected' : ''}>Team</option>
+                    <option value="role" ${cardViewGroupBy === 'role' ? 'selected' : ''}>Role</option>
+                </select>
+            `;
+            controls.appendChild(groupByContainer);
 
             // View mode toggle (flat vs hierarchical)
             const viewModeToggle = document.createElement('div');
@@ -8241,6 +8326,9 @@ John Doe,Engineering,john@example.com"
             if (cardViewHierarchical) {
                 // Hierarchical/nested view
                 hasContent = renderHierarchicalCardView(contentContainer, sidebarFilters);
+            } else if (cardViewGroupBy !== 'none') {
+                // Grouped flat view
+                hasContent = renderGroupedFlatCardView(contentContainer, sidebarFilters);
             } else {
                 // Flat view (original behavior)
                 hasContent = renderFlatCardView(contentContainer, sidebarFilters);
@@ -8302,6 +8390,248 @@ John Doe,Engineering,john@example.com"
             }
 
             // Work Products
+            if (cardViewTypeFilters.object && sidebarFilters.entities.object && entities.object.length > 0) {
+                let filteredObjects = filterEntitiesBySearch(entities.object, cardViewSearchTerm);
+                filteredObjects = sortEntities(filteredObjects, cardViewSortOption);
+                if (filteredObjects.length > 0) {
+                    contentContainer.appendChild(createCardRow('Work Products', filteredObjects, getIcon('object')));
+                    hasContent = true;
+                }
+            }
+
+            // Activities
+            if (cardViewTypeFilters.activity && relationships.length > 0) {
+                const activityRow = createActivityCardRowFiltered();
+                if (activityRow) {
+                    contentContainer.appendChild(activityRow);
+                    hasContent = true;
+                }
+            }
+
+            return hasContent;
+        }
+
+        // Get the parent entity of an entity based on the groupBy type
+        function getParentEntity(entity, groupByType) {
+            // Find DES relationship where entity is the object (child)
+            const desRelationship = relationships.find(r =>
+                r.predicate === 'DES' && r.object === entity.id
+            );
+
+            if (!desRelationship) return null;
+
+            const parentEntity = findEntity(desRelationship.subject);
+            if (!parentEntity) return null;
+
+            // If groupByType matches parent type, return it
+            if (parentEntity.type === groupByType) {
+                return parentEntity;
+            }
+
+            // Otherwise, recursively look up the chain
+            // e.g., if we want to group roles by unit, but role's parent is team,
+            // we need to find team's parent unit
+            if (groupByType === 'unit' && parentEntity.type === 'team') {
+                return getParentEntity(parentEntity, 'unit');
+            }
+
+            // For people, they connect to roles via INS, then roles connect to teams/units via DES
+            return null;
+        }
+
+        // Get parent for person via INS relationship (person fills role)
+        function getPersonParent(person, groupByType) {
+            // Find INS relationship where person is the subject
+            const insRelationship = relationships.find(r =>
+                r.predicate === 'INS' && r.subject === person.id
+            );
+
+            if (!insRelationship) return null;
+
+            const role = findEntity(insRelationship.object);
+            if (!role) return null;
+
+            if (groupByType === 'role') {
+                return role;
+            }
+
+            // Look up the hierarchy from role
+            return getParentEntity(role, groupByType);
+        }
+
+        function renderGroupedFlatCardView(contentContainer, sidebarFilters) {
+            let hasContent = false;
+            const groupByType = cardViewGroupBy;
+
+            // Helper to get parent for any entity
+            function getParentForEntity(entity) {
+                if (entity.type === 'person') {
+                    return getPersonParent(entity, groupByType);
+                }
+                return getParentEntity(entity, groupByType);
+            }
+
+            // Helper to render a grouped section
+            function renderGroupedSection(entityType, typeLabel, icon, allEntities) {
+                if (!allEntities || allEntities.length === 0) return false;
+
+                let filteredEntities = filterEntitiesBySearch(allEntities, cardViewSearchTerm);
+                filteredEntities = sortEntities(filteredEntities, cardViewSortOption);
+
+                if (filteredEntities.length === 0) return false;
+
+                // Group entities by their parent
+                const groups = new Map();
+                const ungrouped = [];
+
+                filteredEntities.forEach(entity => {
+                    const parent = getParentForEntity(entity);
+                    if (parent) {
+                        if (!groups.has(parent.id)) {
+                            groups.set(parent.id, { parent, entities: [] });
+                        }
+                        groups.get(parent.id).entities.push(entity);
+                    } else {
+                        ungrouped.push(entity);
+                    }
+                });
+
+                // Get groupBy type label and icon
+                const groupByLabel = groupByType === 'unit' ? 'Unit' :
+                                     groupByType === 'team' ? 'Team' : 'Role';
+                const groupByIcon = getIcon(groupByType);
+
+                // Create section for this entity type
+                const section = document.createElement('div');
+                section.className = 'card-row grouped-section';
+
+                const header = document.createElement('div');
+                header.className = 'card-row-header';
+                header.innerHTML = `
+                    <div class="card-row-title">
+                        ${icon} ${typeLabel}
+                        <span class="card-row-count">${filteredEntities.length}</span>
+                        <span class="grouped-by-label">grouped by ${groupByLabel}</span>
+                    </div>
+                `;
+                section.appendChild(header);
+
+                // Sort groups by parent name
+                const sortedGroups = Array.from(groups.values())
+                    .sort((a, b) => a.parent.name.localeCompare(b.parent.name));
+
+                // Render each group
+                sortedGroups.forEach(group => {
+                    const groupContainer = document.createElement('div');
+                    groupContainer.className = 'entity-group';
+
+                    const groupHeader = document.createElement('div');
+                    groupHeader.className = 'entity-group-header';
+                    groupHeader.innerHTML = `
+                        <span class="entity-group-icon">${groupByIcon}</span>
+                        <span class="entity-group-name">${group.parent.name}</span>
+                        <span class="entity-group-count">${group.entities.length}</span>
+                    `;
+                    groupContainer.appendChild(groupHeader);
+
+                    const grid = document.createElement('div');
+                    grid.className = 'card-grid';
+                    group.entities.forEach(entity => {
+                        grid.appendChild(createSimpleEntityCard(entity));
+                    });
+                    groupContainer.appendChild(grid);
+
+                    section.appendChild(groupContainer);
+                });
+
+                // Render ungrouped entities
+                if (ungrouped.length > 0) {
+                    const ungroupedContainer = document.createElement('div');
+                    ungroupedContainer.className = 'entity-group ungrouped';
+
+                    const ungroupedHeader = document.createElement('div');
+                    ungroupedHeader.className = 'entity-group-header';
+                    ungroupedHeader.innerHTML = `
+                        <span class="entity-group-icon">○</span>
+                        <span class="entity-group-name">No ${groupByLabel}</span>
+                        <span class="entity-group-count">${ungrouped.length}</span>
+                    `;
+                    ungroupedContainer.appendChild(ungroupedHeader);
+
+                    const grid = document.createElement('div');
+                    grid.className = 'card-grid';
+                    ungrouped.forEach(entity => {
+                        grid.appendChild(createSimpleEntityCard(entity));
+                    });
+                    ungroupedContainer.appendChild(grid);
+
+                    section.appendChild(ungroupedContainer);
+                }
+
+                contentContainer.appendChild(section);
+                return true;
+            }
+
+            // Can't group units (they're top-level) - render normally
+            if (cardViewTypeFilters.unit && sidebarFilters.entities.unit && entities.unit.length > 0) {
+                let filteredUnits = filterEntitiesBySearch(entities.unit, cardViewSearchTerm);
+                filteredUnits = sortEntities(filteredUnits, cardViewSortOption);
+                if (filteredUnits.length > 0) {
+                    contentContainer.appendChild(createCardRow('Units', filteredUnits, getIcon('unit')));
+                    hasContent = true;
+                }
+            }
+
+            // Teams - can be grouped by unit
+            if (cardViewTypeFilters.team && sidebarFilters.entities.team && entities.team.length > 0) {
+                if (groupByType === 'unit') {
+                    if (renderGroupedSection('team', 'Teams', getIcon('team'), entities.team)) {
+                        hasContent = true;
+                    }
+                } else {
+                    let filteredTeams = filterEntitiesBySearch(entities.team, cardViewSearchTerm);
+                    filteredTeams = sortEntities(filteredTeams, cardViewSortOption);
+                    if (filteredTeams.length > 0) {
+                        contentContainer.appendChild(createCardRow('Teams', filteredTeams, getIcon('team')));
+                        hasContent = true;
+                    }
+                }
+            }
+
+            // Roles - can be grouped by unit or team
+            if (cardViewTypeFilters.role && sidebarFilters.entities.role && entities.role.length > 0) {
+                if (groupByType === 'unit' || groupByType === 'team') {
+                    if (renderGroupedSection('role', 'Roles', getIcon('role'), entities.role)) {
+                        hasContent = true;
+                    }
+                } else {
+                    let filteredRoles = filterEntitiesBySearch(entities.role, cardViewSearchTerm);
+                    filteredRoles = sortEntities(filteredRoles, cardViewSortOption);
+                    if (filteredRoles.length > 0) {
+                        contentContainer.appendChild(createCardRow('Roles', filteredRoles, getIcon('role')));
+                        hasContent = true;
+                    }
+                }
+            }
+
+            // People - can be grouped by unit, team, or role
+            if (cardViewTypeFilters.person && sidebarFilters.entities.person && entities.person.length > 0) {
+                if (groupByType === 'unit' || groupByType === 'team' || groupByType === 'role') {
+                    if (renderGroupedSection('person', 'People', getIcon('person'), entities.person)) {
+                        hasContent = true;
+                    }
+                } else {
+                    let filteredPeople = filterEntitiesBySearch(entities.person, cardViewSearchTerm);
+                    filteredPeople = sortEntities(filteredPeople, cardViewSortOption);
+                    if (filteredPeople.length > 0) {
+                        contentContainer.appendChild(createCardRow('People', filteredPeople, getIcon('person')));
+                        hasContent = true;
+                    }
+                }
+            }
+
+            // Work Products - can potentially be grouped (via CON relationships)
+            // For now, render normally
             if (cardViewTypeFilters.object && sidebarFilters.entities.object && entities.object.length > 0) {
                 let filteredObjects = filterEntitiesBySearch(entities.object, cardViewSearchTerm);
                 filteredObjects = sortEntities(filteredObjects, cardViewSortOption);
