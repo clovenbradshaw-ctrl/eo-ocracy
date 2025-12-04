@@ -1301,6 +1301,22 @@
             border-color: #E5DDD1;
         }
 
+        /* Nested unit cards within parent units */
+        .hierarchy-card-container.nested-unit-card {
+            background: linear-gradient(135deg, #FDF8F2 0%, #FFFBF7 100%);
+            border-color: #C9A77A;
+            margin-bottom: 0;
+            padding: 1rem;
+        }
+
+        .hierarchy-card-container.nested-unit-card .hierarchy-card-header {
+            margin-bottom: 0.5rem;
+        }
+
+        .hierarchy-card-container.nested-unit-card .hierarchy-card-title {
+            font-size: 1rem;
+        }
+
         .hierarchy-card-header {
             display: flex;
             align-items: center;
@@ -8402,13 +8418,15 @@ John Doe,Engineering,john@example.com"
                     .filter(e => e !== null && e.type === 'person');
             }
 
-            // Build tree structure for units (top level)
-            const hierarchyTree = entities.unit.map(unit => {
+            // Recursively build unit node with nested units, teams, and roles
+            function buildUnitNode(unit) {
                 const directTeams = getChildren(unit.id).filter(e => e.type === 'team');
                 const directRoles = getChildren(unit.id).filter(e => e.type === 'role');
+                const childUnits = getChildren(unit.id).filter(e => e.type === 'unit');
 
                 return {
                     entity: unit,
+                    units: childUnits.map(childUnit => buildUnitNode(childUnit)),
                     teams: directTeams.map(team => {
                         const teamRoles = getChildren(team.id).filter(e => e.type === 'role');
                         return {
@@ -8424,7 +8442,17 @@ John Doe,Engineering,john@example.com"
                         people: getPeopleInRole(role.id)
                     }))
                 };
+            }
+
+            // Find top-level units (units that don't have a parent unit)
+            const topLevelUnits = entities.unit.filter(unit => {
+                return !desRelationships.some(r =>
+                    r.object === unit.id && entities.unit.some(u => u.id === r.subject)
+                );
             });
+
+            // Build tree structure starting from top-level units only
+            const hierarchyTree = topLevelUnits.map(unit => buildUnitNode(unit));
 
             // Find orphan entities (no DES parent)
             const orphanTeams = entities.team.filter(t => !entitiesWithParents.has(t.id));
@@ -8964,6 +8992,13 @@ John Doe,Engineering,john@example.com"
 
             // Helper to check if any child entities pass the search
             function hasMatchingDescendants(unitNode) {
+                // Check nested units (recursive)
+                if (unitNode.units) {
+                    for (const childUnitNode of unitNode.units) {
+                        if (passesSearch(childUnitNode.entity)) return true;
+                        if (hasMatchingDescendants(childUnitNode)) return true;
+                    }
+                }
                 // Check teams
                 for (const teamNode of unitNode.teams) {
                     if (passesSearch(teamNode.entity)) return true;
@@ -9097,6 +9132,7 @@ John Doe,Engineering,john@example.com"
 
         function createHierarchyUnitCard(unitNode, sidebarFilters) {
             const unit = unitNode.entity;
+            const showUnits = cardViewTypeFilters.unit && sidebarFilters.entities.unit;
             const showTeams = cardViewTypeFilters.team && sidebarFilters.entities.team;
             const showRoles = cardViewTypeFilters.role && sidebarFilters.entities.role;
             const showPeople = cardViewTypeFilters.person && sidebarFilters.entities.person;
@@ -9138,6 +9174,27 @@ John Doe,Engineering,john@example.com"
             }
 
             card.innerHTML = headerHTML + descHTML + activitiesHTML;
+
+            // Nested units section (sub-units within this unit)
+            if (showUnits && unitNode.units && unitNode.units.length > 0) {
+                const unitsSection = document.createElement('div');
+                unitsSection.className = 'nested-cards-section';
+                unitsSection.innerHTML = `<div class="nested-cards-label">${getIcon('unit')} Sub-Units (${unitNode.units.length})</div>`;
+
+                const unitsGrid = document.createElement('div');
+                unitsGrid.className = 'nested-cards-grid';
+
+                unitNode.units.forEach(childUnitNode => {
+                    const childUnitCard = createHierarchyUnitCard(childUnitNode, sidebarFilters);
+                    if (childUnitCard) {
+                        childUnitCard.classList.add('nested-unit-card');
+                        unitsGrid.appendChild(childUnitCard);
+                    }
+                });
+
+                unitsSection.appendChild(unitsGrid);
+                card.appendChild(unitsSection);
+            }
 
             // Nested teams section
             if (showTeams && unitNode.teams.length > 0) {
@@ -9547,8 +9604,9 @@ John Doe,Engineering,john@example.com"
         }
 
         function handleTreeDrop(draggedData, targetEntity) {
-            // Validate drop - can only drop team onto unit, or role onto team/unit
+            // Validate drop - can drop unit onto unit, team onto unit, or role onto team/unit
             const validDrops = {
+                'unit': ['unit'],           // units can be dropped on units (nesting)
                 'team': ['unit'],           // teams can be dropped on units
                 'role': ['unit', 'team']    // roles can be dropped on units or teams
             };
@@ -9562,6 +9620,22 @@ John Doe,Engineering,john@example.com"
             // Don't drop on self
             if (draggedData.id === targetEntity.id) {
                 return;
+            }
+
+            // Prevent circular references when nesting units
+            if (draggedData.type === 'unit' && targetEntity.type === 'unit') {
+                // Check if target is a descendant of dragged unit
+                function isDescendant(parentId, childId) {
+                    const children = relationships
+                        .filter(r => r.predicate === 'DES' && r.subject === parentId)
+                        .map(r => r.object);
+                    if (children.includes(childId)) return true;
+                    return children.some(cId => isDescendant(cId, childId));
+                }
+                if (isDescendant(draggedData.id, targetEntity.id)) {
+                    showNotification(`Cannot nest ${draggedData.name} inside its own child unit`, 'error');
+                    return;
+                }
             }
 
             // Check if already connected to target
