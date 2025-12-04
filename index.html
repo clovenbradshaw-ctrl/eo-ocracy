@@ -1164,9 +1164,9 @@
             <div class="modal-body">
                 <div class="modal-section" id="modalConnections"></div>
                 <div class="modal-section" id="modalActivities"></div>
-                <div style="display: flex; justify-content: flex-end; gap: 1rem; margin-top: 2rem;">
+                <div id="modalFooterButtons" style="display: flex; justify-content: flex-end; gap: 1rem; margin-top: 2rem;">
                     <button class="btn btn-secondary" onclick="closeEntityModal()">Close</button>
-                    <button class="btn" onclick="editEntityFromModal()">Edit</button>
+                    <button id="modalEditButton" class="btn" onclick="editEntityFromModal()">Edit</button>
                 </div>
             </div>
         </div>
@@ -1183,7 +1183,11 @@
         };
 
         let relationships = [];
-        
+
+        // Modal state - stores current entity being viewed
+        let currentModalEntity = null;
+        let currentModalEntityType = null;
+
         // EO Operators - Emergence Operators for activity modeling
         // Internal codes used for data store, friendly labels for UI
         // 
@@ -1331,8 +1335,15 @@
             const entity = entities[entityType]?.find(e => e.id === entityId);
             if (!entity) return;
 
+            // Store entity data for edit function
+            currentModalEntity = entity;
+            currentModalEntityType = entityType;
+
             document.getElementById('modalEntityName').textContent = entity.name;
             document.getElementById('modalEntityType').textContent = entityType.toUpperCase();
+
+            // Show edit button for entities
+            document.getElementById('modalEditButton').style.display = 'inline-block';
 
             // Get connected entities  
             const connections = [];
@@ -1405,25 +1416,20 @@
         }
 
         function editEntityFromModal() {
-            const nameEl = document.getElementById('modalEntityName');
-            const typeEl = document.getElementById('modalEntityType');
-            
-            if (!nameEl || !typeEl) return;
-            
-            const currentName = nameEl.textContent;
-            const entityType = typeEl.textContent.toLowerCase();
-            
-            // Find the entity
-            const entity = entities[entityType]?.find(e => e.name === currentName);
-            if (!entity) return;
-            
+            // Use stored entity data instead of looking up by name
+            if (!currentModalEntity || !currentModalEntityType) return;
+
+            const entity = currentModalEntity;
+            const entityType = currentModalEntityType;
+            const currentName = entity.name;
+
             // Prompt for new name
             const newName = prompt('Enter new name:', entity.name);
             if (!newName || newName.trim() === '' || newName === entity.name) return;
-            
+
             // Update entity
             entity.name = newName.trim();
-            
+
             // Log to Xano
             logActivityToXano({
                 event_verb: 'Shift Entity',
@@ -1437,14 +1443,14 @@
                     entity_type: entityType
                 }
             });
-            
+
             // Close modal and refresh
             closeEntityModal();
             saveToLocalStorage();
             renderEntityList();
             updateSelects();
             renderActivityList();
-            
+
             if (currentView === 'graph') {
                 updateGraph();
             } else if (currentView === 'tree') {
@@ -1458,6 +1464,13 @@
             // Get the actual relationship object from the data
             const rel = relationships.find(r => r.id === relationshipData.id);
             if (!rel) return;
+
+            // Clear entity data - this is a relationship, not an entity
+            currentModalEntity = null;
+            currentModalEntityType = null;
+
+            // Hide edit button for relationships
+            document.getElementById('modalEditButton').style.display = 'none';
 
             const subject = findEntity(rel.subject);
             const object = findEntity(rel.object);
