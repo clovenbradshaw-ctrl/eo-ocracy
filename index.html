@@ -3622,6 +3622,66 @@
             padding: 0 4px;
         }
 
+        /* Nested hierarchy styles */
+        .nested-hierarchy {
+            flex-direction: column;
+            align-items: flex-start;
+        }
+
+        .nested-unit-item {
+            display: flex;
+            flex-direction: column;
+            gap: 0.25rem;
+            padding: 0.125rem 0;
+            position: relative;
+        }
+
+        .nested-unit-item::before {
+            content: '';
+            position: absolute;
+            left: -0.75rem;
+            top: 0;
+            bottom: 0;
+            width: 1px;
+            background: #E5DDD1;
+        }
+
+        .nested-unit-item:first-child::before {
+            top: 50%;
+        }
+
+        .nested-unit-item:last-child::before {
+            bottom: 50%;
+        }
+
+        .nested-unit-item:only-child::before {
+            display: none;
+        }
+
+        .nested-children {
+            display: flex;
+            flex-direction: column;
+            gap: 0.125rem;
+            margin-top: 0.25rem;
+            padding-left: 0.5rem;
+            border-left: 1px solid #E5DDD1;
+        }
+
+        .connection-badge.unit-badge {
+            border-color: #C88F4A;
+            background: rgba(200, 143, 74, 0.08);
+        }
+
+        .connection-badge.team-badge {
+            border-color: #8B6F47;
+            background: rgba(139, 111, 71, 0.08);
+        }
+
+        .connection-badge.role-badge {
+            border-color: #6B5642;
+            background: rgba(107, 86, 66, 0.08);
+        }
+
         /* View toggle for connections */
         .connections-header {
             display: flex;
@@ -7490,6 +7550,99 @@ John Doe,Engineering,john@example.com"
             }
         }
 
+        // Helper function to get nested children of an entity (DES relationships)
+        function getNestedChildren(parentId) {
+            return relationships
+                .filter(r => r.predicate === 'DES' && r.subject === parentId)
+                .map(r => findEntity(r.object))
+                .filter(e => e !== null);
+        }
+
+        // Render a unit with its nested children recursively
+        function renderNestedUnitItem(unit, centerEntityId, depth = 0) {
+            const itemWrapper = document.createElement('div');
+            itemWrapper.className = 'nested-unit-item';
+            itemWrapper.style.marginLeft = depth > 0 ? `${depth * 1.25}rem` : '0';
+
+            // Main badge for the unit
+            const badge = document.createElement('div');
+            badge.className = 'connection-badge unit-badge';
+            badge.innerHTML = `${getIcon(unit.type)} ${unit.name}`;
+            badge.onclick = () => openEntityModal(unit.id, unit.type);
+            itemWrapper.appendChild(badge);
+
+            // Get nested children of this unit
+            const children = getNestedChildren(unit.id);
+
+            if (children.length > 0) {
+                const childrenContainer = document.createElement('div');
+                childrenContainer.className = 'nested-children';
+
+                // Group children by type
+                const childUnits = children.filter(c => c.type === 'unit');
+                const childTeams = children.filter(c => c.type === 'team');
+                const childRoles = children.filter(c => c.type === 'role');
+
+                // Render child units recursively
+                childUnits.forEach(childUnit => {
+                    childrenContainer.appendChild(renderNestedUnitItem(childUnit, centerEntityId, depth + 1));
+                });
+
+                // Render child teams
+                childTeams.forEach(team => {
+                    const teamItem = document.createElement('div');
+                    teamItem.className = 'nested-unit-item';
+                    teamItem.style.marginLeft = `${(depth + 1) * 1.25}rem`;
+
+                    const teamBadge = document.createElement('div');
+                    teamBadge.className = 'connection-badge team-badge';
+                    teamBadge.innerHTML = `${getIcon(team.type)} ${team.name}`;
+                    teamBadge.onclick = () => openEntityModal(team.id, team.type);
+                    teamItem.appendChild(teamBadge);
+
+                    // Get roles under the team
+                    const teamRoles = getNestedChildren(team.id).filter(c => c.type === 'role');
+                    if (teamRoles.length > 0) {
+                        const teamRolesContainer = document.createElement('div');
+                        teamRolesContainer.className = 'nested-children';
+                        teamRoles.forEach(role => {
+                            const roleItem = document.createElement('div');
+                            roleItem.className = 'nested-unit-item';
+                            roleItem.style.marginLeft = `${(depth + 2) * 1.25}rem`;
+
+                            const roleBadge = document.createElement('div');
+                            roleBadge.className = 'connection-badge role-badge';
+                            roleBadge.innerHTML = `${getIcon(role.type)} ${role.name}`;
+                            roleBadge.onclick = () => openEntityModal(role.id, role.type);
+                            roleItem.appendChild(roleBadge);
+                            teamRolesContainer.appendChild(roleItem);
+                        });
+                        teamItem.appendChild(teamRolesContainer);
+                    }
+
+                    childrenContainer.appendChild(teamItem);
+                });
+
+                // Render direct child roles (not under a team)
+                childRoles.forEach(role => {
+                    const roleItem = document.createElement('div');
+                    roleItem.className = 'nested-unit-item';
+                    roleItem.style.marginLeft = `${(depth + 1) * 1.25}rem`;
+
+                    const roleBadge = document.createElement('div');
+                    roleBadge.className = 'connection-badge role-badge';
+                    roleBadge.innerHTML = `${getIcon(role.type)} ${role.name}`;
+                    roleBadge.onclick = () => openEntityModal(role.id, role.type);
+                    roleItem.appendChild(roleBadge);
+                    childrenContainer.appendChild(roleItem);
+                });
+
+                itemWrapper.appendChild(childrenContainer);
+            }
+
+            return itemWrapper;
+        }
+
         // Render grouped connections (fallback for many items)
         function renderGroupedConnections(container, connections, centerEntityId) {
             const typeLabels = {
@@ -7523,28 +7676,22 @@ John Doe,Engineering,john@example.com"
                     const items = document.createElement('div');
                     items.className = 'connection-group-items';
 
-                    grouped[type].forEach(conn => {
-                        // Check for nested connections
-                        const nestedCount = relationships.filter(r =>
-                            (r.subject === conn.id || r.object === conn.id) &&
-                            r.subject !== centerEntityId && r.object !== centerEntityId
-                        ).length;
-
-                        const badge = document.createElement('div');
-                        badge.className = 'connection-badge' + (nestedCount > 0 ? ' has-nested' : '');
-                        badge.style.position = 'relative';
-                        badge.innerHTML = `${getIcon(conn.type)} ${conn.name}`;
-
-                        if (nestedCount > 0) {
-                            const countEl = document.createElement('span');
-                            countEl.className = 'nested-count';
-                            countEl.textContent = nestedCount;
-                            badge.appendChild(countEl);
-                        }
-
-                        badge.onclick = () => openEntityModal(conn.id, conn.type);
-                        items.appendChild(badge);
-                    });
+                    // For units, render hierarchically with nested children
+                    if (type === 'unit') {
+                        items.className = 'connection-group-items nested-hierarchy';
+                        grouped[type].forEach(conn => {
+                            items.appendChild(renderNestedUnitItem(conn, centerEntityId, 0));
+                        });
+                    } else {
+                        // For other types, render as flat badges
+                        grouped[type].forEach(conn => {
+                            const badge = document.createElement('div');
+                            badge.className = 'connection-badge';
+                            badge.innerHTML = `${getIcon(conn.type)} ${conn.name}`;
+                            badge.onclick = () => openEntityModal(conn.id, conn.type);
+                            items.appendChild(badge);
+                        });
+                    }
 
                     group.appendChild(items);
                     wrapper.appendChild(group);
