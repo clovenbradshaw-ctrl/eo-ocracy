@@ -1611,17 +1611,22 @@
         // Xano Activity Store Integration
         async function logActivityToXano(activity) {
             try {
+                // New schema: app_id, data (json), entity_id, event_type
                 const payload = {
                     app_id: APP_ID,
-                    event_verb: activity.event_verb,
-                    eo_operator: activity.eo_operator, // Store the EO code (NUL, DES, INS, etc)
-                    agent_type: 'user',
-                    agent_id: 'user_' + Date.now(), // Replace with actual user ID
-                    agent_name: 'User', // Replace with actual user name
-                    object_type: activity.object_type,
-                    object_id: activity.object_id,
-                    object_label: activity.object_label,
-                    data_json: activity.data_json || {}
+                    entity_id: activity.object_id || '',
+                    event_type: activity.eo_operator || activity.event_verb || 'unknown',
+                    data: {
+                        event_verb: activity.event_verb,
+                        eo_operator: activity.eo_operator,
+                        agent_type: 'user',
+                        agent_id: 'user_' + Date.now(),
+                        agent_name: 'User',
+                        object_type: activity.object_type,
+                        object_id: activity.object_id,
+                        object_label: activity.object_label,
+                        ...(activity.data_json || {})
+                    }
                 };
 
                 console.log('📝 Logging activity to Xano:', payload);
@@ -1651,15 +1656,29 @@
         async function getActivitiesFromXano() {
             try {
                 const response = await fetch(`${XANO_BASE_URL}/activity_store`);
-                
+
                 if (!response.ok) {
                     console.error('Failed to fetch activities:', response.statusText);
                     return [];
                 }
 
                 const activities = await response.json();
-                // Filter by app_id since we might get all activities
-                return activities.filter(a => a.app_id === APP_ID);
+                console.log('📥 Fetched activities from Xano:', activities);
+
+                // Filter by app_id and transform to include nested data
+                return activities
+                    .filter(a => a.app_id === APP_ID)
+                    .map(a => ({
+                        id: a.id,
+                        created_at: a.created_at,
+                        app_id: a.app_id,
+                        entity_id: a.entity_id,
+                        event_type: a.event_type,
+                        // Flatten data fields for easier access
+                        ...a.data,
+                        // Keep original data object for reference
+                        _raw: a
+                    }));
             } catch (error) {
                 console.error('Error fetching activities from Xano:', error);
                 return [];
@@ -1668,12 +1687,44 @@
 
         async function updateActivityInXano(activityId, updates) {
             try {
+                // Build payload conforming to new schema: app_id, data (json), entity_id, event_type
+                const payload = {};
+
+                // Only include fields that are being updated
+                if (updates.app_id !== undefined) payload.app_id = updates.app_id;
+                if (updates.entity_id !== undefined) payload.entity_id = updates.entity_id;
+                if (updates.event_type !== undefined) payload.event_type = updates.event_type;
+
+                // If updates contain data-level fields, wrap them in data object
+                if (updates.data !== undefined) {
+                    payload.data = updates.data;
+                } else {
+                    // Check for individual data fields and merge them
+                    const dataFields = ['event_verb', 'eo_operator', 'agent_type', 'agent_id',
+                                       'agent_name', 'object_type', 'object_id', 'object_label'];
+                    const dataUpdates = {};
+                    let hasDataUpdates = false;
+
+                    dataFields.forEach(field => {
+                        if (updates[field] !== undefined) {
+                            dataUpdates[field] = updates[field];
+                            hasDataUpdates = true;
+                        }
+                    });
+
+                    if (hasDataUpdates) {
+                        payload.data = dataUpdates;
+                    }
+                }
+
+                console.log('📝 Updating activity in Xano:', activityId, payload);
+
                 const response = await fetch(`${XANO_BASE_URL}/activity_store/${activityId}`, {
                     method: 'PUT',
                     headers: {
                         'Content-Type': 'application/json'
                     },
-                    body: JSON.stringify(updates)
+                    body: JSON.stringify(payload)
                 });
 
                 if (!response.ok) {
@@ -1681,7 +1732,9 @@
                     return null;
                 }
 
-                return await response.json();
+                const result = await response.json();
+                console.log('✅ Activity updated:', result);
+                return result;
             } catch (error) {
                 console.error('Error updating activity in Xano:', error);
                 return null;
