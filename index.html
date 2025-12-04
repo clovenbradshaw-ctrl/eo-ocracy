@@ -3722,6 +3722,236 @@
             box-shadow: 0 1px 3px rgba(0,0,0,0.1);
         }
 
+        /* Embedded Unit Cards */
+        .embedded-units-container {
+            display: flex;
+            flex-direction: column;
+            gap: 0.75rem;
+        }
+
+        .embedded-unit-card {
+            background: linear-gradient(135deg, #FFF9F0 0%, #FFFBF7 100%);
+            border: 1px solid #E5DDD1;
+            border-radius: 10px;
+            padding: 1rem;
+            transition: all 0.2s ease;
+            cursor: pointer;
+        }
+
+        .embedded-unit-card:hover {
+            border-color: #C88F4A;
+            box-shadow: 0 2px 8px rgba(200, 143, 74, 0.15);
+        }
+
+        .embedded-unit-card.expanded {
+            border-color: #C88F4A;
+            box-shadow: 0 4px 12px rgba(200, 143, 74, 0.2);
+        }
+
+        .embedded-unit-header {
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+        }
+
+        .embedded-unit-icon {
+            width: 36px;
+            height: 36px;
+            border-radius: 8px;
+            background: #FFF5E6;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: #C88F4A;
+            font-size: 1.1rem;
+            flex-shrink: 0;
+        }
+
+        .embedded-unit-info {
+            flex: 1;
+            min-width: 0;
+        }
+
+        .embedded-unit-name {
+            font-weight: 600;
+            font-size: 0.95rem;
+            color: #3D2E1F;
+            margin-bottom: 0.15rem;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .embedded-unit-type {
+            font-size: 0.75rem;
+            color: #8B6F47;
+            text-transform: capitalize;
+        }
+
+        .embedded-unit-actions {
+            display: flex;
+            gap: 0.375rem;
+            flex-shrink: 0;
+        }
+
+        .embedded-unit-btn {
+            width: 28px;
+            height: 28px;
+            border: none;
+            background: rgba(200, 143, 74, 0.1);
+            color: #8B6F47;
+            border-radius: 6px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.2s;
+        }
+
+        .embedded-unit-btn:hover {
+            background: #C88F4A;
+            color: white;
+        }
+
+        .embedded-unit-content {
+            display: none;
+            margin-top: 0.75rem;
+            padding-top: 0.75rem;
+            border-top: 1px solid #E5DDD1;
+        }
+
+        .embedded-unit-card.expanded .embedded-unit-content {
+            display: block;
+        }
+
+        .embedded-unit-description {
+            font-size: 0.875rem;
+            color: #5C4D3A;
+            line-height: 1.5;
+            margin-bottom: 0.75rem;
+        }
+
+        .embedded-unit-meta {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 0.5rem;
+        }
+
+        .embedded-unit-stat {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.375rem;
+            padding: 0.35rem 0.65rem;
+            background: white;
+            border: 1px solid #E5DDD1;
+            border-radius: 16px;
+            font-size: 0.75rem;
+            color: #6B5642;
+        }
+
+        .embedded-unit-stat i {
+            color: #8B6F47;
+            font-size: 0.8rem;
+        }
+
+        .embedded-unit-nested-preview {
+            margin-top: 0.75rem;
+        }
+
+        .embedded-nested-label {
+            font-size: 0.75rem;
+            color: #8B6F47;
+            margin-bottom: 0.375rem;
+            display: flex;
+            align-items: center;
+            gap: 0.375rem;
+        }
+
+        .embedded-nested-chips {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 0.375rem;
+        }
+
+        .embedded-nested-chip {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.35rem;
+            padding: 0.3rem 0.6rem;
+            background: white;
+            border: 1px solid #E5DDD1;
+            border-radius: 14px;
+            font-size: 0.75rem;
+            color: #5C4D3A;
+            cursor: pointer;
+            transition: all 0.15s;
+        }
+
+        .embedded-nested-chip:hover {
+            border-color: #C88F4A;
+            background: #FFF9F0;
+        }
+
+        .embedded-nested-chip i {
+            font-size: 0.7rem;
+            color: #8B6F47;
+        }
+
+        .embedded-nested-more {
+            color: #8B6F47;
+            font-style: italic;
+        }
+
+        /* Entity type colors for embedded cards */
+        .embedded-unit-card.team {
+            background: linear-gradient(135deg, #FAF7F5 0%, #FEFEFE 100%);
+        }
+        .embedded-unit-card.team .embedded-unit-icon {
+            background: #F0EDE8;
+            color: #7A6B5A;
+        }
+
+        .embedded-unit-card.role {
+            background: linear-gradient(135deg, #F8F6F3 0%, #FEFEFE 100%);
+        }
+        .embedded-unit-card.role .embedded-unit-icon {
+            background: #EDEAE5;
+            color: #6B5F4F;
+        }
+
+        .embedded-unit-card.person {
+            background: linear-gradient(135deg, #F5F3F0 0%, #FEFEFE 100%);
+        }
+        .embedded-unit-card.person .embedded-unit-icon {
+            background: #EAE7E2;
+            color: #5C5248;
+        }
+
+        .embedded-unit-card.object {
+            background: linear-gradient(135deg, #FFFBF5 0%, #FEFEFE 100%);
+        }
+        .embedded-unit-card.object .embedded-unit-icon {
+            background: #FFF5E6;
+            color: #B8860B;
+        }
+
+        /* Mobile adjustments for embedded cards */
+        @media (max-width: 768px) {
+            .embedded-unit-card {
+                padding: 0.875rem;
+            }
+
+            .embedded-unit-icon {
+                width: 32px;
+                height: 32px;
+                font-size: 1rem;
+            }
+
+            .embedded-unit-name {
+                font-size: 0.9rem;
+            }
+        }
+
         .activity-item {
             display: flex;
             align-items: center;
@@ -7059,10 +7289,13 @@ John Doe,Engineering,john@example.com"
                         <div style="display: flex; gap: 0.5rem; align-items: center;">
                             ${canHaveNested ? `<button class="section-add-btn" onclick="toggleInlineNestedForm()" title="Add nested"><i class="ph ph-plus"></i></button>` : ''}
                             <div class="view-toggle">
-                                <button class="view-toggle-btn" data-view="orbital" onclick="switchNestedView('orbital', '${entityId}', '${entityType}')">
+                                <button class="view-toggle-btn" data-view="orbital" onclick="switchNestedView('orbital', '${entityId}', '${entityType}')" title="Orbital view">
                                     <i class="ph ph-planet"></i>
                                 </button>
-                                <button class="view-toggle-btn active" data-view="list" onclick="switchNestedView('list', '${entityId}', '${entityType}')">
+                                <button class="view-toggle-btn" data-view="embedded" onclick="switchNestedView('embedded', '${entityId}', '${entityType}')" title="Embedded cards">
+                                    <i class="ph ph-stack"></i>
+                                </button>
+                                <button class="view-toggle-btn active" data-view="list" onclick="switchNestedView('list', '${entityId}', '${entityType}')" title="List view">
                                     <i class="ph ph-list"></i>
                                 </button>
                             </div>
@@ -7718,8 +7951,103 @@ John Doe,Engineering,john@example.com"
                 setTimeout(() => {
                     renderOrbitalConnections(orbitalContainer, entity, nestedEntities, 'nested');
                 }, 0);
+            } else if (view === 'embedded') {
+                renderEmbeddedUnits(viewContainer, nestedEntities, entityId);
             } else {
                 renderGroupedConnections(viewContainer, nestedEntities, entityId);
+            }
+        }
+
+        // Render embedded unit cards with expandable details
+        function renderEmbeddedUnits(container, connections, parentEntityId) {
+            const wrapper = document.createElement('div');
+            wrapper.className = 'embedded-units-container';
+
+            connections.forEach(conn => {
+                // Get nested entities for this connection
+                const nestedRels = relationships.filter(r =>
+                    r.predicate === 'DES' && r.subject === conn.id
+                );
+                const nestedChildren = nestedRels.map(r => findEntity(r.object)).filter(Boolean);
+
+                // Count all relationships for this entity
+                const allRels = relationships.filter(r =>
+                    r.subject === conn.id || r.object === conn.id
+                );
+
+                const card = document.createElement('div');
+                card.className = `embedded-unit-card ${conn.type}`;
+                card.dataset.entityId = conn.id;
+
+                // Build nested preview chips (show up to 3)
+                const previewChips = nestedChildren.slice(0, 3).map(child =>
+                    `<span class="embedded-nested-chip" onclick="event.stopPropagation(); openEntityModal('${child.id}', '${child.type}')">
+                        <i class="ph ${getEntityIcon(child.type)}"></i>
+                        ${child.name}
+                    </span>`
+                ).join('');
+
+                const moreCount = nestedChildren.length - 3;
+                const moreChip = moreCount > 0 ? `<span class="embedded-nested-chip embedded-nested-more">+${moreCount} more</span>` : '';
+
+                card.innerHTML = `
+                    <div class="embedded-unit-header">
+                        <div class="embedded-unit-icon">
+                            <i class="ph ${getEntityIcon(conn.type)}"></i>
+                        </div>
+                        <div class="embedded-unit-info">
+                            <div class="embedded-unit-name">${conn.name}</div>
+                            <div class="embedded-unit-type">${conn.type}</div>
+                        </div>
+                        <div class="embedded-unit-actions">
+                            <button class="embedded-unit-btn expand-btn" onclick="event.stopPropagation(); toggleEmbeddedCard(this)" title="Expand details">
+                                <i class="ph ph-caret-down"></i>
+                            </button>
+                            <button class="embedded-unit-btn" onclick="event.stopPropagation(); openEntityModal('${conn.id}', '${conn.type}')" title="Open full modal">
+                                <i class="ph ph-arrow-square-out"></i>
+                            </button>
+                        </div>
+                    </div>
+                    <div class="embedded-unit-content">
+                        ${conn.description ? `<div class="embedded-unit-description">${conn.description}</div>` : ''}
+                        <div class="embedded-unit-meta">
+                            ${nestedChildren.length > 0 ? `<span class="embedded-unit-stat"><i class="ph ph-tree-structure"></i> ${nestedChildren.length} nested</span>` : ''}
+                            ${allRels.length > 0 ? `<span class="embedded-unit-stat"><i class="ph ph-arrows-left-right"></i> ${allRels.length} connections</span>` : ''}
+                        </div>
+                        ${nestedChildren.length > 0 ? `
+                            <div class="embedded-unit-nested-preview">
+                                <div class="embedded-nested-label"><i class="ph ph-tree-structure"></i> Contains:</div>
+                                <div class="embedded-nested-chips">
+                                    ${previewChips}
+                                    ${moreChip}
+                                </div>
+                            </div>
+                        ` : ''}
+                    </div>
+                `;
+
+                // Click on card header to expand
+                card.querySelector('.embedded-unit-header').addEventListener('click', (e) => {
+                    if (!e.target.closest('.embedded-unit-btn')) {
+                        toggleEmbeddedCard(card.querySelector('.expand-btn'));
+                    }
+                });
+
+                wrapper.appendChild(card);
+            });
+
+            container.appendChild(wrapper);
+        }
+
+        // Toggle embedded card expansion
+        function toggleEmbeddedCard(btn) {
+            const card = btn.closest('.embedded-unit-card');
+            card.classList.toggle('expanded');
+            const icon = btn.querySelector('i');
+            if (card.classList.contains('expanded')) {
+                icon.className = 'ph ph-caret-up';
+            } else {
+                icon.className = 'ph ph-caret-down';
             }
         }
 
