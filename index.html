@@ -2035,6 +2035,246 @@
             opacity: 0.5;
         }
 
+        /* Inline Editing Styles */
+        .inline-editable {
+            position: relative;
+            cursor: text;
+            border-radius: 6px;
+            transition: all 0.2s;
+        }
+
+        .inline-editable:hover {
+            background: rgba(255,255,255,0.1);
+        }
+
+        .inline-editable.editing {
+            background: rgba(255,255,255,0.15);
+        }
+
+        .inline-edit-input {
+            width: 100%;
+            border: none;
+            background: rgba(255,255,255,0.2);
+            color: inherit;
+            font: inherit;
+            padding: 0.25rem 0.5rem;
+            border-radius: 6px;
+            outline: none;
+        }
+
+        .inline-edit-input:focus {
+            background: rgba(255,255,255,0.25);
+            box-shadow: 0 0 0 2px rgba(255,255,255,0.3);
+        }
+
+        /* Inline description editing */
+        .modal-description-editable {
+            background: #FAF7F5;
+            border: 2px dashed transparent;
+            border-radius: 8px;
+            padding: 1rem;
+            min-height: 60px;
+            cursor: text;
+            transition: all 0.2s;
+        }
+
+        .modal-description-editable:hover {
+            border-color: #E5DDD1;
+            background: #FFF9F0;
+        }
+
+        .modal-description-editable.editing {
+            border-color: #C88F4A;
+            background: white;
+        }
+
+        .modal-description-editable .description-placeholder {
+            color: #A89984;
+            font-style: italic;
+        }
+
+        .modal-description-textarea {
+            width: 100%;
+            border: none;
+            background: transparent;
+            font: inherit;
+            resize: none;
+            outline: none;
+            min-height: 80px;
+            color: #3D2E1F;
+        }
+
+        .inline-edit-actions {
+            display: flex;
+            gap: 0.5rem;
+            margin-top: 0.75rem;
+            justify-content: flex-end;
+        }
+
+        .inline-edit-btn {
+            padding: 0.4rem 0.75rem;
+            border-radius: 6px;
+            font-size: 0.8rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.2s;
+            border: none;
+        }
+
+        .inline-edit-btn.save {
+            background: #D4A54A;
+            color: white;
+        }
+
+        .inline-edit-btn.save:hover {
+            background: #E5B555;
+        }
+
+        .inline-edit-btn.cancel {
+            background: #E5DDD1;
+            color: #6B5642;
+        }
+
+        .inline-edit-btn.cancel:hover {
+            background: #D5CCC1;
+        }
+
+        .char-counter {
+            font-size: 0.75rem;
+            color: #A89984;
+            text-align: right;
+            margin-top: 0.25rem;
+        }
+
+        .char-counter.warning {
+            color: #d32f2f;
+        }
+
+        /* Entity-specific fields section */
+        .entity-fields-section {
+            display: flex;
+            flex-direction: column;
+            gap: 1rem;
+        }
+
+        .entity-field {
+            display: flex;
+            flex-direction: column;
+            gap: 0.35rem;
+        }
+
+        .entity-field-label {
+            font-size: 0.75rem;
+            font-weight: 600;
+            color: #8B6F47;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .entity-field-value {
+            padding: 0.6rem 0.75rem;
+            background: #FAF7F5;
+            border: 2px solid transparent;
+            border-radius: 6px;
+            font-size: 0.9rem;
+            color: #3D2E1F;
+            cursor: text;
+            transition: all 0.2s;
+            min-height: 38px;
+        }
+
+        .entity-field-value:hover {
+            border-color: #E5DDD1;
+            background: #FFF9F0;
+        }
+
+        .entity-field-value.editing {
+            border-color: #C88F4A;
+            background: white;
+        }
+
+        .entity-field-value.empty {
+            color: #A89984;
+            font-style: italic;
+        }
+
+        .entity-field-input {
+            width: 100%;
+            border: none;
+            background: transparent;
+            font: inherit;
+            outline: none;
+            color: #3D2E1F;
+        }
+
+        .entity-field-select {
+            width: 100%;
+            padding: 0.6rem 0.75rem;
+            background: #FAF7F5;
+            border: 2px solid transparent;
+            border-radius: 6px;
+            font-size: 0.9rem;
+            color: #3D2E1F;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .entity-field-select:hover {
+            border-color: #E5DDD1;
+        }
+
+        .entity-field-select:focus {
+            border-color: #C88F4A;
+            background: white;
+            outline: none;
+        }
+
+        /* Entity type specific header colors */
+        .modal-header-section.type-unit {
+            background: linear-gradient(135deg, #8B6F47 0%, #6B5642 100%);
+        }
+
+        .modal-header-section.type-team {
+            background: linear-gradient(135deg, #7B95A3 0%, #5A7A8A 100%);
+        }
+
+        .modal-header-section.type-role {
+            background: linear-gradient(135deg, #C88F4A 0%, #B87B5B 100%);
+        }
+
+        .modal-header-section.type-person {
+            background: linear-gradient(135deg, #D4A574 0%, #C88F4A 100%);
+        }
+
+        .modal-header-section.type-object {
+            background: linear-gradient(135deg, #A89984 0%, #8B7B6B 100%);
+        }
+
+        /* Connection type specific badges */
+        .connection-type-label {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.25rem;
+            font-size: 0.7rem;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            padding: 0.2rem 0.5rem;
+            border-radius: 4px;
+            margin-left: 0.5rem;
+        }
+
+        /* Filtered connection options */
+        .modal-connection-context {
+            font-size: 0.8rem;
+            color: #8B6F47;
+            margin-bottom: 0.75rem;
+            padding: 0.5rem 0.75rem;
+            background: #FFF9F0;
+            border-radius: 6px;
+            border-left: 3px solid #C88F4A;
+        }
+
         /* Delete confirmation */
         .delete-confirm-overlay {
             position: fixed;
@@ -2967,16 +3207,16 @@
     <!-- Entity Detail Modal -->
     <div id="entityModal" class="modal-overlay" onclick="if(event.target === this) closeEntityModal()">
         <div class="modal-dialog">
-            <div class="modal-header-section">
+            <div class="modal-header-section" id="modalHeaderSection">
                 <button class="modal-close-btn" onclick="closeEntityModal()">
                     <i class="ph ph-x"></i>
                 </button>
                 <div class="modal-header-top">
                     <span class="modal-header-icon" id="modalEntityIcon"></span>
                     <div class="modal-header-content">
-                        <div class="modal-title-wrapper">
-                            <div class="modal-title-text" id="modalEntityName"></div>
-                            <button class="modal-title-edit-btn" id="modalTitleEditBtn" onclick="openEntityEditModal()" title="Rename">
+                        <div class="modal-title-wrapper" id="modalTitleWrapper">
+                            <div class="modal-title-text inline-editable" id="modalEntityName" onclick="startInlineNameEdit(event)"></div>
+                            <button class="modal-title-edit-btn" id="modalTitleEditBtn" onclick="startInlineNameEdit(event)" title="Edit name">
                                 <i class="ph ph-pencil-simple"></i>
                             </button>
                         </div>
@@ -2986,6 +3226,7 @@
             </div>
             <div class="modal-body">
                 <div class="modal-section" id="modalDescription"></div>
+                <div class="modal-section" id="modalEntityFields" style="display: none;"></div>
                 <div class="modal-section" id="modalConnections"></div>
                 <div class="modal-section" id="modalAddConnection"></div>
                 <div class="modal-section" id="modalActivities"></div>
@@ -2998,10 +3239,6 @@
                 <div class="modal-action-spacer"></div>
                 <button class="modal-action-btn secondary" onclick="closeEntityModal()">
                     Close
-                </button>
-                <button class="modal-action-btn primary" id="modalEditButton" onclick="openEntityEditModal()">
-                    <i class="ph ph-pencil-simple"></i>
-                    Edit
                 </button>
             </div>
         </div>
@@ -3695,7 +3932,135 @@ John Doe,Engineering,john@example.com"
                 weight: 2 
             }
         };
-        
+
+        // Entity Type Configurations - defines entity-specific modal behavior
+        const entityTypeConfig = {
+            unit: {
+                displayName: 'Unit',
+                icon: 'ph-buildings',
+                gradient: 'linear-gradient(135deg, #8B6F47 0%, #6B5642 100%)',
+                headerColor: '#8B6F47',
+                description: 'Organizational unit or department',
+                // Operators this entity type can use as subject
+                allowedOperators: ['DES', 'SEG', 'CON', 'ALT', 'SYN', 'SUP'],
+                // What entity types this can connect to
+                canConnectTo: {
+                    DES: ['unit', 'team', 'role'], // Define sub-units, teams, roles
+                    SEG: ['unit', 'team'],         // Divide into units or teams
+                    CON: ['unit', 'object'],       // Link to other units or objects
+                    ALT: ['unit', 'team', 'role'], // Modify relationships
+                    SYN: ['unit', 'team'],         // Merge units or teams
+                    SUP: ['unit', 'team', 'role']  // Oversee
+                },
+                // Labels for relationship actions from this entity's perspective
+                connectionLabels: {
+                    DES: 'Contains',
+                    SEG: 'Divides into',
+                    CON: 'Partners with',
+                    ALT: 'Modifies',
+                    SYN: 'Merges with',
+                    SUP: 'Oversees'
+                },
+                // Entity-specific fields
+                fields: [
+                    { key: 'department_code', label: 'Department Code', type: 'text', placeholder: 'e.g., DEPT-001' }
+                ],
+                emptyConnectionMessage: 'No teams or roles defined yet'
+            },
+            team: {
+                displayName: 'Team',
+                icon: 'ph-users-three',
+                gradient: 'linear-gradient(135deg, #7B95A3 0%, #5A7A8A 100%)',
+                headerColor: '#7B95A3',
+                description: 'A group of people working together',
+                allowedOperators: ['DES', 'CON', 'ALT', 'SYN'],
+                canConnectTo: {
+                    DES: ['team', 'role'],         // Define sub-teams, roles
+                    CON: ['team', 'object'],       // Link to other teams or objects
+                    ALT: ['team', 'role'],         // Modify relationships
+                    SYN: ['team']                  // Merge with other teams
+                },
+                connectionLabels: {
+                    DES: 'Has role',
+                    CON: 'Collaborates with',
+                    ALT: 'Changes',
+                    SYN: 'Merges with'
+                },
+                fields: [
+                    { key: 'team_size', label: 'Team Size', type: 'number', placeholder: 'Number of members' }
+                ],
+                emptyConnectionMessage: 'No roles or members assigned yet'
+            },
+            role: {
+                displayName: 'Role',
+                icon: 'ph-briefcase',
+                gradient: 'linear-gradient(135deg, #C88F4A 0%, #B87B5B 100%)',
+                headerColor: '#C88F4A',
+                description: 'A position or function within a team',
+                allowedOperators: ['CON', 'ALT'],
+                canConnectTo: {
+                    CON: ['object', 'role'],       // Link to work objects or other roles
+                    ALT: ['object']                // Modify work objects
+                },
+                connectionLabels: {
+                    CON: 'Works on',
+                    ALT: 'Modifies'
+                },
+                fields: [
+                    { key: 'responsibilities', label: 'Key Responsibilities', type: 'textarea', placeholder: 'Main duties...' }
+                ],
+                emptyConnectionMessage: 'No work objects linked yet'
+            },
+            person: {
+                displayName: 'Person',
+                icon: 'ph-user',
+                gradient: 'linear-gradient(135deg, #D4A574 0%, #C88F4A 100%)',
+                headerColor: '#D4A574',
+                description: 'An individual in the organization',
+                allowedOperators: ['INS', 'CON', 'ALT'],
+                canConnectTo: {
+                    INS: ['role'],                 // Start/join roles
+                    CON: ['person', 'object'],     // Link to other people or objects
+                    ALT: ['object']                // Modify objects
+                },
+                connectionLabels: {
+                    INS: 'Fills role',
+                    CON: 'Collaborates with',
+                    ALT: 'Works on'
+                },
+                fields: [
+                    { key: 'email', label: 'Email', type: 'email', placeholder: 'email@example.com' },
+                    { key: 'phone', label: 'Phone', type: 'tel', placeholder: '+1 (555) 000-0000' }
+                ],
+                emptyConnectionMessage: 'No roles assigned yet'
+            },
+            object: {
+                displayName: 'Work Object',
+                icon: 'ph-package',
+                gradient: 'linear-gradient(135deg, #A89984 0%, #8B7B6B 100%)',
+                headerColor: '#A89984',
+                description: 'A project, task, or deliverable',
+                allowedOperators: ['CON', 'SEG', 'ALT', 'SYN'],
+                canConnectTo: {
+                    CON: ['object'],               // Link to other objects
+                    SEG: ['object'],               // Break into sub-objects
+                    ALT: ['object'],               // Modify objects
+                    SYN: ['object']                // Merge objects
+                },
+                connectionLabels: {
+                    CON: 'Related to',
+                    SEG: 'Breaks into',
+                    ALT: 'Modifies',
+                    SYN: 'Combines with'
+                },
+                fields: [
+                    { key: 'status', label: 'Status', type: 'select', options: ['Not Started', 'In Progress', 'On Hold', 'Completed'] },
+                    { key: 'due_date', label: 'Due Date', type: 'date', placeholder: '' }
+                ],
+                emptyConnectionMessage: 'No related objects yet'
+            }
+        };
+
         // Xano configuration
         const XANO_BASE_URL = 'https://xvkq-pq7i-idtl.n7d.xano.io/api:nrIL-Oi-';
         const APP_ID = 'holonic-org-graph'; // Your app identifier
@@ -3747,28 +4112,44 @@ John Doe,Engineering,john@example.com"
             currentModalEntity = entity;
             currentModalEntityType = entityType;
 
+            // Get entity type configuration
+            const config = entityTypeConfig[entityType] || entityTypeConfig.object;
+
+            // Set header with entity-specific styling
+            const headerSection = document.getElementById('modalHeaderSection');
+            headerSection.className = 'modal-header-section type-' + entityType;
+
             // Set header content
             document.getElementById('modalEntityIcon').innerHTML = getIcon(entityType);
             document.getElementById('modalEntityName').textContent = entity.name;
-            document.getElementById('modalEntityType').innerHTML = `${getIcon(entityType)} ${entityType.toUpperCase()}`;
+            document.getElementById('modalEntityType').innerHTML = `${getIcon(entityType)} ${config.displayName.toUpperCase()}`;
 
-            // Show edit and delete buttons for entities
-            document.getElementById('modalEditButton').style.display = 'inline-flex';
+            // Show delete button
             document.getElementById('modalDeleteButton').style.display = 'inline-flex';
             document.getElementById('modalTitleEditBtn').style.display = 'flex';
 
-            // Display description
+            // Display description with inline editing
             const descriptionEl = document.getElementById('modalDescription');
-            if (entity.description && entity.description.trim()) {
-                descriptionEl.innerHTML = `
-                    <div class="modal-section-title"><i class="ph ph-text-align-left"></i> Description</div>
-                    <div class="modal-description-text">${entity.description}</div>
+            const descText = entity.description && entity.description.trim() ? entity.description : '';
+            descriptionEl.innerHTML = `
+                <div class="modal-section-title"><i class="ph ph-text-align-left"></i> Description</div>
+                <div class="modal-description-editable" onclick="startInlineDescriptionEdit(event)" id="descriptionEditable">
+                    ${descText ? `<div class="description-content">${descText}</div>` : '<div class="description-placeholder">Click to add a description...</div>'}
+                </div>
+            `;
+
+            // Display entity-specific fields
+            const fieldsEl = document.getElementById('modalEntityFields');
+            if (config.fields && config.fields.length > 0) {
+                fieldsEl.style.display = 'block';
+                fieldsEl.innerHTML = `
+                    <div class="modal-section-title"><i class="ph ph-sliders"></i> Details</div>
+                    <div class="entity-fields-section">
+                        ${config.fields.map(field => renderEntityField(entity, field)).join('')}
+                    </div>
                 `;
             } else {
-                descriptionEl.innerHTML = `
-                    <div class="modal-section-title"><i class="ph ph-text-align-left"></i> Description</div>
-                    <div class="modal-description-empty">No description yet. Click Edit to add one.</div>
-                `;
+                fieldsEl.style.display = 'none';
             }
 
             // Get connected entities
@@ -3823,26 +4204,31 @@ John Doe,Engineering,john@example.com"
                     <div class="modal-section-title"><i class="ph ph-link"></i> Connected To</div>
                     <div class="modal-empty-state">
                         <i class="ph ph-link-break"></i>
-                        <div>No connections yet</div>
+                        <div>${config.emptyConnectionMessage || 'No connections yet'}</div>
                     </div>
                 `;
             }
 
-            // Add connection UI
+            // Add connection UI with filtered operators based on entity type
             const addConnectionEl = document.getElementById('modalAddConnection');
+            const allowedOps = config.allowedOperators || Object.keys(eoOperators);
             addConnectionEl.innerHTML = `
                 <div class="modal-section-title"><i class="ph ph-plus-circle"></i> Add Connection</div>
+                <div class="modal-connection-context">
+                    <i class="ph ph-info"></i> ${config.displayName}s can: ${allowedOps.map(op => eoOperators[op]?.label).join(', ')}
+                </div>
                 <div class="modal-add-connection">
                     <div class="modal-add-connection-row">
-                        <select id="modalOperatorSelect">
-                            <option value="">Operator...</option>
-                            ${Object.entries(eoOperators).map(([code, op]) =>
-                                `<option value="${code}">${op.label}</option>`
-                            ).join('')}
+                        <select id="modalOperatorSelect" onchange="updateTargetOptionsForOperator()">
+                            <option value="">Action...</option>
+                            ${allowedOps.map(code => {
+                                const op = eoOperators[code];
+                                const contextLabel = config.connectionLabels?.[code] || op.label;
+                                return `<option value="${code}">${contextLabel}</option>`;
+                            }).join('')}
                         </select>
                         <select id="modalTargetSelect">
-                            <option value="">Connect to...</option>
-                            ${getAllEntitiesForModal(entityId)}
+                            <option value="">Select action first...</option>
                         </select>
                         <button class="modal-add-connection-btn" onclick="addConnectionFromModal()">
                             <i class="ph ph-plus"></i> Add
@@ -3883,6 +4269,336 @@ John Doe,Engineering,john@example.com"
             }
 
             document.getElementById('entityModal').classList.add('active');
+        }
+
+        // Render entity-specific field
+        function renderEntityField(entity, field) {
+            const value = entity[field.key] || '';
+            const isEmpty = !value;
+
+            if (field.type === 'select') {
+                return `
+                    <div class="entity-field">
+                        <label class="entity-field-label">${field.label}</label>
+                        <select class="entity-field-select" onchange="saveEntityField('${field.key}', this.value)">
+                            <option value="">Select...</option>
+                            ${field.options.map(opt => `<option value="${opt}" ${value === opt ? 'selected' : ''}>${opt}</option>`).join('')}
+                        </select>
+                    </div>
+                `;
+            } else if (field.type === 'textarea') {
+                return `
+                    <div class="entity-field">
+                        <label class="entity-field-label">${field.label}</label>
+                        <div class="entity-field-value ${isEmpty ? 'empty' : ''}" onclick="startFieldEdit(this, '${field.key}', 'textarea')" data-field="${field.key}">
+                            ${isEmpty ? field.placeholder || 'Click to add...' : value}
+                        </div>
+                    </div>
+                `;
+            } else {
+                return `
+                    <div class="entity-field">
+                        <label class="entity-field-label">${field.label}</label>
+                        <div class="entity-field-value ${isEmpty ? 'empty' : ''}" onclick="startFieldEdit(this, '${field.key}', '${field.type}')" data-field="${field.key}" data-placeholder="${field.placeholder || ''}">
+                            ${isEmpty ? field.placeholder || 'Click to add...' : value}
+                        </div>
+                    </div>
+                `;
+            }
+        }
+
+        // Update target options when operator changes
+        function updateTargetOptionsForOperator() {
+            if (!currentModalEntity || !currentModalEntityType) return;
+
+            const operatorSelect = document.getElementById('modalOperatorSelect');
+            const targetSelect = document.getElementById('modalTargetSelect');
+            const selectedOperator = operatorSelect.value;
+
+            if (!selectedOperator) {
+                targetSelect.innerHTML = '<option value="">Select action first...</option>';
+                return;
+            }
+
+            const config = entityTypeConfig[currentModalEntityType];
+            const allowedTargetTypes = config?.canConnectTo?.[selectedOperator] || ['unit', 'team', 'role', 'person', 'object'];
+
+            // Get filtered entities
+            let options = '<option value="">Connect to...</option>';
+            allowedTargetTypes.forEach(type => {
+                const typeEntities = entities[type] || [];
+                const typeConfig = entityTypeConfig[type] || {};
+                if (typeEntities.length > 0) {
+                    options += `<optgroup label="${typeConfig.displayName || type}s">`;
+                    typeEntities.forEach(e => {
+                        if (e.id !== currentModalEntity.id) {
+                            options += `<option value="${e.id}">${e.name}</option>`;
+                        }
+                    });
+                    options += '</optgroup>';
+                }
+            });
+
+            targetSelect.innerHTML = options;
+        }
+
+        // Inline editing functions
+        function startInlineNameEdit(event) {
+            event.stopPropagation();
+            if (!currentModalEntity) return;
+
+            const nameEl = document.getElementById('modalEntityName');
+            const wrapper = document.getElementById('modalTitleWrapper');
+            const currentName = currentModalEntity.name;
+
+            // Replace with input
+            wrapper.innerHTML = `
+                <input type="text" class="inline-edit-input" id="inlineNameInput" value="${currentName}"
+                    onkeydown="handleInlineNameKeydown(event)"
+                    onblur="saveInlineName()">
+            `;
+
+            const input = document.getElementById('inlineNameInput');
+            input.focus();
+            input.select();
+        }
+
+        function handleInlineNameKeydown(event) {
+            if (event.key === 'Enter') {
+                event.preventDefault();
+                saveInlineName();
+            } else if (event.key === 'Escape') {
+                cancelInlineNameEdit();
+            }
+        }
+
+        function saveInlineName() {
+            const input = document.getElementById('inlineNameInput');
+            if (!input || !currentModalEntity) return;
+
+            const newName = input.value.trim();
+            if (!newName) {
+                cancelInlineNameEdit();
+                return;
+            }
+
+            const oldName = currentModalEntity.name;
+            if (newName !== oldName) {
+                currentModalEntity.name = newName;
+
+                // Log activity
+                logActivityToXano({
+                    event_verb: 'Shift Entity',
+                    eo_operator: 'ALT',
+                    object_type: currentModalEntityType,
+                    object_id: currentModalEntity.id,
+                    object_label: `${oldName} → ${newName}`,
+                    data_json: { old_name: oldName, new_name: newName, entity_type: currentModalEntityType }
+                });
+
+                // Update views
+                saveToLocalStorage();
+                renderEntityList();
+                updateSelects();
+                if (currentView === 'graph') updateGraph();
+                else if (currentView === 'tree') renderTreeView();
+                else if (currentView === 'card') renderCardView();
+            }
+
+            // Restore display
+            const wrapper = document.getElementById('modalTitleWrapper');
+            wrapper.innerHTML = `
+                <div class="modal-title-text inline-editable" id="modalEntityName" onclick="startInlineNameEdit(event)">${currentModalEntity.name}</div>
+                <button class="modal-title-edit-btn" id="modalTitleEditBtn" onclick="startInlineNameEdit(event)" title="Edit name">
+                    <i class="ph ph-pencil-simple"></i>
+                </button>
+            `;
+        }
+
+        function cancelInlineNameEdit() {
+            if (!currentModalEntity) return;
+            const wrapper = document.getElementById('modalTitleWrapper');
+            wrapper.innerHTML = `
+                <div class="modal-title-text inline-editable" id="modalEntityName" onclick="startInlineNameEdit(event)">${currentModalEntity.name}</div>
+                <button class="modal-title-edit-btn" id="modalTitleEditBtn" onclick="startInlineNameEdit(event)" title="Edit name">
+                    <i class="ph ph-pencil-simple"></i>
+                </button>
+            `;
+        }
+
+        function startInlineDescriptionEdit(event) {
+            event.stopPropagation();
+            if (!currentModalEntity) return;
+
+            const container = document.getElementById('descriptionEditable');
+            const currentDesc = currentModalEntity.description || '';
+
+            container.classList.add('editing');
+            container.innerHTML = `
+                <textarea class="modal-description-textarea" id="inlineDescInput"
+                    placeholder="Add a description..."
+                    maxlength="240"
+                    oninput="updateDescCharCounter()">${currentDesc}</textarea>
+                <div class="char-counter" id="descCharCounter">${currentDesc.length}/240</div>
+                <div class="inline-edit-actions">
+                    <button class="inline-edit-btn cancel" onclick="cancelInlineDescriptionEdit(event)">Cancel</button>
+                    <button class="inline-edit-btn save" onclick="saveInlineDescription(event)">Save</button>
+                </div>
+            `;
+
+            const textarea = document.getElementById('inlineDescInput');
+            textarea.focus();
+            textarea.setSelectionRange(textarea.value.length, textarea.value.length);
+        }
+
+        function updateDescCharCounter() {
+            const textarea = document.getElementById('inlineDescInput');
+            const counter = document.getElementById('descCharCounter');
+            if (textarea && counter) {
+                const len = textarea.value.length;
+                counter.textContent = `${len}/240`;
+                counter.className = len > 220 ? 'char-counter warning' : 'char-counter';
+            }
+        }
+
+        function saveInlineDescription(event) {
+            if (event) event.stopPropagation();
+            const textarea = document.getElementById('inlineDescInput');
+            if (!textarea || !currentModalEntity) return;
+
+            const newDesc = textarea.value.trim();
+            const oldDesc = currentModalEntity.description || '';
+
+            if (newDesc !== oldDesc) {
+                currentModalEntity.description = newDesc;
+
+                // Log activity
+                logActivityToXano({
+                    event_verb: 'Shift Description',
+                    eo_operator: 'ALT',
+                    object_type: currentModalEntityType,
+                    object_id: currentModalEntity.id,
+                    object_label: `Updated description for ${currentModalEntity.name}`,
+                    data_json: { entity_name: currentModalEntity.name, old_description: oldDesc, new_description: newDesc }
+                });
+
+                saveToLocalStorage();
+            }
+
+            // Restore display
+            const container = document.getElementById('descriptionEditable');
+            container.classList.remove('editing');
+            container.innerHTML = newDesc
+                ? `<div class="description-content">${newDesc}</div>`
+                : '<div class="description-placeholder">Click to add a description...</div>';
+        }
+
+        function cancelInlineDescriptionEdit(event) {
+            if (event) event.stopPropagation();
+            const container = document.getElementById('descriptionEditable');
+            const currentDesc = currentModalEntity?.description || '';
+
+            container.classList.remove('editing');
+            container.innerHTML = currentDesc
+                ? `<div class="description-content">${currentDesc}</div>`
+                : '<div class="description-placeholder">Click to add a description...</div>';
+        }
+
+        // Field inline editing
+        function startFieldEdit(element, fieldKey, fieldType) {
+            if (!currentModalEntity) return;
+
+            const currentValue = currentModalEntity[fieldKey] || '';
+            const placeholder = element.dataset.placeholder || 'Enter value...';
+
+            element.classList.add('editing');
+
+            if (fieldType === 'textarea') {
+                element.innerHTML = `
+                    <textarea class="entity-field-input" style="min-height: 60px; resize: vertical;"
+                        onblur="saveFieldEdit(this, '${fieldKey}')"
+                        onkeydown="if(event.key==='Escape') cancelFieldEdit(this, '${fieldKey}')">${currentValue}</textarea>
+                `;
+            } else {
+                element.innerHTML = `
+                    <input type="${fieldType}" class="entity-field-input" value="${currentValue}"
+                        placeholder="${placeholder}"
+                        onblur="saveFieldEdit(this, '${fieldKey}')"
+                        onkeydown="if(event.key==='Enter') this.blur(); if(event.key==='Escape') cancelFieldEdit(this, '${fieldKey}')">
+                `;
+            }
+
+            const input = element.querySelector('input, textarea');
+            if (input) {
+                input.focus();
+                if (input.tagName === 'INPUT') input.select();
+            }
+        }
+
+        function saveFieldEdit(input, fieldKey) {
+            if (!currentModalEntity) return;
+
+            const newValue = input.value.trim();
+            const oldValue = currentModalEntity[fieldKey] || '';
+            const container = input.closest('.entity-field-value');
+            const config = entityTypeConfig[currentModalEntityType];
+            const fieldConfig = config?.fields?.find(f => f.key === fieldKey);
+
+            if (newValue !== oldValue) {
+                currentModalEntity[fieldKey] = newValue;
+
+                logActivityToXano({
+                    event_verb: 'Shift Field',
+                    eo_operator: 'ALT',
+                    object_type: currentModalEntityType,
+                    object_id: currentModalEntity.id,
+                    object_label: `Updated ${fieldConfig?.label || fieldKey} for ${currentModalEntity.name}`,
+                    data_json: { field: fieldKey, old_value: oldValue, new_value: newValue }
+                });
+
+                saveToLocalStorage();
+            }
+
+            // Restore display
+            container.classList.remove('editing');
+            const isEmpty = !newValue;
+            container.className = `entity-field-value ${isEmpty ? 'empty' : ''}`;
+            container.innerHTML = isEmpty ? (fieldConfig?.placeholder || 'Click to add...') : newValue;
+        }
+
+        function cancelFieldEdit(input, fieldKey) {
+            const container = input.closest('.entity-field-value');
+            const currentValue = currentModalEntity?.[fieldKey] || '';
+            const config = entityTypeConfig[currentModalEntityType];
+            const fieldConfig = config?.fields?.find(f => f.key === fieldKey);
+
+            container.classList.remove('editing');
+            const isEmpty = !currentValue;
+            container.className = `entity-field-value ${isEmpty ? 'empty' : ''}`;
+            container.innerHTML = isEmpty ? (fieldConfig?.placeholder || 'Click to add...') : currentValue;
+        }
+
+        function saveEntityField(fieldKey, value) {
+            if (!currentModalEntity) return;
+
+            const oldValue = currentModalEntity[fieldKey] || '';
+            if (value !== oldValue) {
+                currentModalEntity[fieldKey] = value;
+
+                const config = entityTypeConfig[currentModalEntityType];
+                const fieldConfig = config?.fields?.find(f => f.key === fieldKey);
+
+                logActivityToXano({
+                    event_verb: 'Shift Field',
+                    eo_operator: 'ALT',
+                    object_type: currentModalEntityType,
+                    object_id: currentModalEntity.id,
+                    object_label: `Updated ${fieldConfig?.label || fieldKey} for ${currentModalEntity.name}`,
+                    data_json: { field: fieldKey, old_value: oldValue, new_value: value }
+                });
+
+                saveToLocalStorage();
+            }
         }
 
         function closeEntityModal() {
@@ -4575,7 +5291,6 @@ John Doe,Engineering,john@example.com"
             currentModalEntityType = null;
 
             // Hide entity-specific buttons for relationships
-            document.getElementById('modalEditButton').style.display = 'none';
             document.getElementById('modalDeleteButton').style.display = 'none';
             document.getElementById('modalTitleEditBtn').style.display = 'none';
 
