@@ -3082,6 +3082,12 @@
             color: #8B6F47;
         }
 
+        .operator-btn.active.assign-type {
+            border-color: #6B8B9E;
+            background: #F0F5F7;
+            color: #6B8B9E;
+        }
+
         .operator-btn-subtitle {
             font-size: 0.7rem;
             opacity: 0.8;
@@ -3390,6 +3396,51 @@
             font-size: 0.9rem;
             padding: 0.5rem 0 1rem 0;
             font-style: italic;
+        }
+
+        .role-assignment-item {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 0.6rem 1rem;
+            background: white;
+            border: 2px solid #C88F4A;
+            border-radius: 8px;
+            font-size: 0.9rem;
+            font-weight: 600;
+            color: #5A4A3A;
+        }
+
+        .role-assignment-name {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .role-assignment-name:hover {
+            color: #C88F4A;
+        }
+
+        .role-assignment-name i {
+            color: #C88F4A;
+        }
+
+        .role-assignment-remove {
+            padding: 0.25rem;
+            border: none;
+            background: transparent;
+            color: #8B6F47;
+            cursor: pointer;
+            border-radius: 4px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.2s;
+        }
+
+        .role-assignment-remove:hover {
+            background: rgba(200, 50, 50, 0.1);
+            color: #c83232;
         }
 
         .modal-section-title {
@@ -5997,6 +6048,10 @@
                         <div>Link</div>
                         <div class="operator-btn-subtitle">connect work</div>
                     </button>
+                    <button class="operator-btn assign-type" id="assignOperatorBtn" data-predicate="INS" onclick="selectSimplifiedPredicate('INS', this)" title="Assign person to a role" style="display: none;">
+                        <div>Assign</div>
+                        <div class="operator-btn-subtitle">to role</div>
+                    </button>
                 </div>
 
                 <!-- More Operators Button -->
@@ -7318,9 +7373,42 @@ John Doe,Engineering,john@example.com"
             `;
             descriptionEl.style.display = '';
 
-            // Role Assignment Section - not used, persons cannot have activities
+            // Role Assignment Section - show roles the person is assigned to
             const roleAssignmentEl = document.getElementById('modalRoleAssignment');
-            roleAssignmentEl.innerHTML = '';
+            if (entityType === 'person') {
+                // Get INS relationships where this person is the subject
+                const roleAssignments = relationships
+                    .filter(r => r.predicate === 'INS' && r.subject === entityId)
+                    .map(r => ({ relationship: r, role: findEntity(r.object) }))
+                    .filter(a => a.role !== null);
+
+                if (roleAssignments.length > 0) {
+                    roleAssignmentEl.innerHTML = `
+                        <div class="modal-section-title"><i class="ph ph-identification-badge"></i> Assigned Roles</div>
+                        <div class="role-assignment-list">
+                            ${roleAssignments.map(a => `
+                                <div class="role-assignment-item">
+                                    <span class="role-assignment-name" onclick="openEntityModal('${a.role.id}', 'role')" style="cursor: pointer;">
+                                        <i class="ph ph-identification-badge"></i> ${a.role.name}
+                                    </span>
+                                    <button class="role-assignment-remove" onclick="removeRoleAssignment('${a.relationship.id}')" title="Remove assignment">
+                                        <i class="ph ph-x"></i>
+                                    </button>
+                                </div>
+                            `).join('')}
+                        </div>
+                    `;
+                } else {
+                    roleAssignmentEl.innerHTML = `
+                        <div class="modal-section-title"><i class="ph ph-identification-badge"></i> Assigned Roles</div>
+                        <div class="empty-state" style="padding: 1rem; text-align: center; color: #8B6F47; font-size: 0.875rem;">
+                            <em>Not assigned to any roles</em>
+                        </div>
+                    `;
+                }
+            } else {
+                roleAssignmentEl.innerHTML = '';
+            }
 
             // Separate relationships into Nesting (DES) and Activities (non-DES)
             const nestedRelationships = relationships.filter(r =>
@@ -7568,12 +7656,25 @@ John Doe,Engineering,john@example.com"
                 }
             }
 
-            // Add activity UI - hide for persons since they cannot have activities
+            // Add activity UI
             const addActivityEl = document.getElementById('modalAddActivity');
 
             if (isPerson) {
-                // Persons cannot have activities
-                addActivityEl.innerHTML = '';
+                // Persons can only be assigned to roles
+                addActivityEl.innerHTML = `
+                    <div class="modal-section-title"><i class="ph ph-user-circle-plus"></i> Assign to Role</div>
+                    <div class="modal-add-connection">
+                        <div class="modal-add-connection-row">
+                            <select id="modalRoleSelect">
+                                <option value="">Select role...</option>
+                                ${entities.role.map(role => `<option value="${role.id}">${role.name}</option>`).join('')}
+                            </select>
+                            <button class="modal-add-connection-btn" onclick="assignPersonToRoleFromModal()">
+                                <i class="ph ph-plus"></i> Assign
+                            </button>
+                        </div>
+                    </div>
+                `;
             } else {
                 // Work products can only be linked to roles and teams
                 const canLinkWorkProduct = entityType === 'role' || entityType === 'team';
@@ -8959,6 +9060,134 @@ John Doe,Engineering,john@example.com"
             renderActivityList();
         }
 
+        // Assign person to role from modal (creates INS relationship)
+        function assignPersonToRoleFromModal() {
+            if (!currentModalEntity || currentModalEntityType !== 'person') return;
+
+            const roleId = document.getElementById('modalRoleSelect').value;
+
+            if (!roleId) {
+                alert('Please select a role to assign');
+                return;
+            }
+
+            const roleEntity = findEntity(roleId);
+            if (!roleEntity) {
+                alert('Role not found');
+                return;
+            }
+
+            // Check if already assigned to this role
+            const alreadyAssigned = relationships.some(r =>
+                r.predicate === 'INS' && r.subject === currentModalEntity.id && r.object === roleId
+            );
+            if (alreadyAssigned) {
+                alert('This person is already assigned to this role');
+                return;
+            }
+
+            // Create the INS relationship (person assigned to role)
+            const relId = 'rel' + Date.now();
+            const relationship = {
+                id: relId,
+                subject: currentModalEntity.id,
+                predicate: 'INS',
+                object: roleId,
+                description: ''
+            };
+
+            relationships.push(relationship);
+
+            // Track in undo history
+            pushToUndoHistory({
+                type: 'create_relationship',
+                data: JSON.parse(JSON.stringify(relationship)),
+                description: `Assigned: ${currentModalEntity.name} → ${roleEntity.name}`
+            });
+
+            // Log to Xano
+            logActivityToXano({
+                event_verb: 'Assign to Role',
+                eo_operator: 'INS',
+                object_type: 'relationship',
+                object_id: relId,
+                object_label: `${currentModalEntity.name} assigned to ${roleEntity.name}`,
+                data_json: {
+                    subject_id: currentModalEntity.id,
+                    subject_type: 'person',
+                    subject_name: currentModalEntity.name,
+                    predicate: 'INS',
+                    predicate_label: 'Assign',
+                    object_id: roleId,
+                    object_type: 'role',
+                    object_name: roleEntity.name,
+                    connection_type: 'role_assignment'
+                }
+            });
+
+            // Save and refresh
+            saveToLocalStorage();
+
+            // Refresh the modal to show new assignment
+            openEntityModal(currentModalEntity.id, currentModalEntityType);
+
+            // Refresh views
+            if (currentView === 'graph') {
+                updateGraph();
+            } else if (currentView === 'tree') {
+                renderTreeView();
+            } else if (currentView === 'card') {
+                renderCardView();
+            } else if (currentView === 'orgchart') {
+                renderOrgChartView();
+            }
+
+            renderActivityList();
+        }
+
+        // Remove role assignment from person
+        function removeRoleAssignment(relationshipId) {
+            const relationship = relationships.find(r => r.id === relationshipId);
+            if (!relationship) return;
+
+            const person = findEntity(relationship.subject);
+            const role = findEntity(relationship.object);
+
+            // Remove the relationship
+            const index = relationships.findIndex(r => r.id === relationshipId);
+            if (index !== -1) {
+                relationships.splice(index, 1);
+            }
+
+            // Track in undo history
+            pushToUndoHistory({
+                type: 'delete_relationship',
+                data: JSON.parse(JSON.stringify(relationship)),
+                description: `Unassigned: ${person?.name || 'Person'} from ${role?.name || 'Role'}`
+            });
+
+            // Save and refresh
+            saveToLocalStorage();
+
+            // Refresh the modal if still open
+            if (currentModalEntity && currentModalEntityType === 'person') {
+                openEntityModal(currentModalEntity.id, currentModalEntityType);
+            }
+
+            // Refresh views
+            if (currentView === 'graph') {
+                updateGraph();
+            } else if (currentView === 'tree') {
+                renderTreeView();
+            } else if (currentView === 'card') {
+                renderCardView();
+            } else if (currentView === 'orgchart') {
+                renderOrgChartView();
+            }
+
+            renderActivityList();
+        }
+
         // Inline Editing Functions for Modal Fields
         function startInlineNameEdit() {
             if (!currentModalEntity) return;
@@ -9701,6 +9930,66 @@ John Doe,Engineering,john@example.com"
             const preview = document.getElementById('sentencePreview');
 
             if (!preview) return; // Safety check
+
+            // Show/hide Assign button based on whether subject is a person
+            const assignBtn = document.getElementById('assignOperatorBtn');
+            const defineBtn = document.querySelector('.operator-btn[data-predicate="DES"]');
+            const linkBtn = document.querySelector('.operator-btn[data-predicate="CON"]');
+            const orgEntitySelect = document.getElementById('orgEntitySelect');
+
+            if (assignBtn && subjectId) {
+                const subject = findEntity(subjectId);
+                if (subject && subject.type === 'person') {
+                    // Person selected: show Assign, hide Define/Link
+                    assignBtn.style.display = '';
+                    if (defineBtn) defineBtn.style.display = 'none';
+                    if (linkBtn) linkBtn.style.display = 'none';
+                    // Auto-select Assign if nothing selected or invalid for person
+                    if (selectedPredicate !== 'INS') {
+                        selectSimplifiedPredicate('INS', assignBtn);
+                    }
+                    // Update org entity dropdown to only show roles
+                    if (orgEntitySelect) {
+                        const currentValue = orgEntitySelect.value;
+                        orgEntitySelect.innerHTML = '<option value="">Select role...</option>';
+                        entities.role.forEach(role => {
+                            const option = document.createElement('option');
+                            option.value = role.id;
+                            option.textContent = role.name;
+                            if (role.id === currentValue) option.selected = true;
+                            orgEntitySelect.appendChild(option);
+                        });
+                    }
+                } else {
+                    // Not a person: hide Assign, show Define/Link
+                    assignBtn.style.display = 'none';
+                    if (defineBtn) defineBtn.style.display = '';
+                    if (linkBtn) linkBtn.style.display = '';
+                    // Switch away from INS if currently selected
+                    if (selectedPredicate === 'INS' && defineBtn) {
+                        selectSimplifiedPredicate('DES', defineBtn);
+                    }
+                    // Restore org entity dropdown to show all org types
+                    if (orgEntitySelect) {
+                        const currentValue = orgEntitySelect.value;
+                        orgEntitySelect.innerHTML = '<option value="">Select entity...</option>';
+                        ['unit', 'team', 'role'].forEach(type => {
+                            entities[type].forEach(entity => {
+                                const option = document.createElement('option');
+                                option.value = entity.id;
+                                option.textContent = `${entity.name} (${type})`;
+                                if (entity.id === currentValue) option.selected = true;
+                                orgEntitySelect.appendChild(option);
+                            });
+                        });
+                    }
+                }
+            } else if (assignBtn) {
+                // No subject selected: default state
+                assignBtn.style.display = 'none';
+                if (defineBtn) defineBtn.style.display = '';
+                if (linkBtn) linkBtn.style.display = '';
+            }
 
             // Determine which object was selected (org entity or work object)
             const selectedObjectId = objectId || orgEntityId;
@@ -10725,9 +11014,17 @@ John Doe,Engineering,john@example.com"
         function validateConnection(subject, object, predicate) {
             if (!subject || !object) return 'Invalid entities selected';
 
-            // Persons cannot have any activities or relationships
+            // INS operator: assign person to role
+            if (predicate === 'INS') {
+                if (subject.type === 'person' && object.type === 'role') {
+                    return null; // Valid: person assigned to role
+                }
+                return 'Start operator is only for assigning people to roles';
+            }
+
+            // Persons cannot have other activities or relationships (except INS handled above)
             if (subject.type === 'person') {
-                return 'People cannot have activities tied to them';
+                return 'People can only be assigned to roles (use Start operator)';
             }
             if (object.type === 'person') {
                 return 'Activities cannot target people';
@@ -10747,11 +11044,6 @@ John Doe,Engineering,john@example.com"
                 if (subject.type === 'role') {
                     return 'Roles cannot use Define operator (use Link or other operators)';
                 }
-            }
-
-            // INS operator is no longer used (was for person role assignments)
-            if (predicate === 'INS') {
-                return 'The Start operator is no longer available';
             }
 
             // Link operator: connecting work
@@ -12282,9 +12574,12 @@ John Doe,Engineering,john@example.com"
                     .filter(e => e !== null);
             }
 
-            // People can no longer be assigned to roles
+            // Get people who fill a role (via INS relationships)
             function getPeopleInRole(roleId) {
-                return [];
+                return relationships
+                    .filter(r => r.predicate === 'INS' && r.object === roleId)
+                    .map(r => findEntity(r.subject))
+                    .filter(e => e !== null && e.type === 'person');
             }
 
             // Recursively build unit node with nested units, teams, and roles
@@ -12326,8 +12621,11 @@ John Doe,Engineering,john@example.com"
             // Find orphan entities (no DES parent)
             const orphanTeams = entities.team.filter(t => !entitiesWithParents.has(t.id));
             const orphanRoles = entities.role.filter(r => !entitiesWithParents.has(r.id));
-            // All people are standalone - they cannot have activities tied to them
-            const orphanPeople = entities.person;
+            // People not assigned to any role (via INS relationship)
+            const peopleWithRoles = new Set(
+                relationships.filter(r => r.predicate === 'INS').map(r => r.subject)
+            );
+            const orphanPeople = entities.person.filter(p => !peopleWithRoles.has(p.id));
 
             return {
                 units: hierarchyTree,
