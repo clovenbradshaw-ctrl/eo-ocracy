@@ -10013,24 +10013,55 @@ John Doe,Engineering,john@example.com"
         // Calculate auto-layout positions based on hierarchy
         function calculateAutoLayout(nodes, width, height) {
             const positions = new Map();
+            const nodeIds = new Set(nodes.map(n => n.id));
 
-            // Build hierarchy from DES relationships
-            const parentMap = new Map();
-            const childrenMap = new Map();
+            // Build a lookup of ALL entities for hierarchy calculation
+            const allEntities = new Map();
+            ['unit', 'team', 'role', 'object'].forEach(type => {
+                entities[type].forEach(e => allEntities.set(e.id, e));
+            });
+
+            // Build FULL hierarchy from ALL DES relationships (not just filtered nodes)
+            const fullParentMap = new Map();
+            const fullChildrenMap = new Map();
 
             relationships.filter(r => r.predicate === 'DES').forEach(rel => {
-                const parentNode = nodes.find(n => n.id === rel.subject);
-                const childNode = nodes.find(n => n.id === rel.object);
-                if (parentNode && childNode) {
-                    parentMap.set(rel.object, rel.subject);
-                    if (!childrenMap.has(rel.subject)) {
-                        childrenMap.set(rel.subject, []);
+                if (allEntities.has(rel.subject) && allEntities.has(rel.object)) {
+                    fullParentMap.set(rel.object, rel.subject);
+                    if (!fullChildrenMap.has(rel.subject)) {
+                        fullChildrenMap.set(rel.subject, []);
                     }
-                    childrenMap.get(rel.subject).push(rel.object);
+                    fullChildrenMap.get(rel.subject).push(rel.object);
                 }
             });
 
-            // Find root nodes (no parent)
+            // Build filtered hierarchy - only include relationships where both nodes are visible
+            const parentMap = new Map();
+            const childrenMap = new Map();
+
+            // For each visible node, find its nearest visible ancestor
+            function findVisibleAncestor(nodeId) {
+                let current = fullParentMap.get(nodeId);
+                while (current) {
+                    if (nodeIds.has(current)) return current;
+                    current = fullParentMap.get(current);
+                }
+                return null;
+            }
+
+            // Build effective parent-child relationships between visible nodes
+            nodes.forEach(node => {
+                const visibleParent = findVisibleAncestor(node.id);
+                if (visibleParent) {
+                    parentMap.set(node.id, visibleParent);
+                    if (!childrenMap.has(visibleParent)) {
+                        childrenMap.set(visibleParent, []);
+                    }
+                    childrenMap.get(visibleParent).push(node.id);
+                }
+            });
+
+            // Find root nodes (no visible parent in hierarchy)
             const rootNodes = nodes.filter(n => !parentMap.has(n.id));
 
             // Calculate depths
