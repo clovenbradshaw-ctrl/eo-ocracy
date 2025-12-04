@@ -13331,16 +13331,18 @@ John Doe,Engineering,john@example.com"
             const positions = new Map();
             const nodeIds = new Set(nodes.map(n => n.id));
 
-            // Build a lookup of ALL entities for hierarchy calculation
+            // Build a lookup of ALL entities for hierarchy calculation (including person)
             const allEntities = new Map();
-            ['unit', 'team', 'role', 'object'].forEach(type => {
+            ['unit', 'team', 'role', 'person', 'object'].forEach(type => {
                 entities[type].forEach(e => allEntities.set(e.id, e));
             });
 
-            // Build FULL hierarchy from ALL DES relationships (not just filtered nodes)
+            // Build FULL hierarchy from DES relationships (unit -> team -> role)
+            // AND INS relationships (person -> role, meaning person is child of role)
             const fullParentMap = new Map();
             const fullChildrenMap = new Map();
 
+            // Process DES relationships (hierarchical: subject is parent of object)
             relationships.filter(r => r.predicate === 'DES').forEach(rel => {
                 if (allEntities.has(rel.subject) && allEntities.has(rel.object)) {
                     fullParentMap.set(rel.object, rel.subject);
@@ -13348,6 +13350,26 @@ John Doe,Engineering,john@example.com"
                         fullChildrenMap.set(rel.subject, []);
                     }
                     fullChildrenMap.get(rel.subject).push(rel.object);
+                }
+            });
+
+            // Process INS relationships (person assigned to role: subject=person, object=role)
+            // In hierarchy terms, person is a child of the role they're assigned to
+            relationships.filter(r => r.predicate === 'INS').forEach(rel => {
+                if (allEntities.has(rel.subject) && allEntities.has(rel.object)) {
+                    const person = allEntities.get(rel.subject);
+                    const role = allEntities.get(rel.object);
+                    // Only if subject is a person and object is a role
+                    if (person && person.type === 'person' && role && role.type === 'role') {
+                        fullParentMap.set(rel.subject, rel.object);
+                        if (!fullChildrenMap.has(rel.object)) {
+                            fullChildrenMap.set(rel.object, []);
+                        }
+                        // Avoid duplicates
+                        if (!fullChildrenMap.get(rel.object).includes(rel.subject)) {
+                            fullChildrenMap.get(rel.object).push(rel.subject);
+                        }
+                    }
                 }
             });
 
@@ -13385,8 +13407,9 @@ John Doe,Engineering,john@example.com"
             // Find orphan nodes (no parent AND no children in hierarchy)
             const orphanNodes = nodes.filter(n => !parentMap.has(n.id) && !childrenMap.has(n.id));
 
-            const VERTICAL_SPACING = 140;
-            const HORIZONTAL_SPACING = 180;
+            // Increased spacing for better readability
+            const VERTICAL_SPACING = 160;
+            const HORIZONTAL_SPACING = 200;
 
             // Use d3.tree() for proper hierarchical layout
             if (rootNodes.length > 0) {
@@ -13405,12 +13428,16 @@ John Doe,Engineering,john@example.com"
                 // Create d3 hierarchy
                 const root = d3.hierarchy(virtualRoot);
 
-                // Calculate tree layout
+                // Calculate tree layout with increased separation
                 const treeLayout = d3.tree()
                     .nodeSize([HORIZONTAL_SPACING, VERTICAL_SPACING])
                     .separation((a, b) => {
-                        // More separation between different subtrees
-                        return a.parent === b.parent ? 1 : 1.5;
+                        // Much more separation between different subtrees
+                        // Also consider depth - deeper nodes need more space
+                        if (a.parent === b.parent) {
+                            return 1.2;
+                        }
+                        return 2.0;
                     });
 
                 treeLayout(root);
@@ -13436,13 +13463,13 @@ John Doe,Engineering,john@example.com"
                     maxY = Math.max(maxY, pos.y);
                 });
 
-                // Calculate grid dimensions for orphans
-                const gridColumns = Math.ceil(Math.sqrt(orphanNodes.length * 1.5)); // Wider than tall
+                // Calculate grid dimensions for orphans - prefer wider layout
+                const gridColumns = Math.max(3, Math.ceil(Math.sqrt(orphanNodes.length * 2)));
                 const gridRows = Math.ceil(orphanNodes.length / gridColumns);
 
-                const orphanStartY = maxY + VERTICAL_SPACING + 40;
+                const orphanStartY = maxY + VERTICAL_SPACING + 60;
                 const gridWidth = (gridColumns - 1) * HORIZONTAL_SPACING;
-                const gridStartX = (width - gridWidth) / 2;
+                const gridStartX = Math.max(100, (width - gridWidth) / 2);
 
                 orphanNodes.forEach((n, i) => {
                     const col = i % gridColumns;
@@ -13471,6 +13498,43 @@ John Doe,Engineering,john@example.com"
                 });
             }
 
+            // Collision detection and resolution
+            // Check for overlapping nodes and nudge them apart
+            const nodeWidth = NODE_WIDTH + 20;  // Add padding
+            const nodeHeight = NODE_HEIGHT + 20;
+            const posArray = Array.from(positions.entries());
+
+            for (let iteration = 0; iteration < 5; iteration++) {
+                let hasCollision = false;
+                for (let i = 0; i < posArray.length; i++) {
+                    for (let j = i + 1; j < posArray.length; j++) {
+                        const [id1, pos1] = posArray[i];
+                        const [id2, pos2] = posArray[j];
+
+                        const dx = Math.abs(pos1.x - pos2.x);
+                        const dy = Math.abs(pos1.y - pos2.y);
+
+                        // Check if nodes overlap
+                        if (dx < nodeWidth && dy < nodeHeight) {
+                            hasCollision = true;
+                            // Nudge nodes apart horizontally
+                            const nudge = (nodeWidth - dx) / 2 + 10;
+                            if (pos1.x < pos2.x) {
+                                pos1.x -= nudge;
+                                pos2.x += nudge;
+                            } else {
+                                pos1.x += nudge;
+                                pos2.x -= nudge;
+                            }
+                            // Update in map
+                            positions.set(id1, pos1);
+                            positions.set(id2, pos2);
+                        }
+                    }
+                }
+                if (!hasCollision) break;
+            }
+
             return positions;
         }
 
@@ -13487,7 +13551,7 @@ John Doe,Engineering,john@example.com"
 
             // Get filtered nodes (same as updateGraph)
             const nodes = [];
-            ['unit', 'team', 'role', 'object'].forEach(type => {
+            ['unit', 'team', 'role', 'person', 'object'].forEach(type => {
                 if (filters.entities[type]) {
                     entities[type].forEach(entity => nodes.push(entity));
                 }
@@ -13498,7 +13562,7 @@ John Doe,Engineering,john@example.com"
 
             // Apply positions to entities and save
             positions.forEach((pos, nodeId) => {
-                for (const type of ['unit', 'team', 'role', 'object']) {
+                for (const type of ['unit', 'team', 'role', 'person', 'object']) {
                     const entity = entities[type].find(e => e.id === nodeId);
                     if (entity) {
                         entity.graphX = pos.x;
@@ -13626,7 +13690,7 @@ John Doe,Engineering,john@example.com"
 
             // Prepare data with filters applied
             const nodes = [];
-            const types = ['unit', 'team', 'role', 'object'];
+            const types = ['unit', 'team', 'role', 'person', 'object'];
             types.forEach(type => {
                 if (filters.entities[type]) {
                     entities[type].forEach(entity => {
