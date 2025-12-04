@@ -885,6 +885,192 @@
         .entity-card.object { background: linear-gradient(135deg, #FFFBF5 0%, white 100%); }
         .entity-card.activity { background: linear-gradient(135deg, #F5F8FA 0%, white 100%); }
 
+        /* Drag and Drop Styles */
+        .entity-card[draggable="true"] {
+            cursor: grab;
+        }
+
+        .entity-card[draggable="true"]:active {
+            cursor: grabbing;
+        }
+
+        .entity-card.dragging {
+            opacity: 0.5;
+            transform: scale(0.95);
+            box-shadow: 0 4px 16px rgba(200, 143, 74, 0.4);
+        }
+
+        .entity-card.drag-over {
+            border-color: #C88F4A;
+            border-width: 3px;
+            border-style: dashed;
+            background: rgba(200, 143, 74, 0.1) !important;
+            transform: scale(1.02);
+        }
+
+        .card-row.drag-over-section .card-grid {
+            background: rgba(200, 143, 74, 0.08);
+            border-radius: 12px;
+            border: 2px dashed #C88F4A;
+            padding: 1rem;
+            margin: -1rem;
+        }
+
+        .card-row.drag-over-section .card-row-header {
+            background: rgba(200, 143, 74, 0.15);
+            border-radius: 8px;
+            padding: 0.5rem;
+            margin: -0.5rem -0.5rem 0.75rem;
+        }
+
+        /* Nesting Modal */
+        .nesting-modal-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(61, 46, 31, 0.8);
+            display: none;
+            align-items: center;
+            justify-content: center;
+            z-index: 3000;
+        }
+
+        .nesting-modal-overlay.open {
+            display: flex;
+        }
+
+        .nesting-modal {
+            background: white;
+            border-radius: 16px;
+            max-width: 480px;
+            width: 90%;
+            box-shadow: 0 8px 40px rgba(61, 46, 31, 0.25);
+            overflow: hidden;
+        }
+
+        .nesting-modal-header {
+            padding: 1.5rem 2rem;
+            background: linear-gradient(135deg, #C88F4A 0%, #B87B5B 100%);
+            color: white;
+        }
+
+        .nesting-modal-header h3 {
+            margin: 0;
+            font-size: 1.2rem;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .nesting-modal-content {
+            padding: 1.5rem 2rem;
+        }
+
+        .nesting-modal-preview {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 1rem;
+            padding: 1.25rem;
+            background: #FAF7F5;
+            border-radius: 12px;
+            margin-bottom: 1.5rem;
+        }
+
+        .nesting-preview-entity {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .nesting-preview-icon {
+            font-size: 2rem;
+        }
+
+        .nesting-preview-name {
+            font-weight: 600;
+            color: #3D2E1F;
+            font-size: 0.9rem;
+            text-align: center;
+            max-width: 120px;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            white-space: nowrap;
+        }
+
+        .nesting-preview-type {
+            font-size: 0.75rem;
+            color: #8B6F47;
+            text-transform: capitalize;
+        }
+
+        .nesting-preview-arrow {
+            font-size: 1.5rem;
+            color: #C88F4A;
+        }
+
+        .nesting-modal-question {
+            text-align: center;
+            color: #6B5642;
+            margin-bottom: 1.5rem;
+            line-height: 1.5;
+        }
+
+        .nesting-modal-options {
+            display: flex;
+            flex-direction: column;
+            gap: 0.75rem;
+        }
+
+        .nesting-option-btn {
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+            padding: 1rem 1.25rem;
+            background: white;
+            border: 2px solid #E5DDD1;
+            border-radius: 12px;
+            cursor: pointer;
+            transition: all 0.2s;
+            text-align: left;
+        }
+
+        .nesting-option-btn:hover {
+            border-color: #C88F4A;
+            background: #FFF9F0;
+        }
+
+        .nesting-option-btn .option-icon {
+            font-size: 1.5rem;
+        }
+
+        .nesting-option-btn .option-text {
+            flex: 1;
+        }
+
+        .nesting-option-btn .option-title {
+            font-weight: 600;
+            color: #3D2E1F;
+            margin-bottom: 0.25rem;
+        }
+
+        .nesting-option-btn .option-desc {
+            font-size: 0.85rem;
+            color: #8B6F47;
+        }
+
+        .nesting-modal-actions {
+            display: flex;
+            gap: 0.75rem;
+            justify-content: center;
+            padding: 1.25rem 2rem;
+            background: #FAF7F5;
+            border-top: 1px solid #E5DDD1;
+        }
+
         .card-header {
             display: flex;
             align-items: center;
@@ -2860,6 +3046,39 @@
         </div>
     </div>
 
+    <!-- Nesting Modal (Type Conversion Choice) -->
+    <div id="nestingModal" class="nesting-modal-overlay" onclick="if(event.target === this) closeNestingModal()">
+        <div class="nesting-modal">
+            <div class="nesting-modal-header">
+                <h3><i class="ph ph-tree-structure"></i> Nest Entity</h3>
+            </div>
+            <div class="nesting-modal-content">
+                <div class="nesting-modal-preview">
+                    <div class="nesting-preview-entity">
+                        <span class="nesting-preview-icon" id="nestingDraggedIcon"></span>
+                        <span class="nesting-preview-name" id="nestingDraggedName"></span>
+                        <span class="nesting-preview-type" id="nestingDraggedType"></span>
+                    </div>
+                    <span class="nesting-preview-arrow"><i class="ph ph-arrow-right"></i></span>
+                    <div class="nesting-preview-entity">
+                        <span class="nesting-preview-icon" id="nestingTargetIcon"></span>
+                        <span class="nesting-preview-name" id="nestingTargetName"></span>
+                        <span class="nesting-preview-type" id="nestingTargetType"></span>
+                    </div>
+                </div>
+                <p class="nesting-modal-question" id="nestingModalQuestion">
+                    Do you want to keep the original entity type or convert it?
+                </p>
+                <div class="nesting-modal-options" id="nestingModalOptions">
+                    <!-- Options will be populated dynamically -->
+                </div>
+            </div>
+            <div class="nesting-modal-actions">
+                <button class="modal-action-btn secondary" onclick="closeNestingModal()">Cancel</button>
+            </div>
+        </div>
+    </div>
+
     <!-- Workspace Modal (Create/Rename) -->
     <div id="workspaceModal" class="workspace-modal-overlay" onclick="if(event.target === this) closeWorkspaceModal()">
         <div class="workspace-modal">
@@ -3932,6 +4151,375 @@ John Doe,Engineering,john@example.com"
             document.getElementById('deleteConfirmModal').classList.remove('open');
             relationshipToDelete = null;
         }
+
+        // ==========================================
+        // Drag and Drop for Entity Nesting
+        // ==========================================
+
+        let draggedEntity = null;
+        let draggedEntityType = null;
+        let pendingNestingAction = null;
+
+        function handleCardDragStart(e) {
+            const card = e.target.closest('.entity-card');
+            if (!card) return;
+
+            draggedEntity = findEntity(card.dataset.entityId);
+            draggedEntityType = card.dataset.entityType;
+
+            card.classList.add('dragging');
+            e.dataTransfer.effectAllowed = 'move';
+            e.dataTransfer.setData('text/plain', JSON.stringify({
+                entityId: card.dataset.entityId,
+                entityType: card.dataset.entityType
+            }));
+        }
+
+        function handleCardDragEnd(e) {
+            const card = e.target.closest('.entity-card');
+            if (card) {
+                card.classList.remove('dragging');
+            }
+            // Clear all drag-over states
+            document.querySelectorAll('.drag-over').forEach(el => el.classList.remove('drag-over'));
+            document.querySelectorAll('.drag-over-section').forEach(el => el.classList.remove('drag-over-section'));
+
+            draggedEntity = null;
+            draggedEntityType = null;
+        }
+
+        function handleCardDragOver(e) {
+            e.preventDefault();
+            e.stopPropagation();
+
+            const card = e.target.closest('.entity-card');
+            if (!card || !draggedEntity) return;
+
+            const targetId = card.dataset.entityId;
+            const targetType = card.dataset.entityType;
+
+            // Don't allow dropping on itself
+            if (targetId === draggedEntity.id) return;
+
+            // Only allow dropping on unit, team, role
+            if (!['unit', 'team', 'role'].includes(targetType)) return;
+
+            e.dataTransfer.dropEffect = 'move';
+            card.classList.add('drag-over');
+        }
+
+        function handleCardDragLeave(e) {
+            const card = e.target.closest('.entity-card');
+            if (card) {
+                card.classList.remove('drag-over');
+            }
+        }
+
+        function handleCardDrop(e) {
+            e.preventDefault();
+            e.stopPropagation();
+
+            const card = e.target.closest('.entity-card');
+            if (!card || !draggedEntity) return;
+
+            card.classList.remove('drag-over');
+
+            const targetId = card.dataset.entityId;
+            const targetType = card.dataset.entityType;
+            const targetEntity = findEntity(targetId);
+
+            // Don't allow dropping on itself
+            if (targetId === draggedEntity.id) return;
+
+            // Check if already nested under this entity
+            const existingRelationship = relationships.find(r =>
+                r.subject === targetId && r.object === draggedEntity.id && r.predicate === 'DES'
+            );
+            if (existingRelationship) {
+                alert(`"${draggedEntity.name}" is already nested under "${targetEntity.name}"`);
+                return;
+            }
+
+            // Check if types are different - show modal to ask about conversion
+            if (draggedEntityType !== targetType) {
+                openNestingModal(draggedEntity, draggedEntityType, targetEntity, targetType);
+            } else {
+                // Same type - just nest it
+                nestEntityUnder(draggedEntity.id, draggedEntityType, targetId, targetType, false);
+            }
+
+            // Prevent click event from firing
+            card.classList.add('just-dropped');
+            setTimeout(() => card.classList.remove('just-dropped'), 100);
+        }
+
+        function handleRowDragOver(e) {
+            e.preventDefault();
+
+            const row = e.target.closest('.card-row');
+            if (!row || !draggedEntity) return;
+
+            const targetType = row.dataset.entityType;
+
+            // Only allow dropping on unit, team, role sections
+            if (!['unit', 'team', 'role'].includes(targetType)) return;
+
+            // Don't highlight if same type (no conversion needed)
+            if (targetType === draggedEntityType) return;
+
+            e.dataTransfer.dropEffect = 'move';
+            row.classList.add('drag-over-section');
+        }
+
+        function handleRowDragLeave(e) {
+            const row = e.target.closest('.card-row');
+            if (row && !row.contains(e.relatedTarget)) {
+                row.classList.remove('drag-over-section');
+            }
+        }
+
+        function handleRowDrop(e) {
+            // Only handle if not dropping on a card (card handler takes precedence)
+            if (e.target.closest('.entity-card')) return;
+
+            e.preventDefault();
+
+            const row = e.target.closest('.card-row');
+            if (!row || !draggedEntity) return;
+
+            row.classList.remove('drag-over-section');
+
+            const targetType = row.dataset.entityType;
+
+            // Only allow dropping on unit, team, role sections
+            if (!['unit', 'team', 'role'].includes(targetType)) return;
+
+            // If same type, nothing to do
+            if (targetType === draggedEntityType) return;
+
+            // Convert entity type
+            convertEntityType(draggedEntity.id, draggedEntityType, targetType);
+        }
+
+        function openNestingModal(dragged, draggedType, target, targetType) {
+            pendingNestingAction = {
+                draggedId: dragged.id,
+                draggedType: draggedType,
+                targetId: target.id,
+                targetType: targetType
+            };
+
+            // Populate modal
+            document.getElementById('nestingDraggedIcon').innerHTML = getIcon(draggedType);
+            document.getElementById('nestingDraggedName').textContent = dragged.name;
+            document.getElementById('nestingDraggedType').textContent = draggedType;
+
+            document.getElementById('nestingTargetIcon').innerHTML = getIcon(targetType);
+            document.getElementById('nestingTargetName').textContent = target.name;
+            document.getElementById('nestingTargetType').textContent = targetType;
+
+            // Determine appropriate child type based on target
+            let suggestedType = targetType;
+            if (targetType === 'unit') {
+                suggestedType = 'team';
+            } else if (targetType === 'team') {
+                suggestedType = 'role';
+            }
+
+            document.getElementById('nestingModalQuestion').innerHTML = `
+                <strong>"${dragged.name}"</strong> (${draggedType}) will be nested under <strong>"${target.name}"</strong> (${targetType}).<br>
+                What type should the nested entity be?
+            `;
+
+            // Build options
+            let optionsHTML = '';
+
+            // Option 1: Keep as original type
+            optionsHTML += `
+                <button class="nesting-option-btn" onclick="confirmNesting(false)">
+                    <span class="option-icon">${getIcon(draggedType)}</span>
+                    <div class="option-text">
+                        <div class="option-title">Keep as ${draggedType}</div>
+                        <div class="option-desc">Nest "${dragged.name}" under "${target.name}" without changing its type</div>
+                    </div>
+                </button>
+            `;
+
+            // Option 2: Convert to target type (if different)
+            if (draggedType !== targetType) {
+                optionsHTML += `
+                    <button class="nesting-option-btn" onclick="confirmNesting(true, '${targetType}')">
+                        <span class="option-icon">${getIcon(targetType)}</span>
+                        <div class="option-text">
+                            <div class="option-title">Convert to ${targetType}</div>
+                            <div class="option-desc">Change "${dragged.name}" to a ${targetType} and nest under "${target.name}"</div>
+                        </div>
+                    </button>
+                `;
+            }
+
+            // Option 3: If unit -> team, suggest role as child
+            if (targetType === 'unit' && draggedType !== 'team') {
+                optionsHTML += `
+                    <button class="nesting-option-btn" onclick="confirmNesting(true, 'team')">
+                        <span class="option-icon">${getIcon('team')}</span>
+                        <div class="option-text">
+                            <div class="option-title">Convert to team</div>
+                            <div class="option-desc">Change "${dragged.name}" to a team under this unit</div>
+                        </div>
+                    </button>
+                `;
+            }
+
+            // Option 4: If team -> role suggest
+            if (targetType === 'team' && draggedType !== 'role') {
+                optionsHTML += `
+                    <button class="nesting-option-btn" onclick="confirmNesting(true, 'role')">
+                        <span class="option-icon">${getIcon('role')}</span>
+                        <div class="option-text">
+                            <div class="option-title">Convert to role</div>
+                            <div class="option-desc">Change "${dragged.name}" to a role under this team</div>
+                        </div>
+                    </button>
+                `;
+            }
+
+            document.getElementById('nestingModalOptions').innerHTML = optionsHTML;
+            document.getElementById('nestingModal').classList.add('open');
+        }
+
+        function closeNestingModal() {
+            document.getElementById('nestingModal').classList.remove('open');
+            pendingNestingAction = null;
+        }
+
+        function confirmNesting(convertType, newType = null) {
+            if (!pendingNestingAction) return;
+
+            const { draggedId, draggedType, targetId, targetType } = pendingNestingAction;
+
+            if (convertType && newType) {
+                // Convert type first (skip render), then nest - convertEntityType returns the new ID
+                const newId = convertEntityType(draggedId, draggedType, newType, true);
+                nestEntityUnder(newId, newType, targetId, targetType, true);
+            } else {
+                // Just nest without conversion
+                nestEntityUnder(draggedId, draggedType, targetId, targetType, false);
+            }
+
+            closeNestingModal();
+        }
+
+        function nestEntityUnder(childId, childType, parentId, parentType, skipLog = false) {
+            const child = findEntity(childId);
+            const parent = findEntity(parentId);
+            if (!child || !parent) return;
+
+            // Remove any existing parent relationships for this child (only DES relationships where child is object)
+            const existingParentRels = relationships.filter(r =>
+                r.object === childId && r.predicate === 'DES'
+            );
+            existingParentRels.forEach(rel => {
+                relationships = relationships.filter(r => r.id !== rel.id);
+            });
+
+            // Create new parent relationship
+            const relId = 'rel_nest_' + Date.now();
+            relationships.push({
+                id: relId,
+                subject: parentId,
+                predicate: 'DES',
+                object: childId
+            });
+
+            // Log to Xano
+            if (!skipLog) {
+                logActivityToXano({
+                    event_verb: 'Nest Entity',
+                    eo_operator: 'DES',
+                    object_type: childType,
+                    object_id: childId,
+                    object_label: child.name,
+                    data_json: {
+                        action: 'nest',
+                        child_name: child.name,
+                        child_type: childType,
+                        parent_name: parent.name,
+                        parent_type: parentType,
+                        removed_parent_relationships: existingParentRels.length
+                    }
+                });
+            }
+
+            saveToLocalStorage();
+            renderAll();
+        }
+
+        function convertEntityType(entityId, fromType, toType, skipRender = false) {
+            const entity = findEntity(entityId);
+            if (!entity) return entityId;
+
+            // Remove from old type array
+            entities[fromType] = entities[fromType].filter(e => e.id !== entityId);
+
+            // Update entity type and id prefix
+            const newId = toType[0] + Date.now();
+            const oldId = entity.id;
+
+            entity.type = toType;
+            entity.id = newId;
+
+            // Add to new type array
+            entities[toType].push(entity);
+
+            // Update all relationships that reference this entity
+            relationships.forEach(rel => {
+                if (rel.subject === oldId) rel.subject = newId;
+                if (rel.object === oldId) rel.object = newId;
+            });
+
+            // Log to Xano
+            logActivityToXano({
+                event_verb: 'Convert Entity Type',
+                eo_operator: 'SEG',
+                object_type: toType,
+                object_id: newId,
+                object_label: entity.name,
+                data_json: {
+                    action: 'convert_type',
+                    entity_name: entity.name,
+                    from_type: fromType,
+                    to_type: toType,
+                    old_id: oldId,
+                    new_id: newId
+                }
+            });
+
+            saveToLocalStorage();
+            if (!skipRender) {
+                renderAll();
+            }
+
+            return newId;
+        }
+
+        function renderAll() {
+            renderEntityList();
+            updateSelects();
+            renderActivityList();
+
+            if (currentView === 'graph') {
+                renderGraphView();
+            } else if (currentView === 'tree') {
+                renderTreeView();
+            } else {
+                renderCardView();
+            }
+        }
+
+        // ==========================================
+        // End Drag and Drop
+        // ==========================================
 
         function confirmDelete() {
             // Check if we're deleting a relationship or entity
@@ -5362,27 +5950,56 @@ John Doe,Engineering,john@example.com"
             }
         }
 
-        function createCardRow(title, entities, icon) {
+        function createCardRow(title, entityList, icon) {
+            // Determine entity type from title
+            const typeMap = { 'Units': 'unit', 'Teams': 'team', 'Roles': 'role', 'People': 'person', 'Work Products': 'object' };
+            const sectionType = typeMap[title] || 'unit';
+
             const row = document.createElement('div');
             row.className = 'card-row';
+            row.dataset.entityType = sectionType;
+
+            // Make row a drop target for type conversion
+            row.addEventListener('dragover', handleRowDragOver);
+            row.addEventListener('dragleave', handleRowDragLeave);
+            row.addEventListener('drop', handleRowDrop);
 
             const header = document.createElement('div');
             header.className = 'card-row-header';
             header.innerHTML = `
-                <div class="card-row-title">${icon} ${title} (${entities.length})</div>
+                <div class="card-row-title">${icon} ${title} (${entityList.length})</div>
             `;
             row.appendChild(header);
 
             const grid = document.createElement('div');
             grid.className = 'card-grid';
 
-            entities.forEach(entity => {
+            entityList.forEach(entity => {
                 const card = document.createElement('div');
                 card.className = `entity-card ${entity.type}`;
-                card.onclick = () => openEntityModal(entity.id, entity.type);
+
+                // Make card draggable (only for unit, team, role)
+                if (['unit', 'team', 'role'].includes(entity.type)) {
+                    card.draggable = true;
+                    card.dataset.entityId = entity.id;
+                    card.dataset.entityType = entity.type;
+
+                    card.addEventListener('dragstart', handleCardDragStart);
+                    card.addEventListener('dragend', handleCardDragEnd);
+                    card.addEventListener('dragover', handleCardDragOver);
+                    card.addEventListener('dragleave', handleCardDragLeave);
+                    card.addEventListener('drop', handleCardDrop);
+                }
+
+                card.onclick = (e) => {
+                    // Don't open modal if we just finished dragging
+                    if (!e.target.closest('.entity-card').classList.contains('just-dropped')) {
+                        openEntityModal(entity.id, entity.type);
+                    }
+                };
 
                 // Get all activities this entity is involved in
-                const entityActivities = relationships.filter(r => 
+                const entityActivities = relationships.filter(r =>
                     r.subject === entity.id || r.object === entity.id
                 );
 
