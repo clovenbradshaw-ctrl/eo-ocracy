@@ -990,6 +990,327 @@
             display: block;
         }
 
+        /* Venn View Styles */
+        .venn-view {
+            display: none;
+            position: relative;
+            height: 100%;
+            background: white;
+            overflow: hidden;
+        }
+
+        .venn-view.active {
+            display: block;
+        }
+
+        .venn-controls {
+            position: absolute;
+            top: 1rem;
+            left: 50%;
+            transform: translateX(-50%);
+            z-index: 10;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .venn-level-nav {
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+            background: white;
+            padding: 0.5rem 1rem;
+            border-radius: 20px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+            border: 1px solid #E5DDD1;
+        }
+
+        .venn-level-btn {
+            width: 28px;
+            height: 28px;
+            border-radius: 50%;
+            border: 1px solid #E5DDD1;
+            background: white;
+            color: #6B5642;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.2s;
+        }
+
+        .venn-level-btn:hover:not(:disabled) {
+            background: #C88F4A;
+            color: white;
+            border-color: #C88F4A;
+        }
+
+        .venn-level-btn:disabled {
+            opacity: 0.4;
+            cursor: not-allowed;
+        }
+
+        .venn-level-label {
+            font-weight: 600;
+            color: #3D2E1F;
+            min-width: 80px;
+            text-align: center;
+            font-size: 0.95rem;
+        }
+
+        .venn-breadcrumb {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            font-size: 0.8rem;
+            color: #8B6F47;
+        }
+
+        .venn-breadcrumb-item {
+            cursor: pointer;
+            padding: 0.25rem 0.5rem;
+            border-radius: 4px;
+            transition: all 0.15s;
+        }
+
+        .venn-breadcrumb-item:hover {
+            background: rgba(200, 143, 74, 0.15);
+            color: #C88F4A;
+        }
+
+        .venn-breadcrumb-separator {
+            color: #C8B9A0;
+        }
+
+        #vennDiagram {
+            width: 100%;
+            height: 100%;
+        }
+
+        .venn-circle {
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .venn-circle:hover {
+            filter: brightness(1.05);
+        }
+
+        .venn-circle-label {
+            pointer-events: none;
+            font-weight: 600;
+            font-size: 14px;
+            fill: #3D2E1F;
+        }
+
+        .venn-circle-count {
+            pointer-events: none;
+            font-size: 11px;
+            fill: #6B5642;
+        }
+
+        .venn-overlap {
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .venn-overlap:hover {
+            filter: brightness(0.95);
+        }
+
+        .venn-overlap-indicator {
+            pointer-events: none;
+        }
+
+        .venn-tooltip {
+            position: absolute;
+            background: white;
+            border-radius: 8px;
+            box-shadow: 0 4px 16px rgba(0,0,0,0.15);
+            padding: 0.75rem 1rem;
+            pointer-events: none;
+            opacity: 0;
+            transition: opacity 0.15s;
+            z-index: 100;
+            max-width: 250px;
+            border: 1px solid #E5DDD1;
+        }
+
+        .venn-tooltip.visible {
+            opacity: 1;
+        }
+
+        .venn-tooltip-title {
+            font-weight: 600;
+            color: #3D2E1F;
+            margin-bottom: 0.25rem;
+        }
+
+        .venn-tooltip-desc {
+            font-size: 0.85rem;
+            color: #6B5642;
+        }
+
+        .venn-overlap-panel {
+            position: absolute;
+            right: 1rem;
+            top: 1rem;
+            width: 300px;
+            max-height: calc(100% - 2rem);
+            background: white;
+            border-radius: 12px;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.15);
+            border: 1px solid #E5DDD1;
+            z-index: 50;
+            display: none;
+            overflow: hidden;
+        }
+
+        .venn-overlap-panel.visible {
+            display: block;
+        }
+
+        .venn-overlap-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 0.875rem 1rem;
+            background: linear-gradient(135deg, #C88F4A 0%, #B87B5B 100%);
+            color: white;
+            font-weight: 600;
+        }
+
+        .venn-close-btn {
+            background: rgba(255,255,255,0.2);
+            border: none;
+            width: 24px;
+            height: 24px;
+            border-radius: 50%;
+            color: white;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: background 0.2s;
+        }
+
+        .venn-close-btn:hover {
+            background: rgba(255,255,255,0.3);
+        }
+
+        .venn-overlap-content {
+            padding: 1rem;
+            overflow-y: auto;
+            max-height: calc(100vh - 200px);
+        }
+
+        .venn-connection-item {
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+            padding: 0.625rem 0.75rem;
+            margin-bottom: 0.5rem;
+            border-radius: 8px;
+            background: #FAF7F5;
+            border: 1px solid #E5DDD1;
+            cursor: pointer;
+            transition: all 0.15s;
+        }
+
+        .venn-connection-item:hover {
+            border-color: #C88F4A;
+            background: white;
+        }
+
+        .venn-connection-icon {
+            width: 32px;
+            height: 32px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-size: 14px;
+        }
+
+        .venn-connection-info {
+            flex: 1;
+            min-width: 0;
+        }
+
+        .venn-connection-name {
+            font-weight: 500;
+            color: #3D2E1F;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+
+        .venn-connection-type {
+            font-size: 0.75rem;
+            color: #8B6F47;
+            text-transform: uppercase;
+        }
+
+        .venn-shared-label {
+            font-size: 0.85rem;
+            color: #6B5642;
+            font-weight: 600;
+            margin-bottom: 0.75rem;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .venn-shared-count {
+            background: #C88F4A;
+            color: white;
+            padding: 0.125rem 0.5rem;
+            border-radius: 10px;
+            font-size: 0.75rem;
+        }
+
+        .venn-entity-section {
+            margin-bottom: 1rem;
+            padding-bottom: 1rem;
+            border-bottom: 1px solid #E5DDD1;
+        }
+
+        .venn-entity-section:last-child {
+            margin-bottom: 0;
+            padding-bottom: 0;
+            border-bottom: none;
+        }
+
+        .venn-entity-header {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            font-weight: 600;
+            color: #3D2E1F;
+            margin-bottom: 0.5rem;
+        }
+
+        .venn-zoom-hint {
+            position: absolute;
+            bottom: 1rem;
+            left: 50%;
+            transform: translateX(-50%);
+            background: rgba(59, 46, 31, 0.8);
+            color: white;
+            padding: 0.5rem 1rem;
+            border-radius: 20px;
+            font-size: 0.8rem;
+            opacity: 0;
+            transition: opacity 0.3s;
+            pointer-events: none;
+        }
+
+        .venn-zoom-hint.visible {
+            opacity: 1;
+        }
+
         .tree-node-container {
             margin-bottom: 0.5rem;
         }
@@ -2627,6 +2948,9 @@
                 <button class="view-toggle-btn" data-view="graph" onclick="switchView('graph')">
                     <i class="ph ph-graph"></i> Graph
                 </button>
+                <button class="view-toggle-btn" data-view="venn" onclick="switchView('venn')">
+                    <i class="ph ph-circles-three"></i> Venn
+                </button>
             </div>
             <button class="btn btn-small btn-outline" onclick="toggleSampleData()" id="sampleDataBtn">
                 <i class="ph ph-database"></i> <span id="sampleDataText">Clear Sample Data</span>
@@ -2734,6 +3058,33 @@
             <div id="graphView" class="graph-view active">
                 <svg id="graph"></svg>
                 <div class="tooltip" id="tooltip"></div>
+            </div>
+
+            <!-- Venn View -->
+            <div id="vennView" class="venn-view">
+                <div class="venn-controls">
+                    <div class="venn-level-nav">
+                        <button class="venn-level-btn" onclick="changeVennLevel(-1)" id="vennLevelUp" disabled>
+                            <i class="ph ph-arrow-up"></i>
+                        </button>
+                        <span class="venn-level-label" id="vennLevelLabel">Units</span>
+                        <button class="venn-level-btn" onclick="changeVennLevel(1)" id="vennLevelDown">
+                            <i class="ph ph-arrow-down"></i>
+                        </button>
+                    </div>
+                    <div class="venn-breadcrumb" id="vennBreadcrumb"></div>
+                </div>
+                <svg id="vennDiagram"></svg>
+                <div class="venn-tooltip" id="vennTooltip"></div>
+                <div class="venn-overlap-panel" id="vennOverlapPanel">
+                    <div class="venn-overlap-header">
+                        <span id="vennOverlapTitle">Shared Connections</span>
+                        <button class="venn-close-btn" onclick="closeOverlapPanel()">
+                            <i class="ph ph-x"></i>
+                        </button>
+                    </div>
+                    <div class="venn-overlap-content" id="vennOverlapContent"></div>
+                </div>
             </div>
         </div>
 
@@ -3710,10 +4061,17 @@ John Doe,Engineering,john@example.com"
         let height = 600;
         let graphSimulation, graphLink, graphNode, graphLinkText;
 
+        // Venn diagram state
+        let vennCurrentLevel = 0; // 0: units, 1: teams, 2: roles, 3: people
+        const vennLevels = ['unit', 'team', 'role', 'person'];
+        const vennLevelLabels = ['Units', 'Teams', 'Roles', 'People'];
+        let vennFocusedEntity = null; // When drilling down into a specific entity
+        let vennBreadcrumb = []; // Track navigation path
+
         // View switching
         function switchView(view) {
             currentView = view;
-            
+
             document.querySelectorAll('.view-toggle-btn').forEach(btn => {
                 btn.classList.remove('active');
                 if (btn.dataset.view === view) {
@@ -3724,6 +4082,7 @@ John Doe,Engineering,john@example.com"
             document.getElementById('treeView').classList.remove('active');
             document.getElementById('cardView').classList.remove('active');
             document.getElementById('graphView').classList.remove('active');
+            document.getElementById('vennView').classList.remove('active');
 
             if (view === 'tree') {
                 document.getElementById('treeView').classList.add('active');
@@ -3731,6 +4090,9 @@ John Doe,Engineering,john@example.com"
             } else if (view === 'card' || view === 'cards') {
                 document.getElementById('cardView').classList.add('active');
                 renderCardView();
+            } else if (view === 'venn') {
+                document.getElementById('vennView').classList.add('active');
+                setTimeout(() => renderVennView(), 100);
             } else {
                 document.getElementById('graphView').classList.add('active');
                 setTimeout(() => updateGraph(), 100);
@@ -5889,6 +6251,638 @@ John Doe,Engineering,john@example.com"
                 if (entity) return entity;
             }
             return null;
+        }
+
+        // ==========================================
+        // VENN DIAGRAM VIEW
+        // ==========================================
+
+        // Get children entities of a specific entity (entities connected via DES)
+        function getVennChildren(parentId, childType) {
+            const children = [];
+            relationships.forEach(r => {
+                if (r.predicate === 'DES') {
+                    if (r.subject === parentId) {
+                        const child = entities[childType]?.find(e => e.id === r.object);
+                        if (child) children.push(child);
+                    }
+                    if (r.object === parentId) {
+                        const child = entities[childType]?.find(e => e.id === r.subject);
+                        if (child) children.push(child);
+                    }
+                }
+            });
+            return children;
+        }
+
+        // Get all sub-entities nested under an entity (recursive)
+        function getAllNestedEntities(entityId, includeTypes = ['team', 'role', 'person']) {
+            const nested = [];
+            const visited = new Set();
+
+            function traverse(id) {
+                if (visited.has(id)) return;
+                visited.add(id);
+
+                relationships.forEach(r => {
+                    if (r.predicate === 'DES' || r.predicate === 'INS') {
+                        let childId = null;
+                        if (r.subject === id) childId = r.object;
+                        else if (r.object === id) childId = r.subject;
+
+                        if (childId && !visited.has(childId)) {
+                            const child = findEntity(childId);
+                            if (child && includeTypes.includes(child.type)) {
+                                nested.push(child);
+                                traverse(childId);
+                            }
+                        }
+                    }
+                });
+            }
+
+            traverse(entityId);
+            return nested;
+        }
+
+        // Find shared connections between two entities (through their nested children)
+        function getSharedConnections(entity1Id, entity2Id) {
+            const nested1 = getAllNestedEntities(entity1Id);
+            const nested2 = getAllNestedEntities(entity2Id);
+            const nested1Ids = new Set([entity1Id, ...nested1.map(e => e.id)]);
+            const nested2Ids = new Set([entity2Id, ...nested2.map(e => e.id)]);
+
+            const shared = [];
+
+            // Find relationships that connect entities from both groups
+            relationships.forEach(r => {
+                const subjectIn1 = nested1Ids.has(r.subject);
+                const subjectIn2 = nested2Ids.has(r.subject);
+                const objectIn1 = nested1Ids.has(r.object);
+                const objectIn2 = nested2Ids.has(r.object);
+
+                // Connection bridges the two groups
+                if ((subjectIn1 && objectIn2) || (subjectIn2 && objectIn1)) {
+                    const subjectEntity = findEntity(r.subject);
+                    const objectEntity = findEntity(r.object);
+                    if (subjectEntity && objectEntity) {
+                        shared.push({
+                            relationship: r,
+                            from: subjectEntity,
+                            to: objectEntity
+                        });
+                    }
+                }
+            });
+
+            return shared;
+        }
+
+        // Calculate overlap weight between two entities
+        function getOverlapWeight(entity1Id, entity2Id) {
+            return getSharedConnections(entity1Id, entity2Id).length;
+        }
+
+        // Get entities at current level, optionally filtered by focused parent
+        function getVennEntitiesAtLevel() {
+            const levelType = vennLevels[vennCurrentLevel];
+            let entitiesAtLevel = entities[levelType] || [];
+
+            // If we have a focused entity, only show its children
+            if (vennFocusedEntity) {
+                const childType = vennLevels[vennCurrentLevel];
+                entitiesAtLevel = getVennChildren(vennFocusedEntity.id, childType);
+
+                // Also include entities connected via other relationships
+                relationships.forEach(r => {
+                    if (r.subject === vennFocusedEntity.id || r.object === vennFocusedEntity.id) {
+                        const otherId = r.subject === vennFocusedEntity.id ? r.object : r.subject;
+                        const otherEntity = entities[childType]?.find(e => e.id === otherId);
+                        if (otherEntity && !entitiesAtLevel.find(e => e.id === otherEntity.id)) {
+                            entitiesAtLevel.push(otherEntity);
+                        }
+                    }
+                });
+            }
+
+            return entitiesAtLevel;
+        }
+
+        // Render the Venn diagram
+        function renderVennView() {
+            const container = document.getElementById('vennView');
+            const svg = d3.select('#vennDiagram');
+
+            if (!container || !svg.node()) return;
+
+            // Clear previous content
+            svg.selectAll('*').remove();
+            closeOverlapPanel();
+
+            const rect = container.getBoundingClientRect();
+            const width = rect.width;
+            const height = rect.height;
+            const centerX = width / 2;
+            const centerY = height / 2;
+
+            svg.attr('viewBox', `0 0 ${width} ${height}`)
+               .attr('preserveAspectRatio', 'xMidYMid meet');
+
+            // Update level controls
+            updateVennLevelControls();
+
+            // Get entities at current level
+            const entitiesAtLevel = getVennEntitiesAtLevel();
+
+            if (entitiesAtLevel.length === 0) {
+                // Show empty state
+                svg.append('text')
+                    .attr('x', centerX)
+                    .attr('y', centerY)
+                    .attr('text-anchor', 'middle')
+                    .attr('fill', '#8B6F47')
+                    .attr('font-size', '16px')
+                    .text(`No ${vennLevelLabels[vennCurrentLevel].toLowerCase()} to display`);
+                return;
+            }
+
+            // Calculate circle positions and sizes based on number of entities
+            const circles = calculateVennCircles(entitiesAtLevel, width, height, centerX, centerY);
+
+            // Calculate overlaps between circles
+            const overlaps = calculateVennOverlaps(circles);
+
+            // Draw overlaps first (underneath circles)
+            overlaps.forEach(overlap => {
+                if (overlap.weight > 0) {
+                    drawOverlapRegion(svg, overlap, circles);
+                }
+            });
+
+            // Draw circles
+            circles.forEach(circle => {
+                drawVennCircle(svg, circle);
+            });
+
+            // Add zoom hint
+            showVennZoomHint();
+        }
+
+        // Calculate positions for Venn circles using force simulation
+        function calculateVennCircles(entitiesAtLevel, width, height, centerX, centerY) {
+            const n = entitiesAtLevel.length;
+            const maxRadius = Math.min(width, height) * 0.35;
+            const minRadius = 60;
+
+            // Calculate radius based on nested entities count
+            const circles = entitiesAtLevel.map((entity, i) => {
+                const nested = getAllNestedEntities(entity.id);
+                const nestedCount = nested.length + 1; // Include self
+                const baseRadius = Math.max(minRadius, Math.min(maxRadius, 40 + nestedCount * 8));
+
+                // Initial position in a circle
+                const angle = (2 * Math.PI * i) / n - Math.PI / 2;
+                const spread = Math.min(width, height) * 0.25;
+
+                return {
+                    entity: entity,
+                    id: entity.id,
+                    x: centerX + spread * Math.cos(angle),
+                    y: centerY + spread * Math.sin(angle),
+                    radius: baseRadius,
+                    nestedCount: nestedCount,
+                    color: getNodeColor(entity.type)
+                };
+            });
+
+            // Apply force simulation to position circles with overlaps
+            if (n > 1) {
+                // Create links for circles that should overlap
+                const links = [];
+                for (let i = 0; i < circles.length; i++) {
+                    for (let j = i + 1; j < circles.length; j++) {
+                        const weight = getOverlapWeight(circles[i].id, circles[j].id);
+                        if (weight > 0) {
+                            // Stronger connection = closer circles
+                            const distance = circles[i].radius + circles[j].radius - Math.min(40, weight * 10);
+                            links.push({
+                                source: i,
+                                target: j,
+                                distance: Math.max(circles[i].radius, distance)
+                            });
+                        }
+                    }
+                }
+
+                // Simple force-based positioning
+                const simulation = d3.forceSimulation(circles)
+                    .force('center', d3.forceCenter(centerX, centerY))
+                    .force('charge', d3.forceManyBody().strength(-200))
+                    .force('collision', d3.forceCollide().radius(d => d.radius * 0.7))
+                    .force('link', d3.forceLink(links).distance(d => d.distance).strength(0.5))
+                    .stop();
+
+                // Run simulation
+                for (let i = 0; i < 100; i++) simulation.tick();
+
+                // Keep circles within bounds
+                circles.forEach(c => {
+                    c.x = Math.max(c.radius + 10, Math.min(width - c.radius - 10, c.x));
+                    c.y = Math.max(c.radius + 60, Math.min(height - c.radius - 10, c.y));
+                });
+            }
+
+            return circles;
+        }
+
+        // Calculate overlaps between all circle pairs
+        function calculateVennOverlaps(circles) {
+            const overlaps = [];
+
+            for (let i = 0; i < circles.length; i++) {
+                for (let j = i + 1; j < circles.length; j++) {
+                    const c1 = circles[i];
+                    const c2 = circles[j];
+                    const dx = c2.x - c1.x;
+                    const dy = c2.y - c1.y;
+                    const distance = Math.sqrt(dx * dx + dy * dy);
+
+                    // Check if circles overlap
+                    if (distance < c1.radius + c2.radius) {
+                        const weight = getOverlapWeight(c1.id, c2.id);
+                        const sharedConnections = getSharedConnections(c1.id, c2.id);
+
+                        overlaps.push({
+                            circle1: c1,
+                            circle2: c2,
+                            weight: weight,
+                            sharedConnections: sharedConnections,
+                            distance: distance
+                        });
+                    }
+                }
+            }
+
+            return overlaps;
+        }
+
+        // Draw a single Venn circle
+        function drawVennCircle(svg, circle) {
+            const group = svg.append('g')
+                .attr('class', 'venn-circle-group')
+                .style('cursor', 'pointer');
+
+            // Main circle
+            group.append('circle')
+                .attr('class', 'venn-circle')
+                .attr('cx', circle.x)
+                .attr('cy', circle.y)
+                .attr('r', circle.radius)
+                .attr('fill', circle.color)
+                .attr('fill-opacity', 0.25)
+                .attr('stroke', circle.color)
+                .attr('stroke-width', 3)
+                .on('click', () => handleVennCircleClick(circle))
+                .on('dblclick', () => drillIntoEntity(circle.entity))
+                .on('mouseenter', (event) => showVennTooltip(event, circle))
+                .on('mouseleave', hideVennTooltip);
+
+            // Entity name label
+            const labelText = circle.entity.name.length > 20
+                ? circle.entity.name.substring(0, 17) + '...'
+                : circle.entity.name;
+
+            group.append('text')
+                .attr('class', 'venn-circle-label')
+                .attr('x', circle.x)
+                .attr('y', circle.y - 8)
+                .attr('text-anchor', 'middle')
+                .attr('dominant-baseline', 'middle')
+                .text(labelText);
+
+            // Count label
+            group.append('text')
+                .attr('class', 'venn-circle-count')
+                .attr('x', circle.x)
+                .attr('y', circle.y + 12)
+                .attr('text-anchor', 'middle')
+                .text(`${circle.nestedCount} nested`);
+
+            // Icon
+            group.append('text')
+                .attr('x', circle.x)
+                .attr('y', circle.y - circle.radius + 20)
+                .attr('text-anchor', 'middle')
+                .attr('font-size', '16px')
+                .attr('fill', circle.color)
+                .text(getIconChar(circle.entity.type));
+        }
+
+        // Draw overlap region between two circles
+        function drawOverlapRegion(svg, overlap, circles) {
+            const { circle1, circle2, sharedConnections } = overlap;
+
+            // Calculate intersection path
+            const path = calculateIntersectionPath(circle1, circle2);
+            if (!path) return;
+
+            // Create gradient for overlap
+            const gradientId = `overlap-gradient-${circle1.id}-${circle2.id}`;
+            const defs = svg.append('defs');
+            const gradient = defs.append('linearGradient')
+                .attr('id', gradientId)
+                .attr('x1', '0%').attr('y1', '0%')
+                .attr('x2', '100%').attr('y2', '0%');
+
+            gradient.append('stop')
+                .attr('offset', '0%')
+                .attr('stop-color', circle1.color)
+                .attr('stop-opacity', 0.4);
+            gradient.append('stop')
+                .attr('offset', '100%')
+                .attr('stop-color', circle2.color)
+                .attr('stop-opacity', 0.4);
+
+            // Draw overlap area
+            const overlapGroup = svg.append('g')
+                .attr('class', 'venn-overlap')
+                .style('cursor', 'pointer')
+                .on('click', () => showOverlapDetails(circle1.entity, circle2.entity, sharedConnections));
+
+            overlapGroup.append('path')
+                .attr('d', path)
+                .attr('fill', `url(#${gradientId})`)
+                .attr('stroke', '#C88F4A')
+                .attr('stroke-width', 2)
+                .attr('stroke-dasharray', '4,2');
+
+            // Add connection count indicator in overlap center
+            if (sharedConnections.length > 0) {
+                const midX = (circle1.x + circle2.x) / 2;
+                const midY = (circle1.y + circle2.y) / 2;
+
+                overlapGroup.append('circle')
+                    .attr('cx', midX)
+                    .attr('cy', midY)
+                    .attr('r', 16)
+                    .attr('fill', '#C88F4A')
+                    .attr('class', 'venn-overlap-indicator');
+
+                overlapGroup.append('text')
+                    .attr('x', midX)
+                    .attr('y', midY)
+                    .attr('text-anchor', 'middle')
+                    .attr('dominant-baseline', 'central')
+                    .attr('fill', 'white')
+                    .attr('font-size', '12px')
+                    .attr('font-weight', '600')
+                    .attr('class', 'venn-overlap-indicator')
+                    .text(sharedConnections.length);
+            }
+        }
+
+        // Calculate SVG path for circle intersection (lens shape)
+        function calculateIntersectionPath(c1, c2) {
+            const dx = c2.x - c1.x;
+            const dy = c2.y - c1.y;
+            const d = Math.sqrt(dx * dx + dy * dy);
+
+            if (d >= c1.radius + c2.radius || d === 0) return null;
+
+            // Calculate intersection points
+            const a = (c1.radius * c1.radius - c2.radius * c2.radius + d * d) / (2 * d);
+            const h = Math.sqrt(Math.max(0, c1.radius * c1.radius - a * a));
+
+            const px = c1.x + a * dx / d;
+            const py = c1.y + a * dy / d;
+
+            const p1x = px + h * dy / d;
+            const p1y = py - h * dx / d;
+            const p2x = px - h * dy / d;
+            const p2y = py + h * dx / d;
+
+            // Create lens-shaped path using arcs
+            const largeArc1 = c1.radius > d / 2 ? 1 : 0;
+            const largeArc2 = c2.radius > d / 2 ? 1 : 0;
+
+            return `M ${p1x} ${p1y}
+                    A ${c1.radius} ${c1.radius} 0 ${largeArc1} 1 ${p2x} ${p2y}
+                    A ${c2.radius} ${c2.radius} 0 ${largeArc2} 1 ${p1x} ${p1y}`;
+        }
+
+        // Handle click on a Venn circle
+        function handleVennCircleClick(circle) {
+            openEntityModal(circle.entity.id, circle.entity.type);
+        }
+
+        // Drill into an entity to see its children
+        function drillIntoEntity(entity) {
+            const nextLevel = vennCurrentLevel + 1;
+            if (nextLevel >= vennLevels.length) return;
+
+            // Check if entity has children at next level
+            const childType = vennLevels[nextLevel];
+            const children = getVennChildren(entity.id, childType);
+
+            if (children.length === 0) {
+                // Show hint that there's nothing to drill into
+                showVennZoomHint(`No ${vennLevelLabels[nextLevel].toLowerCase()} under ${entity.name}`);
+                return;
+            }
+
+            // Update state and re-render
+            vennBreadcrumb.push({ entity: vennFocusedEntity, level: vennCurrentLevel });
+            vennFocusedEntity = entity;
+            vennCurrentLevel = nextLevel;
+            renderVennView();
+        }
+
+        // Change hierarchy level
+        function changeVennLevel(direction) {
+            const newLevel = vennCurrentLevel + direction;
+
+            if (newLevel < 0 || newLevel >= vennLevels.length) return;
+
+            // If going up, clear focus
+            if (direction < 0) {
+                if (vennBreadcrumb.length > 0) {
+                    const prev = vennBreadcrumb.pop();
+                    vennFocusedEntity = prev.entity;
+                } else {
+                    vennFocusedEntity = null;
+                }
+            }
+
+            vennCurrentLevel = newLevel;
+            renderVennView();
+        }
+
+        // Update level navigation controls
+        function updateVennLevelControls() {
+            const upBtn = document.getElementById('vennLevelUp');
+            const downBtn = document.getElementById('vennLevelDown');
+            const label = document.getElementById('vennLevelLabel');
+            const breadcrumb = document.getElementById('vennBreadcrumb');
+
+            if (upBtn) upBtn.disabled = vennCurrentLevel === 0;
+            if (downBtn) downBtn.disabled = vennCurrentLevel >= vennLevels.length - 1;
+            if (label) label.textContent = vennLevelLabels[vennCurrentLevel];
+
+            // Update breadcrumb
+            if (breadcrumb) {
+                let html = '';
+                vennBreadcrumb.forEach((item, i) => {
+                    if (item.entity) {
+                        html += `<span class="venn-breadcrumb-item" onclick="navigateVennBreadcrumb(${i})">${item.entity.name}</span>`;
+                        html += '<span class="venn-breadcrumb-separator">›</span>';
+                    }
+                });
+                if (vennFocusedEntity) {
+                    html += `<span class="venn-breadcrumb-item active">${vennFocusedEntity.name}</span>`;
+                }
+                breadcrumb.innerHTML = html;
+            }
+        }
+
+        // Navigate via breadcrumb
+        function navigateVennBreadcrumb(index) {
+            if (index < vennBreadcrumb.length) {
+                const target = vennBreadcrumb[index];
+                vennBreadcrumb = vennBreadcrumb.slice(0, index);
+                vennFocusedEntity = target.entity;
+                vennCurrentLevel = target.level;
+                renderVennView();
+            }
+        }
+
+        // Show overlap details panel
+        function showOverlapDetails(entity1, entity2, sharedConnections) {
+            const panel = document.getElementById('vennOverlapPanel');
+            const title = document.getElementById('vennOverlapTitle');
+            const content = document.getElementById('vennOverlapContent');
+
+            if (!panel || !content) return;
+
+            title.textContent = `${entity1.name} ↔ ${entity2.name}`;
+
+            let html = '';
+
+            if (sharedConnections.length === 0) {
+                html = '<div style="color: #8B6F47; text-align: center; padding: 1rem;">No shared connections</div>';
+            } else {
+                html += `<div class="venn-shared-label">
+                    <i class="ph ph-link"></i> Shared Connections
+                    <span class="venn-shared-count">${sharedConnections.length}</span>
+                </div>`;
+
+                // Group by relationship type
+                const grouped = {};
+                sharedConnections.forEach(conn => {
+                    const op = eoOperators[conn.relationship.predicate];
+                    const key = op ? op.label : conn.relationship.predicate;
+                    if (!grouped[key]) grouped[key] = [];
+                    grouped[key].push(conn);
+                });
+
+                Object.keys(grouped).forEach(key => {
+                    html += `<div class="venn-entity-section">
+                        <div class="venn-entity-header">
+                            <i class="ph ph-arrow-right"></i> ${key}
+                        </div>`;
+
+                    grouped[key].forEach(conn => {
+                        html += `
+                            <div class="venn-connection-item" onclick="openEntityModal('${conn.from.id}', '${conn.from.type}')">
+                                <div class="venn-connection-icon" style="background: ${getNodeColor(conn.from.type)}">
+                                    ${getIcon(conn.from.type)}
+                                </div>
+                                <div class="venn-connection-info">
+                                    <div class="venn-connection-name">${conn.from.name}</div>
+                                    <div class="venn-connection-type">${conn.from.type}</div>
+                                </div>
+                            </div>
+                            <div style="text-align: center; color: #C88F4A; margin: 0.25rem 0;">
+                                <i class="ph ph-arrow-down"></i>
+                            </div>
+                            <div class="venn-connection-item" onclick="openEntityModal('${conn.to.id}', '${conn.to.type}')">
+                                <div class="venn-connection-icon" style="background: ${getNodeColor(conn.to.type)}">
+                                    ${getIcon(conn.to.type)}
+                                </div>
+                                <div class="venn-connection-info">
+                                    <div class="venn-connection-name">${conn.to.name}</div>
+                                    <div class="venn-connection-type">${conn.to.type}</div>
+                                </div>
+                            </div>
+                        `;
+                    });
+
+                    html += '</div>';
+                });
+            }
+
+            content.innerHTML = html;
+            panel.classList.add('visible');
+        }
+
+        // Close overlap details panel
+        function closeOverlapPanel() {
+            const panel = document.getElementById('vennOverlapPanel');
+            if (panel) panel.classList.remove('visible');
+        }
+
+        // Show tooltip on hover
+        function showVennTooltip(event, circle) {
+            const tooltip = document.getElementById('vennTooltip');
+            if (!tooltip) return;
+
+            const nested = getAllNestedEntities(circle.entity.id);
+            const nestedByType = {};
+            nested.forEach(e => {
+                if (!nestedByType[e.type]) nestedByType[e.type] = 0;
+                nestedByType[e.type]++;
+            });
+
+            let nestedText = Object.keys(nestedByType)
+                .map(type => `${nestedByType[type]} ${type}${nestedByType[type] > 1 ? 's' : ''}`)
+                .join(', ');
+
+            tooltip.innerHTML = `
+                <div class="venn-tooltip-title">${circle.entity.name}</div>
+                <div class="venn-tooltip-desc">
+                    ${circle.entity.description || 'No description'}<br>
+                    <strong>Contains:</strong> ${nestedText || 'Nothing nested'}
+                </div>
+            `;
+
+            tooltip.style.left = (event.pageX + 10) + 'px';
+            tooltip.style.top = (event.pageY + 10) + 'px';
+            tooltip.classList.add('visible');
+        }
+
+        // Hide tooltip
+        function hideVennTooltip() {
+            const tooltip = document.getElementById('vennTooltip');
+            if (tooltip) tooltip.classList.remove('visible');
+        }
+
+        // Show temporary hint
+        function showVennZoomHint(message) {
+            const hint = document.querySelector('.venn-zoom-hint');
+            if (!hint) {
+                // Create hint element
+                const vennView = document.getElementById('vennView');
+                if (vennView) {
+                    const hintEl = document.createElement('div');
+                    hintEl.className = 'venn-zoom-hint';
+                    hintEl.textContent = message || 'Double-click to drill down';
+                    vennView.appendChild(hintEl);
+                    setTimeout(() => hintEl.classList.add('visible'), 10);
+                    setTimeout(() => {
+                        hintEl.classList.remove('visible');
+                        setTimeout(() => hintEl.remove(), 300);
+                    }, 2000);
+                }
+            }
         }
 
         // Card View Rendering
