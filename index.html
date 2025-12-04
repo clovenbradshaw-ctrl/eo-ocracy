@@ -10412,6 +10412,75 @@ John Doe,Engineering,john@example.com"
                 }
             }
 
+            // Fallback: Render units that have circular parent relationships (no top-level units found)
+            // This handles cases where units form cycles (e.g., Unit A defines Unit B and Unit B defines Unit A)
+            if (cardViewTypeFilters.unit && sidebarFilters.entities.unit && hierarchy.units.length === 0 && entities.unit.length > 0) {
+                const filteredUnits = entities.unit.filter(passesSearch);
+                if (filteredUnits.length > 0) {
+                    const unitsSection = document.createElement('div');
+                    unitsSection.className = 'card-row';
+
+                    const header = document.createElement('div');
+                    header.className = 'card-row-header';
+                    header.innerHTML = `<div class="card-row-title">${getIcon('unit')} Units</div>`;
+                    unitsSection.appendChild(header);
+
+                    const grid = document.createElement('div');
+                    grid.className = 'hierarchy-grid';
+
+                    // Build unit nodes for all units and render them
+                    filteredUnits.forEach(unit => {
+                        // Build a unit node for this unit
+                        const desRelationships = relationships.filter(r => r.predicate === 'DES');
+                        function getChildren(parentId) {
+                            return desRelationships
+                                .filter(r => r.subject === parentId)
+                                .map(r => findEntity(r.object))
+                                .filter(e => e !== null);
+                        }
+                        function getPeopleInRole(roleId) {
+                            return relationships
+                                .filter(r => r.predicate === 'INS' && r.object === roleId)
+                                .map(r => findEntity(r.subject))
+                                .filter(e => e !== null && e.type === 'person');
+                        }
+
+                        const directTeams = getChildren(unit.id).filter(e => e.type === 'team');
+                        const directRoles = getChildren(unit.id).filter(e => e.type === 'role');
+
+                        const unitNode = {
+                            entity: unit,
+                            units: [], // Don't recursively include child units to avoid infinite loops
+                            teams: directTeams.map(team => {
+                                const teamRoles = getChildren(team.id).filter(e => e.type === 'role');
+                                return {
+                                    entity: team,
+                                    roles: teamRoles.map(role => ({
+                                        entity: role,
+                                        people: getPeopleInRole(role.id)
+                                    }))
+                                };
+                            }),
+                            roles: directRoles.map(role => ({
+                                entity: role,
+                                people: getPeopleInRole(role.id)
+                            }))
+                        };
+
+                        const unitCard = createHierarchyUnitCard(unitNode, sidebarFilters);
+                        if (unitCard) {
+                            grid.appendChild(unitCard);
+                            hasContent = true;
+                        }
+                    });
+
+                    if (grid.children.length > 0) {
+                        unitsSection.appendChild(grid);
+                        contentContainer.appendChild(unitsSection);
+                    }
+                }
+            }
+
             // Render orphan teams (teams without a parent unit)
             if (cardViewTypeFilters.team && sidebarFilters.entities.team && hierarchy.orphanTeams.length > 0) {
                 const filteredOrphanTeams = hierarchy.orphanTeams.filter(passesSearch);
