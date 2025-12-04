@@ -2502,23 +2502,6 @@
             margin-bottom: 1rem;
         }
 
-        .technical-toggle {
-            display: flex;
-            align-items: center;
-            gap: 0.5rem;
-            padding: 0.5rem 0.75rem;
-            background: #F5E6D3;
-            border-radius: 4px;
-            font-size: 0.8rem;
-            color: #6B5642;
-            margin-bottom: 1rem;
-        }
-
-        .technical-toggle input[type="checkbox"] {
-            width: auto;
-            margin: 0;
-        }
-
         .tooltip-hint {
             display: inline-flex;
             align-items: center;
@@ -4037,13 +4020,6 @@
             <button class="panel-collapse-btn" onclick="togglePanel('right')" title="Collapse sidebar">
                 <i class="ph ph-caret-right"></i>
             </button>
-            <!-- Technical Mode Toggle -->
-            <div class="technical-toggle">
-                <input type="checkbox" id="techMode" onchange="toggleTechnicalMode()">
-                <label for="techMode">Show technical labels</label>
-                <span class="tooltip-hint" title="Show operator codes and technical terminology">?</span>
-            </div>
-
             <!-- Simplified Filters -->
             <div class="panel-title" style="display: flex; align-items: center; gap: 0.5rem;">
                 <i class="ph ph-funnel"></i>
@@ -11581,24 +11557,6 @@ John Doe,Engineering,john@example.com"
             }
         }
 
-        // Technical mode toggle
-        function toggleTechnicalMode() {
-            const techMode = document.getElementById('techMode');
-            if (techMode) {
-                document.body.classList.toggle('technical-mode', techMode.checked);
-                localStorage.setItem('technicalMode', techMode.checked ? 'true' : 'false');
-            }
-        }
-
-        function checkTechnicalMode() {
-            const techMode = document.getElementById('techMode');
-            const stored = localStorage.getItem('technicalMode');
-            if (techMode && stored === 'true') {
-                techMode.checked = true;
-                document.body.classList.add('technical-mode');
-            }
-        }
-
         // Simplified predicate selection (for 3 main operators)
         function selectSimplifiedPredicate(predicateCode, btn) {
             // Remove active from all quick operator buttons
@@ -11767,7 +11725,6 @@ John Doe,Engineering,john@example.com"
 
                 // Initialize simplified UX
                 checkWelcomeBanner();
-                checkTechnicalMode();
                 restorePanelStates();
             } catch (e) {
                 console.error('❌ Error rendering UI:', e);
