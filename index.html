@@ -933,6 +933,37 @@
             border: 1px solid #E5DDD1;
         }
 
+        .card-nested-under {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 0.375rem;
+            align-items: center;
+        }
+
+        .card-nested-under .nested-label {
+            font-size: 0.7rem;
+            color: #8B6F47;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            margin-right: 0.25rem;
+        }
+
+        .nested-parent-badge {
+            font-size: 0.75rem;
+            padding: 0.25rem 0.5rem;
+            background: linear-gradient(135deg, #C88F4A 0%, #D4A574 100%);
+            color: white;
+            border-radius: 12px;
+            font-weight: 500;
+            display: inline-flex;
+            align-items: center;
+            gap: 0.25rem;
+        }
+
+        .nested-parent-badge .parent-icon {
+            font-size: 0.85rem;
+        }
+
         .sentence-preview {
             padding: 1rem;
             background: #FAF7F5;
@@ -6309,9 +6340,33 @@ John Doe,Engineering,john@example.com"
                 card.className = `entity-card ${entity.type}`;
                 card.onclick = () => openEntityModal(entity.id, entity.type);
 
-                // Get all activities this entity is involved in
-                const entityActivities = relationships.filter(r => 
-                    r.subject === entity.id || r.object === entity.id
+                // For teams and roles, find what they're nested under (DES relationships where entity is the object)
+                let nestedUnderHTML = '';
+                if (entity.type === 'team' || entity.type === 'role') {
+                    const parentRelationships = relationships.filter(r =>
+                        r.predicate === 'DES' && r.object === entity.id
+                    );
+                    if (parentRelationships.length > 0) {
+                        nestedUnderHTML = '<div class="card-nested-under"><span class="nested-label">In:</span>';
+                        parentRelationships.forEach(rel => {
+                            const parentEntity = findEntity(rel.subject);
+                            if (parentEntity) {
+                                const parentIcon = getIcon(parentEntity.type);
+                                nestedUnderHTML += `
+                                    <span class="nested-parent-badge">
+                                        <span class="parent-icon">${parentIcon}</span>
+                                        ${parentEntity.name}
+                                    </span>
+                                `;
+                            }
+                        });
+                        nestedUnderHTML += '</div>';
+                    }
+                }
+
+                // Get all activities this entity is involved in (excluding DES relationships for display)
+                const entityActivities = relationships.filter(r =>
+                    (r.subject === entity.id || r.object === entity.id) && r.predicate !== 'DES'
                 );
 
                 // Build activities HTML
@@ -6348,6 +6403,7 @@ John Doe,Engineering,john@example.com"
                         <div class="card-icon">${icon}</div>
                         <div class="card-title">${entity.name}</div>
                     </div>
+                    ${nestedUnderHTML}
                     ${descriptionHTML}
                     ${activitiesHTML}
                 `;
