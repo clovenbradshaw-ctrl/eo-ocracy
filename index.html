@@ -7943,6 +7943,56 @@ John Doe,Engineering,john@example.com"
             const linkGroup = g.append('g').attr('class', 'links');
             const nodeGroup = g.append('g').attr('class', 'nodes');
 
+            // Build hierarchy map for vertical alignment of nested entities
+            const parentMap = new Map(); // childId -> parentId
+            const childrenMap = new Map(); // parentId -> [childIds]
+
+            // Find all DES relationships to build parent-child hierarchy
+            relationships.filter(r => r.predicate === 'DES').forEach(rel => {
+                const parentId = rel.subject;
+                const childId = rel.object;
+                const parentNode = nodes.find(n => n.id === parentId);
+                const childNode = nodes.find(n => n.id === childId);
+
+                if (parentNode && childNode) {
+                    parentMap.set(childId, parentId);
+                    if (!childrenMap.has(parentId)) {
+                        childrenMap.set(parentId, []);
+                    }
+                    childrenMap.get(parentId).push(childId);
+                }
+            });
+
+            // Find root entities (those with no parent in the current view)
+            const rootNodes = nodes.filter(n => !parentMap.has(n.id));
+
+            // Calculate X positions: root entities spread evenly, children align under parents
+            const nodeXPositions = new Map();
+            const rootSpacing = width / (rootNodes.length + 1);
+
+            // Assign X positions to root nodes
+            rootNodes.forEach((node, index) => {
+                nodeXPositions.set(node.id, rootSpacing * (index + 1));
+            });
+
+            // Recursively assign X positions to children (centered under parent)
+            function assignChildPositions(parentId) {
+                const children = childrenMap.get(parentId) || [];
+                if (children.length === 0) return;
+
+                const parentX = nodeXPositions.get(parentId);
+                const childSpacing = 80; // Spacing between siblings
+                const totalWidth = (children.length - 1) * childSpacing;
+                const startX = parentX - totalWidth / 2;
+
+                children.forEach((childId, index) => {
+                    nodeXPositions.set(childId, startX + index * childSpacing);
+                    assignChildPositions(childId); // Recurse to grandchildren
+                });
+            }
+
+            rootNodes.forEach(node => assignChildPositions(node.id));
+
             // Create force simulation with very strong hierarchical layering
             graphSimulation = d3.forceSimulation(nodes)
                 .alphaDecay(0.01) // Slower decay for better settling
@@ -7963,12 +8013,9 @@ John Doe,Engineering,john@example.com"
                     return height * 0.5;
                 }).strength(1.2)) // Very strong force to lock in layers
                 .force('x', d3.forceX().x(d => {
-                    // Spread entities horizontally within their layer
-                    const sameTypeNodes = nodes.filter(n => n.type === d.type);
-                    const index = sameTypeNodes.indexOf(d);
-                    const spacing = width / (sameTypeNodes.length + 1);
-                    return spacing * (index + 1);
-                }).strength(0.3));
+                    // Use pre-calculated position for vertical nesting alignment
+                    return nodeXPositions.get(d.id) || width / 2;
+                }).strength(0.8)); // Strong X force to maintain vertical alignment
 
             // Create links with semantic styling
             graphLink = linkGroup.selectAll('line')
