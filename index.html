@@ -4009,9 +4009,16 @@
             document.querySelectorAll('.quick-operator-selector .operator-btn').forEach(btn => {
                 btn.classList.remove('active');
             });
-            // Add active to the clicked button if it exists in the event
-            if (event && event.target) {
-                event.target.classList.add('active');
+            // Find and activate the button matching this predicate
+            // Check advanced operators first
+            const advancedBtn = document.querySelector(`.predicate-btn.${predicate}`);
+            if (advancedBtn) {
+                advancedBtn.classList.add('active');
+            }
+            // Check quick operator buttons
+            const quickBtn = document.querySelector(`.quick-operator-selector .operator-btn[data-predicate="${predicate}"]`);
+            if (quickBtn) {
+                quickBtn.classList.add('active');
             }
             updateSentencePreview(); // Update preview when operator changes
         }
@@ -5337,8 +5344,9 @@
             });
             // Add active to clicked button
             btn.classList.add('active');
-            // Call the original selectPredicate
-            selectPredicate(predicateCode);
+            // Set the predicate and update preview (don't call selectPredicate to avoid clearing active state)
+            selectedPredicate = predicateCode;
+            updateSentencePreview();
         }
 
         // Simplified filters (dropdown-based)
