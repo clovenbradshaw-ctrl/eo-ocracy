@@ -1797,6 +1797,501 @@
             background: #FAF7F5;
             border-top: 1px solid #E5DDD1;
         }
+
+        /* ========================================== */
+        /* Bulk Import Modal Styles */
+        /* ========================================== */
+
+        .bulk-import-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(61, 46, 31, 0.7);
+            display: none;
+            align-items: center;
+            justify-content: center;
+            z-index: 2000;
+        }
+
+        .bulk-import-overlay.open {
+            display: flex;
+        }
+
+        .bulk-import-modal {
+            background: white;
+            border-radius: 16px;
+            width: 95%;
+            max-width: 900px;
+            max-height: 90vh;
+            overflow: hidden;
+            box-shadow: 0 8px 40px rgba(61, 46, 31, 0.25);
+            display: flex;
+            flex-direction: column;
+        }
+
+        .bulk-import-header {
+            padding: 1.5rem 2rem;
+            background: linear-gradient(135deg, #C88F4A 0%, #B87B5B 100%);
+            color: white;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .bulk-import-header h2 {
+            font-size: 1.25rem;
+            font-weight: 700;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .bulk-import-close {
+            background: rgba(255,255,255,0.2);
+            border: none;
+            color: white;
+            width: 32px;
+            height: 32px;
+            border-radius: 50%;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.25rem;
+            transition: all 0.2s;
+        }
+
+        .bulk-import-close:hover {
+            background: rgba(255,255,255,0.3);
+        }
+
+        .bulk-import-body {
+            padding: 1.5rem 2rem;
+            overflow-y: auto;
+            flex: 1;
+        }
+
+        .bulk-import-steps {
+            display: flex;
+            gap: 1rem;
+            margin-bottom: 1.5rem;
+        }
+
+        .bulk-import-step {
+            flex: 1;
+            padding: 0.75rem 1rem;
+            background: #FAF7F5;
+            border-radius: 8px;
+            text-align: center;
+            font-size: 0.875rem;
+            color: #8B6F47;
+            border: 2px solid transparent;
+            transition: all 0.2s;
+        }
+
+        .bulk-import-step.active {
+            background: #FFF9F0;
+            border-color: #C88F4A;
+            color: #C88F4A;
+            font-weight: 600;
+        }
+
+        .bulk-import-step.completed {
+            background: #E8F5E9;
+            color: #4CAF50;
+        }
+
+        .bulk-import-step-number {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            width: 24px;
+            height: 24px;
+            background: #E5DDD1;
+            border-radius: 50%;
+            margin-right: 0.5rem;
+            font-weight: 700;
+            font-size: 0.75rem;
+        }
+
+        .bulk-import-step.active .bulk-import-step-number {
+            background: #C88F4A;
+            color: white;
+        }
+
+        .bulk-import-step.completed .bulk-import-step-number {
+            background: #4CAF50;
+            color: white;
+        }
+
+        .bulk-import-section {
+            margin-bottom: 1.5rem;
+        }
+
+        .bulk-import-section-title {
+            font-size: 0.9rem;
+            font-weight: 600;
+            color: #6B5642;
+            margin-bottom: 0.75rem;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .bulk-import-entity-type {
+            display: flex;
+            gap: 0.5rem;
+            flex-wrap: wrap;
+            margin-bottom: 1rem;
+        }
+
+        .bulk-import-entity-btn {
+            padding: 0.6rem 1rem;
+            border: 2px solid #E5DDD1;
+            background: white;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 0.875rem;
+            font-weight: 500;
+            transition: all 0.2s;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .bulk-import-entity-btn:hover {
+            border-color: #C88F4A;
+        }
+
+        .bulk-import-entity-btn.active {
+            background: #C88F4A;
+            color: white;
+            border-color: #C88F4A;
+        }
+
+        .bulk-import-tabs {
+            display: flex;
+            gap: 0.5rem;
+            margin-bottom: 1rem;
+            border-bottom: 2px solid #E5DDD1;
+            padding-bottom: 0.5rem;
+        }
+
+        .bulk-import-tab {
+            padding: 0.5rem 1rem;
+            background: none;
+            border: none;
+            cursor: pointer;
+            font-size: 0.875rem;
+            color: #8B6F47;
+            border-radius: 6px 6px 0 0;
+            transition: all 0.2s;
+        }
+
+        .bulk-import-tab:hover {
+            background: #FAF7F5;
+        }
+
+        .bulk-import-tab.active {
+            background: #C88F4A;
+            color: white;
+            font-weight: 600;
+        }
+
+        .bulk-import-textarea {
+            width: 100%;
+            min-height: 150px;
+            padding: 1rem;
+            border: 2px solid #E5DDD1;
+            border-radius: 8px;
+            font-family: 'Monaco', 'Menlo', monospace;
+            font-size: 0.8rem;
+            resize: vertical;
+            transition: border-color 0.2s;
+        }
+
+        .bulk-import-textarea:focus {
+            outline: none;
+            border-color: #C88F4A;
+        }
+
+        .bulk-import-textarea::placeholder {
+            color: #B0A090;
+        }
+
+        .bulk-import-hint {
+            font-size: 0.8rem;
+            color: #8B6F47;
+            margin-top: 0.5rem;
+            display: flex;
+            align-items: center;
+            gap: 0.375rem;
+        }
+
+        .bulk-import-file-upload {
+            border: 2px dashed #E5DDD1;
+            border-radius: 8px;
+            padding: 2rem;
+            text-align: center;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .bulk-import-file-upload:hover {
+            border-color: #C88F4A;
+            background: #FFF9F0;
+        }
+
+        .bulk-import-file-upload i {
+            font-size: 2.5rem;
+            color: #C88F4A;
+            margin-bottom: 0.75rem;
+        }
+
+        .bulk-import-file-upload input {
+            display: none;
+        }
+
+        .bulk-import-mapping {
+            background: #FAF7F5;
+            border-radius: 8px;
+            padding: 1rem;
+        }
+
+        .bulk-import-mapping-row {
+            display: grid;
+            grid-template-columns: 1fr auto 1fr auto;
+            gap: 0.75rem;
+            align-items: center;
+            padding: 0.75rem;
+            background: white;
+            border-radius: 6px;
+            margin-bottom: 0.5rem;
+            border: 1px solid #E5DDD1;
+        }
+
+        .bulk-import-mapping-row:last-child {
+            margin-bottom: 0;
+        }
+
+        .bulk-import-mapping-col {
+            padding: 0.5rem 0.75rem;
+            background: #F5E6D3;
+            border-radius: 4px;
+            font-size: 0.8rem;
+            font-weight: 600;
+            color: #6B5642;
+        }
+
+        .bulk-import-mapping-arrow {
+            color: #C88F4A;
+            font-size: 1.25rem;
+        }
+
+        .bulk-import-mapping-select {
+            padding: 0.5rem 0.75rem;
+            border: 1px solid #E5DDD1;
+            border-radius: 6px;
+            font-size: 0.875rem;
+            background: white;
+            cursor: pointer;
+            min-width: 150px;
+        }
+
+        .bulk-import-mapping-select:focus {
+            outline: none;
+            border-color: #C88F4A;
+        }
+
+        .bulk-import-set-all {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .bulk-import-set-all-btn {
+            padding: 0.4rem 0.6rem;
+            background: #E5DDD1;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 0.75rem;
+            color: #6B5642;
+            transition: all 0.2s;
+            display: flex;
+            align-items: center;
+            gap: 0.25rem;
+        }
+
+        .bulk-import-set-all-btn:hover {
+            background: #C88F4A;
+            color: white;
+        }
+
+        .bulk-import-set-all-btn.active {
+            background: #C88F4A;
+            color: white;
+        }
+
+        .bulk-import-set-all-input {
+            padding: 0.4rem 0.6rem;
+            border: 1px solid #E5DDD1;
+            border-radius: 4px;
+            font-size: 0.8rem;
+            width: 120px;
+        }
+
+        .bulk-import-set-all-input:focus {
+            outline: none;
+            border-color: #C88F4A;
+        }
+
+        .bulk-import-preview {
+            background: white;
+            border: 1px solid #E5DDD1;
+            border-radius: 8px;
+            overflow: hidden;
+            margin-top: 1rem;
+        }
+
+        .bulk-import-preview-header {
+            background: #FAF7F5;
+            padding: 0.75rem 1rem;
+            font-weight: 600;
+            color: #6B5642;
+            font-size: 0.875rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-bottom: 1px solid #E5DDD1;
+        }
+
+        .bulk-import-preview-count {
+            background: #C88F4A;
+            color: white;
+            padding: 0.25rem 0.5rem;
+            border-radius: 12px;
+            font-size: 0.75rem;
+        }
+
+        .bulk-import-preview-table {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: 0.8rem;
+        }
+
+        .bulk-import-preview-table th {
+            background: #F5F2ED;
+            padding: 0.6rem 0.75rem;
+            text-align: left;
+            font-weight: 600;
+            color: #6B5642;
+            border-bottom: 1px solid #E5DDD1;
+        }
+
+        .bulk-import-preview-table td {
+            padding: 0.6rem 0.75rem;
+            border-bottom: 1px solid #F0EBE4;
+        }
+
+        .bulk-import-preview-table tr:hover {
+            background: #FFF9F0;
+        }
+
+        .bulk-import-preview-table tr.error {
+            background: #FFF5F5;
+        }
+
+        .bulk-import-preview-table .preview-error {
+            color: #d32f2f;
+            font-size: 0.75rem;
+        }
+
+        .bulk-import-preview-table .preview-set-all {
+            color: #C88F4A;
+            font-style: italic;
+        }
+
+        .bulk-import-footer {
+            padding: 1rem 2rem;
+            background: #FAF7F5;
+            border-top: 1px solid #E5DDD1;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .bulk-import-footer-info {
+            font-size: 0.875rem;
+            color: #8B6F47;
+        }
+
+        .bulk-import-footer-actions {
+            display: flex;
+            gap: 0.75rem;
+        }
+
+        .bulk-import-btn {
+            padding: 0.75rem 1.5rem;
+            border-radius: 8px;
+            font-size: 0.875rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.2s;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .bulk-import-btn.secondary {
+            background: white;
+            border: 2px solid #E5DDD1;
+            color: #6B5642;
+        }
+
+        .bulk-import-btn.secondary:hover {
+            border-color: #C88F4A;
+            color: #C88F4A;
+        }
+
+        .bulk-import-btn.primary {
+            background: #C88F4A;
+            border: 2px solid #C88F4A;
+            color: white;
+        }
+
+        .bulk-import-btn.primary:hover {
+            background: #B87B5B;
+            border-color: #B87B5B;
+        }
+
+        .bulk-import-btn:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+        }
+
+        .bulk-import-success {
+            text-align: center;
+            padding: 2rem;
+        }
+
+        .bulk-import-success i {
+            font-size: 4rem;
+            color: #4CAF50;
+            margin-bottom: 1rem;
+        }
+
+        .bulk-import-success h3 {
+            font-size: 1.25rem;
+            color: #3D2E1F;
+            margin-bottom: 0.5rem;
+        }
+
+        .bulk-import-success p {
+            color: #8B6F47;
+        }
     </style>
 </head>
 <body>
@@ -1844,6 +2339,7 @@
                 <i class="ph ph-trash"></i> Clear All
             </button>
             <button class="btn btn-small btn-outline" onclick="resetGraph()">Reset View</button>
+            <button class="btn btn-small btn-outline" onclick="openBulkImportModal()"><i class="ph ph-upload-simple"></i> Import</button>
             <button class="btn btn-small" onclick="exportData()">Export Data</button>
         </div>
     </div>
@@ -2263,6 +2759,223 @@
             <div class="workspace-modal-actions">
                 <button class="workspace-modal-btn cancel" onclick="closeWorkspaceModal()">Cancel</button>
                 <button class="workspace-modal-btn primary" onclick="saveWorkspaceFromModal()">Save</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Bulk Import Modal -->
+    <div id="bulkImportModal" class="bulk-import-overlay" onclick="if(event.target === this) closeBulkImportModal()">
+        <div class="bulk-import-modal">
+            <div class="bulk-import-header">
+                <h2><i class="ph ph-upload-simple"></i> Bulk Import</h2>
+                <button class="bulk-import-close" onclick="closeBulkImportModal()">
+                    <i class="ph ph-x"></i>
+                </button>
+            </div>
+            <div class="bulk-import-body">
+                <!-- Step Indicator -->
+                <div class="bulk-import-steps">
+                    <div class="bulk-import-step active" id="bulkImportStep1">
+                        <span class="bulk-import-step-number">1</span>
+                        Select Type & Input Data
+                    </div>
+                    <div class="bulk-import-step" id="bulkImportStep2">
+                        <span class="bulk-import-step-number">2</span>
+                        Map Fields
+                    </div>
+                    <div class="bulk-import-step" id="bulkImportStep3">
+                        <span class="bulk-import-step-number">3</span>
+                        Review & Import
+                    </div>
+                </div>
+
+                <!-- Step 1: Select Entity Type & Input Data -->
+                <div id="bulkImportStepContent1">
+                    <div class="bulk-import-section">
+                        <div class="bulk-import-section-title">
+                            <i class="ph ph-tag"></i> What type of entity are you importing?
+                        </div>
+                        <div class="bulk-import-entity-type">
+                            <button class="bulk-import-entity-btn" data-type="unit" onclick="selectBulkImportType('unit')">
+                                <i class="ph ph-buildings"></i> Units
+                            </button>
+                            <button class="bulk-import-entity-btn" data-type="team" onclick="selectBulkImportType('team')">
+                                <i class="ph ph-users-three"></i> Teams
+                            </button>
+                            <button class="bulk-import-entity-btn" data-type="role" onclick="selectBulkImportType('role')">
+                                <i class="ph ph-briefcase"></i> Roles
+                            </button>
+                            <button class="bulk-import-entity-btn active" data-type="person" onclick="selectBulkImportType('person')">
+                                <i class="ph ph-user"></i> People
+                            </button>
+                            <button class="bulk-import-entity-btn" data-type="object" onclick="selectBulkImportType('object')">
+                                <i class="ph ph-package"></i> Objects
+                            </button>
+                        </div>
+                    </div>
+
+                    <div class="bulk-import-section">
+                        <div class="bulk-import-section-title">
+                            <i class="ph ph-clipboard-text"></i> How would you like to input data?
+                        </div>
+                        <div class="bulk-import-tabs">
+                            <button class="bulk-import-tab active" onclick="switchBulkImportTab('paste')">
+                                <i class="ph ph-clipboard"></i> Paste from Spreadsheet
+                            </button>
+                            <button class="bulk-import-tab" onclick="switchBulkImportTab('file')">
+                                <i class="ph ph-file-csv"></i> Upload CSV File
+                            </button>
+                        </div>
+
+                        <!-- Paste Tab -->
+                        <div id="bulkImportPasteTab">
+                            <textarea
+                                id="bulkImportPasteArea"
+                                class="bulk-import-textarea"
+                                placeholder="Paste rows from your spreadsheet here...
+
+Example (tab-separated):
+Name    Team    Email
+John Doe    Engineering    john@example.com
+Jane Smith    Design    jane@example.com
+
+Or comma-separated:
+Name,Team,Email
+John Doe,Engineering,john@example.com"
+                                oninput="parseBulkImportData()"></textarea>
+                            <div class="bulk-import-hint">
+                                <i class="ph ph-info"></i>
+                                Supports tab-separated (copy from Excel/Sheets) or comma-separated values. First row should be headers.
+                            </div>
+                        </div>
+
+                        <!-- File Upload Tab -->
+                        <div id="bulkImportFileTab" style="display: none;">
+                            <div class="bulk-import-file-upload" onclick="document.getElementById('bulkImportFileInput').click()">
+                                <i class="ph ph-file-arrow-up"></i>
+                                <div><strong>Click to upload</strong> or drag and drop</div>
+                                <div style="font-size: 0.8rem; color: #8B6F47; margin-top: 0.5rem;">CSV files supported</div>
+                                <input type="file" id="bulkImportFileInput" accept=".csv,.tsv,.txt" onchange="handleBulkImportFile(event)">
+                            </div>
+                            <div id="bulkImportFileName" style="margin-top: 0.75rem; font-size: 0.875rem; color: #6B5642;"></div>
+                        </div>
+                    </div>
+
+                    <div id="bulkImportDataPreview" style="display: none;">
+                        <div class="bulk-import-section-title">
+                            <i class="ph ph-eye"></i> Data Preview
+                        </div>
+                        <div class="bulk-import-preview">
+                            <div class="bulk-import-preview-header">
+                                <span>Detected Data</span>
+                                <span class="bulk-import-preview-count" id="bulkImportRowCount">0 rows</span>
+                            </div>
+                            <div style="overflow-x: auto; max-height: 200px;">
+                                <table class="bulk-import-preview-table" id="bulkImportPreviewTable">
+                                </table>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Step 2: Field Mapping -->
+                <div id="bulkImportStepContent2" style="display: none;">
+                    <div class="bulk-import-section">
+                        <div class="bulk-import-section-title">
+                            <i class="ph ph-arrows-left-right"></i> Map your columns to entity fields
+                        </div>
+                        <p style="font-size: 0.875rem; color: #8B6F47; margin-bottom: 1rem;">
+                            Match your spreadsheet columns to the appropriate fields. Use "Set for All" to apply a default value to all imported items.
+                        </p>
+                        <div class="bulk-import-mapping" id="bulkImportMappingContainer">
+                            <!-- Mapping rows will be dynamically generated -->
+                        </div>
+                    </div>
+
+                    <div id="bulkImportMappedPreview" style="margin-top: 1.5rem;">
+                        <div class="bulk-import-section-title">
+                            <i class="ph ph-eye"></i> Preview with Mapping Applied
+                        </div>
+                        <div class="bulk-import-preview">
+                            <div class="bulk-import-preview-header">
+                                <span>Mapped Data Preview</span>
+                                <span class="bulk-import-preview-count" id="bulkImportMappedCount">0 items</span>
+                            </div>
+                            <div style="overflow-x: auto; max-height: 250px;">
+                                <table class="bulk-import-preview-table" id="bulkImportMappedTable">
+                                </table>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Step 3: Review & Import -->
+                <div id="bulkImportStepContent3" style="display: none;">
+                    <div id="bulkImportReviewContent">
+                        <div class="bulk-import-section">
+                            <div class="bulk-import-section-title">
+                                <i class="ph ph-check-square"></i> Review Import
+                            </div>
+                            <div style="background: #FAF7F5; padding: 1.25rem; border-radius: 8px; margin-bottom: 1rem;">
+                                <div style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 1rem; text-align: center;">
+                                    <div>
+                                        <div style="font-size: 2rem; font-weight: 700; color: #C88F4A;" id="bulkImportTotalCount">0</div>
+                                        <div style="font-size: 0.875rem; color: #6B5642;">Total Items</div>
+                                    </div>
+                                    <div>
+                                        <div style="font-size: 2rem; font-weight: 700; color: #4CAF50;" id="bulkImportValidCount">0</div>
+                                        <div style="font-size: 0.875rem; color: #6B5642;">Valid</div>
+                                    </div>
+                                    <div>
+                                        <div style="font-size: 2rem; font-weight: 700; color: #d32f2f;" id="bulkImportErrorCount">0</div>
+                                        <div style="font-size: 0.875rem; color: #6B5642;">Errors</div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div style="font-size: 0.875rem; color: #6B5642; margin-bottom: 1rem;" id="bulkImportEntityTypeLabel">
+                                Importing as: <strong>People</strong>
+                            </div>
+                        </div>
+
+                        <div class="bulk-import-preview">
+                            <div class="bulk-import-preview-header">
+                                <span>Final Preview</span>
+                                <span class="bulk-import-preview-count" id="bulkImportFinalCount">0 items</span>
+                            </div>
+                            <div style="overflow-x: auto; max-height: 300px;">
+                                <table class="bulk-import-preview-table" id="bulkImportFinalTable">
+                                </table>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div id="bulkImportSuccessContent" style="display: none;">
+                        <div class="bulk-import-success">
+                            <i class="ph ph-check-circle"></i>
+                            <h3>Import Successful!</h3>
+                            <p id="bulkImportSuccessMessage">Successfully imported 0 items.</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="bulk-import-footer">
+                <div class="bulk-import-footer-info" id="bulkImportFooterInfo">
+                    Select an entity type and paste or upload your data to continue.
+                </div>
+                <div class="bulk-import-footer-actions">
+                    <button class="bulk-import-btn secondary" id="bulkImportBackBtn" onclick="bulkImportBack()" style="display: none;">
+                        <i class="ph ph-arrow-left"></i> Back
+                    </button>
+                    <button class="bulk-import-btn primary" id="bulkImportNextBtn" onclick="bulkImportNext()" disabled>
+                        <i class="ph ph-arrow-right"></i> Next
+                    </button>
+                    <button class="bulk-import-btn primary" id="bulkImportImportBtn" onclick="executeBulkImport()" style="display: none;">
+                        <i class="ph ph-check"></i> Import
+                    </button>
+                    <button class="bulk-import-btn primary" id="bulkImportDoneBtn" onclick="closeBulkImportModal()" style="display: none;">
+                        <i class="ph ph-check"></i> Done
+                    </button>
+                </div>
             </div>
         </div>
     </div>
@@ -5120,6 +5833,696 @@
             a.href = url;
             a.download = `${workspaceName.toLowerCase().replace(/\s+/g, '-')}-data.json`;
             a.click();
+        }
+
+        // ==========================================
+        // BULK IMPORT FUNCTIONALITY
+        // ==========================================
+
+        let bulkImportState = {
+            step: 1,
+            entityType: 'person',
+            rawData: '',
+            parsedData: [],
+            headers: [],
+            fieldMappings: {},  // { sourceColumn: targetField }
+            setAllValues: {},   // { targetField: { enabled: true, value: 'xyz' } }
+            processedData: []
+        };
+
+        // Field definitions for each entity type
+        const bulkImportFields = {
+            unit: [
+                { key: 'name', label: 'Name', required: true },
+                { key: 'parent', label: 'Parent Unit', required: false, type: 'relationship', targetType: 'unit' }
+            ],
+            team: [
+                { key: 'name', label: 'Name', required: true },
+                { key: 'parent', label: 'Parent (Unit or Team)', required: false, type: 'relationship', targetTypes: ['unit', 'team'] }
+            ],
+            role: [
+                { key: 'name', label: 'Name', required: true },
+                { key: 'parent', label: 'Parent (Unit or Team)', required: false, type: 'relationship', targetTypes: ['unit', 'team'] }
+            ],
+            person: [
+                { key: 'name', label: 'Name', required: true },
+                { key: 'role', label: 'Assigned Role', required: false, type: 'relationship', targetType: 'role' }
+            ],
+            object: [
+                { key: 'name', label: 'Name', required: true },
+                { key: 'parent', label: 'Parent Role', required: false, type: 'relationship', targetType: 'role' }
+            ]
+        };
+
+        function openBulkImportModal() {
+            // Reset state
+            bulkImportState = {
+                step: 1,
+                entityType: 'person',
+                rawData: '',
+                parsedData: [],
+                headers: [],
+                fieldMappings: {},
+                setAllValues: {},
+                processedData: []
+            };
+
+            // Reset UI
+            document.getElementById('bulkImportPasteArea').value = '';
+            document.getElementById('bulkImportFileInput').value = '';
+            document.getElementById('bulkImportFileName').textContent = '';
+            document.getElementById('bulkImportDataPreview').style.display = 'none';
+
+            // Reset entity type buttons
+            document.querySelectorAll('.bulk-import-entity-btn').forEach(btn => {
+                btn.classList.toggle('active', btn.dataset.type === 'person');
+            });
+
+            // Reset tabs
+            switchBulkImportTab('paste');
+
+            // Reset steps
+            updateBulkImportStep(1);
+
+            // Show modal
+            document.getElementById('bulkImportModal').classList.add('open');
+        }
+
+        function closeBulkImportModal() {
+            document.getElementById('bulkImportModal').classList.remove('open');
+        }
+
+        function selectBulkImportType(type) {
+            bulkImportState.entityType = type;
+            document.querySelectorAll('.bulk-import-entity-btn').forEach(btn => {
+                btn.classList.toggle('active', btn.dataset.type === type);
+            });
+
+            // Re-validate if we have data
+            if (bulkImportState.parsedData.length > 0) {
+                updateBulkImportNextButton();
+            }
+        }
+
+        function switchBulkImportTab(tab) {
+            document.querySelectorAll('.bulk-import-tab').forEach(t => t.classList.remove('active'));
+            document.querySelector(`.bulk-import-tab:nth-child(${tab === 'paste' ? 1 : 2})`).classList.add('active');
+
+            document.getElementById('bulkImportPasteTab').style.display = tab === 'paste' ? 'block' : 'none';
+            document.getElementById('bulkImportFileTab').style.display = tab === 'file' ? 'block' : 'none';
+        }
+
+        function parseBulkImportData() {
+            const rawData = document.getElementById('bulkImportPasteArea').value.trim();
+            if (!rawData) {
+                bulkImportState.parsedData = [];
+                bulkImportState.headers = [];
+                document.getElementById('bulkImportDataPreview').style.display = 'none';
+                updateBulkImportNextButton();
+                return;
+            }
+
+            bulkImportState.rawData = rawData;
+            parseDataContent(rawData);
+        }
+
+        function parseDataContent(content) {
+            const lines = content.split('\n').filter(line => line.trim());
+            if (lines.length < 2) {
+                bulkImportState.parsedData = [];
+                bulkImportState.headers = [];
+                document.getElementById('bulkImportDataPreview').style.display = 'none';
+                updateBulkImportNextButton();
+                return;
+            }
+
+            // Detect delimiter (tab or comma)
+            const firstLine = lines[0];
+            const delimiter = firstLine.includes('\t') ? '\t' : ',';
+
+            // Parse CSV/TSV with proper quote handling
+            function parseLine(line, delim) {
+                const result = [];
+                let current = '';
+                let inQuotes = false;
+
+                for (let i = 0; i < line.length; i++) {
+                    const char = line[i];
+                    if (char === '"') {
+                        if (inQuotes && line[i + 1] === '"') {
+                            current += '"';
+                            i++;
+                        } else {
+                            inQuotes = !inQuotes;
+                        }
+                    } else if (char === delim && !inQuotes) {
+                        result.push(current.trim());
+                        current = '';
+                    } else {
+                        current += char;
+                    }
+                }
+                result.push(current.trim());
+                return result;
+            }
+
+            // Parse headers
+            bulkImportState.headers = parseLine(lines[0], delimiter);
+
+            // Parse data rows
+            bulkImportState.parsedData = [];
+            for (let i = 1; i < lines.length; i++) {
+                const values = parseLine(lines[i], delimiter);
+                if (values.some(v => v.trim())) {  // Skip empty rows
+                    const row = {};
+                    bulkImportState.headers.forEach((header, idx) => {
+                        row[header] = values[idx] || '';
+                    });
+                    bulkImportState.parsedData.push(row);
+                }
+            }
+
+            // Update preview
+            renderBulkImportDataPreview();
+            updateBulkImportNextButton();
+        }
+
+        function handleBulkImportFile(event) {
+            const file = event.target.files[0];
+            if (!file) return;
+
+            document.getElementById('bulkImportFileName').innerHTML = `
+                <i class="ph ph-file-csv"></i> ${escapeHtml(file.name)}
+            `;
+
+            const reader = new FileReader();
+            reader.onload = (e) => {
+                const content = e.target.result;
+                bulkImportState.rawData = content;
+                parseDataContent(content);
+            };
+            reader.readAsText(file);
+        }
+
+        function renderBulkImportDataPreview() {
+            const previewContainer = document.getElementById('bulkImportDataPreview');
+            const table = document.getElementById('bulkImportPreviewTable');
+            const rowCount = document.getElementById('bulkImportRowCount');
+
+            if (bulkImportState.parsedData.length === 0) {
+                previewContainer.style.display = 'none';
+                return;
+            }
+
+            previewContainer.style.display = 'block';
+            rowCount.textContent = `${bulkImportState.parsedData.length} rows`;
+
+            // Build table
+            let html = '<thead><tr>';
+            bulkImportState.headers.forEach(h => {
+                html += `<th>${escapeHtml(h)}</th>`;
+            });
+            html += '</tr></thead><tbody>';
+
+            // Show first 10 rows
+            const previewRows = bulkImportState.parsedData.slice(0, 10);
+            previewRows.forEach(row => {
+                html += '<tr>';
+                bulkImportState.headers.forEach(h => {
+                    html += `<td>${escapeHtml(row[h] || '')}</td>`;
+                });
+                html += '</tr>';
+            });
+
+            if (bulkImportState.parsedData.length > 10) {
+                html += `<tr><td colspan="${bulkImportState.headers.length}" style="text-align: center; color: #8B6F47; font-style: italic;">... and ${bulkImportState.parsedData.length - 10} more rows</td></tr>`;
+            }
+
+            html += '</tbody>';
+            table.innerHTML = html;
+        }
+
+        function updateBulkImportNextButton() {
+            const nextBtn = document.getElementById('bulkImportNextBtn');
+            const footerInfo = document.getElementById('bulkImportFooterInfo');
+
+            if (bulkImportState.step === 1) {
+                const hasData = bulkImportState.parsedData.length > 0;
+                nextBtn.disabled = !hasData;
+                footerInfo.textContent = hasData
+                    ? `${bulkImportState.parsedData.length} rows detected. Click Next to map fields.`
+                    : 'Select an entity type and paste or upload your data to continue.';
+            } else if (bulkImportState.step === 2) {
+                // Check if name field is mapped
+                const nameMapping = Object.entries(bulkImportState.fieldMappings).find(([src, tgt]) => tgt === 'name');
+                const hasNameMapping = !!nameMapping || (bulkImportState.setAllValues.name && bulkImportState.setAllValues.name.enabled);
+                nextBtn.disabled = !hasNameMapping;
+                footerInfo.textContent = hasNameMapping
+                    ? 'Ready to review. Click Next to see the final preview.'
+                    : 'Please map at least the Name field to continue.';
+            }
+        }
+
+        function updateBulkImportStep(step) {
+            bulkImportState.step = step;
+
+            // Update step indicators
+            for (let i = 1; i <= 3; i++) {
+                const stepEl = document.getElementById(`bulkImportStep${i}`);
+                stepEl.classList.remove('active', 'completed');
+                if (i < step) stepEl.classList.add('completed');
+                if (i === step) stepEl.classList.add('active');
+            }
+
+            // Show/hide content
+            document.getElementById('bulkImportStepContent1').style.display = step === 1 ? 'block' : 'none';
+            document.getElementById('bulkImportStepContent2').style.display = step === 2 ? 'block' : 'none';
+            document.getElementById('bulkImportStepContent3').style.display = step === 3 ? 'block' : 'none';
+
+            // Show/hide buttons
+            document.getElementById('bulkImportBackBtn').style.display = step > 1 ? 'inline-flex' : 'none';
+            document.getElementById('bulkImportNextBtn').style.display = step < 3 ? 'inline-flex' : 'none';
+            document.getElementById('bulkImportImportBtn').style.display = step === 3 ? 'inline-flex' : 'none';
+            document.getElementById('bulkImportDoneBtn').style.display = 'none';
+
+            // Reset success content visibility
+            document.getElementById('bulkImportReviewContent').style.display = 'block';
+            document.getElementById('bulkImportSuccessContent').style.display = 'none';
+
+            updateBulkImportNextButton();
+        }
+
+        function bulkImportNext() {
+            if (bulkImportState.step === 1) {
+                // Go to step 2: field mapping
+                updateBulkImportStep(2);
+                renderFieldMappingUI();
+            } else if (bulkImportState.step === 2) {
+                // Go to step 3: review
+                updateBulkImportStep(3);
+                processAndPreviewData();
+            }
+        }
+
+        function bulkImportBack() {
+            if (bulkImportState.step > 1) {
+                updateBulkImportStep(bulkImportState.step - 1);
+            }
+        }
+
+        function renderFieldMappingUI() {
+            const container = document.getElementById('bulkImportMappingContainer');
+            const fields = bulkImportFields[bulkImportState.entityType];
+
+            // Auto-map fields based on header names
+            bulkImportState.fieldMappings = {};
+            bulkImportState.setAllValues = {};
+
+            fields.forEach(field => {
+                // Try to find a matching header
+                const matchingHeader = bulkImportState.headers.find(h =>
+                    h.toLowerCase().includes(field.key.toLowerCase()) ||
+                    h.toLowerCase().includes(field.label.toLowerCase().split(' ')[0].toLowerCase())
+                );
+                if (matchingHeader) {
+                    bulkImportState.fieldMappings[matchingHeader] = field.key;
+                }
+            });
+
+            let html = '';
+
+            // Field mapping rows
+            fields.forEach(field => {
+                const currentMapping = Object.entries(bulkImportState.fieldMappings).find(([src, tgt]) => tgt === field.key);
+                const mappedColumn = currentMapping ? currentMapping[0] : '';
+
+                html += `
+                    <div class="bulk-import-mapping-row" data-field="${field.key}">
+                        <div>
+                            <div class="bulk-import-mapping-col">
+                                ${field.label}${field.required ? ' <span style="color: #d32f2f;">*</span>' : ''}
+                            </div>
+                            ${field.type === 'relationship' ? `<div style="font-size: 0.7rem; color: #8B6F47; margin-top: 0.25rem;">Links to existing ${field.targetType || field.targetTypes?.join('/')}</div>` : ''}
+                        </div>
+                        <div class="bulk-import-mapping-arrow"><i class="ph ph-arrow-left"></i></div>
+                        <div>
+                            <select class="bulk-import-mapping-select" onchange="updateFieldMapping('${field.key}', this.value)">
+                                <option value="">-- Select column --</option>
+                                ${bulkImportState.headers.map(h => `
+                                    <option value="${escapeHtml(h)}" ${mappedColumn === h ? 'selected' : ''}>${escapeHtml(h)}</option>
+                                `).join('')}
+                            </select>
+                        </div>
+                        <div class="bulk-import-set-all">
+                            <button class="bulk-import-set-all-btn" onclick="toggleSetAll('${field.key}', this)" title="Set a default value for all items">
+                                <i class="ph ph-pencil-simple"></i> Set for All
+                            </button>
+                            <input type="text"
+                                class="bulk-import-set-all-input"
+                                id="setAllInput_${field.key}"
+                                placeholder="Default value..."
+                                style="display: none;"
+                                oninput="updateSetAllValue('${field.key}', this.value)"
+                                ${field.type === 'relationship' ? `list="existingEntities_${field.key}"` : ''}>
+                            ${field.type === 'relationship' ? renderExistingEntitiesDatalist(field) : ''}
+                        </div>
+                    </div>
+                `;
+            });
+
+            container.innerHTML = html;
+            updateBulkImportNextButton();
+            renderMappedPreview();
+        }
+
+        function renderExistingEntitiesDatalist(field) {
+            const targetTypes = field.targetTypes || [field.targetType];
+            let options = [];
+
+            targetTypes.forEach(type => {
+                if (entities[type]) {
+                    entities[type].forEach(e => {
+                        options.push(e.name);
+                    });
+                }
+            });
+
+            return `<datalist id="existingEntities_${field.key}">${options.map(o => `<option value="${escapeHtml(o)}">`).join('')}</datalist>`;
+        }
+
+        function updateFieldMapping(fieldKey, sourceColumn) {
+            // Remove any existing mapping to this field
+            Object.keys(bulkImportState.fieldMappings).forEach(key => {
+                if (bulkImportState.fieldMappings[key] === fieldKey) {
+                    delete bulkImportState.fieldMappings[key];
+                }
+            });
+
+            // Add new mapping
+            if (sourceColumn) {
+                bulkImportState.fieldMappings[sourceColumn] = fieldKey;
+            }
+
+            updateBulkImportNextButton();
+            renderMappedPreview();
+        }
+
+        function toggleSetAll(fieldKey, btn) {
+            const input = document.getElementById(`setAllInput_${fieldKey}`);
+            const isActive = btn.classList.contains('active');
+
+            if (isActive) {
+                btn.classList.remove('active');
+                input.style.display = 'none';
+                input.value = '';
+                delete bulkImportState.setAllValues[fieldKey];
+            } else {
+                btn.classList.add('active');
+                input.style.display = 'block';
+                input.focus();
+                bulkImportState.setAllValues[fieldKey] = { enabled: true, value: '' };
+            }
+
+            updateBulkImportNextButton();
+            renderMappedPreview();
+        }
+
+        function updateSetAllValue(fieldKey, value) {
+            if (bulkImportState.setAllValues[fieldKey]) {
+                bulkImportState.setAllValues[fieldKey].value = value;
+            }
+            renderMappedPreview();
+        }
+
+        function renderMappedPreview() {
+            const table = document.getElementById('bulkImportMappedTable');
+            const countEl = document.getElementById('bulkImportMappedCount');
+            const fields = bulkImportFields[bulkImportState.entityType];
+
+            // Build header
+            let html = '<thead><tr>';
+            fields.forEach(f => {
+                html += `<th>${f.label}</th>`;
+            });
+            html += '</tr></thead><tbody>';
+
+            // Process and show preview
+            const previewRows = bulkImportState.parsedData.slice(0, 10);
+            previewRows.forEach(row => {
+                html += '<tr>';
+                fields.forEach(f => {
+                    let value = '';
+                    const setAll = bulkImportState.setAllValues[f.key];
+
+                    // Check if there's a column mapping
+                    const mappedColumn = Object.entries(bulkImportState.fieldMappings)
+                        .find(([src, tgt]) => tgt === f.key);
+
+                    if (mappedColumn && row[mappedColumn[0]]) {
+                        value = row[mappedColumn[0]];
+                    } else if (setAll && setAll.enabled && setAll.value) {
+                        value = `<span class="preview-set-all">${escapeHtml(setAll.value)}</span>`;
+                    }
+
+                    html += `<td>${value ? (value.includes('preview-set-all') ? value : escapeHtml(value)) : '<span style="color: #ccc;">—</span>'}</td>`;
+                });
+                html += '</tr>';
+            });
+
+            if (bulkImportState.parsedData.length > 10) {
+                html += `<tr><td colspan="${fields.length}" style="text-align: center; color: #8B6F47; font-style: italic;">... and ${bulkImportState.parsedData.length - 10} more rows</td></tr>`;
+            }
+
+            html += '</tbody>';
+            table.innerHTML = html;
+            countEl.textContent = `${bulkImportState.parsedData.length} items`;
+        }
+
+        function processAndPreviewData() {
+            const fields = bulkImportFields[bulkImportState.entityType];
+            bulkImportState.processedData = [];
+            let validCount = 0;
+            let errorCount = 0;
+
+            bulkImportState.parsedData.forEach((row, idx) => {
+                const processed = { _original: row, _errors: [], _rowIndex: idx };
+
+                fields.forEach(field => {
+                    let value = '';
+
+                    // Check mapped column first
+                    const mappedColumn = Object.entries(bulkImportState.fieldMappings)
+                        .find(([src, tgt]) => tgt === field.key);
+
+                    if (mappedColumn && row[mappedColumn[0]]) {
+                        value = row[mappedColumn[0]].trim();
+                    }
+
+                    // Apply "Set for All" if no value from mapping
+                    if (!value) {
+                        const setAll = bulkImportState.setAllValues[field.key];
+                        if (setAll && setAll.enabled && setAll.value) {
+                            value = setAll.value.trim();
+                            processed[`${field.key}_isSetAll`] = true;
+                        }
+                    }
+
+                    processed[field.key] = value;
+
+                    // Validate required fields
+                    if (field.required && !value) {
+                        processed._errors.push(`${field.label} is required`);
+                    }
+                });
+
+                if (processed._errors.length === 0) {
+                    validCount++;
+                } else {
+                    errorCount++;
+                }
+
+                bulkImportState.processedData.push(processed);
+            });
+
+            // Update counts
+            document.getElementById('bulkImportTotalCount').textContent = bulkImportState.processedData.length;
+            document.getElementById('bulkImportValidCount').textContent = validCount;
+            document.getElementById('bulkImportErrorCount').textContent = errorCount;
+            document.getElementById('bulkImportFinalCount').textContent = `${validCount} valid items`;
+
+            // Update entity type label
+            const typeLabels = {
+                unit: 'Units',
+                team: 'Teams',
+                role: 'Roles',
+                person: 'People',
+                object: 'Objects'
+            };
+            document.getElementById('bulkImportEntityTypeLabel').innerHTML =
+                `Importing as: <strong>${typeLabels[bulkImportState.entityType]}</strong>`;
+
+            // Render final table
+            renderFinalPreview();
+
+            // Disable import if no valid items
+            document.getElementById('bulkImportImportBtn').disabled = validCount === 0;
+            document.getElementById('bulkImportFooterInfo').textContent = validCount > 0
+                ? `${validCount} items ready to import.`
+                : 'No valid items to import. Please check your data.';
+        }
+
+        function renderFinalPreview() {
+            const table = document.getElementById('bulkImportFinalTable');
+            const fields = bulkImportFields[bulkImportState.entityType];
+
+            let html = '<thead><tr>';
+            html += '<th style="width: 40px;">#</th>';
+            fields.forEach(f => {
+                html += `<th>${f.label}</th>`;
+            });
+            html += '<th>Status</th>';
+            html += '</tr></thead><tbody>';
+
+            bulkImportState.processedData.forEach((row, idx) => {
+                const hasErrors = row._errors.length > 0;
+                html += `<tr class="${hasErrors ? 'error' : ''}">`;
+                html += `<td>${idx + 1}</td>`;
+                fields.forEach(f => {
+                    const value = row[f.key];
+                    const isSetAll = row[`${f.key}_isSetAll`];
+                    html += `<td>${value ? `<span class="${isSetAll ? 'preview-set-all' : ''}">${escapeHtml(value)}</span>` : '<span style="color: #ccc;">—</span>'}</td>`;
+                });
+                html += `<td>${hasErrors
+                    ? `<span class="preview-error"><i class="ph ph-warning"></i> ${row._errors.join(', ')}</span>`
+                    : '<span style="color: #4CAF50;"><i class="ph ph-check"></i> Valid</span>'
+                }</td>`;
+                html += '</tr>';
+            });
+
+            html += '</tbody>';
+            table.innerHTML = html;
+        }
+
+        function executeBulkImport() {
+            const validItems = bulkImportState.processedData.filter(row => row._errors.length === 0);
+            const entityType = bulkImportState.entityType;
+            const fields = bulkImportFields[entityType];
+            let importedCount = 0;
+
+            validItems.forEach(item => {
+                const name = item.name;
+                if (!name) return;
+
+                // Create entity
+                const id = entityType[0] + Date.now() + Math.random().toString(36).substr(2, 5);
+                const entity = {
+                    id,
+                    name,
+                    type: entityType
+                };
+
+                entities[entityType].push(entity);
+
+                // Log to Xano
+                logActivityToXano({
+                    event_verb: 'Start Entity (Bulk Import)',
+                    eo_operator: 'INS',
+                    object_type: entityType,
+                    object_id: id,
+                    object_label: name,
+                    data_json: {
+                        entity_type: entityType,
+                        entity_name: name,
+                        import_source: 'bulk_import'
+                    }
+                });
+
+                // Handle relationships
+                fields.forEach(field => {
+                    if (field.type === 'relationship' && item[field.key]) {
+                        const targetName = item[field.key];
+                        const targetTypes = field.targetTypes || [field.targetType];
+
+                        // Find matching entity
+                        let targetEntity = null;
+                        for (const tt of targetTypes) {
+                            targetEntity = entities[tt]?.find(e =>
+                                e.name.toLowerCase() === targetName.toLowerCase()
+                            );
+                            if (targetEntity) break;
+                        }
+
+                        if (targetEntity) {
+                            // Create relationship
+                            const relId = 'rel' + Date.now() + Math.random().toString(36).substr(2, 5);
+                            let subjectId, objectId, predicate;
+
+                            if (field.key === 'role' && entityType === 'person') {
+                                // Person fills role: Person INS Role
+                                subjectId = id;
+                                objectId = targetEntity.id;
+                                predicate = 'INS';
+                            } else {
+                                // Hierarchy: Parent DES Child
+                                subjectId = targetEntity.id;
+                                objectId = id;
+                                predicate = 'DES';
+                            }
+
+                            relationships.push({
+                                id: relId,
+                                subject: subjectId,
+                                predicate: predicate,
+                                object: objectId
+                            });
+
+                            // Log relationship
+                            logActivityToXano({
+                                event_verb: 'Create Connection (Bulk Import)',
+                                eo_operator: predicate,
+                                object_type: 'relationship',
+                                object_id: relId,
+                                object_label: `${findEntity(subjectId)?.name} ${predicate} ${findEntity(objectId)?.name}`,
+                                data_json: {
+                                    subject_id: subjectId,
+                                    object_id: objectId,
+                                    predicate: predicate,
+                                    import_source: 'bulk_import'
+                                }
+                            });
+                        }
+                    }
+                });
+
+                importedCount++;
+            });
+
+            // Save and refresh
+            saveToLocalStorage();
+            renderEntityList();
+            updateSelects();
+            updateParentOptions();
+            renderActivityList();
+
+            if (currentView === 'graph') {
+                updateGraph();
+            } else if (currentView === 'tree') {
+                renderTreeView();
+            } else if (currentView === 'card') {
+                renderCardView();
+            }
+
+            // Show success
+            document.getElementById('bulkImportReviewContent').style.display = 'none';
+            document.getElementById('bulkImportSuccessContent').style.display = 'block';
+            document.getElementById('bulkImportSuccessMessage').textContent =
+                `Successfully imported ${importedCount} ${bulkImportState.entityType}${importedCount !== 1 ? 's' : ''}.`;
+
+            // Update footer
+            document.getElementById('bulkImportImportBtn').style.display = 'none';
+            document.getElementById('bulkImportBackBtn').style.display = 'none';
+            document.getElementById('bulkImportDoneBtn').style.display = 'inline-flex';
+            document.getElementById('bulkImportFooterInfo').textContent = 'Import complete!';
         }
 
         function saveWorkspaceName() {
