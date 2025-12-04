@@ -6965,7 +6965,9 @@ John Doe,Engineering,john@example.com"
                 return;
             }
 
+            // Filter out DES (Define) relationships - those are for nesting/hierarchy, not activities
             const filtered = relationships.filter(rel => {
+                if (rel.predicate === 'DES') return false; // Exclude nesting relationships
                 const subjectEntity = findEntity(rel.subject);
                 const objectEntity = findEntity(rel.object);
                 const searchText = `${subjectEntity?.name || ''} ${rel.predicate} ${objectEntity?.name || ''}`.toLowerCase();
