@@ -1141,6 +1141,227 @@
             color: #7B95A3;
         }
 
+        /* Tree View Drag and Drop Styles */
+        .tree-node-item[draggable="true"] {
+            cursor: grab;
+        }
+
+        .tree-node-item[draggable="true"]:active {
+            cursor: grabbing;
+        }
+
+        .tree-node-item.dragging {
+            opacity: 0.5;
+            transform: scale(0.98);
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+        }
+
+        .tree-node-item.drag-over {
+            border: 2px dashed #C88F4A !important;
+            background: #FFF9F0 !important;
+            transform: scale(1.02);
+        }
+
+        .tree-node-item.drag-over.unit {
+            background: #E8DCC8 !important;
+        }
+
+        .tree-section-drop-zone {
+            min-height: 60px;
+            border: 2px dashed transparent;
+            border-radius: 8px;
+            margin-top: 0.5rem;
+            transition: all 0.2s;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: transparent;
+            font-size: 0.85rem;
+        }
+
+        .tree-section-drop-zone.drag-over {
+            border-color: #C88F4A;
+            background: #FFF9F0;
+            color: #8B6F47;
+        }
+
+        .tree-section-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 0.75rem 1rem;
+            background: #FAF7F5;
+            border-radius: 6px;
+            margin-bottom: 0.5rem;
+            border: 2px solid transparent;
+            transition: all 0.2s;
+        }
+
+        .tree-section-header.drag-over {
+            border-color: #C88F4A;
+            background: #FFF9F0;
+        }
+
+        .tree-section-header .section-title {
+            font-size: 1.1rem;
+            color: #8B6F47;
+            font-weight: 600;
+        }
+
+        .tree-section-header .section-hint {
+            font-size: 0.75rem;
+            color: #B8A082;
+            opacity: 0;
+            transition: opacity 0.2s;
+        }
+
+        .tree-section-header.drag-over .section-hint {
+            opacity: 1;
+        }
+
+        /* Nesting Action Modal */
+        .nesting-modal-overlay {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(0, 0, 0, 0.5);
+            z-index: 10000;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .nesting-modal-overlay.open {
+            display: flex;
+        }
+
+        .nesting-modal {
+            background: white;
+            border-radius: 12px;
+            padding: 1.5rem;
+            width: 90%;
+            max-width: 420px;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.2);
+        }
+
+        .nesting-modal-header {
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+            margin-bottom: 1rem;
+        }
+
+        .nesting-modal-header i {
+            font-size: 1.5rem;
+            color: #C88F4A;
+        }
+
+        .nesting-modal-header h3 {
+            color: #5D4E37;
+            font-size: 1.1rem;
+            margin: 0;
+        }
+
+        .nesting-modal-body {
+            margin-bottom: 1.5rem;
+        }
+
+        .nesting-modal-body p {
+            color: #6B5642;
+            font-size: 0.9rem;
+            margin-bottom: 1rem;
+            line-height: 1.5;
+        }
+
+        .nesting-entity-info {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            padding: 0.75rem;
+            background: #FAF7F5;
+            border-radius: 8px;
+            margin-bottom: 0.75rem;
+        }
+
+        .nesting-entity-info .entity-icon {
+            font-size: 1.25rem;
+        }
+
+        .nesting-entity-info .entity-details {
+            flex: 1;
+        }
+
+        .nesting-entity-info .entity-name {
+            font-weight: 600;
+            color: #5D4E37;
+        }
+
+        .nesting-entity-info .entity-type {
+            font-size: 0.75rem;
+            color: #8B6F47;
+            text-transform: capitalize;
+        }
+
+        .nesting-arrow {
+            text-align: center;
+            color: #C88F4A;
+            font-size: 1.25rem;
+            margin: 0.5rem 0;
+        }
+
+        .nesting-modal-actions {
+            display: flex;
+            flex-direction: column;
+            gap: 0.5rem;
+        }
+
+        .nesting-action-btn {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 0.5rem;
+            padding: 0.875rem 1rem;
+            border: 2px solid #E5DDD1;
+            border-radius: 8px;
+            background: white;
+            color: #5D4E37;
+            font-size: 0.9rem;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .nesting-action-btn:hover {
+            border-color: #C88F4A;
+            background: #FFF9F0;
+        }
+
+        .nesting-action-btn.primary {
+            background: #C88F4A;
+            border-color: #C88F4A;
+            color: white;
+        }
+
+        .nesting-action-btn.primary:hover {
+            background: #B87B5B;
+            border-color: #B87B5B;
+        }
+
+        .nesting-action-btn.cancel {
+            background: #FAF7F5;
+            border-color: #E5DDD1;
+        }
+
+        .nesting-action-btn.cancel:hover {
+            background: #F5E6D3;
+        }
+
+        .nesting-action-btn i {
+            font-size: 1.1rem;
+        }
+
         @keyframes spin {
             from { transform: rotate(0deg); }
             to { transform: rotate(360deg); }
@@ -3085,6 +3306,50 @@ John Doe,Engineering,john@example.com"
                         <i class="ph ph-check"></i> Done
                     </button>
                 </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Nesting Action Modal (Tree View Drag-Drop) -->
+    <div id="nestingActionModal" class="nesting-modal-overlay" onclick="if(event.target === this) closeNestingActionModal()">
+        <div class="nesting-modal">
+            <div class="nesting-modal-header">
+                <i class="ph ph-tree-structure"></i>
+                <h3>Nest Entity</h3>
+            </div>
+            <div class="nesting-modal-body">
+                <p id="nestingActionDescription">How would you like to nest this entity?</p>
+                <div class="nesting-entity-info" id="nestingSourceEntity">
+                    <span class="entity-icon" id="nestingSourceIcon"></span>
+                    <div class="entity-details">
+                        <div class="entity-name" id="nestingSourceName"></div>
+                        <div class="entity-type" id="nestingSourceType"></div>
+                    </div>
+                </div>
+                <div class="nesting-arrow">
+                    <i class="ph ph-arrow-down"></i>
+                </div>
+                <div class="nesting-entity-info" id="nestingTargetEntity">
+                    <span class="entity-icon" id="nestingTargetIcon"></span>
+                    <div class="entity-details">
+                        <div class="entity-name" id="nestingTargetName"></div>
+                        <div class="entity-type" id="nestingTargetType"></div>
+                    </div>
+                </div>
+            </div>
+            <div class="nesting-modal-actions">
+                <button class="nesting-action-btn primary" id="nestingKeepTypeBtn" onclick="executeNestingAction('keep')">
+                    <i class="ph ph-check"></i>
+                    <span id="nestingKeepTypeLabel">Keep as Original Type</span>
+                </button>
+                <button class="nesting-action-btn" id="nestingConvertTypeBtn" onclick="executeNestingAction('convert')">
+                    <i class="ph ph-swap"></i>
+                    <span id="nestingConvertTypeLabel">Convert to New Type</span>
+                </button>
+                <button class="nesting-action-btn cancel" onclick="closeNestingActionModal()">
+                    <i class="ph ph-x"></i>
+                    Cancel
+                </button>
             </div>
         </div>
     </div>
@@ -5495,7 +5760,7 @@ John Doe,Engineering,john@example.com"
         function renderTreeView() {
             const container = document.getElementById('treeView');
             if (!container) return; // Safety check
-            
+
             container.innerHTML = '';
 
             const filters = getActiveFilters();
@@ -5505,45 +5770,37 @@ John Doe,Engineering,john@example.com"
                 return;
             }
 
-            // Render each unit (if unit filter is on)
+            // Create Units section with drop zone
             if (filters.entities.unit) {
+                const unitSection = createTreeSectionWithDropZone('unit', 'Units', entities.unit.length);
                 entities.unit.forEach(unit => {
                     const unitEl = createTreeNodeDetailed(unit, filters);
-                    container.appendChild(unitEl);
+                    unitSection.appendChild(unitEl);
                 });
+                container.appendChild(unitSection);
             }
 
-            // Show unassigned teams
+            // Show unassigned teams with drop zone
             const unassignedTeams = entities.team.filter(team => {
-                const isAssigned = relationships.some(r => 
+                const isAssigned = relationships.some(r =>
                     (r.subject === team.id || r.object === team.id) &&
                     entities.unit.some(u => u.id === r.subject || u.id === r.object)
                 );
                 return !isAssigned;
             });
 
-            if (unassignedTeams.length > 0 && filters.entities.team) {
-                const section = document.createElement('div');
-                section.style.marginTop = '2rem';
-                const header = document.createElement('div');
-                header.style.fontSize = '1.1rem';
-                header.style.color = '#8B6F47';
-                header.style.fontWeight = '600';
-                header.style.marginBottom = '1rem';
-                header.textContent = '📁 Unassigned Teams';
-                section.appendChild(header);
-
+            if (filters.entities.team) {
+                const teamSection = createTreeSectionWithDropZone('team', 'Unassigned Teams', unassignedTeams.length);
                 unassignedTeams.forEach(team => {
                     const teamEl = createTreeNodeDetailed(team, filters);
-                    section.appendChild(teamEl);
+                    teamSection.appendChild(teamEl);
                 });
-
-                container.appendChild(section);
+                container.appendChild(teamSection);
             }
 
-            // Show unassigned roles
+            // Show unassigned roles with drop zone
             const unassignedRoles = entities.role.filter(role => {
-                const isAssigned = relationships.some(r => 
+                const isAssigned = relationships.some(r =>
                     (r.subject === role.id || r.object === role.id) &&
                     (entities.team.some(t => t.id === r.subject || t.id === r.object) ||
                      entities.unit.some(u => u.id === r.subject || u.id === r.object))
@@ -5551,23 +5808,13 @@ John Doe,Engineering,john@example.com"
                 return !isAssigned;
             });
 
-            if (unassignedRoles.length > 0 && filters.entities.role) {
-                const section = document.createElement('div');
-                section.style.marginTop = '2rem';
-                const header = document.createElement('div');
-                header.style.fontSize = '1.1rem';
-                header.style.color = '#8B6F47';
-                header.style.fontWeight = '600';
-                header.style.marginBottom = '1rem';
-                header.textContent = '📁 Unassigned Roles';
-                section.appendChild(header);
-
+            if (filters.entities.role) {
+                const roleSection = createTreeSectionWithDropZone('role', 'Unassigned Roles', unassignedRoles.length);
                 unassignedRoles.forEach(role => {
                     const roleEl = createTreeNodeDetailed(role, filters);
-                    section.appendChild(roleEl);
+                    roleSection.appendChild(roleEl);
                 });
-
-                container.appendChild(section);
+                container.appendChild(roleSection);
             }
 
             // Show all people
@@ -5611,12 +5858,118 @@ John Doe,Engineering,john@example.com"
             }
         }
 
+        // Create a section with a drop zone header for type conversion
+        function createTreeSectionWithDropZone(entityType, title, count) {
+            const section = document.createElement('div');
+            section.style.marginTop = '1.5rem';
+            section.className = 'tree-section';
+            section.dataset.entityType = entityType;
+
+            const header = document.createElement('div');
+            header.className = 'tree-section-header';
+            header.dataset.targetType = entityType;
+
+            const icons = {
+                unit: '🏢',
+                team: '👥',
+                role: '💼'
+            };
+
+            header.innerHTML = `
+                <span class="section-title">${icons[entityType] || '📁'} ${title} ${count > 0 ? `(${count})` : ''}</span>
+                <span class="section-hint">Drop here to convert to ${entityType}</span>
+            `;
+
+            // Add drop zone functionality to header
+            header.addEventListener('dragover', (e) => {
+                e.preventDefault();
+                if (treeDragState.sourceEntity && treeDragState.sourceEntity.type !== entityType) {
+                    e.dataTransfer.dropEffect = 'move';
+                    header.classList.add('drag-over');
+                }
+            });
+
+            header.addEventListener('dragleave', (e) => {
+                header.classList.remove('drag-over');
+            });
+
+            header.addEventListener('drop', (e) => {
+                e.preventDefault();
+                header.classList.remove('drag-over');
+
+                const sourceData = JSON.parse(e.dataTransfer.getData('text/plain'));
+                if (sourceData.type !== entityType) {
+                    handleTreeSectionDrop(sourceData, entityType);
+                }
+            });
+
+            section.appendChild(header);
+            return section;
+        }
+
         function createTreeNodeDetailed(entity, filters) {
             const container = document.createElement('div');
             container.className = 'tree-node-container';
 
             const node = document.createElement('div');
             node.className = `tree-node-item ${entity.type}`;
+
+            // Add drag-and-drop for units, teams, and roles
+            const isDraggable = ['unit', 'team', 'role'].includes(entity.type);
+            if (isDraggable) {
+                node.setAttribute('draggable', 'true');
+                node.dataset.entityId = entity.id;
+                node.dataset.entityType = entity.type;
+                node.dataset.entityName = entity.name;
+
+                // Drag start
+                node.addEventListener('dragstart', (e) => {
+                    e.stopPropagation();
+                    node.classList.add('dragging');
+                    e.dataTransfer.effectAllowed = 'move';
+                    e.dataTransfer.setData('text/plain', JSON.stringify({
+                        id: entity.id,
+                        type: entity.type,
+                        name: entity.name
+                    }));
+                    treeDragState.sourceEntity = entity;
+                });
+
+                // Drag end
+                node.addEventListener('dragend', (e) => {
+                    node.classList.remove('dragging');
+                    treeDragState.sourceEntity = null;
+                    // Clear all drag-over states
+                    document.querySelectorAll('.drag-over').forEach(el => el.classList.remove('drag-over'));
+                });
+
+                // Allow dropping on this node (for nesting)
+                node.addEventListener('dragover', (e) => {
+                    e.preventDefault();
+                    e.stopPropagation();
+                    if (treeDragState.sourceEntity && treeDragState.sourceEntity.id !== entity.id) {
+                        e.dataTransfer.dropEffect = 'move';
+                        node.classList.add('drag-over');
+                    }
+                });
+
+                node.addEventListener('dragleave', (e) => {
+                    e.stopPropagation();
+                    node.classList.remove('drag-over');
+                });
+
+                // Drop handler - nest under this entity
+                node.addEventListener('drop', (e) => {
+                    e.preventDefault();
+                    e.stopPropagation();
+                    node.classList.remove('drag-over');
+
+                    const sourceData = JSON.parse(e.dataTransfer.getData('text/plain'));
+                    if (sourceData.id !== entity.id) {
+                        handleTreeDrop(sourceData, entity);
+                    }
+                });
+            }
 
             const icon = getIcon(entity.type);
             
@@ -6152,6 +6505,292 @@ John Doe,Engineering,john@example.com"
             a.href = url;
             a.download = `${workspaceName.toLowerCase().replace(/\s+/g, '-')}-data.json`;
             a.click();
+        }
+
+        // ==========================================
+        // TREE VIEW DRAG & DROP FUNCTIONALITY
+        // ==========================================
+
+        // State for drag operations
+        let treeDragState = {
+            sourceEntity: null,
+            pendingNest: null  // { source: {...}, target: {...} }
+        };
+
+        // Handle drop on another entity (nesting)
+        function handleTreeDrop(sourceData, targetEntity) {
+            const sourceEntity = findEntity(sourceData.id);
+            if (!sourceEntity) return;
+
+            // Check if source and target are different types
+            const sourceType = sourceData.type;
+            const targetType = targetEntity.type;
+
+            // If dropping on a different type, show modal asking to keep or convert
+            if (sourceType !== targetType) {
+                treeDragState.pendingNest = {
+                    source: sourceEntity,
+                    target: targetEntity
+                };
+                openNestingActionModal(sourceEntity, targetEntity);
+            } else {
+                // Same type - just create the relationship and refresh views
+                createNestingRelationship(sourceEntity, targetEntity, true);
+            }
+        }
+
+        // Handle drop on a type section (convert type)
+        function handleTreeSectionDrop(sourceData, targetType) {
+            const sourceEntity = findEntity(sourceData.id);
+            if (!sourceEntity) return;
+
+            // Only convert if types are different
+            if (sourceEntity.type !== targetType) {
+                convertEntityType(sourceEntity, targetType);
+            }
+        }
+
+        // Open the nesting action modal
+        function openNestingActionModal(sourceEntity, targetEntity) {
+            // Populate modal
+            document.getElementById('nestingSourceIcon').textContent = getIcon(sourceEntity.type);
+            document.getElementById('nestingSourceName').textContent = sourceEntity.name;
+            document.getElementById('nestingSourceType').textContent = sourceEntity.type;
+
+            document.getElementById('nestingTargetIcon').textContent = getIcon(targetEntity.type);
+            document.getElementById('nestingTargetName').textContent = targetEntity.name;
+            document.getElementById('nestingTargetType').textContent = targetEntity.type;
+
+            // Determine appropriate child type for the target
+            const targetType = targetEntity.type;
+            const sourceType = sourceEntity.type;
+
+            let appropriateChildType = 'role';
+            if (targetType === 'unit') {
+                appropriateChildType = 'team';
+            } else if (targetType === 'team') {
+                appropriateChildType = 'role';
+            }
+
+            // Set button labels
+            document.getElementById('nestingKeepTypeLabel').textContent = `Keep as ${capitalizeFirst(sourceType)} and nest`;
+            document.getElementById('nestingConvertTypeLabel').textContent = `Convert to ${capitalizeFirst(appropriateChildType)} and nest`;
+
+            // Determine description based on types
+            let description = '';
+            if (sourceType === targetType) {
+                description = `Nest "${sourceEntity.name}" under "${targetEntity.name}"?`;
+            } else {
+                description = `"${sourceEntity.name}" is a ${sourceType}. Do you want to nest it under "${targetEntity.name}" (${targetType})?`;
+            }
+            document.getElementById('nestingActionDescription').textContent = description;
+
+            // Show/hide convert button based on hierarchy validity
+            const convertBtn = document.getElementById('nestingConvertTypeBtn');
+            const canConvert = canNestType(appropriateChildType, targetType);
+            convertBtn.style.display = canConvert ? 'flex' : 'none';
+
+            // Show modal
+            document.getElementById('nestingActionModal').classList.add('open');
+        }
+
+        function closeNestingActionModal() {
+            document.getElementById('nestingActionModal').classList.remove('open');
+            treeDragState.pendingNest = null;
+        }
+
+        // Execute the nesting action
+        function executeNestingAction(action) {
+            if (!treeDragState.pendingNest) return;
+
+            const { source, target } = treeDragState.pendingNest;
+
+            if (action === 'keep') {
+                // Keep original type, just create relationship
+                createNestingRelationship(source, target, false);
+            } else if (action === 'convert') {
+                // Convert type first, then create relationship
+                let newType = 'role';
+                if (target.type === 'unit') {
+                    newType = 'team';
+                } else if (target.type === 'team') {
+                    newType = 'role';
+                }
+
+                // Convert and then nest
+                const convertedEntity = convertEntityType(source, newType, false);
+                if (convertedEntity) {
+                    createNestingRelationship(convertedEntity, target, false);
+                }
+            }
+
+            closeNestingActionModal();
+
+            // Refresh views
+            if (currentView === 'tree') {
+                renderTreeView();
+            } else if (currentView === 'graph') {
+                updateGraph();
+            } else if (currentView === 'card') {
+                renderCardView();
+            }
+            renderActivityList();
+        }
+
+        // Check if a type can be nested under another type
+        function canNestType(childType, parentType) {
+            // Unit can contain: units, teams, roles
+            // Team can contain: teams, roles
+            // Role can contain: nothing structural
+            if (parentType === 'unit') {
+                return ['unit', 'team', 'role'].includes(childType);
+            } else if (parentType === 'team') {
+                return ['team', 'role'].includes(childType);
+            }
+            return false;
+        }
+
+        // Create a nesting relationship (DES - Define)
+        function createNestingRelationship(childEntity, parentEntity, refreshViews = true) {
+            // Check if relationship already exists
+            const existingRel = relationships.find(r =>
+                r.predicate === 'DES' &&
+                ((r.subject === parentEntity.id && r.object === childEntity.id) ||
+                (r.subject === childEntity.id && r.object === parentEntity.id))
+            );
+
+            if (existingRel) {
+                console.log('Relationship already exists');
+                if (refreshViews) renderTreeView();
+                return;
+            }
+
+            // Remove existing parent relationships for this child (if any)
+            const oldParentRels = relationships.filter(r =>
+                r.predicate === 'DES' && r.object === childEntity.id
+            );
+            oldParentRels.forEach(rel => {
+                const idx = relationships.indexOf(rel);
+                if (idx > -1) relationships.splice(idx, 1);
+            });
+
+            // Create new relationship
+            const relId = 'rel' + Date.now();
+            const relationship = {
+                id: relId,
+                subject: parentEntity.id,
+                predicate: 'DES',
+                object: childEntity.id,
+                description: ''
+            };
+
+            relationships.push(relationship);
+
+            // Log to Xano
+            const operatorData = eoOperators['DES'];
+            logActivityToXano({
+                event_verb: `${operatorData.label} (Nested)`,
+                eo_operator: 'DES',
+                object_type: 'relationship',
+                object_id: relId,
+                object_label: `${parentEntity.name} ${operatorData.label} ${childEntity.name}`,
+                data_json: {
+                    action: 'tree_drag_nest',
+                    subject_id: parentEntity.id,
+                    subject_type: parentEntity.type,
+                    subject_name: parentEntity.name,
+                    predicate: 'DES',
+                    object_id: childEntity.id,
+                    object_type: childEntity.type,
+                    object_name: childEntity.name
+                }
+            });
+
+            saveToLocalStorage();
+
+            if (refreshViews) {
+                if (currentView === 'tree') {
+                    renderTreeView();
+                } else if (currentView === 'graph') {
+                    updateGraph();
+                } else if (currentView === 'card') {
+                    renderCardView();
+                }
+                renderActivityList();
+            }
+        }
+
+        // Convert entity to a different type
+        function convertEntityType(entity, newType, refreshViews = true) {
+            if (entity.type === newType) return entity;
+
+            const oldType = entity.type;
+            const oldId = entity.id;
+
+            // Remove from old array
+            const oldArray = entities[oldType];
+            const idx = oldArray.findIndex(e => e.id === oldId);
+            if (idx > -1) {
+                oldArray.splice(idx, 1);
+            }
+
+            // Create new ID with correct prefix
+            const typePrefix = newType.charAt(0);
+            const newId = typePrefix + Date.now();
+
+            // Create new entity
+            const newEntity = {
+                id: newId,
+                name: entity.name,
+                type: newType,
+                description: entity.description || ''
+            };
+
+            // Add to new array
+            entities[newType].push(newEntity);
+
+            // Update all relationships to use new ID
+            relationships.forEach(rel => {
+                if (rel.subject === oldId) rel.subject = newId;
+                if (rel.object === oldId) rel.object = newId;
+            });
+
+            // Log to Xano
+            logActivityToXano({
+                event_verb: 'Convert Type',
+                eo_operator: 'ALT',
+                object_type: newType,
+                object_id: newId,
+                object_label: entity.name,
+                data_json: {
+                    action: 'tree_drag_convert',
+                    old_type: oldType,
+                    new_type: newType,
+                    old_id: oldId,
+                    new_id: newId,
+                    name: entity.name
+                }
+            });
+
+            saveToLocalStorage();
+
+            if (refreshViews) {
+                if (currentView === 'tree') {
+                    renderTreeView();
+                } else if (currentView === 'graph') {
+                    updateGraph();
+                } else if (currentView === 'card') {
+                    renderCardView();
+                }
+                renderActivityList();
+            }
+
+            return newEntity;
+        }
+
+        // Helper to capitalize first letter
+        function capitalizeFirst(str) {
+            return str.charAt(0).toUpperCase() + str.slice(1);
         }
 
         // ==========================================
