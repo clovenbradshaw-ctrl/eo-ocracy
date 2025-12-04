@@ -6999,6 +6999,7 @@
                 <div class="modal-section" id="modalNested"></div>
                 <div class="modal-section" id="modalAddNested"></div>
                 <div class="modal-section" id="modalNestUnder"></div>
+                <div class="modal-section" id="modalConnections"></div>
                 <div class="modal-section" id="modalActivities"></div>
                 <div class="modal-section" id="modalAddActivity"></div>
             </div>
@@ -8411,7 +8412,7 @@ John Doe,Engineering,john@example.com"
                     ${currentParents.length > 0 ? `
                         <div class="nested-chips-container" style="margin-bottom: 0.75rem;">
                             ${currentParents.map(parent => `
-                                <span class="entity-chip ${parent.type}" onclick="openEntityModal('${parent.id}')" style="cursor: pointer;">
+                                <span class="entity-chip ${parent.type}" onclick="openEntityModal('${parent.id}', '${parent.type}')" style="cursor: pointer;">
                                     <i class="ph ${getEntityIcon(parent.type)}"></i>
                                     ${parent.name}
                                     <button class="chip-remove-btn" onclick="event.stopPropagation(); removeParentRelationship('${entityId}', '${parent.id}')" title="Remove parent">
@@ -10327,7 +10328,8 @@ John Doe,Engineering,john@example.com"
 
                 // Refresh views
                 render();
-                openEntityModal(childId);
+                // Use currentModalEntityType since this is called from the modal context
+                openEntityModal(childId, currentModalEntityType);
             }
         }
 
