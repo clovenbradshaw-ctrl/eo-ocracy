@@ -3256,6 +3256,296 @@
             cursor: not-allowed;
         }
 
+        /* Work Product Selector Modal */
+        .work-product-selector-overlay {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(61, 46, 31, 0.8);
+            z-index: 2000;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .work-product-selector-overlay.active {
+            display: flex;
+        }
+
+        .work-product-selector-modal {
+            background: white;
+            border-radius: 12px;
+            width: 90%;
+            max-width: 500px;
+            max-height: 70vh;
+            display: flex;
+            flex-direction: column;
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.25);
+        }
+
+        .work-product-selector-header {
+            padding: 1.25rem 1.5rem;
+            border-bottom: 2px solid #F5E6D3;
+            background: linear-gradient(135deg, #D4A574 0%, #C88F4A 100%);
+            color: white;
+            border-radius: 12px 12px 0 0;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .work-product-selector-header h3 {
+            margin: 0;
+            font-size: 1.1rem;
+            font-weight: 600;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .work-product-selector-close {
+            background: rgba(255, 255, 255, 0.2);
+            border: none;
+            color: white;
+            width: 32px;
+            height: 32px;
+            border-radius: 50%;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1rem;
+            transition: background 0.2s;
+        }
+
+        .work-product-selector-close:hover {
+            background: rgba(255, 255, 255, 0.35);
+        }
+
+        .work-product-selector-search {
+            padding: 1rem 1.5rem;
+            border-bottom: 1px solid #E5DDD1;
+            background: #FAF7F5;
+        }
+
+        .work-product-selector-search input {
+            width: 100%;
+            padding: 0.75rem 1rem;
+            border: 2px solid #E5DDD1;
+            border-radius: 8px;
+            font-size: 0.9rem;
+            background: white;
+        }
+
+        .work-product-selector-search input:focus {
+            outline: none;
+            border-color: #C88F4A;
+        }
+
+        .work-product-selector-content {
+            flex: 1;
+            overflow-y: auto;
+            padding: 0.75rem;
+        }
+
+        .work-product-category {
+            margin-bottom: 0.5rem;
+        }
+
+        .work-product-category-header {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            padding: 0.75rem 1rem;
+            background: #F5F0E8;
+            border-radius: 8px;
+            cursor: pointer;
+            font-weight: 600;
+            color: #6B5642;
+            transition: background 0.2s;
+        }
+
+        .work-product-category-header:hover {
+            background: #EDE5D8;
+        }
+
+        .work-product-category-header .category-toggle {
+            transition: transform 0.2s;
+        }
+
+        .work-product-category-header.collapsed .category-toggle {
+            transform: rotate(-90deg);
+        }
+
+        .work-product-category-items {
+            padding-left: 0.5rem;
+            max-height: 500px;
+            overflow: hidden;
+            transition: max-height 0.3s ease-out;
+        }
+
+        .work-product-category-items.collapsed {
+            max-height: 0;
+        }
+
+        .work-product-item {
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+            padding: 0.875rem 1rem;
+            margin: 0.25rem 0;
+            background: white;
+            border: 2px solid #E5DDD1;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .work-product-item:hover {
+            border-color: #C88F4A;
+            background: #FFF9F0;
+        }
+
+        .work-product-item.selected {
+            border-color: #C88F4A;
+            background: #FFF9F0;
+            box-shadow: 0 2px 8px rgba(200, 143, 74, 0.2);
+        }
+
+        .work-product-item-icon {
+            width: 36px;
+            height: 36px;
+            border-radius: 8px;
+            background: linear-gradient(135deg, #D4A574 0%, #C88F4A 100%);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-size: 1.1rem;
+        }
+
+        .work-product-item-content {
+            flex: 1;
+        }
+
+        .work-product-item-name {
+            font-weight: 600;
+            color: #3D2E1F;
+            font-size: 0.95rem;
+        }
+
+        .work-product-item-desc {
+            font-size: 0.8rem;
+            color: #8B6F47;
+            margin-top: 0.125rem;
+        }
+
+        .work-product-selector-footer {
+            padding: 1rem 1.5rem;
+            border-top: 1px solid #E5DDD1;
+            background: #FAF7F5;
+            border-radius: 0 0 12px 12px;
+            display: flex;
+            gap: 0.75rem;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .work-product-create-new {
+            display: flex;
+            gap: 0.5rem;
+            align-items: center;
+            flex: 1;
+        }
+
+        .work-product-create-new input {
+            flex: 1;
+            padding: 0.625rem 0.875rem;
+            border: 2px solid #E5DDD1;
+            border-radius: 6px;
+            font-size: 0.875rem;
+        }
+
+        .work-product-create-new input:focus {
+            outline: none;
+            border-color: #C88F4A;
+        }
+
+        .work-product-create-btn {
+            padding: 0.625rem 1rem;
+            background: #8B6F47;
+            color: white;
+            border: none;
+            border-radius: 6px;
+            font-size: 0.875rem;
+            font-weight: 600;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            gap: 0.375rem;
+            transition: background 0.2s;
+        }
+
+        .work-product-create-btn:hover {
+            background: #6B5642;
+        }
+
+        .work-product-select-btn {
+            padding: 0.625rem 1.25rem;
+            background: #C88F4A;
+            color: white;
+            border: none;
+            border-radius: 6px;
+            font-size: 0.875rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: background 0.2s;
+        }
+
+        .work-product-select-btn:hover {
+            background: #B87B5B;
+        }
+
+        .work-product-select-btn:disabled {
+            background: #E5DDD1;
+            cursor: not-allowed;
+        }
+
+        /* Work product selector button in modal */
+        .modal-work-product-selector-btn {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            padding: 0.625rem 0.875rem;
+            background: white;
+            border: 2px solid #E5DDD1;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 0.875rem;
+            color: #6B5642;
+            transition: all 0.2s;
+            flex: 1;
+            min-width: 150px;
+        }
+
+        .modal-work-product-selector-btn:hover {
+            border-color: #C88F4A;
+            background: #FFF9F0;
+        }
+
+        .modal-work-product-selector-btn.has-selection {
+            border-color: #C88F4A;
+            background: #FFF9F0;
+            color: #3D2E1F;
+            font-weight: 600;
+        }
+
+        .modal-work-product-selector-btn .btn-icon {
+            color: #C88F4A;
+        }
+
         .entity-edit-modal-actions {
             display: flex;
             gap: 0.75rem;
@@ -4343,6 +4633,35 @@
         </div>
     </div>
 
+    <!-- Work Product Selector Modal -->
+    <div id="workProductSelectorModal" class="work-product-selector-overlay" onclick="if(event.target === this) closeWorkProductSelectorModal()">
+        <div class="work-product-selector-modal">
+            <div class="work-product-selector-header">
+                <h3><i class="ph ph-package"></i> Select Work Product</h3>
+                <button class="work-product-selector-close" onclick="closeWorkProductSelectorModal()">
+                    <i class="ph ph-x"></i>
+                </button>
+            </div>
+            <div class="work-product-selector-search">
+                <input type="text" id="workProductSearchInput" placeholder="Search work products..." oninput="filterWorkProducts()">
+            </div>
+            <div class="work-product-selector-content" id="workProductSelectorContent">
+                <!-- Work products will be populated here dynamically -->
+            </div>
+            <div class="work-product-selector-footer">
+                <div class="work-product-create-new">
+                    <input type="text" id="newWorkProductName" placeholder="New work product name..." onkeypress="if(event.key==='Enter') createWorkProductFromModal()">
+                    <button class="work-product-create-btn" onclick="createWorkProductFromModal()">
+                        <i class="ph ph-plus"></i> Create
+                    </button>
+                </div>
+                <button class="work-product-select-btn" id="confirmWorkProductSelection" onclick="confirmWorkProductSelection()" disabled>
+                    Select
+                </button>
+            </div>
+        </div>
+    </div>
+
     <!-- Workspace Modal (Create/Rename) -->
     <div id="workspaceModal" class="workspace-modal-overlay" onclick="if(event.target === this) closeWorkspaceModal()">
         <div class="workspace-modal">
@@ -5221,11 +5540,15 @@ John Doe,Engineering,john@example.com"
 
             // Add activity UI
             const addActivityEl = document.getElementById('modalAddActivity');
+
+            // Work products can only be linked to roles and teams, not people
+            const canLinkWorkProduct = entityType === 'role' || entityType === 'team';
+
             addActivityEl.innerHTML = `
                 <div class="modal-section-title"><i class="ph ph-plus-circle"></i> Add Activity</div>
                 <div class="modal-add-connection">
                     <div class="modal-add-connection-row">
-                        <select id="modalOperatorSelect">
+                        <select id="modalOperatorSelect" onchange="handleModalOperatorChange()">
                             <option value="">Type...</option>
                             ${Object.entries(eoOperators)
                                 .filter(([code]) => code !== 'DES') // Exclude DES since that's for nesting
@@ -5234,12 +5557,36 @@ John Doe,Engineering,john@example.com"
                         </select>
                         <select id="modalTargetSelect">
                             <option value="">Connect to...</option>
-                            ${getAllEntitiesForModal(entityId)}
+                            ${getAllEntitiesForModal(entityId, entityType === 'person')}
                         </select>
                         <button class="modal-add-connection-btn" onclick="addActivityFromModal()">
                             <i class="ph ph-plus"></i> Add
                         </button>
                     </div>
+                    ${canLinkWorkProduct ? `
+                    <div style="margin-top: 0.75rem; padding-top: 0.75rem; border-top: 1px dashed #E5DDD1;">
+                        <div style="font-size: 0.8rem; color: #8B6F47; margin-bottom: 0.5rem; font-weight: 500;">
+                            <i class="ph ph-package"></i> Or link to a Work Product
+                        </div>
+                        <div class="modal-add-connection-row">
+                            <select id="modalWorkProductOperatorSelect">
+                                <option value="">Type...</option>
+                                ${Object.entries(eoOperators)
+                                    .filter(([code]) => code !== 'DES')
+                                    .map(([code, op]) => `<option value="${code}">${op.label}</option>`)
+                                    .join('')}
+                            </select>
+                            <button type="button" class="modal-work-product-selector-btn" id="modalWorkProductBtn" onclick="openWorkProductSelectorForModal()">
+                                <i class="ph ph-package btn-icon"></i>
+                                <span id="modalWorkProductBtnText">Select work product...</span>
+                            </button>
+                            <input type="hidden" id="modalSelectedWorkProductId" value="">
+                            <button class="modal-add-connection-btn" onclick="addWorkProductActivityFromModal()">
+                                <i class="ph ph-plus"></i> Add
+                            </button>
+                        </div>
+                    </div>
+                    ` : ''}
                 </div>
             `;
 
@@ -5771,9 +6118,16 @@ John Doe,Engineering,john@example.com"
         }
 
         // Helper function to get all entities for modal dropdown (excluding current entity)
-        function getAllEntitiesForModal(excludeId) {
+        // excludeWorkProducts: if true, work products won't be shown (e.g., for person entities)
+        function getAllEntitiesForModal(excludeId, excludeWorkProducts = false) {
             let options = '';
-            const entityTypes = ['unit', 'team', 'role', 'person', 'object'];
+            let entityTypes = ['unit', 'team', 'role', 'person', 'object'];
+
+            // Exclude work products if specified (e.g., for person entities)
+            if (excludeWorkProducts) {
+                entityTypes = entityTypes.filter(t => t !== 'object');
+            }
+
             const typeLabels = {
                 unit: 'Units',
                 team: 'Teams',
@@ -7534,7 +7888,7 @@ John Doe,Engineering,john@example.com"
 
         function validateConnection(subject, object, predicate) {
             if (!subject || !object) return 'Invalid entities selected';
-            
+
             // Define operator: hierarchical relationships
             if (predicate === 'DES') {
                 // Units can Define units, teams, or roles
@@ -7550,7 +7904,7 @@ John Doe,Engineering,john@example.com"
                     return 'Roles cannot use Define operator (use Link or other operators)';
                 }
             }
-            
+
             // Start operator: people joining roles, creating work
             if (predicate === 'INS') {
                 // People can Start (join) roles
@@ -7558,7 +7912,7 @@ John Doe,Engineering,john@example.com"
                     return 'People can only Start roles';
                 }
             }
-            
+
             // Link operator: connecting work
             if (predicate === 'CON') {
                 // Roles Link to objects
@@ -7566,12 +7920,22 @@ John Doe,Engineering,john@example.com"
                     return 'Roles should Link to work objects';
                 }
             }
-            
+
+            // Work products (objects) can only be linked to roles and teams, NOT people
+            if (object.type === 'object') {
+                if (subject.type === 'person') {
+                    return 'Work products can only be linked to roles and teams, not people directly';
+                }
+                if (subject.type === 'unit') {
+                    return 'Work products should be linked to roles or teams, not units directly';
+                }
+            }
+
             // Prevent nonsensical connections
             if (subject.type === 'object' && object.type === 'unit') {
                 return 'Work objects cannot connect upward to organizational units';
             }
-            
+
             return null; // Valid connection
         }
 
@@ -7731,6 +8095,345 @@ John Doe,Engineering,john@example.com"
             } else if (currentView === 'tree') {
                 renderTreeView();
             }
+        }
+
+        // ==========================================
+        // WORK PRODUCT SELECTOR MODAL
+        // ==========================================
+
+        let selectedWorkProductId = null;
+        let workProductSelectorCallback = null;
+
+        function openWorkProductSelectorModal(callback) {
+            workProductSelectorCallback = callback;
+            selectedWorkProductId = null;
+
+            // Clear search
+            document.getElementById('workProductSearchInput').value = '';
+            document.getElementById('newWorkProductName').value = '';
+
+            // Populate work products
+            renderWorkProductList();
+
+            // Update selection button
+            document.getElementById('confirmWorkProductSelection').disabled = true;
+
+            // Show modal
+            document.getElementById('workProductSelectorModal').classList.add('active');
+
+            // Focus search
+            setTimeout(() => {
+                document.getElementById('workProductSearchInput').focus();
+            }, 100);
+        }
+
+        function closeWorkProductSelectorModal() {
+            document.getElementById('workProductSelectorModal').classList.remove('active');
+            selectedWorkProductId = null;
+            workProductSelectorCallback = null;
+        }
+
+        function renderWorkProductList(searchTerm = '') {
+            const content = document.getElementById('workProductSelectorContent');
+            const workProducts = entities.object || [];
+
+            // Filter by search term
+            const filteredProducts = workProducts.filter(wp =>
+                wp.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
+                (wp.description && wp.description.toLowerCase().includes(searchTerm.toLowerCase()))
+            );
+
+            if (filteredProducts.length === 0 && !searchTerm) {
+                content.innerHTML = `
+                    <div class="modal-empty-state">
+                        <i class="ph ph-package"></i>
+                        <div>No work products yet</div>
+                        <div style="font-size: 0.85rem; margin-top: 0.5rem;">Create one below to get started</div>
+                    </div>
+                `;
+                return;
+            }
+
+            if (filteredProducts.length === 0 && searchTerm) {
+                content.innerHTML = `
+                    <div class="modal-empty-state">
+                        <i class="ph ph-magnifying-glass"></i>
+                        <div>No matching work products</div>
+                        <div style="font-size: 0.85rem; margin-top: 0.5rem;">Try a different search or create a new one</div>
+                    </div>
+                `;
+                return;
+            }
+
+            // Group work products by their parent (connected via relationships)
+            const groupedProducts = groupWorkProductsByParent(filteredProducts);
+
+            let html = '';
+
+            // Render grouped work products
+            Object.entries(groupedProducts).forEach(([parentName, products]) => {
+                if (parentName !== 'Uncategorized' || Object.keys(groupedProducts).length === 1) {
+                    // Only show category headers if there are multiple categories
+                    if (Object.keys(groupedProducts).length > 1) {
+                        html += `
+                            <div class="work-product-category">
+                                <div class="work-product-category-header" onclick="toggleWorkProductCategory(this)">
+                                    <i class="ph ph-caret-down category-toggle"></i>
+                                    <i class="ph ph-folder"></i>
+                                    <span>${parentName}</span>
+                                    <span style="margin-left: auto; font-size: 0.8rem; opacity: 0.7;">${products.length}</span>
+                                </div>
+                                <div class="work-product-category-items">
+                        `;
+                    }
+
+                    products.forEach(wp => {
+                        const isSelected = selectedWorkProductId === wp.id;
+                        html += `
+                            <div class="work-product-item ${isSelected ? 'selected' : ''}"
+                                 onclick="selectWorkProductItem('${wp.id}')"
+                                 data-id="${wp.id}">
+                                <div class="work-product-item-icon">
+                                    <i class="ph ph-file-text"></i>
+                                </div>
+                                <div class="work-product-item-content">
+                                    <div class="work-product-item-name">${wp.name}</div>
+                                    ${wp.description ? `<div class="work-product-item-desc">${wp.description}</div>` : ''}
+                                </div>
+                            </div>
+                        `;
+                    });
+
+                    if (Object.keys(groupedProducts).length > 1) {
+                        html += `
+                                </div>
+                            </div>
+                        `;
+                    }
+                }
+            });
+
+            content.innerHTML = html;
+        }
+
+        function groupWorkProductsByParent(workProducts) {
+            const grouped = {};
+
+            workProducts.forEach(wp => {
+                // Find if this work product is connected to any role/team
+                let parentName = 'Uncategorized';
+
+                const connection = relationships.find(r =>
+                    r.object === wp.id && r.predicate !== 'DES'
+                );
+
+                if (connection) {
+                    const parent = findEntity(connection.subject);
+                    if (parent) {
+                        parentName = `${parent.name} (${parent.type})`;
+                    }
+                }
+
+                if (!grouped[parentName]) {
+                    grouped[parentName] = [];
+                }
+                grouped[parentName].push(wp);
+            });
+
+            // Sort to put Uncategorized last
+            const sortedGrouped = {};
+            Object.keys(grouped).sort((a, b) => {
+                if (a === 'Uncategorized') return 1;
+                if (b === 'Uncategorized') return -1;
+                return a.localeCompare(b);
+            }).forEach(key => {
+                sortedGrouped[key] = grouped[key];
+            });
+
+            return sortedGrouped;
+        }
+
+        function toggleWorkProductCategory(header) {
+            header.classList.toggle('collapsed');
+            const items = header.nextElementSibling;
+            items.classList.toggle('collapsed');
+        }
+
+        function selectWorkProductItem(id) {
+            // Clear previous selection
+            document.querySelectorAll('.work-product-item').forEach(item => {
+                item.classList.remove('selected');
+            });
+
+            // Set new selection
+            selectedWorkProductId = id;
+            const selectedItem = document.querySelector(`.work-product-item[data-id="${id}"]`);
+            if (selectedItem) {
+                selectedItem.classList.add('selected');
+            }
+
+            // Enable confirm button
+            document.getElementById('confirmWorkProductSelection').disabled = false;
+        }
+
+        function filterWorkProducts() {
+            const searchTerm = document.getElementById('workProductSearchInput').value;
+            renderWorkProductList(searchTerm);
+        }
+
+        function createWorkProductFromModal() {
+            const name = document.getElementById('newWorkProductName').value.trim();
+
+            if (!name) {
+                alert('Please enter a name for the work product');
+                return;
+            }
+
+            const id = 'o' + Date.now();
+            const entity = { id, name, type: 'object', description: '' };
+            entities.object.push(entity);
+
+            // Log to Xano
+            logActivityToXano({
+                event_verb: 'Start Entity',
+                eo_operator: 'INS',
+                object_type: 'object',
+                object_id: id,
+                object_label: name,
+                data_json: {
+                    entity_type: 'object',
+                    entity_name: name,
+                    created_from: 'work_product_modal'
+                }
+            });
+
+            // Update UI
+            updateSelects();
+            renderEntityList();
+
+            // Save
+            saveToLocalStorage();
+
+            // Clear input
+            document.getElementById('newWorkProductName').value = '';
+
+            // Refresh the list and select the new item
+            renderWorkProductList(document.getElementById('workProductSearchInput').value);
+            selectWorkProductItem(id);
+
+            if (currentView === 'graph') {
+                updateGraph();
+            } else if (currentView === 'tree') {
+                renderTreeView();
+            } else if (currentView === 'card') {
+                renderCardView();
+            }
+        }
+
+        function confirmWorkProductSelection() {
+            if (selectedWorkProductId && workProductSelectorCallback) {
+                const workProduct = findEntity(selectedWorkProductId);
+                workProductSelectorCallback(workProduct);
+            }
+            closeWorkProductSelectorModal();
+        }
+
+        // Open work product selector from the entity modal
+        function openWorkProductSelectorForModal() {
+            openWorkProductSelectorModal((workProduct) => {
+                if (workProduct) {
+                    // Update the hidden input and button text
+                    document.getElementById('modalSelectedWorkProductId').value = workProduct.id;
+                    document.getElementById('modalWorkProductBtnText').textContent = workProduct.name;
+                    document.getElementById('modalWorkProductBtn').classList.add('has-selection');
+                }
+            });
+        }
+
+        // Add work product activity from modal
+        function addWorkProductActivityFromModal() {
+            if (!currentModalEntity || !currentModalEntityType) return;
+
+            const operatorCode = document.getElementById('modalWorkProductOperatorSelect').value;
+            const workProductId = document.getElementById('modalSelectedWorkProductId').value;
+
+            if (!operatorCode || !workProductId) {
+                alert('Please select both an activity type and a work product');
+                return;
+            }
+
+            // DES should not be used here - it's for nesting
+            if (operatorCode === 'DES') {
+                alert('Use "Add Nested" for hierarchical relationships');
+                return;
+            }
+
+            const workProduct = findEntity(workProductId);
+            if (!workProduct) {
+                alert('Work product not found');
+                return;
+            }
+
+            // Validate: Work products can only be linked to roles and teams
+            if (currentModalEntityType !== 'role' && currentModalEntityType !== 'team') {
+                alert('Work products can only be linked to roles and teams');
+                return;
+            }
+
+            // Create the relationship
+            const relId = 'rel' + Date.now();
+            const relationship = {
+                id: relId,
+                subject: currentModalEntity.id,
+                predicate: operatorCode,
+                object: workProductId,
+                description: ''
+            };
+
+            relationships.push(relationship);
+
+            // Log to Xano
+            const operatorData = eoOperators[operatorCode];
+            logActivityToXano({
+                event_verb: `${operatorData.label} Activity`,
+                eo_operator: operatorCode,
+                object_type: 'relationship',
+                object_id: relId,
+                object_label: `${currentModalEntity.name} ${operatorData.label} ${workProduct.name}`,
+                data_json: {
+                    subject_id: currentModalEntity.id,
+                    subject_type: currentModalEntityType,
+                    subject_name: currentModalEntity.name,
+                    predicate: operatorCode,
+                    predicate_label: operatorData.label,
+                    object_id: workProductId,
+                    object_type: 'object',
+                    object_name: workProduct.name,
+                    connection_type: 'work_product_activity'
+                }
+            });
+
+            // Save and refresh
+            saveToLocalStorage();
+
+            // Refresh the modal to show new activity
+            openEntityModal(currentModalEntity.id, currentModalEntityType);
+
+            // Refresh views
+            if (currentView === 'graph') {
+                updateGraph();
+            } else if (currentView === 'tree') {
+                renderTreeView();
+            } else if (currentView === 'card') {
+                renderCardView();
+            }
+
+            renderActivityList();
+        }
+
+        // Handler for modal operator change (optional - for future use)
+        function handleModalOperatorChange() {
+            // Could be used to filter targets based on operator type
         }
 
         function findEntity(id) {
