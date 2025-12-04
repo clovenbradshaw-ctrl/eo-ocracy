@@ -1020,6 +1020,40 @@
             font-weight: 700;
         }
 
+        /* Grouped card view styles */
+        .card-grouped-section {
+            margin-bottom: 2.5rem;
+        }
+
+        .card-grouped-section-header {
+            font-size: 1.25rem;
+            color: #3D2E1F;
+            font-weight: 700;
+            margin-bottom: 1.25rem;
+            padding-bottom: 0.75rem;
+            border-bottom: 2px solid #E5DDD1;
+        }
+
+        .card-row-grouped {
+            margin-bottom: 1.5rem;
+            margin-left: 1rem;
+            padding-left: 1rem;
+            border-left: 3px solid #E5DDD1;
+        }
+
+        .card-row-subheader {
+            display: flex;
+            align-items: center;
+            margin-bottom: 0.75rem;
+            padding-bottom: 0.5rem;
+        }
+
+        .card-row-subtitle {
+            font-size: 1rem;
+            color: #6B5642;
+            font-weight: 600;
+        }
+
         .card-grid {
             display: grid;
             grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
@@ -7739,6 +7773,7 @@ John Doe,Engineering,john@example.com"
         // Card View State
         let cardViewSearchTerm = '';
         let cardViewSortOption = 'name-asc';
+        let cardViewGroupBy = 'none'; // 'none', 'parent-unit', 'parent-team'
         let cardViewTypeFilters = {
             unit: true,
             team: true,
@@ -7792,6 +7827,48 @@ John Doe,Engineering,john@example.com"
             renderCardViewContent();
         }
 
+        function handleCardViewGroupBy(event) {
+            cardViewGroupBy = event.target.value;
+            renderCardViewContent();
+        }
+
+        // Get parent entities for an entity (those that DES-define it)
+        function getParentEntities(entityId) {
+            const parents = [];
+            relationships.forEach(r => {
+                if (r.predicate === 'DES' && r.object === entityId) {
+                    const parent = findEntity(r.subject);
+                    if (parent) parents.push(parent);
+                }
+            });
+            return parents;
+        }
+
+        // Group entities by their parent unit or team
+        function groupEntitiesByParent(entitiesArray, parentType) {
+            const groups = {};
+            const ungrouped = [];
+
+            entitiesArray.forEach(entity => {
+                const parents = getParentEntities(entity.id);
+                const matchingParent = parents.find(p => p.type === parentType);
+
+                if (matchingParent) {
+                    if (!groups[matchingParent.id]) {
+                        groups[matchingParent.id] = {
+                            parent: matchingParent,
+                            entities: []
+                        };
+                    }
+                    groups[matchingParent.id].entities.push(entity);
+                } else {
+                    ungrouped.push(entity);
+                }
+            });
+
+            return { groups, ungrouped };
+        }
+
         function toggleCardViewTypeFilter(type) {
             cardViewTypeFilters[type] = !cardViewTypeFilters[type];
             renderCardView();
@@ -7834,6 +7911,19 @@ John Doe,Engineering,john@example.com"
                 </select>
             `;
             controls.appendChild(sortContainer);
+
+            // Group by dropdown
+            const groupContainer = document.createElement('div');
+            groupContainer.className = 'card-sort-container';
+            groupContainer.innerHTML = `
+                <span class="card-sort-label">Group by:</span>
+                <select class="card-sort-select" onchange="handleCardViewGroupBy(event)">
+                    <option value="none" ${cardViewGroupBy === 'none' ? 'selected' : ''}>None</option>
+                    <option value="parent-unit" ${cardViewGroupBy === 'parent-unit' ? 'selected' : ''}>Unit</option>
+                    <option value="parent-team" ${cardViewGroupBy === 'parent-team' ? 'selected' : ''}>Team</option>
+                </select>
+            `;
+            controls.appendChild(groupContainer);
 
             // Type filter buttons
             const filterButtons = document.createElement('div');
@@ -7884,7 +7974,74 @@ John Doe,Engineering,john@example.com"
             const sidebarFilters = getActiveFilters();
             let hasContent = false;
 
-            // Units
+            // Determine parent type for grouping
+            const parentType = cardViewGroupBy === 'parent-unit' ? 'unit' :
+                              cardViewGroupBy === 'parent-team' ? 'team' : null;
+
+            // Helper to render entities with optional grouping
+            function renderEntitySection(entityType, typeLabel, entityList, icon) {
+                if (!cardViewTypeFilters[entityType] || !sidebarFilters.entities[entityType] || entityList.length === 0) {
+                    return false;
+                }
+
+                let filtered = filterEntitiesBySearch(entityList, cardViewSearchTerm);
+                filtered = sortEntities(filtered, cardViewSortOption);
+
+                if (filtered.length === 0) return false;
+
+                // Check if grouping applies to this entity type
+                const canGroup = parentType &&
+                    ((parentType === 'unit' && (entityType === 'team' || entityType === 'role')) ||
+                     (parentType === 'team' && entityType === 'role'));
+
+                if (canGroup) {
+                    const { groups, ungrouped } = groupEntitiesByParent(filtered, parentType);
+                    const sortedParentIds = Object.keys(groups).sort((a, b) =>
+                        groups[a].parent.name.localeCompare(groups[b].parent.name)
+                    );
+
+                    // Create a section container for the grouped entity type
+                    const section = document.createElement('div');
+                    section.className = 'card-grouped-section';
+
+                    const sectionHeader = document.createElement('div');
+                    sectionHeader.className = 'card-grouped-section-header';
+                    sectionHeader.innerHTML = `${icon} ${typeLabel} (${filtered.length})`;
+                    section.appendChild(sectionHeader);
+
+                    // Render each group
+                    sortedParentIds.forEach(parentId => {
+                        const group = groups[parentId];
+                        const sortedGroupEntities = sortEntities(group.entities, cardViewSortOption);
+                        const groupRow = createCardRowWithSubheader(
+                            `${getIcon(group.parent.type)} ${group.parent.name}`,
+                            sortedGroupEntities,
+                            icon
+                        );
+                        section.appendChild(groupRow);
+                    });
+
+                    // Render ungrouped entities if any
+                    if (ungrouped.length > 0) {
+                        const sortedUngrouped = sortEntities(ungrouped, cardViewSortOption);
+                        const ungroupedRow = createCardRowWithSubheader(
+                            '📁 Ungrouped',
+                            sortedUngrouped,
+                            icon
+                        );
+                        section.appendChild(ungroupedRow);
+                    }
+
+                    contentContainer.appendChild(section);
+                } else {
+                    // No grouping - render normally
+                    contentContainer.appendChild(createCardRow(typeLabel, filtered, icon));
+                }
+
+                return true;
+            }
+
+            // Units (never grouped - they are the top-level)
             if (cardViewTypeFilters.unit && sidebarFilters.entities.unit && entities.unit.length > 0) {
                 let filteredUnits = filterEntitiesBySearch(entities.unit, cardViewSearchTerm);
                 filteredUnits = sortEntities(filteredUnits, cardViewSortOption);
@@ -7895,26 +8052,16 @@ John Doe,Engineering,john@example.com"
             }
 
             // Teams
-            if (cardViewTypeFilters.team && sidebarFilters.entities.team && entities.team.length > 0) {
-                let filteredTeams = filterEntitiesBySearch(entities.team, cardViewSearchTerm);
-                filteredTeams = sortEntities(filteredTeams, cardViewSortOption);
-                if (filteredTeams.length > 0) {
-                    contentContainer.appendChild(createCardRow('Teams', filteredTeams, getIcon('team')));
-                    hasContent = true;
-                }
+            if (renderEntitySection('team', 'Teams', entities.team, getIcon('team'))) {
+                hasContent = true;
             }
 
             // Roles
-            if (cardViewTypeFilters.role && sidebarFilters.entities.role && entities.role.length > 0) {
-                let filteredRoles = filterEntitiesBySearch(entities.role, cardViewSearchTerm);
-                filteredRoles = sortEntities(filteredRoles, cardViewSortOption);
-                if (filteredRoles.length > 0) {
-                    contentContainer.appendChild(createCardRow('Roles', filteredRoles, getIcon('role')));
-                    hasContent = true;
-                }
+            if (renderEntitySection('role', 'Roles', entities.role, getIcon('role'))) {
+                hasContent = true;
             }
 
-            // People
+            // People (not typically grouped)
             if (cardViewTypeFilters.person && sidebarFilters.entities.person && entities.person.length > 0) {
                 let filteredPeople = filterEntitiesBySearch(entities.person, cardViewSearchTerm);
                 filteredPeople = sortEntities(filteredPeople, cardViewSortOption);
@@ -7924,7 +8071,7 @@ John Doe,Engineering,john@example.com"
                 }
             }
 
-            // Work Products
+            // Work Products (not typically grouped)
             if (cardViewTypeFilters.object && sidebarFilters.entities.object && entities.object.length > 0) {
                 let filteredObjects = filterEntitiesBySearch(entities.object, cardViewSearchTerm);
                 filteredObjects = sortEntities(filteredObjects, cardViewSortOption);
@@ -8012,6 +8159,76 @@ John Doe,Engineering,john@example.com"
                         <span class="connection-badge" style="cursor: pointer;" onclick="event.stopPropagation(); openEntityModal('${rel.subject}', '${subj?.type}')">${getIcon(subj?.type)} ${subj?.name}</span>
                         <span class="connection-badge" style="cursor: pointer;" onclick="event.stopPropagation(); openEntityModal('${rel.object}', '${obj?.type}')">${getIcon(obj?.type)} ${obj?.name}</span>
                     </div>
+                `;
+
+                grid.appendChild(card);
+            });
+
+            row.appendChild(grid);
+            return row;
+        }
+
+        // Card row with a subheader (for grouped view)
+        function createCardRowWithSubheader(title, entitiesArr, icon) {
+            const row = document.createElement('div');
+            row.className = 'card-row card-row-grouped';
+
+            const header = document.createElement('div');
+            header.className = 'card-row-subheader';
+            header.innerHTML = `
+                <div class="card-row-subtitle">${title} (${entitiesArr.length})</div>
+            `;
+            row.appendChild(header);
+
+            const grid = document.createElement('div');
+            grid.className = 'card-grid';
+
+            entitiesArr.forEach(entity => {
+                const card = document.createElement('div');
+                card.className = `entity-card ${entity.type}`;
+                card.onclick = () => openEntityModal(entity.id, entity.type);
+
+                // Get all activities this entity is involved in (excluding DES relationships for display)
+                const entityActivities = relationships.filter(r =>
+                    (r.subject === entity.id || r.object === entity.id) && r.predicate !== 'DES'
+                );
+
+                // Build activities HTML
+                let activitiesHTML = '';
+                if (entityActivities.length > 0) {
+                    activitiesHTML = '<div class="card-connections">';
+                    entityActivities.slice(0, 3).forEach(rel => {
+                        const operator = eoOperators[rel.predicate];
+                        const isSubject = rel.subject === entity.id;
+                        const otherEntity = findEntity(isSubject ? rel.object : rel.subject);
+                        activitiesHTML += `
+                            <span class="connection-badge" style="background: ${operator.color}; color: white; border-color: ${operator.color};">
+                                ${isSubject ? '→' : '←'} ${operator.label} ${otherEntity?.name || ''}
+                            </span>
+                        `;
+                    });
+                    if (entityActivities.length > 3) {
+                        activitiesHTML += `<span class="connection-badge">+${entityActivities.length - 3} more</span>`;
+                    }
+                    activitiesHTML += '</div>';
+                }
+
+                // Build description HTML (truncate if too long)
+                let descriptionHTML = '';
+                if (entity.description && entity.description.trim()) {
+                    const truncatedDesc = entity.description.length > 80
+                        ? entity.description.substring(0, 80) + '...'
+                        : entity.description;
+                    descriptionHTML = `<div class="card-description">${truncatedDesc}</div>`;
+                }
+
+                card.innerHTML = `
+                    <div class="card-header">
+                        <div class="card-icon">${icon}</div>
+                        <div class="card-title">${entity.name}</div>
+                    </div>
+                    ${descriptionHTML}
+                    ${activitiesHTML}
                 `;
 
                 grid.appendChild(card);
