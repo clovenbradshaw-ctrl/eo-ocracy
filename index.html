@@ -5273,10 +5273,6 @@
                             <input type="checkbox" id="filterDES" checked onchange="applyFilters()">
                             <span>Define</span>
                         </label>
-                        <label class="filter-pill" title="Instantiate, create, initiate">
-                            <input type="checkbox" id="filterINS" checked onchange="applyFilters()">
-                            <span>Start</span>
-                        </label>
                         <label class="filter-pill" title="Divide, segment, break down">
                             <input type="checkbox" id="filterSEG" checked onchange="applyFilters()">
                             <span>Divide</span>
@@ -5361,10 +5357,6 @@
                     <button class="operator-btn link-type" data-predicate="CON" onclick="selectSimplifiedPredicate('CON', this)" title="Connects work or responsibilities">
                         <div>Link</div>
                         <div class="operator-btn-subtitle">connect work</div>
-                    </button>
-                    <button class="operator-btn start-type" data-predicate="INS" onclick="selectSimplifiedPredicate('INS', this)" title="Assigns a person to a role">
-                        <div>Start</div>
-                        <div class="operator-btn-subtitle">assign</div>
                     </button>
                 </div>
 
@@ -6432,12 +6424,13 @@ John Doe,Engineering,john@example.com"
         // - Updates: ALT (Shift) 
         // - Deletes: NUL (Notice)
         // - Nesting: DES (Define) for hierarchical parent-child relationships
-        // - Activities: CON (Link), INS (Start), etc. for connections between roles
+        // - Activities: CON (Link), etc. for connections between roles
         // - Structural: SEG (Break), REC (Loop), SYN (Merge)
         // - Oversight: SUP (Hold)
+        // Note: INS (Start) is deprecated - people cannot have activities tied to them
         //
         // External (UI) → Internal (Data Store)
-        // Notice → NUL | Define → DES | Start → INS
+        // Notice → NUL | Define → DES
         // Divide → SEG | Link → CON | Shift → ALT
         // Merge → SYN | Balance → SUP | Loop → REC
         const eoOperators = {
@@ -6459,14 +6452,15 @@ John Doe,Engineering,john@example.com"
                 style: 'solid', 
                 weight: 2 
             },
-            INS: { 
-                code: 'INS', 
-                label: 'Start', 
+            INS: {
+                code: 'INS',
+                label: 'Start',
                 fullLabel: 'INSERT',
-                color: '#8B6F47', 
-                description: 'Instantiate, create, initiate', 
-                style: 'solid', 
-                weight: 2 
+                color: '#8B6F47',
+                description: 'Deprecated - people cannot have activities',
+                style: 'solid',
+                weight: 2,
+                deprecated: true
             },
             SEG: { 
                 code: 'SEG', 
@@ -6648,79 +6642,18 @@ John Doe,Engineering,john@example.com"
                 }
             }
 
-            // Role Assignment Section - prominently displayed for persons only
+            // Role Assignment Section - not used, persons cannot have activities
             const roleAssignmentEl = document.getElementById('modalRoleAssignment');
-            if (entityType === 'person') {
-                // Get roles this person is assigned to (Person INS Role relationships)
-                const assignedRoles = relationships
-                    .filter(r => r.predicate === 'INS' && r.subject === entityId)
-                    .map(r => {
-                        const role = findEntity(r.object);
-                        if (role && role.type === 'role') {
-                            return { ...role, relationshipId: r.id };
-                        }
-                        return null;
-                    })
-                    .filter(Boolean);
-
-                // Get all available roles for assignment dropdown
-                const availableRoles = entities.role.filter(r =>
-                    !assignedRoles.find(ar => ar.id === r.id)
-                );
-
-                // Build role options with team context
-                const roleOptionsHtml = availableRoles.map(role => {
-                    const parentTeam = getRoleParentTeam(role.id);
-                    const teamContext = parentTeam ? ` (in ${parentTeam.name})` : '';
-                    return `<option value="${role.id}">${role.name}${teamContext}</option>`;
-                }).join('');
-
-                roleAssignmentEl.innerHTML = `
-                    <div class="modal-section-title"><i class="ph ph-identification-badge"></i> Role Assignments</div>
-                    ${assignedRoles.length > 0 ? `
-                        <div class="role-assignment-list">
-                            ${assignedRoles.map(role => {
-                                const parentTeam = getRoleParentTeam(role.id);
-                                const teamContext = parentTeam ? ` <span style="opacity: 0.7; font-weight: 400; font-size: 0.8rem;">in ${parentTeam.name}</span>` : '';
-                                return `
-                                    <span class="role-assignment-chip" onclick="openEntityModal('${role.id}')">
-                                        <i class="ph ph-briefcase"></i>
-                                        ${role.name}${teamContext}
-                                        <button class="chip-remove-btn" onclick="event.stopPropagation(); removeRoleAssignment('${entityId}', '${role.id}')" title="Remove from role">
-                                            <i class="ph ph-x"></i>
-                                        </button>
-                                    </span>
-                                `;
-                            }).join('')}
-                        </div>
-                    ` : `
-                        <div class="role-assignment-empty">No roles assigned yet</div>
-                    `}
-                    <div class="role-assignment-add-form">
-                        <select id="roleAssignmentSelect">
-                            <option value="">Assign to a role...</option>
-                            ${roleOptionsHtml}
-                        </select>
-                        <button class="role-assignment-add-btn" onclick="addRoleAssignment('${entityId}')">
-                            <i class="ph ph-plus"></i> Assign
-                        </button>
-                    </div>
-                `;
-            } else {
-                roleAssignmentEl.innerHTML = '';
-            }
+            roleAssignmentEl.innerHTML = '';
 
             // Separate relationships into Nesting (DES) and Activities (non-DES)
             const nestedRelationships = relationships.filter(r =>
                 r.predicate === 'DES' && (r.subject === entityId || r.object === entityId)
             );
 
-            // For persons, only show role assignments (INS relationships where person is subject)
-            // For other entities, show all non-DES relationships
+            // Persons cannot have activities - only show activities for other entity types
             const activityRelationships = entityType === 'person'
-                ? relationships.filter(r =>
-                    r.predicate === 'INS' && r.subject === entityId
-                )
+                ? []
                 : relationships.filter(r =>
                     r.predicate !== 'DES' && (r.subject === entityId || r.object === entityId)
                 );
@@ -6742,7 +6675,7 @@ John Doe,Engineering,john@example.com"
             });
 
             // Get activity entities (non-DES relationships)
-            // For persons, this will only contain roles (from INS relationships)
+            // Persons cannot have activities
             const activityEntities = [];
             activityRelationships.forEach(r => {
                 if (r.subject === entityId) {
@@ -6758,11 +6691,11 @@ John Doe,Engineering,john@example.com"
                 }
             });
 
-            // For persons, rename section and determine what roles they can be assigned to
+            // Persons cannot have activities - no activity section for them
             const isPerson = entityType === 'person';
-            const sectionTitle = isPerson ? 'Roles' : 'Activities';
-            const sectionIcon = isPerson ? 'ph-briefcase' : 'ph-arrows-left-right';
-            const emptyStateText = isPerson ? 'No roles assigned' : 'No activities yet';
+            const sectionTitle = 'Activities';
+            const sectionIcon = 'ph-arrows-left-right';
+            const emptyStateText = 'No activities yet';
 
             // Render Nested section (DES relationships - hierarchical structure)
             const nestedEl = document.getElementById('modalNested');
@@ -6889,92 +6822,78 @@ John Doe,Engineering,john@example.com"
                 nestUnderEl.innerHTML = '';
             }
 
-            // Render Activities section (non-DES relationships) OR Roles section for persons
+            // Render Activities section (non-DES relationships) - hidden for persons
             const activitiesEl = document.getElementById('modalActivities');
 
-            // For persons, build a simpler inline add form that only shows roles
-            // For other entities, show the full activity form with all operators
-            const inlineActivityFormHtml = isPerson ? `
-                <div id="inlineActivityForm" class="inline-add-form hidden">
-                    <div class="inline-add-row">
-                        <select id="inlineTargetSelect">
-                            <option value="">Select role...</option>
-                            ${getRolesForPersonAssignment(entityId)}
-                        </select>
-                        <button class="inline-add-btn" onclick="addRoleAssignmentFromInline()"><i class="ph ph-plus"></i> Assign</button>
-                    </div>
-                </div>
-            ` : `
-                <div id="inlineActivityForm" class="inline-add-form hidden">
-                    <div class="inline-add-row">
-                        <select id="inlineOperatorSelect">
-                            <option value="">Type...</option>
-                            ${Object.entries(eoOperators)
-                                .filter(([code]) => code !== 'DES')
-                                .map(([code, op]) => `<option value="${code}">${op.label}</option>`)
-                                .join('')}
-                        </select>
-                        <select id="inlineTargetSelect">
-                            <option value="">Connect to...</option>
-                            ${getAllEntitiesForModal(entityId)}
-                        </select>
-                        <button class="inline-add-btn" onclick="addActivityFromInline()"><i class="ph ph-plus"></i> Add</button>
-                    </div>
-                </div>
-            `;
-
-            if (activityEntities.length > 0) {
-                // Create header with view toggle and inline add button
-                activitiesEl.innerHTML = `
-                    <div class="connections-header">
-                        <div class="modal-section-title" style="margin-bottom: 0;"><i class="ph ${sectionIcon}"></i> ${sectionTitle}</div>
-                        <div style="display: flex; gap: 0.5rem; align-items: center;">
-                            <button class="section-add-btn" onclick="toggleInlineActivityForm()" title="${isPerson ? 'Assign to role' : 'Add activity'}"><i class="ph ph-plus"></i></button>
-                            ${!isPerson ? `
-                            <div class="view-toggle">
-                                <button class="view-toggle-btn" data-view="orbital" onclick="switchActivitiesView('orbital', '${entityId}', '${entityType}')">
-                                    <i class="ph ph-planet"></i>
-                                </button>
-                                <button class="view-toggle-btn active" data-view="list" onclick="switchActivitiesView('list', '${entityId}', '${entityType}')">
-                                    <i class="ph ph-list"></i>
-                                </button>
-                            </div>
-                            ` : ''}
+            // Persons cannot have activities - hide the section entirely
+            if (isPerson) {
+                activitiesEl.innerHTML = '';
+            } else {
+                const inlineActivityFormHtml = `
+                    <div id="inlineActivityForm" class="inline-add-form hidden">
+                        <div class="inline-add-row">
+                            <select id="inlineOperatorSelect">
+                                <option value="">Type...</option>
+                                ${Object.entries(eoOperators)
+                                    .filter(([code]) => code !== 'DES' && code !== 'INS')
+                                    .map(([code, op]) => `<option value="${code}">${op.label}</option>`)
+                                    .join('')}
+                            </select>
+                            <select id="inlineTargetSelect">
+                                <option value="">Connect to...</option>
+                                ${getAllEntitiesForModal(entityId)}
+                            </select>
+                            <button class="inline-add-btn" onclick="addActivityFromInline()"><i class="ph ph-plus"></i> Add</button>
                         </div>
                     </div>
-                    ${inlineActivityFormHtml}
                 `;
 
-                // Container for the view content
-                const viewContainer = document.createElement('div');
-                viewContainer.id = 'activitiesViewContainer';
-                activitiesEl.appendChild(viewContainer);
+                if (activityEntities.length > 0) {
+                    // Create header with view toggle and inline add button
+                    activitiesEl.innerHTML = `
+                        <div class="connections-header">
+                            <div class="modal-section-title" style="margin-bottom: 0;"><i class="ph ${sectionIcon}"></i> ${sectionTitle}</div>
+                            <div style="display: flex; gap: 0.5rem; align-items: center;">
+                                <button class="section-add-btn" onclick="toggleInlineActivityForm()" title="Add activity"><i class="ph ph-plus"></i></button>
+                                <div class="view-toggle">
+                                    <button class="view-toggle-btn" data-view="orbital" onclick="switchActivitiesView('orbital', '${entityId}', '${entityType}')">
+                                        <i class="ph ph-planet"></i>
+                                    </button>
+                                    <button class="view-toggle-btn active" data-view="list" onclick="switchActivitiesView('list', '${entityId}', '${entityType}')">
+                                        <i class="ph ph-list"></i>
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                        ${inlineActivityFormHtml}
+                    `;
 
-                // For persons, render roles as removable chips; for others, use grouped connections
-                if (isPerson) {
-                    renderPersonRoles(viewContainer, activityEntities, entityId);
-                } else {
+                    // Container for the view content
+                    const viewContainer = document.createElement('div');
+                    viewContainer.id = 'activitiesViewContainer';
+                    activitiesEl.appendChild(viewContainer);
+
                     renderGroupedConnections(viewContainer, activityEntities, entityId);
+                } else {
+                    activitiesEl.innerHTML = `
+                        <div class="connections-header">
+                            <div class="modal-section-title" style="margin-bottom: 0;"><i class="ph ${sectionIcon}"></i> ${sectionTitle}</div>
+                            <button class="section-add-btn" onclick="toggleInlineActivityForm()" title="Add activity"><i class="ph ph-plus"></i></button>
+                        </div>
+                        ${inlineActivityFormHtml}
+                        <div class="modal-empty-state">
+                            <i class="ph ${sectionIcon}"></i>
+                            <div>${emptyStateText}</div>
+                        </div>
+                    `;
                 }
-            } else {
-                activitiesEl.innerHTML = `
-                    <div class="connections-header">
-                        <div class="modal-section-title" style="margin-bottom: 0;"><i class="ph ${sectionIcon}"></i> ${sectionTitle}</div>
-                        <button class="section-add-btn" onclick="toggleInlineActivityForm()" title="${isPerson ? 'Assign to role' : 'Add activity'}"><i class="ph ph-plus"></i></button>
-                    </div>
-                    ${inlineActivityFormHtml}
-                    <div class="modal-empty-state">
-                        <i class="ph ${sectionIcon}"></i>
-                        <div>${emptyStateText}</div>
-                    </div>
-                `;
             }
 
-            // Add activity UI - hide for persons since they only have role assignments
+            // Add activity UI - hide for persons since they cannot have activities
             const addActivityEl = document.getElementById('modalAddActivity');
 
             if (isPerson) {
-                // Persons don't have activities, only role assignments (handled in Roles section above)
+                // Persons cannot have activities
                 addActivityEl.innerHTML = '';
             } else {
                 // Work products can only be linked to roles and teams
@@ -6987,7 +6906,7 @@ John Doe,Engineering,john@example.com"
                             <select id="modalOperatorSelect" onchange="handleModalOperatorChange()">
                                 <option value="">Type...</option>
                                 ${Object.entries(eoOperators)
-                                    .filter(([code]) => code !== 'DES') // Exclude DES since that's for nesting
+                                    .filter(([code]) => code !== 'DES' && code !== 'INS') // Exclude DES (nesting) and INS (deprecated)
                                     .map(([code, op]) => `<option value="${code}">${op.label}</option>`)
                                     .join('')}
                             </select>
@@ -7008,7 +6927,7 @@ John Doe,Engineering,john@example.com"
                                 <select id="modalWorkProductOperatorSelect">
                                     <option value="">Type...</option>
                                     ${Object.entries(eoOperators)
-                                        .filter(([code]) => code !== 'DES')
+                                        .filter(([code]) => code !== 'DES' && code !== 'INS')
                                         .map(([code, op]) => `<option value="${code}">${op.label}</option>`)
                                         .join('')}
                                 </select>
@@ -7595,167 +7514,6 @@ John Doe,Engineering,john@example.com"
             return options;
         }
 
-        // Helper function to get roles for person assignment dropdown
-        // Returns only roles, with team context for disambiguation
-        function getRolesForPersonAssignment(personId) {
-            let options = '';
-            const roleEntities = entities.role;
-
-            if (roleEntities.length > 0) {
-                roleEntities.forEach(role => {
-                    // Add team context for disambiguation
-                    let displayName = role.name;
-                    const parentTeam = getRoleParentTeam(role.id);
-                    if (parentTeam) {
-                        displayName = `${role.name} (${parentTeam.name})`;
-                    }
-                    options += `<option value="${role.id}">${displayName}</option>`;
-                });
-            }
-
-            return options;
-        }
-
-        // Add role assignment from inline form (for persons)
-        function addRoleAssignmentFromInline() {
-            if (!currentModalEntity || currentModalEntityType !== 'person') return;
-
-            const targetId = document.getElementById('inlineTargetSelect').value;
-
-            if (!targetId) {
-                alert('Please select a role to assign');
-                return;
-            }
-
-            const targetRole = findEntity(targetId);
-            if (!targetRole || targetRole.type !== 'role') {
-                alert('Please select a valid role');
-                return;
-            }
-
-            // Check if this person is already assigned to this role
-            const existingAssignment = relationships.find(r =>
-                r.predicate === 'INS' &&
-                r.subject === currentModalEntity.id &&
-                r.object === targetId
-            );
-
-            if (existingAssignment) {
-                alert(`${currentModalEntity.name} is already assigned to ${targetRole.name}`);
-                return;
-            }
-
-            // Create the INS relationship (person inserted into role)
-            const relId = 'rel' + Date.now();
-            const relationship = {
-                id: relId,
-                subject: currentModalEntity.id,
-                predicate: 'INS',
-                object: targetId,
-                description: ''
-            };
-
-            relationships.push(relationship);
-
-            // Track in undo history
-            const operatorData = eoOperators['INS'];
-            pushToUndoHistory({
-                type: 'create_relationship',
-                data: JSON.parse(JSON.stringify(relationship)),
-                description: `${operatorData.label}: ${currentModalEntity.name} → ${targetRole.name}`
-            });
-
-            // Log to Xano
-            logActivityToXano({
-                event_verb: 'Role Assignment',
-                eo_operator: 'INS',
-                object_type: 'relationship',
-                object_id: relId,
-                object_name: `${currentModalEntity.name} → ${targetRole.name}`
-            });
-
-            saveToLocalStorage();
-            renderEntityList();
-            renderActivityList();
-
-            // Hide the inline form
-            document.getElementById('inlineActivityForm').classList.add('hidden');
-
-            // Refresh the modal
-            openEntityModal(currentModalEntity.id, currentModalEntityType);
-        }
-
-        // Render person roles as removable chips
-        function renderPersonRoles(container, roles, personId) {
-            const wrapper = document.createElement('div');
-            wrapper.className = 'nested-chips-container';
-            wrapper.style.marginTop = '0.5rem';
-
-            roles.forEach(role => {
-                // Get team context for the role
-                const parentTeam = getRoleParentTeam(role.id);
-                const teamContext = parentTeam ? ` (${parentTeam.name})` : '';
-
-                const chip = document.createElement('span');
-                chip.className = 'entity-chip role';
-                chip.style.cursor = 'pointer';
-                chip.innerHTML = `
-                    <i class="ph ph-briefcase"></i>
-                    ${role.name}${teamContext}
-                    <button class="chip-remove-btn" onclick="event.stopPropagation(); removeRoleAssignment('${personId}', '${role.id}')" title="Remove role assignment">
-                        <i class="ph ph-x"></i>
-                    </button>
-                `;
-                chip.onclick = () => openEntityModal(role.id, 'role');
-                wrapper.appendChild(chip);
-            });
-
-            container.appendChild(wrapper);
-        }
-
-        // Remove role assignment (INS relationship between person and role)
-        function removeRoleAssignment(personId, roleId) {
-            const relIndex = relationships.findIndex(r =>
-                r.predicate === 'INS' &&
-                r.subject === personId &&
-                r.object === roleId
-            );
-
-            if (relIndex === -1) return;
-
-            const relationship = relationships[relIndex];
-            const person = findEntity(personId);
-            const role = findEntity(roleId);
-
-            // Track in undo history before removing
-            pushToUndoHistory({
-                type: 'delete_relationship',
-                data: JSON.parse(JSON.stringify(relationship)),
-                description: `Removed: ${person?.name || 'Person'} from ${role?.name || 'Role'}`
-            });
-
-            // Remove the relationship
-            relationships.splice(relIndex, 1);
-
-            // Log to Xano
-            logActivityToXano({
-                event_verb: 'Role Unassignment',
-                eo_operator: 'INS',
-                object_type: 'relationship',
-                object_id: relationship.id,
-                object_name: `${person?.name || 'Person'} → ${role?.name || 'Role'}`
-            });
-
-            saveToLocalStorage();
-            renderEntityList();
-            renderActivityList();
-
-            // Refresh the modal if it's still open
-            if (currentModalEntity && currentModalEntity.id === personId) {
-                openEntityModal(personId, 'person');
-            }
-        }
-
         // Add connection from modal
         function addConnectionFromModal() {
             if (!currentModalEntity || !currentModalEntityType) return;
@@ -8238,150 +7996,6 @@ John Doe,Engineering,john@example.com"
 
             // Refresh the modal to show new nesting
             openEntityModal(currentModalEntity.id, currentModalEntityType);
-
-            // Refresh views
-            if (currentView === 'graph') {
-                updateGraph();
-            } else if (currentView === 'tree') {
-                renderTreeView();
-            } else if (currentView === 'card') {
-                renderCardView();
-            }
-
-            renderActivityList();
-        }
-
-        // Role Assignment functions for persons
-        function addRoleAssignment(personId) {
-            const roleId = document.getElementById('roleAssignmentSelect').value;
-            if (!roleId) {
-                alert('Please select a role to assign');
-                return;
-            }
-
-            const person = findEntity(personId);
-            const role = findEntity(roleId);
-            if (!person || !role) {
-                alert('Person or role not found');
-                return;
-            }
-
-            // Check if already assigned
-            const existingAssignment = relationships.find(r =>
-                r.predicate === 'INS' && r.subject === personId && r.object === roleId
-            );
-            if (existingAssignment) {
-                alert('This person is already assigned to this role');
-                return;
-            }
-
-            // Create the INS relationship (Person INS Role)
-            const relId = 'rel' + Date.now();
-            const relationship = {
-                id: relId,
-                subject: personId,
-                predicate: 'INS',
-                object: roleId,
-                description: ''
-            };
-
-            relationships.push(relationship);
-
-            // Track in undo history
-            pushToUndoHistory({
-                type: 'create_relationship',
-                data: JSON.parse(JSON.stringify(relationship)),
-                description: `Assign: ${person.name} → ${role.name}`
-            });
-
-            // Log to Xano
-            logActivityToXano({
-                event_verb: 'Role Assignment',
-                eo_operator: 'INS',
-                object_type: 'relationship',
-                object_id: relId,
-                object_label: `${person.name} assigned to ${role.name}`,
-                data_json: {
-                    subject_id: personId,
-                    subject_type: 'person',
-                    subject_name: person.name,
-                    predicate: 'INS',
-                    predicate_label: 'Insert/Start',
-                    object_id: roleId,
-                    object_type: 'role',
-                    object_name: role.name,
-                    connection_type: 'role_assignment'
-                }
-            });
-
-            // Save and refresh
-            saveToLocalStorage();
-
-            // Refresh the modal to show new assignment
-            openEntityModal(personId, 'person');
-
-            // Refresh views
-            if (currentView === 'graph') {
-                updateGraph();
-            } else if (currentView === 'tree') {
-                renderTreeView();
-            } else if (currentView === 'card') {
-                renderCardView();
-            }
-
-            renderActivityList();
-        }
-
-        function removeRoleAssignment(personId, roleId) {
-            const person = findEntity(personId);
-            const role = findEntity(roleId);
-            if (!person || !role) return;
-
-            // Find the relationship
-            const relIndex = relationships.findIndex(r =>
-                r.predicate === 'INS' && r.subject === personId && r.object === roleId
-            );
-
-            if (relIndex === -1) return;
-
-            // Store for undo
-            const removedRelationship = JSON.parse(JSON.stringify(relationships[relIndex]));
-
-            // Remove the relationship
-            relationships.splice(relIndex, 1);
-
-            // Track in undo history
-            pushToUndoHistory({
-                type: 'delete_relationship',
-                data: removedRelationship,
-                description: `Unassign: ${person.name} from ${role.name}`
-            });
-
-            // Log to Xano
-            logActivityToXano({
-                event_verb: 'Role Unassignment',
-                eo_operator: 'INS',
-                object_type: 'relationship',
-                object_id: removedRelationship.id,
-                object_label: `${person.name} unassigned from ${role.name}`,
-                data_json: {
-                    subject_id: personId,
-                    subject_type: 'person',
-                    subject_name: person.name,
-                    predicate: 'INS',
-                    predicate_label: 'Insert/Start',
-                    object_id: roleId,
-                    object_type: 'role',
-                    object_name: role.name,
-                    connection_type: 'role_unassignment'
-                }
-            });
-
-            // Save and refresh
-            saveToLocalStorage();
-
-            // Refresh the modal
-            openEntityModal(personId, 'person');
 
             // Refresh views
             if (currentView === 'graph') {
@@ -9255,14 +8869,9 @@ John Doe,Engineering,john@example.com"
             relationships.push({ subject: 'r1', predicate: 'SUP', object: 'o1', id: 'rel1' }); // Managing Attorney supervises Court Filings
             relationships.push({ subject: 'r2', predicate: 'CON', object: 'o3', id: 'rel2' }); // Associate Attorney connects to Case Preparation
             relationships.push({ subject: 'r3', predicate: 'CON', object: 'o4', id: 'rel3' }); // Case Manager connects to Schedule Management
-            
-            // People INSerted into roles
-            relationships.push({ subject: 'p1', predicate: 'INS', object: 'r1', id: 'rel4' }); // Maria Santos inserted into Managing Attorney
-            relationships.push({ subject: 'p2', predicate: 'INS', object: 'r2', id: 'rel5' }); // James Chen inserted into Associate Attorney
-            relationships.push({ subject: 'p3', predicate: 'INS', object: 'r3', id: 'rel6' }); // Ana Rodriguez inserted into Case Manager
-            
-            // Oversight relationships  
-            relationships.push({ subject: 'r1', predicate: 'SUP', object: 'r2', id: 'rel7' }); // Managing Attorney supersedes Associate Attorney
+
+            // Oversight relationships
+            relationships.push({ subject: 'r1', predicate: 'SUP', object: 'r2', id: 'rel4' }); // Managing Attorney supersedes Associate Attorney
             
             // Collaborative relationships
             relationships.push({ subject: 'r3', predicate: 'SYN', object: 'o4', id: 'rel8' }); // Case Manager synthesizes Schedule Management
@@ -10055,6 +9664,14 @@ John Doe,Engineering,john@example.com"
         function validateConnection(subject, object, predicate) {
             if (!subject || !object) return 'Invalid entities selected';
 
+            // Persons cannot have any activities or relationships
+            if (subject.type === 'person') {
+                return 'People cannot have activities tied to them';
+            }
+            if (object.type === 'person') {
+                return 'Activities cannot target people';
+            }
+
             // Define operator: hierarchical relationships
             if (predicate === 'DES') {
                 // Units can Define units, teams, or roles
@@ -10071,25 +9688,9 @@ John Doe,Engineering,john@example.com"
                 }
             }
 
-            // Start operator: people joining roles
+            // INS operator is no longer used (was for person role assignments)
             if (predicate === 'INS') {
-                // Only persons can use INS (Start) to join roles
-                if (subject.type !== 'person') {
-                    return 'Only people can use the Start operator to join roles';
-                }
-                if (object.type !== 'role') {
-                    return 'People can only Start (join) roles';
-                }
-            }
-
-            // Persons can only be subjects of INS relationships (role assignments)
-            if (subject.type === 'person' && predicate !== 'INS') {
-                return 'People can only be assigned to roles using the Start operator';
-            }
-
-            // Persons cannot be objects of activity relationships
-            if (object.type === 'person') {
-                return 'Activities cannot target people directly - assign them to roles instead';
+                return 'The Start operator is no longer available';
             }
 
             // Link operator: connecting work
@@ -10100,11 +9701,8 @@ John Doe,Engineering,john@example.com"
                 }
             }
 
-            // Work products (objects) can only be linked to roles and teams, NOT people
+            // Work products (objects) can only be linked to roles and teams
             if (object.type === 'object') {
-                if (subject.type === 'person') {
-                    return 'Work products can only be linked to roles and teams, not people directly';
-                }
                 if (subject.type === 'unit') {
                     return 'Work products should be linked to roles or teams, not units directly';
                 }
@@ -11623,12 +11221,9 @@ John Doe,Engineering,john@example.com"
                     .filter(e => e !== null);
             }
 
-            // Get people who fill a role (INS relationships)
+            // People can no longer be assigned to roles
             function getPeopleInRole(roleId) {
-                return relationships
-                    .filter(r => r.predicate === 'INS' && r.object === roleId)
-                    .map(r => findEntity(r.subject))
-                    .filter(e => e !== null && e.type === 'person');
+                return [];
             }
 
             // Recursively build unit node with nested units, teams, and roles
@@ -11670,10 +11265,8 @@ John Doe,Engineering,john@example.com"
             // Find orphan entities (no DES parent)
             const orphanTeams = entities.team.filter(t => !entitiesWithParents.has(t.id));
             const orphanRoles = entities.role.filter(r => !entitiesWithParents.has(r.id));
-            const orphanPeople = entities.person.filter(p => {
-                // People are orphans if they don't fill any roles
-                return !relationships.some(r => r.predicate === 'INS' && r.subject === p.id);
-            });
+            // All people are standalone - they cannot have activities tied to them
+            const orphanPeople = entities.person;
 
             return {
                 units: hierarchyTree,
@@ -11989,28 +11582,13 @@ John Doe,Engineering,john@example.com"
                 return getParentEntity(parentEntity, 'unit');
             }
 
-            // For people, they connect to roles via INS, then roles connect to teams/units via DES
+            // For other cases, no parent found
             return null;
         }
 
-        // Get parent for person via INS relationship (person fills role)
+        // People cannot have activities tied to them - they have no parent
         function getPersonParent(person, groupByType) {
-            // Find INS relationship where person is the subject
-            const insRelationship = relationships.find(r =>
-                r.predicate === 'INS' && r.subject === person.id
-            );
-
-            if (!insRelationship) return null;
-
-            const role = findEntity(insRelationship.object);
-            if (!role) return null;
-
-            if (groupByType === 'role') {
-                return role;
-            }
-
-            // Look up the hierarchy from role
-            return getParentEntity(role, groupByType);
+            return null;
         }
 
         function renderGroupedFlatCardView(contentContainer, sidebarFilters) {
@@ -14703,22 +14281,17 @@ John Doe,Engineering,john@example.com"
                             if (targetEntity) break;
                         }
 
-                        if (targetEntity) {
-                            // Create relationship
-                            const relId = 'rel' + Date.now() + Math.random().toString(36).substr(2, 5);
-                            let subjectId, objectId, predicate;
+                        // Skip person-role relationships - people cannot have activities
+                        if (field.key === 'role' && entityType === 'person') {
+                            return;
+                        }
 
-                            if (field.key === 'role' && entityType === 'person') {
-                                // Person fills role: Person INS Role
-                                subjectId = id;
-                                objectId = targetEntity.id;
-                                predicate = 'INS';
-                            } else {
-                                // Hierarchy: Parent DES Child
-                                subjectId = targetEntity.id;
-                                objectId = id;
-                                predicate = 'DES';
-                            }
+                        if (targetEntity) {
+                            // Create hierarchy relationship: Parent DES Child
+                            const relId = 'rel' + Date.now() + Math.random().toString(36).substr(2, 5);
+                            const subjectId = targetEntity.id;
+                            const objectId = id;
+                            const predicate = 'DES';
 
                             relationships.push({
                                 id: relId,
@@ -15033,9 +14606,9 @@ John Doe,Engineering,john@example.com"
 
             // Map simplified filters to advanced filter checkboxes
             const operatorFilters = {
-                'all': ['NUL', 'DES', 'INS', 'SEG', 'CON', 'ALT', 'SYN', 'SUP', 'REC'],
+                'all': ['NUL', 'DES', 'SEG', 'CON', 'ALT', 'SYN', 'SUP', 'REC'],
                 'nesting': ['DES'],  // DES for nesting/hierarchy
-                'activities': ['NUL', 'INS', 'SEG', 'CON', 'ALT', 'SYN', 'SUP', 'REC']  // All non-DES operators for activities
+                'activities': ['NUL', 'SEG', 'CON', 'ALT', 'SYN', 'SUP', 'REC']  // All non-DES operators for activities
             };
 
             const entityFilters = {
@@ -15047,7 +14620,7 @@ John Doe,Engineering,john@example.com"
 
             // Set operator checkboxes
             const selectedOps = operatorFilters[connectionFilter] || operatorFilters['all'];
-            ['NUL', 'DES', 'INS', 'SEG', 'CON', 'ALT', 'SYN', 'SUP', 'REC'].forEach(op => {
+            ['NUL', 'DES', 'SEG', 'CON', 'ALT', 'SYN', 'SUP', 'REC'].forEach(op => {
                 const checkbox = document.getElementById(`filter${op}`);
                 if (checkbox) {
                     checkbox.checked = selectedOps.includes(op);
