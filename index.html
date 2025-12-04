@@ -4372,6 +4372,214 @@
         .bulk-import-success p {
             color: #8B6F47;
         }
+
+        /* Undo Button Styles */
+        .undo-btn {
+            display: flex;
+            align-items: center;
+            gap: 0.35rem;
+            background: rgba(255,255,255,0.15);
+            border: 1px solid rgba(255,255,255,0.3);
+            border-radius: 6px;
+            padding: 0.4rem 0.75rem;
+            color: white;
+            cursor: pointer;
+            font-size: 0.875rem;
+            font-weight: 500;
+            transition: all 0.2s;
+        }
+
+        .undo-btn:hover:not(:disabled) {
+            background: rgba(255,255,255,0.25);
+            border-color: rgba(255,255,255,0.5);
+        }
+
+        .undo-btn:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+        }
+
+        .undo-btn .undo-count {
+            background: rgba(255,255,255,0.3);
+            border-radius: 10px;
+            padding: 0 0.4rem;
+            font-size: 0.75rem;
+            min-width: 1.25rem;
+            text-align: center;
+        }
+
+        /* Undo Notification Styles */
+        .undo-notification {
+            position: fixed;
+            bottom: 2rem;
+            left: 50%;
+            transform: translateX(-50%) translateY(100px);
+            background: #3D2E1F;
+            color: white;
+            padding: 0.75rem 1.5rem;
+            border-radius: 8px;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.3);
+            z-index: 10000;
+            font-size: 0.9rem;
+            opacity: 0;
+            transition: all 0.3s ease;
+        }
+
+        .undo-notification.show {
+            transform: translateX(-50%) translateY(0);
+            opacity: 1;
+        }
+
+        /* Recycle Bin Section Styles */
+        .recycle-bin-section {
+            margin-top: 1rem;
+            border-top: 1px solid #E5DDD1;
+            padding-top: 1rem;
+        }
+
+        .recycle-bin-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-bottom: 0.75rem;
+        }
+
+        .recycle-bin-title {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            font-weight: 600;
+            color: #6B5642;
+            font-size: 0.9rem;
+        }
+
+        .recycle-bin-count {
+            background: #E5DDD1;
+            color: #6B5642;
+            border-radius: 10px;
+            padding: 0.1rem 0.5rem;
+            font-size: 0.75rem;
+            font-weight: 600;
+        }
+
+        .recycle-bin-empty-btn {
+            background: none;
+            border: none;
+            color: #8B6F47;
+            cursor: pointer;
+            font-size: 0.8rem;
+            padding: 0.25rem 0.5rem;
+            border-radius: 4px;
+            transition: all 0.15s;
+        }
+
+        .recycle-bin-empty-btn:hover {
+            background: #FAF7F5;
+            color: #d32f2f;
+        }
+
+        .recycle-bin-list {
+            max-height: 200px;
+            overflow-y: auto;
+        }
+
+        .recycle-bin-empty {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            padding: 1.5rem;
+            color: #A89984;
+            text-align: center;
+        }
+
+        .recycle-bin-empty i {
+            font-size: 2rem;
+            margin-bottom: 0.5rem;
+            opacity: 0.5;
+        }
+
+        .recycle-bin-empty p {
+            margin: 0;
+            font-size: 0.85rem;
+        }
+
+        .recycle-bin-item {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 0.5rem 0.75rem;
+            background: #FAF7F5;
+            border-radius: 6px;
+            margin-bottom: 0.5rem;
+            transition: all 0.15s;
+        }
+
+        .recycle-bin-item:hover {
+            background: #F5EFE6;
+        }
+
+        .recycle-bin-item-info {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            flex: 1;
+            min-width: 0;
+        }
+
+        .recycle-bin-icon {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            width: 1.5rem;
+            color: #8B6F47;
+        }
+
+        .recycle-bin-details {
+            flex: 1;
+            min-width: 0;
+        }
+
+        .recycle-bin-name {
+            display: block;
+            font-size: 0.85rem;
+            font-weight: 500;
+            color: #3D2E1F;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+
+        .recycle-bin-meta {
+            display: block;
+            font-size: 0.7rem;
+            color: #A89984;
+        }
+
+        .recycle-bin-actions {
+            display: flex;
+            gap: 0.25rem;
+            opacity: 0;
+            transition: opacity 0.15s;
+        }
+
+        .recycle-bin-item:hover .recycle-bin-actions {
+            opacity: 1;
+        }
+
+        .recycle-bin-actions .btn-icon {
+            padding: 0.25rem;
+            border-radius: 4px;
+            color: #8B6F47;
+        }
+
+        .recycle-bin-actions .btn-icon:hover {
+            background: rgba(0,0,0,0.05);
+            color: #C88F4A;
+        }
+
+        .recycle-bin-actions .btn-icon.delete:hover {
+            color: #d32f2f;
+        }
     </style>
 </head>
 <body>
@@ -4415,6 +4623,11 @@
                     <i class="ph ph-circles-three"></i> Venn
                 </button>
             </div>
+            <button class="undo-btn" id="undoBtn" onclick="undo()" disabled title="Nothing to undo">
+                <i class="ph ph-arrow-counter-clockwise"></i>
+                Undo
+                <span class="undo-count" id="undoCount" style="display: none;">0</span>
+            </button>
             <button class="btn btn-small btn-outline" onclick="toggleSampleData()" id="sampleDataBtn">
                 <i class="ph ph-database"></i> <span id="sampleDataText">Clear Sample Data</span>
             </button>
@@ -4510,6 +4723,26 @@
 
             <div class="panel-title" style="font-size: 1rem;">All Entities</div>
             <div id="entityList" class="entity-list"></div>
+
+            <!-- Recycle Bin Section -->
+            <div class="recycle-bin-section">
+                <div class="recycle-bin-header">
+                    <div class="recycle-bin-title">
+                        <i class="ph ph-trash"></i>
+                        Recycle Bin
+                        <span class="recycle-bin-count" id="recycleBinCount" style="display: none;">0</span>
+                    </div>
+                    <button class="recycle-bin-empty-btn" onclick="emptyRecycleBin()" title="Empty recycle bin">
+                        Empty
+                    </button>
+                </div>
+                <div class="recycle-bin-list" id="recycleBinList">
+                    <div class="recycle-bin-empty">
+                        <i class="ph ph-trash"></i>
+                        <p>Recycle bin is empty</p>
+                    </div>
+                </div>
+            </div>
         </div>
 
         <!-- Center Panel: Multiple Views -->
@@ -5248,6 +5481,9 @@ John Doe,Engineering,john@example.com"
                 btnText.textContent = hasSampleData ? 'Clear Sample Data' : 'Load Sample Data';
             }
 
+            // Load undo history for this workspace
+            loadUndoHistory();
+
             // Re-render everything
             renderEntityList();
             updateSelects();
@@ -5327,6 +5563,305 @@ John Doe,Engineering,john@example.com"
 
             saveWorkspaces();
             renderWorkspaceList();
+        }
+
+        // ==========================================
+        // UNDO HISTORY FUNCTIONS
+        // ==========================================
+
+        function pushToUndoHistory(action) {
+            // Add timestamp if not present
+            if (!action.timestamp) {
+                action.timestamp = Date.now();
+            }
+
+            undoHistory.push(action);
+
+            // Trim history if it exceeds max size
+            if (undoHistory.length > MAX_UNDO_HISTORY) {
+                undoHistory = undoHistory.slice(-MAX_UNDO_HISTORY);
+            }
+
+            // Save history to localStorage
+            saveUndoHistory();
+            updateUndoButton();
+        }
+
+        function undo() {
+            if (undoHistory.length === 0) {
+                showUndoNotification('Nothing to undo');
+                return;
+            }
+
+            const action = undoHistory.pop();
+
+            switch (action.type) {
+                case 'create_entity':
+                    // Undo entity creation - delete it (but don't add to recycle bin)
+                    const entityType = action.entityType;
+                    entities[entityType] = entities[entityType].filter(e => e.id !== action.data.id);
+                    // Also remove any relationships created with it
+                    relationships = relationships.filter(r => r.subject !== action.data.id && r.object !== action.data.id);
+                    break;
+
+                case 'delete_entity':
+                    // Undo entity deletion - restore it
+                    entities[action.entityType].push(action.data);
+                    // Restore relationships that were deleted with it
+                    if (action.deletedRelationships) {
+                        relationships.push(...action.deletedRelationships);
+                    }
+                    // Remove from recycle bin if present
+                    recycleBin = recycleBin.filter(item =>
+                        !(item.itemType === 'entity' && item.item.id === action.data.id)
+                    );
+                    break;
+
+                case 'update_entity':
+                    // Undo entity update - restore old values
+                    const entity = findEntity(action.data.id);
+                    if (entity) {
+                        entity.name = action.oldData.name;
+                        entity.description = action.oldData.description;
+                    }
+                    break;
+
+                case 'create_relationship':
+                    // Undo relationship creation - delete it
+                    relationships = relationships.filter(r => r.id !== action.data.id);
+                    break;
+
+                case 'delete_relationship':
+                    // Undo relationship deletion - restore it
+                    relationships.push(action.data);
+                    // Remove from recycle bin if present
+                    recycleBin = recycleBin.filter(item =>
+                        !(item.itemType === 'relationship' && item.item.id === action.data.id)
+                    );
+                    break;
+            }
+
+            saveToLocalStorage();
+            saveUndoHistory();
+            updateUndoButton();
+            refreshAllViews();
+
+            showUndoNotification(`Undone: ${action.description}`);
+        }
+
+        function saveUndoHistory() {
+            try {
+                if (currentWorkspaceId) {
+                    localStorage.setItem(`undoHistory_${currentWorkspaceId}`, JSON.stringify(undoHistory));
+                    localStorage.setItem(`recycleBin_${currentWorkspaceId}`, JSON.stringify(recycleBin));
+                }
+            } catch (e) {
+                console.error('Failed to save undo history:', e);
+            }
+        }
+
+        function loadUndoHistory() {
+            try {
+                if (currentWorkspaceId) {
+                    const savedHistory = localStorage.getItem(`undoHistory_${currentWorkspaceId}`);
+                    const savedRecycleBin = localStorage.getItem(`recycleBin_${currentWorkspaceId}`);
+                    undoHistory = savedHistory ? JSON.parse(savedHistory) : [];
+                    recycleBin = savedRecycleBin ? JSON.parse(savedRecycleBin) : [];
+                } else {
+                    undoHistory = [];
+                    recycleBin = [];
+                }
+            } catch (e) {
+                console.error('Failed to load undo history:', e);
+                undoHistory = [];
+                recycleBin = [];
+            }
+            updateUndoButton();
+            renderRecycleBin();
+        }
+
+        function clearUndoHistory() {
+            undoHistory = [];
+            saveUndoHistory();
+            updateUndoButton();
+        }
+
+        function updateUndoButton() {
+            const undoBtn = document.getElementById('undoBtn');
+            const undoCount = document.getElementById('undoCount');
+            if (undoBtn) {
+                undoBtn.disabled = undoHistory.length === 0;
+                undoBtn.title = undoHistory.length > 0
+                    ? `Undo: ${undoHistory[undoHistory.length - 1]?.description || 'last action'} (Ctrl+Z)`
+                    : 'Nothing to undo';
+            }
+            if (undoCount) {
+                undoCount.textContent = undoHistory.length;
+                undoCount.style.display = undoHistory.length > 0 ? 'inline' : 'none';
+            }
+        }
+
+        function showUndoNotification(message) {
+            // Create or update notification element
+            let notification = document.getElementById('undoNotification');
+            if (!notification) {
+                notification = document.createElement('div');
+                notification.id = 'undoNotification';
+                notification.className = 'undo-notification';
+                document.body.appendChild(notification);
+            }
+
+            notification.textContent = message;
+            notification.classList.add('show');
+
+            // Hide after 2 seconds
+            setTimeout(() => {
+                notification.classList.remove('show');
+            }, 2000);
+        }
+
+        // ==========================================
+        // RECYCLE BIN FUNCTIONS
+        // ==========================================
+
+        function addToRecycleBin(item, itemType, entityType, deletedRelationships = []) {
+            recycleBin.push({
+                item: JSON.parse(JSON.stringify(item)),
+                itemType,
+                entityType,
+                deletedAt: Date.now(),
+                deletedRelationships: deletedRelationships.map(r => JSON.parse(JSON.stringify(r)))
+            });
+            saveUndoHistory();
+            renderRecycleBin();
+        }
+
+        function restoreFromRecycleBin(index) {
+            if (index < 0 || index >= recycleBin.length) return;
+
+            const entry = recycleBin[index];
+
+            if (entry.itemType === 'entity') {
+                // Restore entity
+                entities[entry.entityType].push(entry.item);
+                // Restore associated relationships
+                if (entry.deletedRelationships) {
+                    relationships.push(...entry.deletedRelationships);
+                }
+            } else if (entry.itemType === 'relationship') {
+                // Restore relationship
+                relationships.push(entry.item);
+            }
+
+            // Remove from recycle bin
+            recycleBin.splice(index, 1);
+
+            saveToLocalStorage();
+            saveUndoHistory();
+            refreshAllViews();
+            renderRecycleBin();
+
+            showUndoNotification(`Restored: ${entry.item.name || 'item'}`);
+        }
+
+        function permanentlyDelete(index) {
+            if (index < 0 || index >= recycleBin.length) return;
+
+            const entry = recycleBin[index];
+            const itemName = entry.item.name || 'item';
+
+            if (!confirm(`Permanently delete "${itemName}"? This cannot be undone.`)) return;
+
+            recycleBin.splice(index, 1);
+            saveUndoHistory();
+            renderRecycleBin();
+
+            showUndoNotification(`Permanently deleted: ${itemName}`);
+        }
+
+        function emptyRecycleBin() {
+            if (recycleBin.length === 0) {
+                showUndoNotification('Recycle bin is empty');
+                return;
+            }
+
+            if (!confirm(`Permanently delete all ${recycleBin.length} item(s) in recycle bin? This cannot be undone.`)) return;
+
+            recycleBin = [];
+            saveUndoHistory();
+            renderRecycleBin();
+
+            showUndoNotification('Recycle bin emptied');
+        }
+
+        function renderRecycleBin() {
+            const container = document.getElementById('recycleBinList');
+            if (!container) return;
+
+            const countEl = document.getElementById('recycleBinCount');
+            if (countEl) {
+                countEl.textContent = recycleBin.length;
+                countEl.style.display = recycleBin.length > 0 ? 'inline' : 'none';
+            }
+
+            if (recycleBin.length === 0) {
+                container.innerHTML = '<div class="recycle-bin-empty"><i class="ph ph-trash"></i><p>Recycle bin is empty</p></div>';
+                return;
+            }
+
+            container.innerHTML = recycleBin.map((entry, index) => {
+                const icon = entry.itemType === 'entity' ? getIcon(entry.entityType) : '<i class="ph ph-link"></i>';
+                const name = entry.item.name || `${entry.item.subject} → ${entry.item.object}`;
+                const typeLabel = entry.itemType === 'entity' ? entry.entityType : 'connection';
+                const timeAgo = getTimeAgo(entry.deletedAt);
+
+                return `
+                    <div class="recycle-bin-item">
+                        <div class="recycle-bin-item-info">
+                            <span class="recycle-bin-icon">${icon}</span>
+                            <div class="recycle-bin-details">
+                                <span class="recycle-bin-name">${name}</span>
+                                <span class="recycle-bin-meta">${typeLabel} • ${timeAgo}</span>
+                            </div>
+                        </div>
+                        <div class="recycle-bin-actions">
+                            <button class="btn-icon" onclick="restoreFromRecycleBin(${index})" title="Restore">
+                                <i class="ph ph-arrow-counter-clockwise"></i>
+                            </button>
+                            <button class="btn-icon delete" onclick="permanentlyDelete(${index})" title="Delete permanently">
+                                <i class="ph ph-x"></i>
+                            </button>
+                        </div>
+                    </div>
+                `;
+            }).join('');
+        }
+
+        function getTimeAgo(timestamp) {
+            const seconds = Math.floor((Date.now() - timestamp) / 1000);
+
+            if (seconds < 60) return 'just now';
+            if (seconds < 3600) return `${Math.floor(seconds / 60)}m ago`;
+            if (seconds < 86400) return `${Math.floor(seconds / 3600)}h ago`;
+            return `${Math.floor(seconds / 86400)}d ago`;
+        }
+
+        function refreshAllViews() {
+            renderEntityList();
+            updateSelects();
+            updateParentOptions();
+            renderActivityList();
+            renderRecycleBin();
+
+            if (currentView === 'graph') {
+                updateGraph();
+            } else if (currentView === 'tree') {
+                renderTreeView();
+            } else if (currentView === 'card') {
+                renderCardView();
+            } else if (currentView === 'venn') {
+                renderVennView();
+            }
         }
 
         function toggleWorkspaceDropdown(event) {
@@ -5569,6 +6104,19 @@ John Doe,Engineering,john@example.com"
         let selectedPredicate = 'DES'; // Default to Define operator
         let focusedNode = null;
         let currentView = 'card';
+
+        // ==========================================
+        // UNDO HISTORY & RECYCLE BIN
+        // ==========================================
+
+        // Undo history stack - stores all changes for undo functionality
+        // Each entry: { type: 'create'|'update'|'delete', entityType, data, timestamp, description }
+        let undoHistory = [];
+        const MAX_UNDO_HISTORY = 100; // Maximum number of undo steps to keep
+
+        // Recycle bin - stores deleted entities and relationships
+        // Each entry: { item, itemType: 'entity'|'relationship', entityType, deletedAt, deletedRelationships }
+        let recycleBin = [];
 
         // Mobile detection helper
         function isMobile() {
@@ -6553,8 +7101,15 @@ John Doe,Engineering,john@example.com"
 
             relationships.push(relationship);
 
-            // Log to Xano
+            // Track in undo history
             const operatorData = eoOperators[operatorCode];
+            pushToUndoHistory({
+                type: 'create_relationship',
+                data: JSON.parse(JSON.stringify(relationship)),
+                description: `${operatorData.label}: ${currentModalEntity.name} → ${targetEntity.name}`
+            });
+
+            // Log to Xano
             logActivityToXano({
                 event_verb: `${operatorData.label} Connection`,
                 eo_operator: operatorCode,
@@ -6711,6 +7266,13 @@ John Doe,Engineering,john@example.com"
 
             relationships.push(relationship);
 
+            // Track in undo history
+            pushToUndoHistory({
+                type: 'create_relationship',
+                data: JSON.parse(JSON.stringify(relationship)),
+                description: `Nest ${currentModalEntity.name} under ${parentEntity.name}`
+            });
+
             // Log to Xano
             const operatorData = eoOperators['DES'];
             logActivityToXano({
@@ -6822,6 +7384,13 @@ John Doe,Engineering,john@example.com"
 
             relationships.push(relationship);
 
+            // Track in undo history
+            pushToUndoHistory({
+                type: 'create_relationship',
+                data: JSON.parse(JSON.stringify(relationship)),
+                description: `Nest ${targetEntity.name} under ${currentModalEntity.name}`
+            });
+
             // Log to Xano
             const operatorData = eoOperators['DES'];
             logActivityToXano({
@@ -6882,7 +7451,14 @@ John Doe,Engineering,john@example.com"
 
             relationships.push(relationship);
 
+            // Track in undo history
             const operatorData = eoOperators[operatorCode];
+            pushToUndoHistory({
+                type: 'create_relationship',
+                data: JSON.parse(JSON.stringify(relationship)),
+                description: `${operatorData.label}: ${currentModalEntity.name} → ${targetEntity.name}`
+            });
+
             logActivityToXano({
                 event_verb: 'Create Relationship',
                 eo_operator: operatorCode,
@@ -6936,6 +7512,13 @@ John Doe,Engineering,john@example.com"
             };
 
             relationships.push(relationship);
+
+            // Track in undo history
+            pushToUndoHistory({
+                type: 'create_relationship',
+                data: JSON.parse(JSON.stringify(relationship)),
+                description: `Nest ${targetEntity.name} under ${currentModalEntity.name}`
+            });
 
             // Log to Xano
             const operatorData = eoOperators['DES'];
@@ -7019,8 +7602,15 @@ John Doe,Engineering,john@example.com"
 
             relationships.push(relationship);
 
-            // Log to Xano
+            // Track in undo history
             const operatorData = eoOperators[operatorCode];
+            pushToUndoHistory({
+                type: 'create_relationship',
+                data: JSON.parse(JSON.stringify(relationship)),
+                description: `${operatorData.label}: ${currentModalEntity.name} → ${targetEntity.name}`
+            });
+
+            // Log to Xano
             logActivityToXano({
                 event_verb: `${operatorData.label} Activity`,
                 eo_operator: operatorCode,
@@ -7109,6 +7699,15 @@ John Doe,Engineering,john@example.com"
             const currentName = currentModalEntity.name;
             const currentDesc = currentModalEntity.description || '';
 
+            // Track in undo history before making changes
+            pushToUndoHistory({
+                type: 'update_entity',
+                entityType: currentModalEntityType,
+                data: { id: currentModalEntity.id },
+                oldData: { name: currentName, description: currentDesc },
+                description: `Edit ${currentModalEntityType}: ${currentName}${nameChanged ? ` → ${newName}` : ''}`
+            });
+
             // Update entity
             currentModalEntity.name = newName;
             currentModalEntity.description = newDesc;
@@ -7178,11 +7777,27 @@ John Doe,Engineering,john@example.com"
             }
         }
 
-        // Handle Enter key in edit modal
+        // Handle keyboard shortcuts
         document.addEventListener('keydown', function(e) {
+            // Ctrl+Z or Cmd+Z for undo
+            if ((e.ctrlKey || e.metaKey) && e.key === 'z' && !e.shiftKey) {
+                // Don't trigger undo if user is typing in an input field
+                const activeElement = document.activeElement;
+                const isInputField = activeElement.tagName === 'INPUT' ||
+                                   activeElement.tagName === 'TEXTAREA' ||
+                                   activeElement.isContentEditable;
+                if (!isInputField) {
+                    e.preventDefault();
+                    undo();
+                }
+            }
+
+            // Enter key for edit modal
             if (e.key === 'Enter' && document.getElementById('entityEditModal').classList.contains('open')) {
                 saveEntityEdit();
             }
+
+            // Escape key for closing modals
             if (e.key === 'Escape') {
                 if (document.getElementById('deleteConfirmModal').classList.contains('open')) {
                     closeDeleteConfirmModal();
@@ -7225,13 +7840,29 @@ John Doe,Engineering,john@example.com"
             const entityName = currentModalEntity.name;
             const entityType = currentModalEntityType;
 
-            // Remove from entities
-            entities[entityType] = entities[entityType].filter(e => e.id !== entityId);
+            // Capture entity data before deletion
+            const entityData = JSON.parse(JSON.stringify(currentModalEntity));
 
             // Remove related relationships
             const removedRelationships = relationships.filter(r =>
                 r.subject === entityId || r.object === entityId
             );
+
+            // Track in undo history
+            pushToUndoHistory({
+                type: 'delete_entity',
+                entityType: entityType,
+                data: entityData,
+                deletedRelationships: removedRelationships.map(r => JSON.parse(JSON.stringify(r))),
+                description: `Delete ${entityType}: ${entityName}`
+            });
+
+            // Add to recycle bin
+            addToRecycleBin(entityData, 'entity', entityType, removedRelationships);
+
+            // Remove from entities
+            entities[entityType] = entities[entityType].filter(e => e.id !== entityId);
+
             relationships = relationships.filter(r =>
                 r.subject !== entityId && r.object !== entityId
             );
@@ -7499,26 +8130,42 @@ John Doe,Engineering,john@example.com"
             if (!relationshipToDelete) return;
 
             const rel = relationships.find(r => r.id === relationshipToDelete);
+            if (!rel) {
+                relationshipToDelete = null;
+                closeDeleteConfirmModal();
+                return;
+            }
+
+            const subject = findEntity(rel.subject);
+            const object = findEntity(rel.object);
+            const operatorData = eoOperators[rel.predicate];
+
+            // Track in undo history
+            pushToUndoHistory({
+                type: 'delete_relationship',
+                data: JSON.parse(JSON.stringify(rel)),
+                description: `Delete ${operatorData?.label || rel.predicate}: ${subject?.name || rel.subject} → ${object?.name || rel.object}`
+            });
+
+            // Add to recycle bin
+            addToRecycleBin(rel, 'relationship', null);
+
             relationships = relationships.filter(r => r.id !== relationshipToDelete);
 
             // Log deletion to Xano
-            if (rel) {
-                const subject = findEntity(rel.subject);
-                const object = findEntity(rel.object);
-                logActivityToXano({
-                    event_verb: 'Notice Removal',
-                    eo_operator: 'NUL',
-                    object_type: 'relationship',
-                    object_id: relationshipToDelete,
-                    object_label: `${subject?.name} → ${object?.name}`,
-                    data_json: {
-                        relationship_deleted: true,
-                        subject_id: rel.subject,
-                        object_id: rel.object,
-                        predicate: rel.predicate
-                    }
-                });
-            }
+            logActivityToXano({
+                event_verb: 'Notice Removal',
+                eo_operator: 'NUL',
+                object_type: 'relationship',
+                object_id: relationshipToDelete,
+                object_label: `${subject?.name} → ${object?.name}`,
+                data_json: {
+                    relationship_deleted: true,
+                    subject_id: rel.subject,
+                    object_id: rel.object,
+                    predicate: rel.predicate
+                }
+            });
 
             relationshipToDelete = null;
             closeDeleteConfirmModal();
@@ -7875,8 +8522,16 @@ John Doe,Engineering,john@example.com"
                 type: selectedEntityType,
                 description: ''
             };
-            
+
             entities[selectedEntityType].push(entity);
+
+            // Track in undo history
+            pushToUndoHistory({
+                type: 'create_entity',
+                entityType: selectedEntityType,
+                data: JSON.parse(JSON.stringify(entity)),
+                description: `Create ${selectedEntityType}: ${name}`
+            });
 
             // Log to Xano activity store
             logActivityToXano({
@@ -7897,12 +8552,21 @@ John Doe,Engineering,john@example.com"
             if (parentId && selectedEntityType !== 'person') {
                 const relId = 'rel' + Date.now();
                 const parentEntity = findEntity(parentId);
-                
-                relationships.push({
+
+                const relationship = {
                     id: relId,
                     subject: parentId,
                     predicate: 'DES', // Define relationship for hierarchy
                     object: id
+                };
+
+                relationships.push(relationship);
+
+                // Track relationship creation in undo history
+                pushToUndoHistory({
+                    type: 'create_relationship',
+                    data: JSON.parse(JSON.stringify(relationship)),
+                    description: `Nest ${name} under ${parentEntity?.name}`
                 });
 
                 // Log parent relationship to Xano
@@ -7928,7 +8592,7 @@ John Doe,Engineering,john@example.com"
 
             document.getElementById('entityName').value = '';
             document.getElementById('parentEntitySelect').value = '';
-            
+
             saveToLocalStorage();
             renderEntityList();
             updateSelects();
@@ -7968,37 +8632,54 @@ John Doe,Engineering,john@example.com"
 
         function deleteEntity(id, type) {
             if (!confirm('Delete this entity? This will also remove related relationships.')) return;
-            
+
             const entity = entities[type].find(e => e.id === id);
-            
+            if (!entity) return;
+
+            // Capture related relationships before deleting
+            const deletedRelationships = relationships.filter(r => r.subject === id || r.object === id);
+
+            // Remove entity and relationships
             entities[type] = entities[type].filter(e => e.id !== id);
             relationships = relationships.filter(r => r.subject !== id && r.object !== id);
-            
+
+            // Track in undo history
+            pushToUndoHistory({
+                type: 'delete_entity',
+                entityType: type,
+                data: JSON.parse(JSON.stringify(entity)),
+                deletedRelationships: deletedRelationships.map(r => JSON.parse(JSON.stringify(r))),
+                description: `Delete ${type}: ${entity.name}`
+            });
+
+            // Add to recycle bin
+            addToRecycleBin(entity, 'entity', type, deletedRelationships);
+
             // Log to Xano activity store
-            if (entity) {
-                logActivityToXano({
-                    event_verb: 'Notice Removal', // NUL = Notice
-                    eo_operator: 'NUL',
-                    object_type: type,
-                    object_id: id,
-                    object_label: entity.name,
-                    data_json: {
-                        entity_type: type,
-                        entity_name: entity.name,
-                        action: 'deleted'
-                    }
-                });
-            }
-            
+            logActivityToXano({
+                event_verb: 'Notice Removal', // NUL = Notice
+                eo_operator: 'NUL',
+                object_type: type,
+                object_id: id,
+                object_label: entity.name,
+                data_json: {
+                    entity_type: type,
+                    entity_name: entity.name,
+                    action: 'deleted'
+                }
+            });
+
             saveToLocalStorage();
             renderEntityList();
             updateSelects();
             renderActivityList();
-            
+
             if (currentView === 'graph') {
                 updateGraph();
             } else if (currentView === 'tree') {
                 renderTreeView();
+            } else if (currentView === 'card') {
+                renderCardView();
             }
         }
 
@@ -8485,11 +9166,18 @@ John Doe,Engineering,john@example.com"
                 object,
                 description
             };
-            
+
             relationships.push(relationship);
 
-            // Log to Xano activity store (append-only)
+            // Track in undo history
             const operatorData = eoOperators[selectedPredicate];
+            pushToUndoHistory({
+                type: 'create_relationship',
+                data: JSON.parse(JSON.stringify(relationship)),
+                description: `${operatorData.label}: ${subjectEntity?.name} → ${objectEntity?.name}`
+            });
+
+            // Log to Xano activity store (append-only)
             logActivityToXano({
                 event_verb: `${operatorData.label} Connection`, // e.g., "Define Connection"
                 eo_operator: selectedPredicate, // Store EO code (DES, INS, etc)
@@ -8582,10 +9270,27 @@ John Doe,Engineering,john@example.com"
         }
 
         function deleteActivity(id) {
+            const relationship = relationships.find(r => r.id === id);
+            if (!relationship) return;
+
+            const subjectEntity = findEntity(relationship.subject);
+            const objectEntity = findEntity(relationship.object);
+            const operatorData = eoOperators[relationship.predicate];
+
+            // Track in undo history
+            pushToUndoHistory({
+                type: 'delete_relationship',
+                data: JSON.parse(JSON.stringify(relationship)),
+                description: `Delete ${operatorData?.label || relationship.predicate}: ${subjectEntity?.name || relationship.subject} → ${objectEntity?.name || relationship.object}`
+            });
+
+            // Add to recycle bin
+            addToRecycleBin(relationship, 'relationship', null);
+
             relationships = relationships.filter(r => r.id !== id);
             saveToLocalStorage();
             renderActivityList();
-            
+
             if (currentView === 'graph') {
                 updateGraph();
             } else if (currentView === 'tree') {
@@ -13194,7 +13899,10 @@ John Doe,Engineering,john@example.com"
                 updateStatus('Loaded from storage');
                 console.log('✅ Loaded data from localStorage');
             }
-            
+
+            // Load undo history and recycle bin for current workspace
+            loadUndoHistory();
+
             // Render everything
             try {
                 updateStatus('Rendering interface...');
