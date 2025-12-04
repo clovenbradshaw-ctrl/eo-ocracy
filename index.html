@@ -1716,6 +1716,109 @@
             border-color: #C88F4A;
         }
 
+        .entity-edit-textarea {
+            width: 100%;
+            padding: 0.875rem 1rem;
+            border: 2px solid #E5DDD1;
+            border-radius: 8px;
+            font-size: 0.95rem;
+            transition: border-color 0.2s;
+            color: #3D2E1F;
+            resize: vertical;
+            min-height: 80px;
+            max-height: 160px;
+            font-family: inherit;
+            line-height: 1.5;
+        }
+
+        .entity-edit-textarea:focus {
+            outline: none;
+            border-color: #C88F4A;
+        }
+
+        .entity-edit-label .char-limit {
+            font-weight: 400;
+            color: #8B6F47;
+            font-size: 0.75rem;
+        }
+
+        /* Modal description display */
+        .modal-description-text {
+            color: #6B5642;
+            font-size: 0.95rem;
+            line-height: 1.6;
+            padding: 1rem;
+            background: #FAF7F5;
+            border-radius: 8px;
+            border-left: 3px solid #C88F4A;
+        }
+
+        .modal-description-empty {
+            color: #8B6F47;
+            font-style: italic;
+            font-size: 0.9rem;
+            padding: 1rem;
+            background: #FAF7F5;
+            border-radius: 8px;
+            text-align: center;
+        }
+
+        /* Add connection in modal */
+        .modal-add-connection {
+            background: #FAF7F5;
+            border-radius: 8px;
+            padding: 1rem;
+            border: 1px dashed #E5DDD1;
+        }
+
+        .modal-add-connection-row {
+            display: flex;
+            gap: 0.75rem;
+            align-items: center;
+            flex-wrap: wrap;
+        }
+
+        .modal-add-connection-row select {
+            flex: 1;
+            min-width: 120px;
+            padding: 0.625rem 0.75rem;
+            border: 2px solid #E5DDD1;
+            border-radius: 6px;
+            font-size: 0.875rem;
+            background: white;
+            color: #3D2E1F;
+            cursor: pointer;
+        }
+
+        .modal-add-connection-row select:focus {
+            outline: none;
+            border-color: #C88F4A;
+        }
+
+        .modal-add-connection-btn {
+            padding: 0.625rem 1rem;
+            background: #C88F4A;
+            color: white;
+            border: none;
+            border-radius: 6px;
+            font-size: 0.875rem;
+            font-weight: 600;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            gap: 0.375rem;
+            transition: background 0.2s;
+        }
+
+        .modal-add-connection-btn:hover {
+            background: #B87B5B;
+        }
+
+        .modal-add-connection-btn:disabled {
+            background: #E5DDD1;
+            cursor: not-allowed;
+        }
+
         .entity-edit-modal-actions {
             display: flex;
             gap: 0.75rem;
@@ -2193,7 +2296,9 @@
                 </div>
             </div>
             <div class="modal-body">
+                <div class="modal-section" id="modalDescription"></div>
                 <div class="modal-section" id="modalConnections"></div>
+                <div class="modal-section" id="modalAddConnection"></div>
                 <div class="modal-section" id="modalActivities"></div>
             </div>
             <div class="modal-actions" id="modalFooterButtons">
@@ -2226,6 +2331,10 @@
                 <div class="entity-edit-field">
                     <label class="entity-edit-label">Name</label>
                     <input type="text" class="entity-edit-input" id="entityEditNameInput" placeholder="Enter name...">
+                </div>
+                <div class="entity-edit-field">
+                    <label class="entity-edit-label">Description <span class="char-limit">(<span id="editDescCharCount">0</span>/240)</span></label>
+                    <textarea class="entity-edit-textarea" id="entityEditDescInput" placeholder="Add a description..." maxlength="240" oninput="updateEditDescCharCount()"></textarea>
                 </div>
             </div>
             <div class="entity-edit-modal-actions">
@@ -2742,6 +2851,20 @@
             document.getElementById('modalDeleteButton').style.display = 'inline-flex';
             document.getElementById('modalTitleEditBtn').style.display = 'flex';
 
+            // Display description
+            const descriptionEl = document.getElementById('modalDescription');
+            if (entity.description && entity.description.trim()) {
+                descriptionEl.innerHTML = `
+                    <div class="modal-section-title"><i class="ph ph-text-align-left"></i> Description</div>
+                    <div class="modal-description-text">${entity.description}</div>
+                `;
+            } else {
+                descriptionEl.innerHTML = `
+                    <div class="modal-section-title"><i class="ph ph-text-align-left"></i> Description</div>
+                    <div class="modal-description-empty">No description yet. Click Edit to add one.</div>
+                `;
+            }
+
             // Get connected entities
             const connections = [];
             relationships.forEach(r => {
@@ -2784,6 +2907,29 @@
                 `;
             }
 
+            // Add connection UI
+            const addConnectionEl = document.getElementById('modalAddConnection');
+            addConnectionEl.innerHTML = `
+                <div class="modal-section-title"><i class="ph ph-plus-circle"></i> Add Connection</div>
+                <div class="modal-add-connection">
+                    <div class="modal-add-connection-row">
+                        <select id="modalOperatorSelect">
+                            <option value="">Operator...</option>
+                            ${Object.entries(eoOperators).map(([code, op]) =>
+                                `<option value="${code}">${op.label}</option>`
+                            ).join('')}
+                        </select>
+                        <select id="modalTargetSelect">
+                            <option value="">Connect to...</option>
+                            ${getAllEntitiesForModal(entityId)}
+                        </select>
+                        <button class="modal-add-connection-btn" onclick="addConnectionFromModal()">
+                            <i class="ph ph-plus"></i> Add
+                        </button>
+                    </div>
+                </div>
+            `;
+
             // Get activities
             const entityActivities = relationships.filter(r =>
                 r.subject === entityId || r.object === entityId
@@ -2822,11 +2968,114 @@
             document.getElementById('entityModal').classList.remove('active');
         }
 
+        // Helper function to get all entities for modal dropdown (excluding current entity)
+        function getAllEntitiesForModal(excludeId) {
+            let options = '';
+            const entityTypes = ['unit', 'team', 'role', 'person', 'object'];
+            const typeLabels = {
+                unit: 'Units',
+                team: 'Teams',
+                role: 'Roles',
+                person: 'People',
+                object: 'Work Products'
+            };
+
+            entityTypes.forEach(type => {
+                const typeEntities = entities[type].filter(e => e.id !== excludeId);
+                if (typeEntities.length > 0) {
+                    options += `<optgroup label="${typeLabels[type]}">`;
+                    typeEntities.forEach(e => {
+                        options += `<option value="${e.id}">${e.name}</option>`;
+                    });
+                    options += '</optgroup>';
+                }
+            });
+
+            return options;
+        }
+
+        // Add connection from modal
+        function addConnectionFromModal() {
+            if (!currentModalEntity || !currentModalEntityType) return;
+
+            const operatorCode = document.getElementById('modalOperatorSelect').value;
+            const targetId = document.getElementById('modalTargetSelect').value;
+
+            if (!operatorCode || !targetId) {
+                alert('Please select both an operator and a target entity');
+                return;
+            }
+
+            const targetEntity = findEntity(targetId);
+            if (!targetEntity) {
+                alert('Target entity not found');
+                return;
+            }
+
+            // Validate connection
+            const validationError = validateConnection(currentModalEntity, targetEntity, operatorCode);
+            if (validationError) {
+                alert(validationError);
+                return;
+            }
+
+            // Create the relationship
+            const relId = 'rel' + Date.now();
+            const relationship = {
+                id: relId,
+                subject: currentModalEntity.id,
+                predicate: operatorCode,
+                object: targetId,
+                description: ''
+            };
+
+            relationships.push(relationship);
+
+            // Log to Xano
+            const operatorData = eoOperators[operatorCode];
+            logActivityToXano({
+                event_verb: `${operatorData.label} Connection`,
+                eo_operator: operatorCode,
+                object_type: 'relationship',
+                object_id: relId,
+                object_label: `${currentModalEntity.name} ${operatorData.label} ${targetEntity.name}`,
+                data_json: {
+                    subject_id: currentModalEntity.id,
+                    subject_type: currentModalEntityType,
+                    subject_name: currentModalEntity.name,
+                    predicate: operatorCode,
+                    predicate_label: operatorData.label,
+                    object_id: targetId,
+                    object_type: targetEntity.type,
+                    object_name: targetEntity.name
+                }
+            });
+
+            // Save and refresh
+            saveToLocalStorage();
+
+            // Refresh the modal to show new connection
+            openEntityModal(currentModalEntity.id, currentModalEntityType);
+
+            // Refresh views
+            if (currentView === 'graph') {
+                updateGraph();
+            } else if (currentView === 'tree') {
+                renderTreeView();
+            } else if (currentView === 'card') {
+                renderCardView();
+            }
+
+            renderActivityList();
+        }
+
         // Entity Edit Modal Functions
         function openEntityEditModal() {
             if (!currentModalEntity) return;
 
             document.getElementById('entityEditNameInput').value = currentModalEntity.name;
+            document.getElementById('entityEditDescInput').value = currentModalEntity.description || '';
+            updateEditDescCharCount();
             document.getElementById('entityEditModal').classList.add('open');
 
             // Focus and select the input
@@ -2837,6 +3086,14 @@
             }, 100);
         }
 
+        function updateEditDescCharCount() {
+            const textarea = document.getElementById('entityEditDescInput');
+            const count = document.getElementById('editDescCharCount');
+            if (textarea && count) {
+                count.textContent = textarea.value.length;
+            }
+        }
+
         function closeEntityEditModal() {
             document.getElementById('entityEditModal').classList.remove('open');
         }
@@ -2845,33 +3102,77 @@
             if (!currentModalEntity || !currentModalEntityType) return;
 
             const newName = document.getElementById('entityEditNameInput').value.trim();
-            if (!newName || newName === currentModalEntity.name) {
+            const newDesc = document.getElementById('entityEditDescInput').value.trim();
+
+            if (!newName) {
+                closeEntityEditModal();
+                return;
+            }
+
+            const nameChanged = newName !== currentModalEntity.name;
+            const descChanged = newDesc !== (currentModalEntity.description || '');
+
+            if (!nameChanged && !descChanged) {
                 closeEntityEditModal();
                 return;
             }
 
             const currentName = currentModalEntity.name;
+            const currentDesc = currentModalEntity.description || '';
 
             // Update entity
             currentModalEntity.name = newName;
+            currentModalEntity.description = newDesc;
 
             // Log to Xano
-            logActivityToXano({
-                event_verb: 'Shift Entity',
-                eo_operator: 'ALT',
-                object_type: currentModalEntityType,
-                object_id: currentModalEntity.id,
-                object_label: `${currentName} → ${newName}`,
-                data_json: {
-                    old_name: currentName,
-                    new_name: newName,
-                    entity_type: currentModalEntityType
-                }
-            });
+            if (nameChanged) {
+                logActivityToXano({
+                    event_verb: 'Shift Entity',
+                    eo_operator: 'ALT',
+                    object_type: currentModalEntityType,
+                    object_id: currentModalEntity.id,
+                    object_label: `${currentName} → ${newName}`,
+                    data_json: {
+                        old_name: currentName,
+                        new_name: newName,
+                        entity_type: currentModalEntityType
+                    }
+                });
+            }
+
+            if (descChanged) {
+                logActivityToXano({
+                    event_verb: 'Shift Description',
+                    eo_operator: 'ALT',
+                    object_type: currentModalEntityType,
+                    object_id: currentModalEntity.id,
+                    object_label: `Updated description for ${newName}`,
+                    data_json: {
+                        entity_name: newName,
+                        old_description: currentDesc,
+                        new_description: newDesc,
+                        entity_type: currentModalEntityType
+                    }
+                });
+            }
 
             // Close edit modal and update main modal
             closeEntityEditModal();
             document.getElementById('modalEntityName').textContent = newName;
+
+            // Update description display in modal
+            const descriptionEl = document.getElementById('modalDescription');
+            if (newDesc) {
+                descriptionEl.innerHTML = `
+                    <div class="modal-section-title"><i class="ph ph-text-align-left"></i> Description</div>
+                    <div class="modal-description-text">${newDesc}</div>
+                `;
+            } else {
+                descriptionEl.innerHTML = `
+                    <div class="modal-section-title"><i class="ph ph-text-align-left"></i> Description</div>
+                    <div class="modal-description-empty">No description yet. Click Edit to add one.</div>
+                `;
+            }
 
             // Save and refresh views
             saveToLocalStorage();
@@ -3302,28 +3603,28 @@
 
         function initSampleData() {
             // Units
-            entities.unit.push({ id: 'u1', name: 'Immigration Practice', type: 'unit' });
-            
+            entities.unit.push({ id: 'u1', name: 'Immigration Practice', type: 'unit', description: 'Main practice area handling all immigration-related legal matters including asylum, family petitions, and employment visas.' });
+
             // Teams
-            entities.team.push({ id: 't1', name: 'Asylum Team', type: 'team' });
-            entities.team.push({ id: 't2', name: 'Family Petitions Team', type: 'team' });
-            
+            entities.team.push({ id: 't1', name: 'Asylum Team', type: 'team', description: 'Dedicated team handling asylum applications and refugee status cases.' });
+            entities.team.push({ id: 't2', name: 'Family Petitions Team', type: 'team', description: 'Handles family-based immigration petitions and reunification cases.' });
+
             // Roles
-            entities.role.push({ id: 'r1', name: 'Managing Attorney', type: 'role' });
-            entities.role.push({ id: 'r2', name: 'Associate Attorney', type: 'role' });
-            entities.role.push({ id: 'r3', name: 'Case Manager', type: 'role' });
-            entities.role.push({ id: 'r4', name: 'Lead Attorney', type: 'role' });
-            
+            entities.role.push({ id: 'r1', name: 'Managing Attorney', type: 'role', description: 'Oversees case strategy, team coordination, and client relationships.' });
+            entities.role.push({ id: 'r2', name: 'Associate Attorney', type: 'role', description: 'Handles day-to-day case work, legal research, and court appearances.' });
+            entities.role.push({ id: 'r3', name: 'Case Manager', type: 'role', description: 'Coordinates case logistics, deadlines, and client communications.' });
+            entities.role.push({ id: 'r4', name: 'Lead Attorney', type: 'role', description: 'Senior attorney leading complex cases and mentoring associates.' });
+
             // People
-            entities.person.push({ id: 'p1', name: 'Maria Santos', type: 'person' });
-            entities.person.push({ id: 'p2', name: 'James Chen', type: 'person' });
-            entities.person.push({ id: 'p3', name: 'Ana Rodriguez', type: 'person' });
-            
+            entities.person.push({ id: 'p1', name: 'Maria Santos', type: 'person', description: '15 years immigration law experience, fluent in Spanish and Portuguese.' });
+            entities.person.push({ id: 'p2', name: 'James Chen', type: 'person', description: 'Specializes in employment-based immigration and investor visas.' });
+            entities.person.push({ id: 'p3', name: 'Ana Rodriguez', type: 'person', description: 'Bilingual case manager with expertise in asylum documentation.' });
+
             // Objects (work items)
-            entities.object.push({ id: 'o1', name: 'Court Filings', type: 'object' });
-            entities.object.push({ id: 'o2', name: 'Client Interviews', type: 'object' });
-            entities.object.push({ id: 'o3', name: 'Case Preparation', type: 'object' });
-            entities.object.push({ id: 'o4', name: 'Schedule Management', type: 'object' });
+            entities.object.push({ id: 'o1', name: 'Court Filings', type: 'object', description: 'Legal documents submitted to immigration courts and USCIS.' });
+            entities.object.push({ id: 'o2', name: 'Client Interviews', type: 'object', description: 'Initial consultations and ongoing case review meetings.' });
+            entities.object.push({ id: 'o3', name: 'Case Preparation', type: 'object', description: 'Document compilation, evidence gathering, and legal research.' });
+            entities.object.push({ id: 'o4', name: 'Schedule Management', type: 'object', description: 'Calendar coordination for hearings, deadlines, and appointments.' });
             
             // Hierarchical relationships (Unit DESignates Teams, Teams DESignate Roles)
             relationships.push({ subject: 'u1', predicate: 'DES', object: 't1', id: 'rel_h1' }); // Immigration Practice designates Asylum Team
@@ -3437,7 +3738,8 @@
             const entity = {
                 id,
                 name,
-                type: selectedEntityType
+                type: selectedEntityType,
+                description: ''
             };
             
             entities[selectedEntityType].push(entity);
@@ -4254,7 +4556,7 @@
             }
 
             const id = 'o' + Date.now();
-            const entity = { id, name, type: 'object' };
+            const entity = { id, name, type: 'object', description: '' };
             entities.object.push(entity);
 
             // Log to Xano
@@ -4384,11 +4686,21 @@
                     activitiesHTML += '</div>';
                 }
 
+                // Build description HTML (truncate if too long)
+                let descriptionHTML = '';
+                if (entity.description && entity.description.trim()) {
+                    const truncatedDesc = entity.description.length > 80
+                        ? entity.description.substring(0, 80) + '...'
+                        : entity.description;
+                    descriptionHTML = `<div class="card-description">${truncatedDesc}</div>`;
+                }
+
                 card.innerHTML = `
                     <div class="card-header">
                         <div class="card-icon">${icon}</div>
                         <div class="card-title">${entity.name}</div>
                     </div>
+                    ${descriptionHTML}
                     ${activitiesHTML}
                 `;
 
