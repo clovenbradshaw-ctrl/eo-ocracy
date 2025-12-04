@@ -905,6 +905,250 @@
             from { transform: rotate(0deg); }
             to { transform: rotate(360deg); }
         }
+
+        /* Simplified UX Styles */
+        .welcome-banner {
+            background: linear-gradient(135deg, #FFF9F0 0%, #FAF7F5 100%);
+            border: 2px solid #C88F4A;
+            border-radius: 8px;
+            padding: 1.25rem;
+            margin-bottom: 1.5rem;
+        }
+
+        .welcome-banner h3 {
+            color: #C88F4A;
+            margin-bottom: 0.75rem;
+            font-size: 1rem;
+        }
+
+        .welcome-banner ol {
+            margin-left: 1.25rem;
+            margin-bottom: 1rem;
+            color: #6B5642;
+            font-size: 0.875rem;
+            line-height: 1.6;
+        }
+
+        .welcome-banner .actions {
+            display: flex;
+            gap: 0.5rem;
+            margin-top: 0.75rem;
+        }
+
+        .collapsible-section {
+            border: 1px solid #E5DDD1;
+            border-radius: 6px;
+            margin-bottom: 1rem;
+            overflow: hidden;
+        }
+
+        .collapsible-header {
+            background: #FAF7F5;
+            padding: 0.75rem 1rem;
+            cursor: pointer;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            font-weight: 500;
+            color: #6B5642;
+            transition: background 0.2s;
+        }
+
+        .collapsible-header:hover {
+            background: #F5E6D3;
+        }
+
+        .collapsible-header .collapse-icon {
+            transition: transform 0.2s;
+        }
+
+        .collapsible-section.collapsed .collapse-icon {
+            transform: rotate(-90deg);
+        }
+
+        .collapsible-content {
+            padding: 1rem;
+            max-height: 2000px;
+            transition: max-height 0.3s ease-out, padding 0.3s;
+            overflow: hidden;
+        }
+
+        .collapsible-section.collapsed .collapsible-content {
+            max-height: 0;
+            padding: 0 1rem;
+        }
+
+        .show-more-btn {
+            width: 100%;
+            padding: 0.5rem;
+            background: transparent;
+            border: 1px dashed #C88F4A;
+            color: #C88F4A;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 0.875rem;
+            margin-top: 0.5rem;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 0.375rem;
+        }
+
+        .show-more-btn:hover {
+            background: #FFF9F0;
+        }
+
+        .show-more-btn.expanded {
+            border-style: solid;
+            background: #FFF9F0;
+        }
+
+        .filter-dropdown {
+            flex: 1;
+            padding: 0.625rem;
+            border: 1px solid #E5DDD1;
+            border-radius: 6px;
+            font-size: 0.875rem;
+            background: white;
+            cursor: pointer;
+            font-family: inherit;
+        }
+
+        .filter-simplified {
+            display: flex;
+            gap: 0.5rem;
+            margin-bottom: 1rem;
+        }
+
+        .technical-toggle {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            padding: 0.5rem 0.75rem;
+            background: #F5E6D3;
+            border-radius: 4px;
+            font-size: 0.8rem;
+            color: #6B5642;
+            margin-bottom: 1rem;
+        }
+
+        .technical-toggle input[type="checkbox"] {
+            width: auto;
+            margin: 0;
+        }
+
+        .tooltip-hint {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            width: 16px;
+            height: 16px;
+            background: #E5DDD1;
+            color: #6B5642;
+            border-radius: 50%;
+            font-size: 0.7rem;
+            cursor: help;
+            margin-left: 0.25rem;
+        }
+
+        .help-text {
+            font-size: 0.75rem;
+            color: #8B6F47;
+            font-style: italic;
+            margin-top: 0.25rem;
+        }
+
+        .quick-operator-selector {
+            display: flex;
+            gap: 0.5rem;
+            margin-bottom: 0.75rem;
+        }
+
+        .operator-btn {
+            flex: 1;
+            padding: 0.75rem 0.5rem;
+            border: 2px solid #E5DDD1;
+            background: white;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 0.875rem;
+            font-weight: 600;
+            transition: all 0.2s;
+            text-align: center;
+        }
+
+        .operator-btn:hover {
+            border-color: #C88F4A;
+        }
+
+        .operator-btn.active {
+            border-color: #C88F4A;
+            background: #FFF9F0;
+            color: #C88F4A;
+        }
+
+        .operator-btn.active.link-type {
+            border-color: #7B95A3;
+            background: #F0F4F7;
+            color: #7B95A3;
+        }
+
+        .operator-btn.active.start-type {
+            border-color: #8B6F47;
+            background: #F5F0E8;
+            color: #8B6F47;
+        }
+
+        .operator-btn-subtitle {
+            font-size: 0.7rem;
+            opacity: 0.8;
+            font-weight: 400;
+            margin-top: 0.125rem;
+        }
+
+        .advanced-operators {
+            display: none;
+            margin-top: 0.75rem;
+        }
+
+        .advanced-operators.visible {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 0.5rem;
+        }
+
+        .advanced-filters-content {
+            display: none;
+            padding-top: 1rem;
+        }
+
+        .advanced-filters-content.visible {
+            display: block;
+        }
+
+        .badge {
+            display: inline-block;
+            padding: 0.25rem 0.5rem;
+            background: #FFF9F0;
+            color: #C88F4A;
+            border-radius: 4px;
+            font-size: 0.75rem;
+            font-weight: 600;
+            margin-left: 0.5rem;
+        }
+
+        /* Hide technical labels by default */
+        .technical-label {
+            display: none;
+        }
+
+        body.technical-mode .technical-label {
+            display: inline;
+        }
+
+        body.technical-mode .friendly-label {
+            display: none;
+        }
     </style>
 </head>
 <body>
@@ -943,52 +1187,80 @@
     <div class="container">
         <!-- Left Panel: Entities -->
         <div class="panel panel-left">
-            <div class="panel-title">Entities</div>
-            
-            <div class="input-group">
-                <label>Search Entities</label>
-                <input type="text" id="entitySearch" placeholder="Search by name..." oninput="filterEntities()">
+            <!-- Welcome Banner (dismissible) -->
+            <div id="welcomeBanner" class="welcome-banner">
+                <h3><i class="ph ph-hand-waving"></i> Getting Started</h3>
+                <ol>
+                    <li>Add your first unit (like a department)</li>
+                    <li>Add teams within it</li>
+                    <li>Define roles</li>
+                    <li>Create connections between them</li>
+                </ol>
+                <div class="actions">
+                    <button class="btn btn-small" onclick="loadSampleData()">Load Sample</button>
+                    <button class="btn btn-small btn-secondary" onclick="dismissWelcomeBanner()">Got it!</button>
+                </div>
             </div>
 
-            <div class="divider"></div>
-
-            <div class="panel-title" style="font-size: 1rem;">Add New Entity</div>
-            
-            <div class="entity-type-selector">
-                <button class="entity-type-btn active" data-type="unit" onclick="selectEntityType('unit')" title="Organizational unit or department">
-                    <i class="ph ph-buildings"></i> Unit
-                </button>
-                <button class="entity-type-btn" data-type="team" onclick="selectEntityType('team')" title="Working team or group">
-                    <i class="ph ph-users-three"></i> Team
-                </button>
-                <button class="entity-type-btn" data-type="role" onclick="selectEntityType('role')" title="Position or function">
-                    <i class="ph ph-briefcase"></i> Role
-                </button>
-                <button class="entity-type-btn" data-type="person" onclick="selectEntityType('person')" title="Individual person">
-                    <i class="ph ph-user"></i> Person
-                </button>
-                <button class="entity-type-btn" data-type="object" onclick="selectEntityType('object')" title="Work product or deliverable">
-                    <i class="ph ph-package"></i> Object
-                </button>
-            </div>
+            <div class="panel-title"><i class="ph ph-buildings"></i> Your Organization</div>
 
             <div class="input-group">
-                <label>Name</label>
-                <input type="text" id="entityName" placeholder="Enter entity name" onkeypress="if(event.key==='Enter') addEntity()">
+                <input type="text" id="entitySearch" placeholder="Search entities..." oninput="filterEntities()">
             </div>
 
-            <div class="input-group" id="parentSelectGroup">
-                <label>Parent Entity (Optional)</label>
-                <select id="parentEntitySelect">
-                    <option value="">None - Top Level</option>
-                </select>
+            <!-- Collapsible Add Entity Section -->
+            <div class="collapsible-section" id="addEntitySection">
+                <div class="collapsible-header" onclick="toggleCollapsible('addEntitySection')">
+                    <span><i class="ph ph-plus-circle"></i> Add New Entity</span>
+                    <i class="ph ph-caret-down collapse-icon"></i>
+                </div>
+                <div class="collapsible-content">
+                    <div class="entity-type-selector">
+                        <button class="entity-type-btn active" data-type="unit" onclick="selectEntityType('unit')" title="Organizational unit or department">
+                            <i class="ph ph-buildings"></i> Unit
+                        </button>
+                        <button class="entity-type-btn" data-type="team" onclick="selectEntityType('team')" title="Working team or group">
+                            <i class="ph ph-users-three"></i> Team
+                        </button>
+                        <button class="entity-type-btn" data-type="role" onclick="selectEntityType('role')" title="Position or function">
+                            <i class="ph ph-briefcase"></i> Role
+                        </button>
+                        <button class="entity-type-btn" data-type="person" onclick="selectEntityType('person')" title="Individual person">
+                            <i class="ph ph-user"></i> Person
+                        </button>
+                    </div>
+
+                    <div class="input-group">
+                        <label>Name</label>
+                        <input type="text" id="entityName" placeholder="Enter name..." onkeypress="if(event.key==='Enter') addEntity()">
+                    </div>
+
+                    <button class="btn" onclick="addEntity()" id="addEntityBtn" style="width: 100%; display: flex; align-items: center; justify-content: center; gap: 0.5rem;">
+                        <i class="ph ph-plus-circle" style="color: white; font-size: 1.25rem;"></i> Add Unit
+                    </button>
+
+                    <!-- Advanced Options (collapsed by default) -->
+                    <button class="show-more-btn" onclick="toggleAdvancedEntityOptions()" id="advancedEntityToggle">
+                        <i class="ph ph-plus"></i>
+                        Advanced options
+                    </button>
+                    <div id="advancedEntityOptions" style="display: none; margin-top: 0.75rem;">
+                        <div class="input-group" id="parentSelectGroup">
+                            <label>Parent Entity</label>
+                            <select id="parentEntitySelect">
+                                <option value="">None - Top Level</option>
+                            </select>
+                            <div class="help-text">Place this entity under another one</div>
+                        </div>
+                        <div class="entity-type-selector" style="margin-top: 0.75rem;">
+                            <button class="entity-type-btn" data-type="object" onclick="selectEntityType('object')" title="Work product or deliverable">
+                                <i class="ph ph-package"></i> Object
+                            </button>
+                        </div>
+                        <div class="help-text">Objects are work products or deliverables</div>
+                    </div>
+                </div>
             </div>
-
-            <button class="btn" onclick="addEntity()" style="width: 100%; display: flex; align-items: center; justify-content: center; gap: 0.5rem;">
-                <i class="ph ph-plus-circle" style="color: white; font-size: 1.25rem;"></i> Add Entity
-            </button>
-
-            <div class="divider"></div>
 
             <div class="panel-title" style="font-size: 1rem;">All Entities</div>
             <div id="entityList" class="entity-list"></div>
@@ -1011,117 +1283,185 @@
 
         <!-- Right Panel: Relationships -->
         <div class="panel panel-right">
-            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1rem;">
-                <div class="panel-title" style="margin-bottom: 0;">Filters</div>
-                <button class="btn btn-small btn-secondary" onclick="toggleAllFilters()">Toggle All</button>
+            <!-- Technical Mode Toggle -->
+            <div class="technical-toggle">
+                <input type="checkbox" id="techMode" onchange="toggleTechnicalMode()">
+                <label for="techMode">Show technical labels</label>
+                <span class="tooltip-hint" title="Show operator codes and technical terminology">?</span>
             </div>
-            
-            <div style="background: #FAF7F5; padding: 1rem; border-radius: 8px; margin-bottom: 1rem; border: 1px solid #E5DDD1;">
-                <label style="font-size: 0.9rem; color: #6B5642; font-weight: 600; margin-bottom: 0.75rem; display: block;">Activity Operators</label>
-                <div style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 0.5rem; margin-bottom: 1rem;">
-                    <label class="filter-pill" title="Recognize absence, remove, delete">
-                        <input type="checkbox" id="filterNUL" checked onchange="applyFilters()">
-                        <span>Notice</span>
-                    </label>
-                    <label class="filter-pill" title="Designate, describe, assign">
-                        <input type="checkbox" id="filterDES" checked onchange="applyFilters()">
-                        <span>Define</span>
-                    </label>
-                    <label class="filter-pill" title="Instantiate, create, initiate">
-                        <input type="checkbox" id="filterINS" checked onchange="applyFilters()">
-                        <span>Start</span>
-                    </label>
-                    <label class="filter-pill" title="Divide, segment, break down">
-                        <input type="checkbox" id="filterSEG" checked onchange="applyFilters()">
-                        <span>Divide</span>
-                    </label>
-                    <label class="filter-pill" title="Connect, associate, relate">
-                        <input type="checkbox" id="filterCON" checked onchange="applyFilters()">
-                        <span>Link</span>
-                    </label>
-                    <label class="filter-pill" title="Alternate, modify, switch">
-                        <input type="checkbox" id="filterALT" checked onchange="applyFilters()">
-                        <span>Shift</span>
-                    </label>
-                    <label class="filter-pill" title="Synthesize, combine, bring together">
-                        <input type="checkbox" id="filterSYN" checked onchange="applyFilters()">
-                        <span>Merge</span>
-                    </label>
-                    <label class="filter-pill" title="Superpose, balance multiple frames, oversee">
-                        <input type="checkbox" id="filterSUP" checked onchange="applyFilters()">
-                        <span>Balance</span>
-                    </label>
-                    <label class="filter-pill" title="Recurse, restructure, iterate">
-                        <input type="checkbox" id="filterREC" checked onchange="applyFilters()">
-                        <span>Loop</span>
-                    </label>
+
+            <!-- Simplified Filters -->
+            <div class="panel-title" style="display: flex; align-items: center; gap: 0.5rem;">
+                <i class="ph ph-funnel"></i>
+                View Options
+            </div>
+
+            <div class="filter-simplified">
+                <select class="filter-dropdown" id="connectionFilterDropdown" onchange="applySimplifiedFilters()">
+                    <option value="all">All Connections</option>
+                    <option value="hierarchy">Hierarchy only</option>
+                    <option value="work">Work connections</option>
+                    <option value="assignments">Assignments only</option>
+                </select>
+                <select class="filter-dropdown" id="entityFilterDropdown" onchange="applySimplifiedFilters()">
+                    <option value="all">All Entities</option>
+                    <option value="structure">Units & Teams</option>
+                    <option value="roles">Roles only</option>
+                    <option value="people">People only</option>
+                </select>
+            </div>
+
+            <!-- Advanced Filters (Collapsed) -->
+            <div class="collapsible-section collapsed" id="advancedFiltersSection">
+                <div class="collapsible-header" onclick="toggleCollapsible('advancedFiltersSection')">
+                    <span>Advanced Filters <span class="badge">9 operators</span></span>
+                    <i class="ph ph-caret-down collapse-icon"></i>
                 </div>
-                
-                <label style="font-size: 0.9rem; color: #6B5642; font-weight: 600; margin-bottom: 0.75rem; display: block;">Entity Types</label>
-                <div style="display: flex; gap: 0.5rem; flex-wrap: wrap;">
-                    <label class="filter-pill" style="flex: 0 0 auto;">
-                        <input type="checkbox" id="filterUnit" checked onchange="applyFilters()">
-                        <span>Units</span>
-                    </label>
-                    <label class="filter-pill" style="flex: 0 0 auto;">
-                        <input type="checkbox" id="filterTeam" checked onchange="applyFilters()">
-                        <span>Teams</span>
-                    </label>
-                    <label class="filter-pill" style="flex: 0 0 auto;">
-                        <input type="checkbox" id="filterRole" checked onchange="applyFilters()">
-                        <span>Roles</span>
-                    </label>
-                    <label class="filter-pill" style="flex: 0 0 auto;">
-                        <input type="checkbox" id="filterPerson" checked onchange="applyFilters()">
-                        <span>People</span>
-                    </label>
-                    <label class="filter-pill" style="flex: 0 0 auto;">
-                        <input type="checkbox" id="filterObject" checked onchange="applyFilters()">
-                        <span>Objects</span>
-                    </label>
+                <div class="collapsible-content">
+                    <p class="help-text">Filter by specific activity operators</p>
+                    <div style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 0.5rem; margin-top: 0.75rem;">
+                        <label class="filter-pill" title="Recognize absence, remove, delete">
+                            <input type="checkbox" id="filterNUL" checked onchange="applyFilters()">
+                            <span>Notice</span>
+                        </label>
+                        <label class="filter-pill" title="Designate, describe, assign">
+                            <input type="checkbox" id="filterDES" checked onchange="applyFilters()">
+                            <span>Define</span>
+                        </label>
+                        <label class="filter-pill" title="Instantiate, create, initiate">
+                            <input type="checkbox" id="filterINS" checked onchange="applyFilters()">
+                            <span>Start</span>
+                        </label>
+                        <label class="filter-pill" title="Divide, segment, break down">
+                            <input type="checkbox" id="filterSEG" checked onchange="applyFilters()">
+                            <span>Divide</span>
+                        </label>
+                        <label class="filter-pill" title="Connect, associate, relate">
+                            <input type="checkbox" id="filterCON" checked onchange="applyFilters()">
+                            <span>Link</span>
+                        </label>
+                        <label class="filter-pill" title="Alternate, modify, switch">
+                            <input type="checkbox" id="filterALT" checked onchange="applyFilters()">
+                            <span>Shift</span>
+                        </label>
+                        <label class="filter-pill" title="Synthesize, combine, bring together">
+                            <input type="checkbox" id="filterSYN" checked onchange="applyFilters()">
+                            <span>Merge</span>
+                        </label>
+                        <label class="filter-pill" title="Superpose, balance multiple frames, oversee">
+                            <input type="checkbox" id="filterSUP" checked onchange="applyFilters()">
+                            <span>Balance</span>
+                        </label>
+                        <label class="filter-pill" title="Recurse, restructure, iterate">
+                            <input type="checkbox" id="filterREC" checked onchange="applyFilters()">
+                            <span>Loop</span>
+                        </label>
+                    </div>
+                    <div style="margin-top: 1rem;">
+                        <label style="font-size: 0.85rem; color: #6B5642; font-weight: 600; margin-bottom: 0.5rem; display: block;">Entity Types</label>
+                        <div style="display: flex; gap: 0.5rem; flex-wrap: wrap;">
+                            <label class="filter-pill" style="flex: 0 0 auto;">
+                                <input type="checkbox" id="filterUnit" checked onchange="applyFilters()">
+                                <span>Units</span>
+                            </label>
+                            <label class="filter-pill" style="flex: 0 0 auto;">
+                                <input type="checkbox" id="filterTeam" checked onchange="applyFilters()">
+                                <span>Teams</span>
+                            </label>
+                            <label class="filter-pill" style="flex: 0 0 auto;">
+                                <input type="checkbox" id="filterRole" checked onchange="applyFilters()">
+                                <span>Roles</span>
+                            </label>
+                            <label class="filter-pill" style="flex: 0 0 auto;">
+                                <input type="checkbox" id="filterPerson" checked onchange="applyFilters()">
+                                <span>People</span>
+                            </label>
+                            <label class="filter-pill" style="flex: 0 0 auto;">
+                                <input type="checkbox" id="filterObject" checked onchange="applyFilters()">
+                                <span>Objects</span>
+                            </label>
+                        </div>
+                    </div>
+                    <button class="btn btn-small btn-secondary" onclick="toggleAllFilters()" style="margin-top: 1rem; width: 100%;">Toggle All</button>
                 </div>
             </div>
 
             <div class="divider"></div>
 
-            <div class="panel-title">Create Activity</div>
-            
-            <div class="triple-form">
+            <!-- Simplified Connection Creation -->
+            <div class="panel-title" style="display: flex; align-items: center; gap: 0.5rem;">
+                <i class="ph ph-link"></i>
+                <span class="friendly-label">Create Connection</span>
+                <span class="technical-label">Create Activity</span>
+            </div>
+
+            <div style="background: #FAF7F5; padding: 1rem; border-radius: 6px;">
                 <div class="input-group">
-                    <label>Subject (Who)</label>
+                    <label>
+                        <span class="friendly-label">From</span>
+                        <span class="technical-label">Subject</span>
+                        <span class="help-text" style="margin-left: 0.25rem;">(who/what)</span>
+                    </label>
                     <select id="subjectSelect" onchange="updateSentencePreview()">
-                        <option value="">Select subject...</option>
+                        <option value="">Select entity...</option>
                     </select>
                 </div>
 
-                <div class="predicate-selector" style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 0.5rem;">
+                <!-- Quick Operator Selector (3 main operators) -->
+                <div class="quick-operator-selector">
+                    <button class="operator-btn active" data-predicate="DES" onclick="selectSimplifiedPredicate('DES', this)" title="Creates a hierarchical relationship">
+                        <div>Define</div>
+                        <div class="operator-btn-subtitle">hierarchy</div>
+                    </button>
+                    <button class="operator-btn link-type" data-predicate="CON" onclick="selectSimplifiedPredicate('CON', this)" title="Connects work or responsibilities">
+                        <div>Link</div>
+                        <div class="operator-btn-subtitle">connect work</div>
+                    </button>
+                    <button class="operator-btn start-type" data-predicate="INS" onclick="selectSimplifiedPredicate('INS', this)" title="Assigns a person to a role">
+                        <div>Start</div>
+                        <div class="operator-btn-subtitle">assign</div>
+                    </button>
+                </div>
+
+                <!-- More Operators Button -->
+                <button class="show-more-btn" onclick="toggleAdvancedOperators()" id="moreOperatorsBtn">
+                    <i class="ph ph-plus"></i>
+                    More operators (6)
+                </button>
+
+                <!-- Advanced Operators (hidden by default) -->
+                <div class="advanced-operators" id="advancedOperators">
                     <button class="predicate-btn NUL" onclick="selectPredicate('NUL')" title="Recognize absence, remove, delete">Notice</button>
-                    <button class="predicate-btn DES active" onclick="selectPredicate('DES')" title="Designate, describe, assign">Define</button>
-                    <button class="predicate-btn INS" onclick="selectPredicate('INS')" title="Instantiate, create, initiate">Start</button>
                     <button class="predicate-btn SEG" onclick="selectPredicate('SEG')" title="Divide, segment, break down">Divide</button>
-                    <button class="predicate-btn CON" onclick="selectPredicate('CON')" title="Connect, associate, relate">Link</button>
                     <button class="predicate-btn ALT" onclick="selectPredicate('ALT')" title="Alternate, modify, switch">Shift</button>
                     <button class="predicate-btn SYN" onclick="selectPredicate('SYN')" title="Synthesize, combine, bring together">Merge</button>
                     <button class="predicate-btn SUP" onclick="selectPredicate('SUP')" title="Superpose, balance multiple frames, oversee">Balance</button>
                     <button class="predicate-btn REC" onclick="selectPredicate('REC')" title="Recurse, restructure, iterate">Loop</button>
                 </div>
 
-                <div class="input-group">
-                    <label>To Organizational Entity (Optional)</label>
+                <div class="input-group" style="margin-top: 0.75rem;">
+                    <label>
+                        <span class="friendly-label">To</span>
+                        <span class="technical-label">Object</span>
+                        <span class="help-text" style="margin-left: 0.25rem;">(who/what)</span>
+                    </label>
                     <select id="orgEntitySelect" onchange="handleOrgEntityChange()">
-                        <option value="">Select unit/team/role...</option>
+                        <option value="">Select entity...</option>
                     </select>
                 </div>
 
                 <div class="input-group">
-                    <label>To Work Product (Optional)</label>
+                    <label>
+                        <span class="friendly-label">Or to Work Product</span>
+                        <span class="technical-label">To Object (Work Product)</span>
+                    </label>
                     <div style="display: flex; gap: 0.5rem; align-items: center;">
                         <select id="objectSelect" onchange="handleWorkObjectChange()" style="flex: 1;">
                             <option value="">Select work product...</option>
                         </select>
                         <button class="btn btn-small" onclick="toggleQuickCreateObject()" title="Quick create new work product" style="padding: 0.5rem; width: 36px; height: 36px; display: flex; align-items: center; justify-content: center;"><i class="ph ph-plus-circle" style="font-size: 1.25rem;"></i></button>
                     </div>
-                    <div id="quickCreateObject" style="display: none; margin-top: 0.5rem; padding: 0.75rem; background: #FAF7F5; border-radius: 6px; border: 1px solid #E5DDD1;">
+                    <div id="quickCreateObject" style="display: none; margin-top: 0.5rem; padding: 0.75rem; background: white; border-radius: 6px; border: 1px solid #E5DDD1;">
                         <div style="display: flex; gap: 0.5rem; margin-bottom: 0.5rem;">
                             <input type="text" id="quickObjectName" placeholder="Work product name..." onkeypress="if(event.key==='Enter') createQuickObject()" style="flex: 1; padding: 0.5rem; border: 1px solid #E5DDD1; border-radius: 4px; font-size: 0.875rem;">
                         </div>
@@ -1129,26 +1469,40 @@
                     </div>
                 </div>
 
-                <div class="input-group">
-                    <label>Description (Optional)</label>
-                    <textarea id="activityDescription" placeholder="Add details about this connection..." maxlength="240" rows="2" style="width: 100%; padding: 0.5rem; border: 1px solid #E5DDD1; border-radius: 6px; font-family: inherit; font-size: 0.875rem; resize: vertical;"></textarea>
-                    <div style="font-size: 0.75rem; color: #8B6F47; text-align: right; margin-top: 0.25rem;">
-                        <span id="charCount">0</span>/240
+                <div class="sentence-preview" id="sentencePreview">
+                    <em style="color: #8B6F47;">Select entities to preview connection...</em>
+                </div>
+
+                <button class="btn" onclick="addActivity()" style="width: 100%; margin-top: 0.75rem;">
+                    <i class="ph ph-plus-circle" style="margin-right: 0.25rem;"></i>
+                    <span class="friendly-label">Create Connection</span>
+                    <span class="technical-label">Create Activity</span>
+                </button>
+
+                <!-- Add notes/details (collapsed) -->
+                <button class="show-more-btn" onclick="toggleActivityDetails()" id="activityDetailsToggle">
+                    <i class="ph ph-plus"></i>
+                    Add notes or details
+                </button>
+                <div id="activityDetailsSection" style="display: none; margin-top: 0.75rem;">
+                    <div class="input-group">
+                        <label>Description</label>
+                        <textarea id="activityDescription" placeholder="Add details about this connection..." maxlength="240" rows="2" style="width: 100%; padding: 0.5rem; border: 1px solid #E5DDD1; border-radius: 6px; font-family: inherit; font-size: 0.875rem; resize: vertical;"></textarea>
+                        <div style="font-size: 0.75rem; color: #8B6F47; text-align: right; margin-top: 0.25rem;">
+                            <span id="charCount">0</span>/240
+                        </div>
                     </div>
                 </div>
-
-                <div class="sentence-preview" id="sentencePreview">
-                    <em style="color: #8B6F47;">Select subject and object to preview...</em>
-                </div>
-
-                <button class="btn" onclick="addActivity()" style="width: 100%; margin-top: 0.5rem;">+ Create Activity</button>
             </div>
 
             <div class="divider"></div>
 
-            <div class="panel-title" style="font-size: 1rem;">All Activities</div>
+            <div class="panel-title" style="font-size: 1rem;">
+                <span class="friendly-label">Recent Connections</span>
+                <span class="technical-label">All Activities</span>
+            </div>
             <div class="input-group" style="margin-bottom: 1rem;">
-                <input type="text" id="activitySearch" placeholder="Search activities..." oninput="renderActivityList()">
+                <input type="text" id="activitySearch" placeholder="Search..." oninput="renderActivityList()">
             </div>
             <div id="activityList" class="relationship-list"></div>
         </div>
@@ -1567,7 +1921,7 @@
             const selectedObjectId = objectId || orgEntityId;
 
             if (!subjectId || !selectedObjectId) {
-                preview.innerHTML = '<em style="color: #8B6F47;">Select subject and object to preview...</em>';
+                preview.innerHTML = '<em style="color: #8B6F47;">Select entities to preview connection...</em>';
                 return;
             }
 
@@ -1575,19 +1929,32 @@
             const object = findEntity(selectedObjectId);
 
             if (!subject || !object) {
-                preview.innerHTML = '<em style="color: #8B6F47;">Select subject and object to preview...</em>';
+                preview.innerHTML = '<em style="color: #8B6F47;">Select entities to preview connection...</em>';
                 return;
             }
 
             const operatorLabel = eoOperators[selectedPredicate]?.label || selectedPredicate;
             const operatorColor = eoOperators[selectedPredicate]?.color || '#8B6F47';
 
+            // Get friendly description for the connection type
+            const friendlyDescriptions = {
+                'DES': 'Creates a hierarchical relationship',
+                'INS': 'Assigns or starts a new role/responsibility',
+                'CON': 'Connects work or responsibilities',
+                'SEG': 'Divides or breaks down into parts',
+                'NUL': 'Removes or recognizes absence',
+                'ALT': 'Modifies or shifts responsibility',
+                'SYN': 'Combines or merges elements',
+                'SUP': 'Oversees or balances multiple areas',
+                'REC': 'Creates a recurring or iterative process'
+            };
+
             preview.innerHTML = `
-                <strong>${subject.name}</strong> 
-                <span style="color: ${operatorColor}; font-weight: 600;">${operatorLabel}</span> 
+                <strong>${subject.name}</strong>
+                <span style="color: ${operatorColor}; font-weight: 600;">${operatorLabel}</span>
                 <strong>${object.name}</strong>
-                <div style="font-size: 0.75rem; color: #8B6F47; margin-top: 0.5rem; font-style: italic;">
-                    ${eoOperators[selectedPredicate]?.description || ''}
+                <div class="help-text" style="margin-top: 0.5rem;">
+                    ${friendlyDescriptions[selectedPredicate] || eoOperators[selectedPredicate]?.description || ''}
                 </div>
             `;
         }
@@ -1798,6 +2165,13 @@
                 btn.classList.toggle('active', btn.dataset.type === type);
             });
             updateParentOptions();
+
+            // Update add button text based on type
+            const addBtn = document.getElementById('addEntityBtn');
+            if (addBtn) {
+                const typeLabels = { unit: 'Unit', team: 'Team', role: 'Role', person: 'Person', object: 'Object' };
+                addBtn.innerHTML = `<i class="ph ph-plus-circle" style="color: white; font-size: 1.25rem;"></i> Add ${typeLabels[type] || 'Entity'}`;
+            }
         }
 
         function updateParentOptions() {
@@ -2408,10 +2782,18 @@
         // Relationship management
         function selectPredicate(predicate) {
             selectedPredicate = predicate;
+            // Clear all predicate buttons (advanced)
             document.querySelectorAll('.predicate-btn').forEach(btn => {
                 btn.classList.remove('active');
             });
-            event.target.classList.add('active');
+            // Clear all quick operator buttons (simplified)
+            document.querySelectorAll('.quick-operator-selector .operator-btn').forEach(btn => {
+                btn.classList.remove('active');
+            });
+            // Add active to the clicked button if it exists in the event
+            if (event && event.target) {
+                event.target.classList.add('active');
+            }
             updateSentencePreview(); // Update preview when operator changes
         }
 
@@ -2600,9 +2982,9 @@
             const orgEntitySelect = document.getElementById('orgEntitySelect');
             const objectSelect = document.getElementById('objectSelect');
 
-            subjectSelect.innerHTML = '<option value="">Select subject...</option>';
-            orgEntitySelect.innerHTML = '<option value="">Select unit/team/role...</option>';
-            objectSelect.innerHTML = '<option value="">Select work object...</option>';
+            subjectSelect.innerHTML = '<option value="">Select entity...</option>';
+            orgEntitySelect.innerHTML = '<option value="">Select entity...</option>';
+            objectSelect.innerHTML = '<option value="">Select work product...</option>';
 
             // Subject: all entity types
             const types = ['unit', 'team', 'role', 'person', 'object'];
@@ -3662,6 +4044,151 @@
             }
         });
 
+        // === SIMPLIFIED UX FUNCTIONS ===
+
+        // Collapsible sections
+        function toggleCollapsible(sectionId) {
+            const section = document.getElementById(sectionId);
+            if (section) {
+                section.classList.toggle('collapsed');
+            }
+        }
+
+        // Welcome banner
+        function dismissWelcomeBanner() {
+            const banner = document.getElementById('welcomeBanner');
+            if (banner) {
+                banner.style.display = 'none';
+                localStorage.setItem('welcomeBannerDismissed', 'true');
+            }
+        }
+
+        function checkWelcomeBanner() {
+            const banner = document.getElementById('welcomeBanner');
+            const dismissed = localStorage.getItem('welcomeBannerDismissed');
+            if (banner && dismissed === 'true') {
+                banner.style.display = 'none';
+            }
+        }
+
+        // Advanced entity options toggle
+        function toggleAdvancedEntityOptions() {
+            const options = document.getElementById('advancedEntityOptions');
+            const toggleBtn = document.getElementById('advancedEntityToggle');
+            if (options && toggleBtn) {
+                const isVisible = options.style.display !== 'none';
+                options.style.display = isVisible ? 'none' : 'block';
+                toggleBtn.classList.toggle('expanded', !isVisible);
+                toggleBtn.innerHTML = isVisible
+                    ? '<i class="ph ph-plus"></i> Advanced options'
+                    : '<i class="ph ph-minus"></i> Hide advanced options';
+            }
+        }
+
+        // Advanced operators toggle
+        function toggleAdvancedOperators() {
+            const operators = document.getElementById('advancedOperators');
+            const toggleBtn = document.getElementById('moreOperatorsBtn');
+            if (operators && toggleBtn) {
+                const isVisible = operators.classList.contains('visible');
+                operators.classList.toggle('visible', !isVisible);
+                toggleBtn.classList.toggle('expanded', !isVisible);
+                toggleBtn.innerHTML = isVisible
+                    ? '<i class="ph ph-plus"></i> More operators (6)'
+                    : '<i class="ph ph-minus"></i> Hide operators';
+            }
+        }
+
+        // Activity details toggle
+        function toggleActivityDetails() {
+            const details = document.getElementById('activityDetailsSection');
+            const toggleBtn = document.getElementById('activityDetailsToggle');
+            if (details && toggleBtn) {
+                const isVisible = details.style.display !== 'none';
+                details.style.display = isVisible ? 'none' : 'block';
+                toggleBtn.classList.toggle('expanded', !isVisible);
+                toggleBtn.innerHTML = isVisible
+                    ? '<i class="ph ph-plus"></i> Add notes or details'
+                    : '<i class="ph ph-minus"></i> Hide notes';
+            }
+        }
+
+        // Technical mode toggle
+        function toggleTechnicalMode() {
+            const techMode = document.getElementById('techMode');
+            if (techMode) {
+                document.body.classList.toggle('technical-mode', techMode.checked);
+                localStorage.setItem('technicalMode', techMode.checked ? 'true' : 'false');
+            }
+        }
+
+        function checkTechnicalMode() {
+            const techMode = document.getElementById('techMode');
+            const stored = localStorage.getItem('technicalMode');
+            if (techMode && stored === 'true') {
+                techMode.checked = true;
+                document.body.classList.add('technical-mode');
+            }
+        }
+
+        // Simplified predicate selection (for 3 main operators)
+        function selectSimplifiedPredicate(predicateCode, btn) {
+            // Remove active from all quick operator buttons
+            document.querySelectorAll('.quick-operator-selector .operator-btn').forEach(b => {
+                b.classList.remove('active');
+            });
+            // Remove active from advanced operators too
+            document.querySelectorAll('.advanced-operators .predicate-btn').forEach(b => {
+                b.classList.remove('active');
+            });
+            // Add active to clicked button
+            btn.classList.add('active');
+            // Call the original selectPredicate
+            selectPredicate(predicateCode);
+        }
+
+        // Simplified filters (dropdown-based)
+        function applySimplifiedFilters() {
+            const connectionFilter = document.getElementById('connectionFilterDropdown').value;
+            const entityFilter = document.getElementById('entityFilterDropdown').value;
+
+            // Map simplified filters to advanced filter checkboxes
+            const operatorFilters = {
+                'all': ['NUL', 'DES', 'INS', 'SEG', 'CON', 'ALT', 'SYN', 'SUP', 'REC'],
+                'hierarchy': ['DES', 'SEG'],  // Define and Divide for hierarchy
+                'work': ['CON', 'SYN', 'SUP'],  // Link, Merge, Balance for work connections
+                'assignments': ['INS', 'ALT']  // Start and Shift for assignments
+            };
+
+            const entityFilters = {
+                'all': ['Unit', 'Team', 'Role', 'Person', 'Object'],
+                'structure': ['Unit', 'Team'],
+                'roles': ['Role'],
+                'people': ['Person']
+            };
+
+            // Set operator checkboxes
+            const selectedOps = operatorFilters[connectionFilter] || operatorFilters['all'];
+            ['NUL', 'DES', 'INS', 'SEG', 'CON', 'ALT', 'SYN', 'SUP', 'REC'].forEach(op => {
+                const checkbox = document.getElementById(`filter${op}`);
+                if (checkbox) {
+                    checkbox.checked = selectedOps.includes(op);
+                }
+            });
+
+            // Set entity checkboxes
+            const selectedEntities = entityFilters[entityFilter] || entityFilters['all'];
+            ['Unit', 'Team', 'Role', 'Person', 'Object'].forEach(ent => {
+                const checkbox = document.getElementById(`filter${ent}`);
+                if (checkbox) {
+                    checkbox.checked = selectedEntities.includes(ent);
+                }
+            });
+
+            // Apply the filters
+            applyFilters();
+        }
+
         // Initialize when page loads
         window.addEventListener('DOMContentLoaded', () => {
             const loadingStatus = document.getElementById('loadingStatus');
@@ -3750,6 +4277,10 @@
                 updateFilterStatus();
                 console.log('✅ UI rendered');
                 updateStatus('Ready');
+
+                // Initialize simplified UX
+                checkWelcomeBanner();
+                checkTechnicalMode();
             } catch (e) {
                 console.error('❌ Error rendering UI:', e);
                 updateStatus('Error rendering UI', false);
