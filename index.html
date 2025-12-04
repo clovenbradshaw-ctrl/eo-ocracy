@@ -1630,6 +1630,60 @@
             font-size: 0.85rem;
         }
 
+        /* Nested chips container for parent display in modal */
+        .nested-chips-container {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 0.5rem;
+        }
+
+        .nested-chips-container .entity-chip {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.35rem;
+            padding: 0.35rem 0.6rem;
+            border-radius: 16px;
+            font-size: 0.8rem;
+            font-weight: 500;
+            transition: all 0.2s;
+        }
+
+        .nested-chips-container .entity-chip.unit {
+            background: linear-gradient(135deg, #C88F4A 0%, #D4A574 100%);
+            color: white;
+        }
+
+        .nested-chips-container .entity-chip.team {
+            background: linear-gradient(135deg, #5B8C5A 0%, #7CB37B 100%);
+            color: white;
+        }
+
+        .nested-chips-container .entity-chip:hover {
+            transform: translateY(-1px);
+            box-shadow: 0 2px 8px rgba(0,0,0,0.15);
+        }
+
+        .chip-remove-btn {
+            background: rgba(255,255,255,0.3);
+            border: none;
+            color: inherit;
+            width: 18px;
+            height: 18px;
+            border-radius: 50%;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 0.7rem;
+            margin-left: 0.15rem;
+            transition: all 0.2s;
+            padding: 0;
+        }
+
+        .chip-remove-btn:hover {
+            background: rgba(255,255,255,0.5);
+        }
+
         /* Card View Filter/Sort Controls */
         .card-view-controls {
             display: flex;
@@ -5662,27 +5716,27 @@ John Doe,Engineering,john@example.com"
             const canHaveNested = ['unit', 'team'].includes(entityType);
 
             if (nestedEntities.length > 0) {
-                // Create header with view toggle (hidden on mobile via CSS) and inline add button
+                // Create header with view toggle and inline add button
                 nestedEl.innerHTML = `
                     <div class="connections-header">
                         <div class="modal-section-title" style="margin-bottom: 0;"><i class="ph ph-tree-structure"></i> Nested</div>
                         <div style="display: flex; gap: 0.5rem; align-items: center;">
-                            ${canHaveNested && useMobileView ? `<button class="section-add-btn" onclick="toggleInlineNestedForm()" title="Add nested"><i class="ph ph-plus"></i></button>` : ''}
+                            ${canHaveNested ? `<button class="section-add-btn" onclick="toggleInlineNestedForm()" title="Add nested"><i class="ph ph-plus"></i></button>` : ''}
                             <div class="view-toggle">
-                                <button class="view-toggle-btn ${useMobileView ? '' : 'active'}" data-view="orbital" onclick="switchNestedView('orbital', '${entityId}', '${entityType}')">
+                                <button class="view-toggle-btn" data-view="orbital" onclick="switchNestedView('orbital', '${entityId}', '${entityType}')">
                                     <i class="ph ph-planet"></i>
                                 </button>
-                                <button class="view-toggle-btn ${useMobileView ? 'active' : ''}" data-view="list" onclick="switchNestedView('list', '${entityId}', '${entityType}')">
+                                <button class="view-toggle-btn active" data-view="list" onclick="switchNestedView('list', '${entityId}', '${entityType}')">
                                     <i class="ph ph-list"></i>
                                 </button>
                             </div>
                         </div>
                     </div>
-                    ${canHaveNested && useMobileView ? `
+                    ${canHaveNested ? `
                     <div id="inlineNestedForm" class="inline-add-form hidden">
                         <div class="inline-add-row">
                             <select id="inlineNestedSelect">
-                                <option value="">Nest under this...</option>
+                                <option value="">Select entity to nest...</option>
                                 ${getAllEntitiesForNesting(entityId, entityType)}
                             </select>
                             <button class="inline-add-btn" onclick="addNestedFromInline()"><i class="ph ph-plus"></i> Add</button>
@@ -5696,81 +5750,84 @@ John Doe,Engineering,john@example.com"
                 viewContainer.id = 'nestedViewContainer';
                 nestedEl.appendChild(viewContainer);
 
-                // Mobile: list view, Desktop: orbital view
-                if (useMobileView) {
-                    renderGroupedConnections(viewContainer, nestedEntities, entityId);
+                // Default to list view for all devices
+                renderGroupedConnections(viewContainer, nestedEntities, entityId);
+            } else {
+                // Empty state - show add form if entity can have nested items
+                if (canHaveNested) {
+                    nestedEl.innerHTML = `
+                        <div class="connections-header">
+                            <div class="modal-section-title" style="margin-bottom: 0;"><i class="ph ph-tree-structure"></i> Nested</div>
+                            <button class="section-add-btn" onclick="toggleInlineNestedForm()" title="Add nested"><i class="ph ph-plus"></i></button>
+                        </div>
+                        <div id="inlineNestedForm" class="inline-add-form hidden">
+                            <div class="inline-add-row">
+                                <select id="inlineNestedSelect">
+                                    <option value="">Select entity to nest...</option>
+                                    ${getAllEntitiesForNesting(entityId, entityType)}
+                                </select>
+                                <button class="inline-add-btn" onclick="addNestedFromInline()"><i class="ph ph-plus"></i> Add</button>
+                            </div>
+                        </div>
+                        <div class="modal-empty-state">
+                            <i class="ph ph-tree-structure"></i>
+                            <div>No nested items</div>
+                        </div>
+                    `;
                 } else {
-                    const orbitalContainer = document.createElement('div');
-                    orbitalContainer.className = 'orbital-container';
-                    viewContainer.appendChild(orbitalContainer);
-                    setTimeout(() => {
-                        renderOrbitalConnections(orbitalContainer, entity, nestedEntities, 'nested');
-                    }, 0);
+                    nestedEl.innerHTML = '';
                 }
-            } else {
-                nestedEl.innerHTML = `
-                    <div class="connections-header">
-                        <div class="modal-section-title" style="margin-bottom: 0;"><i class="ph ph-tree-structure"></i> Nested</div>
-                        ${canHaveNested && useMobileView ? `<button class="section-add-btn" onclick="toggleInlineNestedForm()" title="Add nested"><i class="ph ph-plus"></i></button>` : ''}
-                    </div>
-                    ${canHaveNested && useMobileView ? `
-                    <div id="inlineNestedForm" class="inline-add-form hidden">
-                        <div class="inline-add-row">
-                            <select id="inlineNestedSelect">
-                                <option value="">Nest under this...</option>
-                                ${getAllEntitiesForNesting(entityId, entityType)}
-                            </select>
-                            <button class="inline-add-btn" onclick="addNestedFromInline()"><i class="ph ph-plus"></i> Add</button>
-                        </div>
-                    </div>
-                    ` : ''}
-                    <div class="modal-empty-state">
-                        <i class="ph ph-tree-structure"></i>
-                        <div>No nested items</div>
-                    </div>
-                `;
             }
 
-            // Add nested UI
+            // Hide the separate Add Nested section - functionality is now inline
             const addNestedEl = document.getElementById('modalAddNested');
-            // Only show add nested for entity types that can have children (units, teams)
-            if (['unit', 'team'].includes(entityType)) {
-                addNestedEl.innerHTML = `
-                    <div class="modal-section-title"><i class="ph ph-plus-circle"></i> Add Nested</div>
-                    <div class="modal-add-connection">
-                        <div class="modal-add-connection-row">
-                            <select id="modalNestedTargetSelect">
-                                <option value="">Nest under this...</option>
-                                ${getAllEntitiesForNesting(entityId, entityType)}
-                            </select>
-                            <button class="modal-add-connection-btn" onclick="addNestedFromModal()">
-                                <i class="ph ph-plus"></i> Add
-                            </button>
-                        </div>
-                    </div>
-                `;
-            } else {
-                addNestedEl.innerHTML = '';
-            }
+            addNestedEl.innerHTML = '';
 
-            // Nest Under UI - allows entity to choose its parent
+            // Parent UI - shows what this entity is nested inside
             const nestUnderEl = document.getElementById('modalNestUnder');
             // Show for entity types that can have parents (units can nest under units, teams under units/teams, roles under units/teams)
             const parentOptions = getParentOptionsForNesting(entityId, entityType);
-            if (['unit', 'team', 'role'].includes(entityType) && parentOptions) {
+
+            // Find current parent(s) for this entity
+            const currentParents = relationships
+                .filter(r => r.predicate === 'DES' && r.subject === entityId)
+                .map(r => findEntity(r.object))
+                .filter(Boolean);
+
+            if (['unit', 'team', 'role'].includes(entityType)) {
                 nestUnderEl.innerHTML = `
-                    <div class="modal-section-title"><i class="ph ph-arrow-bend-up-left"></i> Nest Under</div>
-                    <div class="modal-add-connection">
-                        <div class="modal-add-connection-row">
+                    <div class="connections-header">
+                        <div class="modal-section-title" style="margin-bottom: 0;"><i class="ph ph-arrow-bend-up-left"></i> Parent</div>
+                        <button class="section-add-btn" onclick="toggleInlineParentForm()" title="Set parent"><i class="ph ph-plus"></i></button>
+                    </div>
+                    ${currentParents.length > 0 ? `
+                        <div class="nested-chips-container" style="margin-bottom: 0.75rem;">
+                            ${currentParents.map(parent => `
+                                <span class="entity-chip ${parent.type}" onclick="openEntityModal('${parent.id}')" style="cursor: pointer;">
+                                    <i class="ph ${getEntityIcon(parent.type)}"></i>
+                                    ${parent.name}
+                                    <button class="chip-remove-btn" onclick="event.stopPropagation(); removeParentRelationship('${entityId}', '${parent.id}')" title="Remove parent">
+                                        <i class="ph ph-x"></i>
+                                    </button>
+                                </span>
+                            `).join('')}
+                        </div>
+                    ` : ''}
+                    <div id="inlineParentForm" class="inline-add-form hidden">
+                        <div class="inline-add-row">
                             <select id="modalNestUnderSelect">
-                                <option value="">Choose parent...</option>
-                                ${parentOptions}
+                                <option value="">Select parent...</option>
+                                ${parentOptions || ''}
                             </select>
-                            <button class="modal-add-connection-btn" onclick="nestUnderFromModal()">
-                                <i class="ph ph-plus"></i> Add
-                            </button>
+                            <button class="inline-add-btn" onclick="nestUnderFromModal()"><i class="ph ph-plus"></i> Add</button>
                         </div>
                     </div>
+                    ${currentParents.length === 0 ? `
+                        <div class="modal-empty-state">
+                            <i class="ph ph-arrow-bend-up-left"></i>
+                            <div>No parent</div>
+                        </div>
+                    ` : ''}
                 `;
             } else {
                 nestUnderEl.innerHTML = '';
@@ -5778,8 +5835,8 @@ John Doe,Engineering,john@example.com"
 
             // Render Activities section (non-DES relationships)
             const activitiesEl = document.getElementById('modalActivities');
-            // Build inline add form HTML for activities (used in both filled and empty states on mobile)
-            const inlineActivityFormHtml = useMobileView ? `
+            // Build inline add form HTML for activities
+            const inlineActivityFormHtml = `
                 <div id="inlineActivityForm" class="inline-add-form hidden">
                     <div class="inline-add-row">
                         <select id="inlineOperatorSelect">
@@ -5796,20 +5853,20 @@ John Doe,Engineering,john@example.com"
                         <button class="inline-add-btn" onclick="addActivityFromInline()"><i class="ph ph-plus"></i> Add</button>
                     </div>
                 </div>
-            ` : '';
+            `;
 
             if (activityEntities.length > 0) {
-                // Create header with view toggle (hidden on mobile via CSS) and inline add button
+                // Create header with view toggle and inline add button
                 activitiesEl.innerHTML = `
                     <div class="connections-header">
                         <div class="modal-section-title" style="margin-bottom: 0;"><i class="ph ph-arrows-left-right"></i> Activities</div>
                         <div style="display: flex; gap: 0.5rem; align-items: center;">
-                            ${useMobileView ? `<button class="section-add-btn" onclick="toggleInlineActivityForm()" title="Add activity"><i class="ph ph-plus"></i></button>` : ''}
+                            <button class="section-add-btn" onclick="toggleInlineActivityForm()" title="Add activity"><i class="ph ph-plus"></i></button>
                             <div class="view-toggle">
-                                <button class="view-toggle-btn ${useMobileView ? '' : 'active'}" data-view="orbital" onclick="switchActivitiesView('orbital', '${entityId}', '${entityType}')">
+                                <button class="view-toggle-btn" data-view="orbital" onclick="switchActivitiesView('orbital', '${entityId}', '${entityType}')">
                                     <i class="ph ph-planet"></i>
                                 </button>
-                                <button class="view-toggle-btn ${useMobileView ? 'active' : ''}" data-view="list" onclick="switchActivitiesView('list', '${entityId}', '${entityType}')">
+                                <button class="view-toggle-btn active" data-view="list" onclick="switchActivitiesView('list', '${entityId}', '${entityType}')">
                                     <i class="ph ph-list"></i>
                                 </button>
                             </div>
@@ -5823,22 +5880,13 @@ John Doe,Engineering,john@example.com"
                 viewContainer.id = 'activitiesViewContainer';
                 activitiesEl.appendChild(viewContainer);
 
-                // Mobile: list view, Desktop: orbital view
-                if (useMobileView) {
-                    renderGroupedConnections(viewContainer, activityEntities, entityId);
-                } else {
-                    const orbitalContainer = document.createElement('div');
-                    orbitalContainer.className = 'orbital-container';
-                    viewContainer.appendChild(orbitalContainer);
-                    setTimeout(() => {
-                        renderOrbitalConnections(orbitalContainer, entity, activityEntities, 'activity');
-                    }, 0);
-                }
+                // Default to list view for all devices
+                renderGroupedConnections(viewContainer, activityEntities, entityId);
             } else {
                 activitiesEl.innerHTML = `
                     <div class="connections-header">
                         <div class="modal-section-title" style="margin-bottom: 0;"><i class="ph ph-arrows-left-right"></i> Activities</div>
-                        ${useMobileView ? `<button class="section-add-btn" onclick="toggleInlineActivityForm()" title="Add activity"><i class="ph ph-plus"></i></button>` : ''}
+                        <button class="section-add-btn" onclick="toggleInlineActivityForm()" title="Add activity"><i class="ph ph-plus"></i></button>
                     </div>
                     ${inlineActivityFormHtml}
                     <div class="modal-empty-state">
@@ -6716,6 +6764,33 @@ John Doe,Engineering,john@example.com"
             const form = document.getElementById('inlineActivityForm');
             if (form) {
                 form.classList.toggle('hidden');
+            }
+        }
+
+        // Toggle inline parent form visibility
+        function toggleInlineParentForm() {
+            const form = document.getElementById('inlineParentForm');
+            if (form) {
+                form.classList.toggle('hidden');
+            }
+        }
+
+        // Remove parent relationship (unlink from parent)
+        function removeParentRelationship(childId, parentId) {
+            // Find and remove the DES relationship where child is subject and parent is object
+            const relIndex = relationships.findIndex(r =>
+                r.predicate === 'DES' && r.subject === childId && r.object === parentId
+            );
+
+            if (relIndex !== -1) {
+                const removedRel = relationships.splice(relIndex, 1)[0];
+
+                // Log to Xano
+                logToXano({ action: 'delete_relationship', data: removedRel });
+
+                // Refresh views
+                render();
+                openEntityModal(childId);
             }
         }
 
