@@ -3931,6 +3931,200 @@
             text-align: center;
         }
 
+        /* Inline editing styles for modal fields */
+        .modal-title-display {
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+            cursor: pointer;
+            padding: 0.25rem 0.5rem;
+            margin: -0.25rem -0.5rem;
+            border-radius: 6px;
+            transition: background 0.15s;
+        }
+
+        .modal-title-display:hover {
+            background: rgba(255,255,255,0.15);
+        }
+
+        .modal-title-display .edit-hint {
+            opacity: 0;
+            font-size: 0.75rem;
+            color: rgba(255,255,255,0.7);
+            transition: opacity 0.15s;
+        }
+
+        .modal-title-display:hover .edit-hint {
+            opacity: 1;
+        }
+
+        .modal-title-edit-form {
+            display: none;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .modal-title-edit-form.active {
+            display: flex;
+        }
+
+        .modal-title-edit-form input {
+            font-size: 1.5rem;
+            font-weight: 700;
+            padding: 0.25rem 0.5rem;
+            border: 2px solid rgba(255,255,255,0.5);
+            border-radius: 6px;
+            background: rgba(255,255,255,0.2);
+            color: white;
+            width: 100%;
+            max-width: 300px;
+        }
+
+        .modal-title-edit-form input:focus {
+            outline: none;
+            border-color: white;
+            background: rgba(255,255,255,0.3);
+        }
+
+        .modal-title-edit-form input::placeholder {
+            color: rgba(255,255,255,0.5);
+        }
+
+        .inline-edit-actions {
+            display: flex;
+            gap: 0.25rem;
+        }
+
+        .inline-edit-btn {
+            background: rgba(255,255,255,0.2);
+            border: none;
+            color: white;
+            padding: 0.35rem;
+            border-radius: 4px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: background 0.15s;
+        }
+
+        .inline-edit-btn:hover {
+            background: rgba(255,255,255,0.35);
+        }
+
+        .inline-edit-btn.save {
+            background: rgba(255,255,255,0.3);
+        }
+
+        .inline-edit-btn.save:hover {
+            background: rgba(255,255,255,0.45);
+        }
+
+        /* Description inline editing */
+        .modal-description-display {
+            cursor: pointer;
+            position: relative;
+            transition: all 0.15s;
+        }
+
+        .modal-description-display:hover {
+            background: #F5EFE6;
+            border-left-color: #D4A54A;
+        }
+
+        .modal-description-display .edit-hint-desc {
+            position: absolute;
+            top: 0.5rem;
+            right: 0.5rem;
+            opacity: 0;
+            font-size: 0.7rem;
+            color: #8B6F47;
+            background: rgba(255,255,255,0.9);
+            padding: 0.2rem 0.4rem;
+            border-radius: 4px;
+            transition: opacity 0.15s;
+        }
+
+        .modal-description-display:hover .edit-hint-desc {
+            opacity: 1;
+        }
+
+        .modal-description-edit-form {
+            display: none;
+            flex-direction: column;
+            gap: 0.5rem;
+        }
+
+        .modal-description-edit-form.active {
+            display: flex;
+        }
+
+        .modal-description-edit-form textarea {
+            width: 100%;
+            min-height: 100px;
+            padding: 0.75rem;
+            border: 2px solid #E5DDD1;
+            border-radius: 8px;
+            font-size: 0.95rem;
+            line-height: 1.6;
+            resize: vertical;
+            font-family: inherit;
+            color: #3D2E1F;
+            background: white;
+        }
+
+        .modal-description-edit-form textarea:focus {
+            outline: none;
+            border-color: #C88F4A;
+        }
+
+        .modal-description-edit-form .desc-edit-footer {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .modal-description-edit-form .char-count {
+            font-size: 0.75rem;
+            color: #8B6F47;
+        }
+
+        .modal-description-edit-form .desc-edit-actions {
+            display: flex;
+            gap: 0.5rem;
+        }
+
+        .desc-edit-btn {
+            padding: 0.4rem 0.75rem;
+            border-radius: 6px;
+            font-size: 0.85rem;
+            cursor: pointer;
+            border: none;
+            display: flex;
+            align-items: center;
+            gap: 0.25rem;
+            transition: all 0.15s;
+        }
+
+        .desc-edit-btn.cancel {
+            background: #F5F2ED;
+            color: #6B5642;
+            border: 1px solid #E5DDD1;
+        }
+
+        .desc-edit-btn.cancel:hover {
+            background: #E5DDD1;
+        }
+
+        .desc-edit-btn.save {
+            background: #C88F4A;
+            color: white;
+        }
+
+        .desc-edit-btn.save:hover {
+            background: #B87B5B;
+        }
+
         /* Add connection in modal */
         .modal-add-connection {
             background: #FAF7F5;
@@ -5524,10 +5718,21 @@
                     <span class="modal-header-icon" id="modalEntityIcon"></span>
                     <div class="modal-header-content">
                         <div class="modal-title-wrapper">
-                            <div class="modal-title-text" id="modalEntityName"></div>
-                            <button class="modal-title-edit-btn" id="modalTitleEditBtn" onclick="openEntityEditModal()" title="Rename">
-                                <i class="ph ph-pencil-simple"></i>
-                            </button>
+                            <div class="modal-title-display" id="modalTitleDisplay" onclick="startInlineNameEdit()">
+                                <span class="modal-title-text" id="modalEntityName"></span>
+                                <span class="edit-hint"><i class="ph ph-pencil-simple"></i> click to edit</span>
+                            </div>
+                            <div class="modal-title-edit-form" id="modalTitleEditForm">
+                                <input type="text" id="inlineNameInput" placeholder="Enter name..." onkeydown="handleInlineNameKeydown(event)">
+                                <div class="inline-edit-actions">
+                                    <button class="inline-edit-btn save" onclick="saveInlineName()" title="Save">
+                                        <i class="ph ph-check"></i>
+                                    </button>
+                                    <button class="inline-edit-btn" onclick="cancelInlineNameEdit()" title="Cancel">
+                                        <i class="ph ph-x"></i>
+                                    </button>
+                                </div>
+                            </div>
                         </div>
                         <div class="modal-type-badge" id="modalEntityType"></div>
                     </div>
@@ -6672,6 +6877,13 @@ John Doe,Engineering,john@example.com"
             document.getElementById('modalEntityIcon').innerHTML = getIcon(entityType);
             document.getElementById('modalEntityName').textContent = entity.name;
 
+            // Reset inline editing state for title
+            const titleDisplay = document.getElementById('modalTitleDisplay');
+            titleDisplay.style.display = 'flex';
+            titleDisplay.style.pointerEvents = 'auto';
+            titleDisplay.querySelector('.edit-hint').style.display = '';
+            document.getElementById('modalTitleEditForm').classList.remove('active');
+
             // For roles, show team context in the type badge for disambiguation
             let typeBadgeContent = `${getIcon(entityType)} ${entityType.toUpperCase()}`;
             if (entityType === 'role') {
@@ -6685,28 +6897,36 @@ John Doe,Engineering,john@example.com"
             // Show edit and delete buttons for entities
             document.getElementById('modalEditButton').style.display = 'inline-flex';
             document.getElementById('modalDeleteButton').style.display = 'inline-flex';
-            document.getElementById('modalTitleEditBtn').style.display = 'flex';
 
-            // Display description - compact on mobile when empty
+            // Display description with inline editing support
             const descriptionEl = document.getElementById('modalDescription');
-            if (entity.description && entity.description.trim()) {
-                descriptionEl.innerHTML = `
-                    <div class="modal-section-title"><i class="ph ph-text-align-left"></i> Description</div>
-                    <div class="modal-description-text">${entity.description}</div>
-                `;
-                descriptionEl.style.display = '';
-            } else {
-                // On mobile, hide empty description section entirely
-                if (isMobile()) {
-                    descriptionEl.style.display = 'none';
-                } else {
-                    descriptionEl.innerHTML = `
-                        <div class="modal-section-title"><i class="ph ph-text-align-left"></i> Description</div>
-                        <div class="modal-description-empty">No description yet. Click Edit to add one.</div>
-                    `;
-                    descriptionEl.style.display = '';
-                }
-            }
+            const descContent = entity.description && entity.description.trim() ? entity.description : '';
+            const descCharCount = descContent.length;
+
+            descriptionEl.innerHTML = `
+                <div class="modal-section-title"><i class="ph ph-text-align-left"></i> Description</div>
+                <div class="modal-description-display ${descContent ? 'modal-description-text' : 'modal-description-empty'}"
+                     id="modalDescriptionDisplay" onclick="startInlineDescEdit()">
+                    ${descContent || 'No description yet. Click to add one.'}
+                    <span class="edit-hint-desc"><i class="ph ph-pencil-simple"></i> edit</span>
+                </div>
+                <div class="modal-description-edit-form" id="modalDescriptionEditForm">
+                    <textarea id="inlineDescInput" maxlength="240" placeholder="Add a description..."
+                              oninput="updateInlineDescCharCount()">${descContent}</textarea>
+                    <div class="desc-edit-footer">
+                        <span class="char-count"><span id="inlineDescCharCount">${descCharCount}</span>/240</span>
+                        <div class="desc-edit-actions">
+                            <button class="desc-edit-btn cancel" onclick="cancelInlineDescEdit()">
+                                <i class="ph ph-x"></i> Cancel
+                            </button>
+                            <button class="desc-edit-btn save" onclick="saveInlineDesc()">
+                                <i class="ph ph-check"></i> Save
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            `;
+            descriptionEl.style.display = '';
 
             // Role Assignment Section - prominently displayed for persons only
             const roleAssignmentEl = document.getElementById('modalRoleAssignment');
@@ -8631,6 +8851,191 @@ John Doe,Engineering,john@example.com"
             renderActivityList();
         }
 
+        // Inline Editing Functions for Modal Fields
+        function startInlineNameEdit() {
+            if (!currentModalEntity) return;
+            document.getElementById('modalTitleDisplay').style.display = 'none';
+            document.getElementById('modalTitleEditForm').classList.add('active');
+            const input = document.getElementById('inlineNameInput');
+            input.value = currentModalEntity.name;
+            setTimeout(() => {
+                input.focus();
+                input.select();
+            }, 50);
+        }
+
+        function cancelInlineNameEdit() {
+            document.getElementById('modalTitleDisplay').style.display = 'flex';
+            document.getElementById('modalTitleEditForm').classList.remove('active');
+        }
+
+        function handleInlineNameKeydown(event) {
+            if (event.key === 'Enter') {
+                event.preventDefault();
+                saveInlineName();
+            } else if (event.key === 'Escape') {
+                cancelInlineNameEdit();
+            }
+        }
+
+        function saveInlineName() {
+            if (!currentModalEntity || !currentModalEntityType) return;
+
+            const newName = document.getElementById('inlineNameInput').value.trim();
+            if (!newName) {
+                cancelInlineNameEdit();
+                return;
+            }
+
+            const nameChanged = newName !== currentModalEntity.name;
+            if (!nameChanged) {
+                cancelInlineNameEdit();
+                return;
+            }
+
+            const currentName = currentModalEntity.name;
+
+            // Track in undo history
+            pushToUndoHistory({
+                type: 'update_entity',
+                entityType: currentModalEntityType,
+                data: { id: currentModalEntity.id },
+                oldData: { name: currentName, description: currentModalEntity.description || '' },
+                description: `Rename ${currentModalEntityType}: ${currentName} → ${newName}`
+            });
+
+            // Update entity
+            currentModalEntity.name = newName;
+
+            // Log to Xano
+            logActivityToXano({
+                event_verb: 'Shift Entity',
+                eo_operator: 'ALT',
+                object_type: currentModalEntityType,
+                object_id: currentModalEntity.id,
+                object_label: `${currentName} → ${newName}`,
+                data_json: {
+                    old_name: currentName,
+                    new_name: newName,
+                    entity_type: currentModalEntityType
+                }
+            });
+
+            // Update display
+            document.getElementById('modalEntityName').textContent = newName;
+            cancelInlineNameEdit();
+
+            // Save and refresh views
+            saveToLocalStorage();
+            renderEntityList();
+            updateSelects();
+            renderActivityList();
+
+            if (currentView === 'graph') {
+                updateGraph();
+            } else if (currentView === 'tree') {
+                renderTreeView();
+            } else if (currentView === 'card') {
+                renderCardView();
+            }
+        }
+
+        function startInlineDescEdit() {
+            if (!currentModalEntity) return;
+            document.getElementById('modalDescriptionDisplay').style.display = 'none';
+            document.getElementById('modalDescriptionEditForm').classList.add('active');
+            const textarea = document.getElementById('inlineDescInput');
+            textarea.value = currentModalEntity.description || '';
+            updateInlineDescCharCount();
+            setTimeout(() => {
+                textarea.focus();
+            }, 50);
+        }
+
+        function cancelInlineDescEdit() {
+            document.getElementById('modalDescriptionDisplay').style.display = 'block';
+            document.getElementById('modalDescriptionEditForm').classList.remove('active');
+        }
+
+        function updateInlineDescCharCount() {
+            const textarea = document.getElementById('inlineDescInput');
+            const count = document.getElementById('inlineDescCharCount');
+            if (textarea && count) {
+                count.textContent = textarea.value.length;
+            }
+        }
+
+        function saveInlineDesc() {
+            if (!currentModalEntity || !currentModalEntityType) return;
+
+            const newDesc = document.getElementById('inlineDescInput').value.trim();
+            const currentDesc = currentModalEntity.description || '';
+            const descChanged = newDesc !== currentDesc;
+
+            if (!descChanged) {
+                cancelInlineDescEdit();
+                return;
+            }
+
+            // Track in undo history
+            pushToUndoHistory({
+                type: 'update_entity',
+                entityType: currentModalEntityType,
+                data: { id: currentModalEntity.id },
+                oldData: { name: currentModalEntity.name, description: currentDesc },
+                description: `Update description for ${currentModalEntityType}: ${currentModalEntity.name}`
+            });
+
+            // Update entity
+            currentModalEntity.description = newDesc;
+
+            // Log to Xano
+            logActivityToXano({
+                event_verb: 'Shift Description',
+                eo_operator: 'ALT',
+                object_type: currentModalEntityType,
+                object_id: currentModalEntity.id,
+                object_label: `Updated description for ${currentModalEntity.name}`,
+                data_json: {
+                    entity_name: currentModalEntity.name,
+                    old_description: currentDesc,
+                    new_description: newDesc,
+                    entity_type: currentModalEntityType
+                }
+            });
+
+            // Update display
+            const displayEl = document.getElementById('modalDescriptionDisplay');
+            if (newDesc) {
+                displayEl.className = 'modal-description-display modal-description-text';
+                displayEl.innerHTML = `
+                    ${newDesc}
+                    <span class="edit-hint-desc"><i class="ph ph-pencil-simple"></i> edit</span>
+                `;
+            } else {
+                displayEl.className = 'modal-description-display modal-description-empty';
+                displayEl.innerHTML = `
+                    No description yet. Click to add one.
+                    <span class="edit-hint-desc"><i class="ph ph-pencil-simple"></i> edit</span>
+                `;
+            }
+            cancelInlineDescEdit();
+
+            // Save and refresh views
+            saveToLocalStorage();
+            renderEntityList();
+            updateSelects();
+            renderActivityList();
+
+            if (currentView === 'graph') {
+                updateGraph();
+            } else if (currentView === 'tree') {
+                renderTreeView();
+            } else if (currentView === 'card') {
+                renderCardView();
+            }
+        }
+
         // Entity Edit Modal Functions
         function openEntityEditModal() {
             if (!currentModalEntity) return;
@@ -8731,19 +9136,32 @@ John Doe,Engineering,john@example.com"
             closeEntityEditModal();
             document.getElementById('modalEntityName').textContent = newName;
 
-            // Update description display in modal
+            // Update description display in modal with inline editing support
             const descriptionEl = document.getElementById('modalDescription');
-            if (newDesc) {
-                descriptionEl.innerHTML = `
-                    <div class="modal-section-title"><i class="ph ph-text-align-left"></i> Description</div>
-                    <div class="modal-description-text">${newDesc}</div>
-                `;
-            } else {
-                descriptionEl.innerHTML = `
-                    <div class="modal-section-title"><i class="ph ph-text-align-left"></i> Description</div>
-                    <div class="modal-description-empty">No description yet. Click Edit to add one.</div>
-                `;
-            }
+            const descCharCount = newDesc.length;
+            descriptionEl.innerHTML = `
+                <div class="modal-section-title"><i class="ph ph-text-align-left"></i> Description</div>
+                <div class="modal-description-display ${newDesc ? 'modal-description-text' : 'modal-description-empty'}"
+                     id="modalDescriptionDisplay" onclick="startInlineDescEdit()">
+                    ${newDesc || 'No description yet. Click to add one.'}
+                    <span class="edit-hint-desc"><i class="ph ph-pencil-simple"></i> edit</span>
+                </div>
+                <div class="modal-description-edit-form" id="modalDescriptionEditForm">
+                    <textarea id="inlineDescInput" maxlength="240" placeholder="Add a description..."
+                              oninput="updateInlineDescCharCount()">${newDesc}</textarea>
+                    <div class="desc-edit-footer">
+                        <span class="char-count"><span id="inlineDescCharCount">${descCharCount}</span>/240</span>
+                        <div class="desc-edit-actions">
+                            <button class="desc-edit-btn cancel" onclick="cancelInlineDescEdit()">
+                                <i class="ph ph-x"></i> Cancel
+                            </button>
+                            <button class="desc-edit-btn save" onclick="saveInlineDesc()">
+                                <i class="ph ph-check"></i> Save
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            `;
 
             // Save and refresh views
             saveToLocalStorage();
@@ -8901,10 +9319,12 @@ John Doe,Engineering,john@example.com"
             currentModalEntity = null;
             currentModalEntityType = null;
 
-            // Hide entity-specific buttons for relationships
+            // Hide entity-specific buttons and inline editing for relationships
             document.getElementById('modalEditButton').style.display = 'none';
             document.getElementById('modalDeleteButton').style.display = 'none';
-            document.getElementById('modalTitleEditBtn').style.display = 'none';
+            // Hide inline editing for title since relationships aren't editable this way
+            document.getElementById('modalTitleDisplay').style.pointerEvents = 'none';
+            document.getElementById('modalTitleDisplay').querySelector('.edit-hint').style.display = 'none';
 
             const subject = findEntity(rel.subject);
             const object = findEntity(rel.object);
