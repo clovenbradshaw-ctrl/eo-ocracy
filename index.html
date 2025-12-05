@@ -2522,327 +2522,259 @@
         }
 
         /* ========================================
-           NESTED CARD ORG CHART - Visual Hierarchy
+           ENTITY ORG CHART - Traditional Hierarchy
            ======================================== */
 
-        .nested-orgchart {
+        .entity-orgchart {
             padding: 2rem;
+            overflow-x: auto;
+        }
+
+        .entity-orgchart-wrapper {
             display: flex;
             flex-direction: column;
-            gap: 2rem;
-        }
-
-        .nested-orgchart-section {
-            margin-bottom: 1rem;
-        }
-
-        .nested-orgchart-section-header {
-            display: flex;
             align-items: center;
-            gap: 0.75rem;
-            margin-bottom: 1.5rem;
-            padding-bottom: 0.75rem;
-            border-bottom: 2px solid #E5DDD1;
+            min-width: fit-content;
         }
 
-        .nested-orgchart-section-title {
-            font-size: 0.8rem;
-            color: #8B6F47;
-            text-transform: uppercase;
-            letter-spacing: 1.5px;
-            font-weight: 600;
+        /* Hierarchy Level Containers */
+        .orgchart-level {
+            display: flex;
+            justify-content: center;
+            gap: 2rem;
+            position: relative;
+            padding: 1rem 0;
         }
 
-        .nested-orgchart-section-count {
-            font-size: 0.7rem;
-            color: #A89984;
-            background: #F5F2ED;
-            padding: 0.2rem 0.6rem;
-            border-radius: 10px;
+        .orgchart-level::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 50%;
+            transform: translateX(-50%);
+            height: 1rem;
+            width: 2px;
+            background: #C88F4A;
         }
 
-        /* Unit Container - Level 0 (Largest) */
-        .nested-unit-container {
-            background: linear-gradient(135deg, #FDFCFA 0%, #F8F5F0 100%);
-            border: 3px solid #C88F4A;
-            border-radius: 16px;
-            padding: 0;
-            margin-bottom: 1.5rem;
-            box-shadow: 0 4px 16px rgba(200, 143, 74, 0.15);
-            overflow: hidden;
+        .orgchart-level:first-child::before {
+            display: none;
         }
 
-        .nested-unit-header {
+        /* Vertical connector from parent */
+        .orgchart-connector-down {
+            position: absolute;
+            bottom: 0;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 2px;
+            height: 1.5rem;
+            background: #C88F4A;
+        }
+
+        /* Horizontal connector line for children */
+        .orgchart-children-connector {
+            position: absolute;
+            top: -1.5rem;
+            left: 0;
+            right: 0;
+            height: 2px;
+            background: #C88F4A;
+        }
+
+        /* Unit Node - Top Level */
+        .orgchart-unit-node {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            position: relative;
+        }
+
+        .orgchart-unit-card {
             background: linear-gradient(135deg, #C88F4A 0%, #B87B5B 100%);
             color: white;
             padding: 1rem 1.5rem;
-            display: flex;
-            align-items: center;
-            gap: 1rem;
+            border-radius: 12px;
+            min-width: 200px;
+            max-width: 280px;
+            text-align: center;
             cursor: pointer;
+            box-shadow: 0 4px 16px rgba(200, 143, 74, 0.3);
             transition: all 0.2s ease;
+            position: relative;
         }
 
-        .nested-unit-header:hover {
-            background: linear-gradient(135deg, #D4A05C 0%, #C88F6A 100%);
-        }
-
-        .nested-unit-icon {
-            width: 48px;
-            height: 48px;
-            background: rgba(255,255,255,0.2);
-            border-radius: 12px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 1.5rem;
-        }
-
-        .nested-unit-info {
-            flex: 1;
-        }
-
-        .nested-unit-name {
-            font-size: 1.25rem;
-            font-weight: 700;
-            margin-bottom: 0.25rem;
-            text-transform: uppercase;
-            letter-spacing: 0.5px;
-        }
-
-        .nested-unit-meta {
-            font-size: 0.8rem;
-            opacity: 0.85;
-        }
-
-        .nested-unit-stats {
-            display: flex;
-            gap: 1rem;
-            font-size: 0.75rem;
-            opacity: 0.9;
-        }
-
-        .nested-unit-stat {
-            display: flex;
-            align-items: center;
-            gap: 0.35rem;
-            background: rgba(255,255,255,0.15);
-            padding: 0.3rem 0.6rem;
-            border-radius: 12px;
-        }
-
-        .nested-unit-body {
-            padding: 1.5rem;
-        }
-
-        .nested-unit-teams {
-            display: grid;
-            grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
-            gap: 1.25rem;
-        }
-
-        .nested-unit-subunits {
-            margin-bottom: 1.5rem;
-        }
-
-        .nested-unit-subunits-label {
-            font-size: 0.75rem;
-            color: #8B6F47;
-            text-transform: uppercase;
-            letter-spacing: 1px;
-            margin-bottom: 1rem;
-            padding-left: 0.5rem;
-            border-left: 3px solid #C88F4A;
-        }
-
-        /* Direct Roles under Unit (not in a team) */
-        .nested-unit-direct-roles {
-            margin-top: 1.5rem;
-            padding-top: 1.5rem;
-            border-top: 2px dashed #E5DDD1;
-        }
-
-        .nested-direct-roles-label {
-            font-size: 0.75rem;
-            color: #8B6F47;
-            text-transform: uppercase;
-            letter-spacing: 1px;
-            margin-bottom: 1rem;
-            display: flex;
-            align-items: center;
-            gap: 0.5rem;
-        }
-
-        .nested-direct-roles-grid {
-            display: flex;
-            flex-wrap: wrap;
-            gap: 1rem;
-        }
-
-        /* Team Container - Level 1 (Medium) */
-        .nested-team-container {
-            background: white;
-            border: 2px solid #7B9E6B;
-            border-radius: 12px;
-            overflow: hidden;
-            box-shadow: 0 2px 8px rgba(123, 158, 107, 0.12);
-            transition: all 0.2s ease;
-        }
-
-        .nested-team-container:hover {
-            box-shadow: 0 4px 16px rgba(123, 158, 107, 0.2);
+        .orgchart-unit-card:hover {
             transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(200, 143, 74, 0.4);
         }
 
-        .nested-team-header {
-            background: linear-gradient(135deg, #7B9E6B 0%, #5E8B5B 100%);
-            color: white;
-            padding: 0.875rem 1rem;
-            display: flex;
-            align-items: center;
-            gap: 0.75rem;
-            cursor: pointer;
-        }
-
-        .nested-team-header:hover {
-            background: linear-gradient(135deg, #8CAE7B 0%, #6E9B6B 100%);
-        }
-
-        .nested-team-icon {
-            width: 36px;
-            height: 36px;
+        .orgchart-unit-card .orgchart-icon {
+            width: 40px;
+            height: 40px;
             background: rgba(255,255,255,0.2);
             border-radius: 10px;
             display: flex;
             align-items: center;
             justify-content: center;
-            font-size: 1.1rem;
+            margin: 0 auto 0.5rem;
+            font-size: 1.25rem;
         }
 
-        .nested-team-info {
-            flex: 1;
-        }
-
-        .nested-team-name {
+        .orgchart-unit-card .orgchart-name {
             font-size: 1rem;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            margin-bottom: 0.25rem;
+        }
+
+        .orgchart-unit-card .orgchart-meta {
+            font-size: 0.75rem;
+            opacity: 0.85;
+        }
+
+        /* Team Node */
+        .orgchart-team-node {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            position: relative;
+        }
+
+        .orgchart-team-card {
+            background: linear-gradient(135deg, #7B9E6B 0%, #5E8B5B 100%);
+            color: white;
+            padding: 0.875rem 1.25rem;
+            border-radius: 10px;
+            min-width: 180px;
+            max-width: 250px;
+            text-align: center;
+            cursor: pointer;
+            box-shadow: 0 3px 12px rgba(123, 158, 107, 0.3);
+            transition: all 0.2s ease;
+            position: relative;
+        }
+
+        .orgchart-team-card:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 16px rgba(123, 158, 107, 0.4);
+        }
+
+        .orgchart-team-card .orgchart-icon {
+            width: 32px;
+            height: 32px;
+            background: rgba(255,255,255,0.2);
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: 0 auto 0.4rem;
+            font-size: 1rem;
+        }
+
+        .orgchart-team-card .orgchart-name {
+            font-size: 0.9rem;
             font-weight: 600;
         }
 
-        .nested-team-meta {
+        .orgchart-team-card .orgchart-meta {
             font-size: 0.7rem;
             opacity: 0.85;
-            margin-top: 0.15rem;
+            margin-top: 0.2rem;
         }
 
-        .nested-team-member-count {
-            background: rgba(255,255,255,0.2);
-            padding: 0.25rem 0.6rem;
-            border-radius: 10px;
-            font-size: 0.7rem;
-            display: flex;
-            align-items: center;
-            gap: 0.3rem;
-        }
-
-        .nested-team-body {
-            padding: 1rem;
-            background: #FAFDF8;
-        }
-
-        .nested-team-roles {
+        /* Role Node - Contains People */
+        .orgchart-role-node {
             display: flex;
             flex-direction: column;
-            gap: 0.75rem;
-        }
-
-        .nested-team-empty {
-            text-align: center;
-            padding: 1.5rem;
-            color: #A89984;
-            font-size: 0.85rem;
-            font-style: italic;
-        }
-
-        /* Role Card - Level 2 (Compact) */
-        .nested-role-card {
-            background: white;
-            border: 1px solid #E5DDD1;
-            border-left: 3px solid #8B6F47;
-            border-radius: 8px;
-            padding: 0.75rem 1rem;
-            transition: all 0.2s ease;
-        }
-
-        .nested-role-card:hover {
-            border-color: #D5C4B0;
-            box-shadow: 0 2px 8px rgba(139, 111, 71, 0.1);
-        }
-
-        .nested-role-header {
-            display: flex;
             align-items: center;
-            gap: 0.6rem;
-            margin-bottom: 0.5rem;
-            cursor: pointer;
+            position: relative;
         }
 
-        .nested-role-icon {
+        .orgchart-role-card {
+            background: white;
+            border: 2px solid #8B6F47;
+            padding: 0;
+            border-radius: 10px;
+            min-width: 160px;
+            max-width: 220px;
+            cursor: pointer;
+            box-shadow: 0 2px 8px rgba(139, 111, 71, 0.15);
+            transition: all 0.2s ease;
+            overflow: hidden;
+        }
+
+        .orgchart-role-card:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(139, 111, 71, 0.25);
+            border-color: #6B5030;
+        }
+
+        .orgchart-role-header {
+            background: linear-gradient(135deg, #8B6F47 0%, #6B5030 100%);
+            color: white;
+            padding: 0.6rem 0.875rem;
+            text-align: center;
+        }
+
+        .orgchart-role-header .orgchart-icon {
             width: 28px;
             height: 28px;
-            background: linear-gradient(135deg, #8B6F47 0%, #6B5030 100%);
+            background: rgba(255,255,255,0.2);
             border-radius: 6px;
             display: flex;
             align-items: center;
             justify-content: center;
+            margin: 0 auto 0.3rem;
             font-size: 0.85rem;
-            color: white;
         }
 
-        .nested-role-name {
-            font-size: 0.9rem;
+        .orgchart-role-header .orgchart-name {
+            font-size: 0.8rem;
             font-weight: 600;
-            color: #3D2E1F;
-            flex: 1;
         }
 
-        .nested-role-vacancy {
+        .orgchart-role-vacancy {
             font-size: 0.65rem;
             color: #B87B5B;
             background: #FEF6EE;
             padding: 0.15rem 0.5rem;
             border-radius: 8px;
             border: 1px solid #F0D9C4;
+            margin-top: 0.25rem;
+            display: inline-block;
         }
 
-        /* People Chips - Level 3 (Embedded) */
-        .nested-people-container {
+        /* People Container inside Role */
+        .orgchart-role-people {
+            padding: 0.6rem;
+            background: #FAF8F5;
             display: flex;
-            flex-wrap: wrap;
-            gap: 0.5rem;
-            padding-left: 2.4rem;
+            flex-direction: column;
+            gap: 0.4rem;
         }
 
-        .nested-person-chip {
+        .orgchart-person-row {
             display: flex;
             align-items: center;
-            gap: 0.4rem;
-            padding: 0.35rem 0.65rem;
-            background: linear-gradient(135deg, #F0F6F8 0%, #E8EEF0 100%);
-            border: 1px solid #D0DDE3;
-            border-radius: 20px;
+            gap: 0.5rem;
+            padding: 0.4rem 0.5rem;
+            background: white;
+            border: 1px solid #E5DDD1;
+            border-radius: 6px;
             cursor: pointer;
             transition: all 0.2s ease;
         }
 
-        .nested-person-chip:hover {
-            background: linear-gradient(135deg, #E8F0F4 0%, #D8E6EC 100%);
+        .orgchart-person-row:hover {
+            background: linear-gradient(135deg, #F0F6F8 0%, #E8EEF0 100%);
             border-color: #6B8B9E;
-            transform: scale(1.02);
         }
 
-        .nested-person-avatar {
-            width: 24px;
-            height: 24px;
+        .orgchart-person-avatar {
+            width: 26px;
+            height: 26px;
             background: linear-gradient(135deg, #6B8B9E 0%, #4B6B8E 100%);
             border-radius: 50%;
             display: flex;
@@ -2852,50 +2784,155 @@
             font-weight: 600;
             color: white;
             text-transform: uppercase;
+            flex-shrink: 0;
         }
 
-        .nested-person-name {
-            font-size: 0.8rem;
+        .orgchart-person-name {
+            font-size: 0.75rem;
             color: #3D2E1F;
             font-weight: 500;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+
+        /* Children Container with Connecting Lines */
+        .orgchart-children {
+            display: flex;
+            justify-content: center;
+            gap: 1.5rem;
+            position: relative;
+            padding-top: 2rem;
+            margin-top: 0.5rem;
+        }
+
+        .orgchart-children::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 2px;
+            height: 2rem;
+            background: #D5C4B0;
+        }
+
+        /* When there are multiple children, add horizontal connector */
+        .orgchart-children.multiple::after {
+            content: '';
+            position: absolute;
+            top: 2rem;
+            left: calc(50% - var(--connector-width, 0px) / 2);
+            width: var(--connector-width, 0px);
+            height: 2px;
+            background: #D5C4B0;
+        }
+
+        .orgchart-children > * {
+            position: relative;
+        }
+
+        .orgchart-children > *::before {
+            content: '';
+            position: absolute;
+            top: -2rem;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 2px;
+            height: 2rem;
+            background: #D5C4B0;
+        }
+
+        .orgchart-children:not(.multiple) > *::before {
+            display: none;
+        }
+
+        /* Sub-Units Section */
+        .orgchart-subunits {
+            margin-top: 0.5rem;
+        }
+
+        .orgchart-subunits-label {
+            font-size: 0.65rem;
+            color: #8B6F47;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            text-align: center;
+            margin-bottom: 0.5rem;
+            opacity: 0.8;
+        }
+
+        /* Teams Row */
+        .orgchart-teams-row {
+            display: flex;
+            justify-content: center;
+            gap: 1.5rem;
+            flex-wrap: wrap;
+        }
+
+        /* Roles Row */
+        .orgchart-roles-row {
+            display: flex;
+            justify-content: center;
+            gap: 1rem;
+            flex-wrap: wrap;
+        }
+
+        /* Direct Roles under Unit */
+        .orgchart-direct-roles {
+            margin-top: 1rem;
+            padding-top: 1rem;
+            border-top: 1px dashed #D5C4B0;
+        }
+
+        .orgchart-direct-roles-label {
+            font-size: 0.65rem;
+            color: #8B6F47;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            text-align: center;
+            margin-bottom: 0.75rem;
         }
 
         /* Orphan Sections */
-        .nested-orphan-section {
+        .orgchart-orphan-section {
             background: #FAF8F5;
             border: 2px dashed #D5C4B0;
             border-radius: 12px;
             padding: 1.5rem;
-            margin-top: 1rem;
+            margin-top: 2rem;
+            width: 100%;
         }
 
-        .nested-orphan-header {
+        .orgchart-orphan-header {
             display: flex;
             align-items: center;
+            justify-content: center;
             gap: 0.75rem;
             margin-bottom: 1rem;
             color: #8B6F47;
         }
 
-        .nested-orphan-header i {
+        .orgchart-orphan-header i {
             font-size: 1.25rem;
             opacity: 0.7;
         }
 
-        .nested-orphan-title {
+        .orgchart-orphan-title {
             font-size: 0.85rem;
             font-weight: 600;
             text-transform: uppercase;
             letter-spacing: 0.5px;
         }
 
-        .nested-orphan-items {
+        .orgchart-orphan-items {
             display: flex;
             flex-wrap: wrap;
+            justify-content: center;
             gap: 0.75rem;
         }
 
-        .nested-orphan-team {
+        .orgchart-orphan-team {
             background: white;
             border: 2px solid #D5C4B0;
             border-left: 4px solid #7B9E6B;
@@ -2908,12 +2945,12 @@
             gap: 0.6rem;
         }
 
-        .nested-orphan-team:hover {
+        .orgchart-orphan-team:hover {
             border-color: #7B9E6B;
             box-shadow: 0 2px 8px rgba(123, 158, 107, 0.15);
         }
 
-        .nested-orphan-role {
+        .orgchart-orphan-role {
             background: white;
             border: 1px solid #E5DDD1;
             border-left: 3px solid #8B6F47;
@@ -2926,12 +2963,12 @@
             gap: 0.5rem;
         }
 
-        .nested-orphan-role:hover {
+        .orgchart-orphan-role:hover {
             border-color: #8B6F47;
             box-shadow: 0 2px 6px rgba(139, 111, 71, 0.1);
         }
 
-        .nested-orphan-person {
+        .orgchart-orphan-person {
             display: flex;
             align-items: center;
             gap: 0.5rem;
@@ -2943,12 +2980,12 @@
             transition: all 0.2s ease;
         }
 
-        .nested-orphan-person:hover {
+        .orgchart-orphan-person:hover {
             border-color: #6B8B9E;
             background: #F0F6F8;
         }
 
-        .nested-orphan-icon {
+        .orgchart-orphan-icon {
             width: 28px;
             height: 28px;
             border-radius: 6px;
@@ -2959,15 +2996,15 @@
             color: white;
         }
 
-        .nested-orphan-icon.team-icon {
+        .orgchart-orphan-icon.team-icon {
             background: linear-gradient(135deg, #7B9E6B 0%, #5E8B5B 100%);
         }
 
-        .nested-orphan-icon.role-icon {
+        .orgchart-orphan-icon.role-icon {
             background: linear-gradient(135deg, #8B6F47 0%, #6B5030 100%);
         }
 
-        .nested-orphan-icon.person-icon {
+        .orgchart-orphan-icon.person-icon {
             width: 26px;
             height: 26px;
             border-radius: 50%;
@@ -2975,59 +3012,83 @@
             font-size: 0.7rem;
         }
 
-        .nested-orphan-name {
+        .orgchart-orphan-name {
             font-size: 0.85rem;
             color: #3D2E1F;
             font-weight: 500;
         }
 
         /* Empty State */
-        .nested-orgchart-empty {
+        .entity-orgchart-empty {
             text-align: center;
             padding: 4rem 2rem;
             color: #8B6F47;
         }
 
-        .nested-orgchart-empty i {
+        .entity-orgchart-empty i {
             font-size: 4rem;
             margin-bottom: 1.5rem;
             opacity: 0.4;
             display: block;
         }
 
-        .nested-orgchart-empty h3 {
+        .entity-orgchart-empty h3 {
             font-size: 1.5rem;
             margin-bottom: 0.75rem;
             color: #3D2E1F;
         }
 
-        .nested-orgchart-empty p {
+        .entity-orgchart-empty p {
             font-size: 1rem;
             opacity: 0.8;
             max-width: 400px;
             margin: 0 auto;
         }
 
-        /* Collapse/Expand animation */
-        .nested-unit-body, .nested-team-body {
-            transition: max-height 0.3s ease, padding 0.3s ease, opacity 0.3s ease;
+        /* Collapse/Expand functionality */
+        .orgchart-collapse-btn {
+            position: absolute;
+            bottom: -10px;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 20px;
+            height: 20px;
+            background: white;
+            border: 2px solid currentColor;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 0.7rem;
+            cursor: pointer;
+            z-index: 10;
+            transition: all 0.2s ease;
         }
 
-        .nested-unit-container.collapsed .nested-unit-body,
-        .nested-team-container.collapsed .nested-team-body {
-            max-height: 0;
-            padding: 0;
-            opacity: 0;
-            overflow: hidden;
+        .orgchart-collapse-btn:hover {
+            transform: translateX(-50%) scale(1.1);
         }
 
-        .nested-collapse-icon {
-            transition: transform 0.2s ease;
+        .orgchart-unit-card .orgchart-collapse-btn {
+            color: #C88F4A;
         }
 
-        .collapsed .nested-collapse-icon {
+        .orgchart-team-card .orgchart-collapse-btn {
+            color: #7B9E6B;
+        }
+
+        .orgchart-node.collapsed .orgchart-children {
+            display: none;
+        }
+
+        .orgchart-node.collapsed .orgchart-collapse-btn i {
             transform: rotate(-90deg);
         }
+
+        /* Legacy compatibility - keep old nested classes working */
+        .nested-orgchart { display: none; }
+        .nested-collapse-icon { transition: transform 0.2s ease; }
+        .collapsed .nested-collapse-icon { transform: rotate(-90deg); }
 
         .tree-node-container {
             margin-bottom: 0.25rem;
@@ -13857,7 +13918,7 @@ John Doe,Engineering,john@example.com"
             return entitiesAtLevel;
         }
 
-        // Render the Org Chart view - Nested Card Visual Hierarchy
+        // Render the Org Chart view - Traditional Entity Hierarchy
         function renderOrgChartView() {
             const container = document.getElementById('orgchartView');
             if (!container) return;
@@ -13875,48 +13936,59 @@ John Doe,Engineering,john@example.com"
 
             if (!hasUnits && !hasOrphanTeams && !hasOrphanRoles && !hasOrphanPeople) {
                 container.innerHTML = `
-                    <div class="nested-orgchart-empty">
+                    <div class="entity-orgchart-empty">
                         <i class="ph ph-flow-arrow"></i>
                         <h3>No Organization Structure</h3>
-                        <p>Add units, teams, and roles to build your org chart with visual hierarchy</p>
+                        <p>Add units, teams, and roles to build your entity org chart</p>
                     </div>
                 `;
                 return;
             }
 
             const chartContainer = document.createElement('div');
-            chartContainer.className = 'nested-orgchart';
+            chartContainer.className = 'entity-orgchart';
 
-            // Render main hierarchy (units with nested teams and people)
+            const wrapper = document.createElement('div');
+            wrapper.className = 'entity-orgchart-wrapper';
+
+            // Render main hierarchy (units with nested structure)
             if (hasUnits) {
+                const unitsLevel = document.createElement('div');
+                unitsLevel.className = 'orgchart-level';
+                unitsLevel.style.cssText = 'padding-top: 0;';
+
                 hierarchy.units.forEach(unitNode => {
-                    const unitEl = renderNestedUnitContainer(unitNode);
-                    chartContainer.appendChild(unitEl);
+                    const unitEl = renderOrgChartUnit(unitNode);
+                    unitsLevel.appendChild(unitEl);
                 });
+
+                wrapper.appendChild(unitsLevel);
             }
 
-            // Render orphan teams
+            chartContainer.appendChild(wrapper);
+
+            // Render orphan sections
             if (hasOrphanTeams) {
                 const orphanSection = document.createElement('div');
-                orphanSection.className = 'nested-orphan-section';
+                orphanSection.className = 'orgchart-orphan-section';
                 orphanSection.innerHTML = `
-                    <div class="nested-orphan-header">
+                    <div class="orgchart-orphan-header">
                         <i class="ph ph-users-three"></i>
-                        <span class="nested-orphan-title">Unassigned Teams</span>
+                        <span class="orgchart-orphan-title">Unassigned Teams</span>
                     </div>
                 `;
                 const itemsContainer = document.createElement('div');
-                itemsContainer.className = 'nested-orphan-items';
+                itemsContainer.className = 'orgchart-orphan-items';
 
                 hierarchy.orphanTeams.forEach(team => {
                     const teamEl = document.createElement('div');
-                    teamEl.className = 'nested-orphan-team';
+                    teamEl.className = 'orgchart-orphan-team';
                     teamEl.onclick = () => openEntityModal(team.id, 'team');
                     teamEl.innerHTML = `
-                        <div class="nested-orphan-icon team-icon">
+                        <div class="orgchart-orphan-icon team-icon">
                             <i class="ph ph-users-three"></i>
                         </div>
-                        <span class="nested-orphan-name">${team.name}</span>
+                        <span class="orgchart-orphan-name">${team.name}</span>
                     `;
                     itemsContainer.appendChild(teamEl);
                 });
@@ -13925,31 +13997,30 @@ John Doe,Engineering,john@example.com"
                 chartContainer.appendChild(orphanSection);
             }
 
-            // Render orphan roles
             if (hasOrphanRoles) {
                 const orphanSection = document.createElement('div');
-                orphanSection.className = 'nested-orphan-section';
+                orphanSection.className = 'orgchart-orphan-section';
                 orphanSection.innerHTML = `
-                    <div class="nested-orphan-header">
+                    <div class="orgchart-orphan-header">
                         <i class="ph ph-identification-badge"></i>
-                        <span class="nested-orphan-title">Unassigned Roles</span>
+                        <span class="orgchart-orphan-title">Unassigned Roles</span>
                     </div>
                 `;
                 const itemsContainer = document.createElement('div');
-                itemsContainer.className = 'nested-orphan-items';
+                itemsContainer.className = 'orgchart-orphan-items';
 
                 hierarchy.orphanRoles.forEach(role => {
                     const roleEl = document.createElement('div');
-                    roleEl.className = 'nested-orphan-role';
+                    roleEl.className = 'orgchart-orphan-role';
                     roleEl.onclick = () => openEntityModal(role.id, 'role');
 
                     const people = getPeopleInRoleForOrgChart(role.id);
                     roleEl.innerHTML = `
-                        <div class="nested-orphan-icon role-icon">
+                        <div class="orgchart-orphan-icon role-icon">
                             <i class="ph ph-identification-badge"></i>
                         </div>
-                        <span class="nested-orphan-name">${role.name}</span>
-                        ${people.length > 0 ? `<span class="nested-role-vacancy" style="background:#E8F0F4;color:#4B6B8E;border-color:#D0DDE3;">${people.length} assigned</span>` : ''}
+                        <span class="orgchart-orphan-name">${role.name}</span>
+                        ${people.length > 0 ? `<span class="orgchart-role-vacancy" style="background:#E8F0F4;color:#4B6B8E;border-color:#D0DDE3;">${people.length} assigned</span>` : ''}
                     `;
                     itemsContainer.appendChild(roleEl);
                 });
@@ -13958,28 +14029,27 @@ John Doe,Engineering,john@example.com"
                 chartContainer.appendChild(orphanSection);
             }
 
-            // Render orphan people
             if (hasOrphanPeople) {
                 const orphanSection = document.createElement('div');
-                orphanSection.className = 'nested-orphan-section';
+                orphanSection.className = 'orgchart-orphan-section';
                 orphanSection.innerHTML = `
-                    <div class="nested-orphan-header">
+                    <div class="orgchart-orphan-header">
                         <i class="ph ph-user"></i>
-                        <span class="nested-orphan-title">Unassigned People</span>
+                        <span class="orgchart-orphan-title">Unassigned People</span>
                     </div>
                 `;
                 const itemsContainer = document.createElement('div');
-                itemsContainer.className = 'nested-orphan-items';
+                itemsContainer.className = 'orgchart-orphan-items';
 
                 hierarchy.orphanPeople.forEach(person => {
                     const personEl = document.createElement('div');
-                    personEl.className = 'nested-orphan-person';
+                    personEl.className = 'orgchart-orphan-person';
                     personEl.onclick = () => openEntityModal(person.id, 'person');
                     personEl.innerHTML = `
-                        <div class="nested-orphan-icon person-icon">
+                        <div class="orgchart-orphan-icon person-icon">
                             ${getInitials(person.name)}
                         </div>
-                        <span class="nested-orphan-name">${person.name}</span>
+                        <span class="orgchart-orphan-name">${person.name}</span>
                     `;
                     itemsContainer.appendChild(personEl);
                 });
@@ -14032,203 +14102,180 @@ John Doe,Engineering,john@example.com"
             return count;
         }
 
-        // Render a nested unit container with visual hierarchy
-        function renderNestedUnitContainer(unitNode) {
-            const container = document.createElement('div');
-            container.className = 'nested-unit-container';
+        // Render a unit node in the org chart (traditional hierarchy)
+        function renderOrgChartUnit(unitNode) {
+            const node = document.createElement('div');
+            node.className = 'orgchart-unit-node orgchart-node';
 
-            const teamCount = (unitNode.teams ? unitNode.teams.length : 0) + (unitNode.units ? unitNode.units.length : 0);
-            const peopleCount = countPeopleInUnit(unitNode);
-            const roleCount = (unitNode.roles ? unitNode.roles.length : 0) +
-                (unitNode.teams ? unitNode.teams.reduce((sum, t) => sum + (t.roles ? t.roles.length : 0), 0) : 0);
+            const hasChildren = (unitNode.units && unitNode.units.length > 0) ||
+                               (unitNode.teams && unitNode.teams.length > 0) ||
+                               (unitNode.roles && unitNode.roles.length > 0);
 
-            // Unit Header
-            const header = document.createElement('div');
-            header.className = 'nested-unit-header';
-            header.onclick = (e) => {
-                if (e.target.closest('.nested-unit-stats')) {
+            // Unit card
+            const card = document.createElement('div');
+            card.className = 'orgchart-unit-card';
+            card.onclick = (e) => {
+                if (!e.target.closest('.orgchart-collapse-btn')) {
                     openEntityModal(unitNode.entity.id, 'unit');
-                } else {
-                    container.classList.toggle('collapsed');
                 }
             };
 
-            header.innerHTML = `
-                <div class="nested-unit-icon">
+            card.innerHTML = `
+                <div class="orgchart-icon">
                     <i class="ph ph-buildings"></i>
                 </div>
-                <div class="nested-unit-info">
-                    <div class="nested-unit-name">${unitNode.entity.name}</div>
-                    ${unitNode.entity.description ? `<div class="nested-unit-meta">${unitNode.entity.description}</div>` : ''}
-                </div>
-                <div class="nested-unit-stats">
-                    ${teamCount > 0 ? `<div class="nested-unit-stat"><i class="ph ph-users-three"></i> ${teamCount}</div>` : ''}
-                    ${roleCount > 0 ? `<div class="nested-unit-stat"><i class="ph ph-identification-badge"></i> ${roleCount}</div>` : ''}
-                    ${peopleCount > 0 ? `<div class="nested-unit-stat"><i class="ph ph-user"></i> ${peopleCount}</div>` : ''}
-                </div>
-                <i class="ph ph-caret-down nested-collapse-icon"></i>
+                <div class="orgchart-name">${unitNode.entity.name}</div>
+                ${unitNode.entity.description ? `<div class="orgchart-meta">${unitNode.entity.description}</div>` : ''}
+                ${hasChildren ? `<div class="orgchart-collapse-btn" onclick="event.stopPropagation(); this.closest('.orgchart-node').classList.toggle('collapsed');"><i class="ph ph-caret-down"></i></div>` : ''}
             `;
-            container.appendChild(header);
+            node.appendChild(card);
 
-            // Unit Body
-            const body = document.createElement('div');
-            body.className = 'nested-unit-body';
+            // Children container
+            if (hasChildren) {
+                const children = document.createElement('div');
+                const childCount = (unitNode.units ? unitNode.units.length : 0) +
+                                   (unitNode.teams ? unitNode.teams.length : 0) +
+                                   (unitNode.roles && !unitNode.teams?.length ? 1 : 0);
+                children.className = 'orgchart-children' + (childCount > 1 ? ' multiple' : '');
 
-            // Sub-units first
-            if (unitNode.units && unitNode.units.length > 0) {
-                const subunitsSection = document.createElement('div');
-                subunitsSection.className = 'nested-unit-subunits';
-                subunitsSection.innerHTML = '<div class="nested-unit-subunits-label">Sub-Units</div>';
+                // Sub-units
+                if (unitNode.units && unitNode.units.length > 0) {
+                    unitNode.units.forEach(subUnit => {
+                        const subUnitEl = renderOrgChartUnit(subUnit);
+                        children.appendChild(subUnitEl);
+                    });
+                }
 
-                unitNode.units.forEach(subUnit => {
-                    const subUnitEl = renderNestedUnitContainer(subUnit);
-                    subunitsSection.appendChild(subUnitEl);
-                });
+                // Teams
+                if (unitNode.teams && unitNode.teams.length > 0) {
+                    unitNode.teams.forEach(teamData => {
+                        const teamEl = renderOrgChartTeam(teamData);
+                        children.appendChild(teamEl);
+                    });
+                }
 
-                body.appendChild(subunitsSection);
+                // Direct roles (not in a team) - grouped in a container
+                if (unitNode.roles && unitNode.roles.length > 0 && (!unitNode.teams || unitNode.teams.length === 0)) {
+                    const rolesContainer = document.createElement('div');
+                    rolesContainer.className = 'orgchart-roles-row';
+                    unitNode.roles.forEach(roleData => {
+                        const roleEl = renderOrgChartRole(roleData);
+                        rolesContainer.appendChild(roleEl);
+                    });
+                    children.appendChild(rolesContainer);
+                } else if (unitNode.roles && unitNode.roles.length > 0) {
+                    // If there are teams AND direct roles, show direct roles separately
+                    const directRolesSection = document.createElement('div');
+                    directRolesSection.className = 'orgchart-direct-roles';
+                    directRolesSection.innerHTML = `<div class="orgchart-direct-roles-label">Direct Roles</div>`;
+                    const rolesRow = document.createElement('div');
+                    rolesRow.className = 'orgchart-roles-row';
+                    unitNode.roles.forEach(roleData => {
+                        const roleEl = renderOrgChartRole(roleData);
+                        rolesRow.appendChild(roleEl);
+                    });
+                    directRolesSection.appendChild(rolesRow);
+                    children.appendChild(directRolesSection);
+                }
+
+                node.appendChild(children);
             }
 
-            // Teams grid
-            if (unitNode.teams && unitNode.teams.length > 0) {
-                const teamsGrid = document.createElement('div');
-                teamsGrid.className = 'nested-unit-teams';
-
-                unitNode.teams.forEach(teamData => {
-                    const teamEl = renderNestedTeamContainer(teamData);
-                    teamsGrid.appendChild(teamEl);
-                });
-
-                body.appendChild(teamsGrid);
-            }
-
-            // Direct roles (not in a team)
-            if (unitNode.roles && unitNode.roles.length > 0) {
-                const directRolesSection = document.createElement('div');
-                directRolesSection.className = 'nested-unit-direct-roles';
-                directRolesSection.innerHTML = `
-                    <div class="nested-direct-roles-label">
-                        <i class="ph ph-identification-badge"></i>
-                        Direct Roles
-                    </div>
-                `;
-
-                const rolesGrid = document.createElement('div');
-                rolesGrid.className = 'nested-direct-roles-grid';
-
-                unitNode.roles.forEach(roleData => {
-                    const roleEl = renderNestedRoleCard(roleData);
-                    rolesGrid.appendChild(roleEl);
-                });
-
-                directRolesSection.appendChild(rolesGrid);
-                body.appendChild(directRolesSection);
-            }
-
-            container.appendChild(body);
-            return container;
+            return node;
         }
 
-        // Render a nested team container with embedded roles and people
-        function renderNestedTeamContainer(teamData) {
-            const container = document.createElement('div');
-            container.className = 'nested-team-container';
+        // Render a team node in the org chart
+        function renderOrgChartTeam(teamData) {
+            const node = document.createElement('div');
+            node.className = 'orgchart-team-node orgchart-node';
 
+            const hasRoles = teamData.roles && teamData.roles.length > 0;
             const peopleCount = teamData.roles ?
                 teamData.roles.reduce((sum, r) => sum + (r.people ? r.people.length : 0), 0) : 0;
 
-            // Team Header
-            const header = document.createElement('div');
-            header.className = 'nested-team-header';
-            header.onclick = (e) => {
-                if (e.target.closest('.nested-team-member-count')) {
+            // Team card
+            const card = document.createElement('div');
+            card.className = 'orgchart-team-card';
+            card.onclick = (e) => {
+                if (!e.target.closest('.orgchart-collapse-btn')) {
                     openEntityModal(teamData.entity.id, 'team');
-                } else {
-                    container.classList.toggle('collapsed');
                 }
             };
 
-            header.innerHTML = `
-                <div class="nested-team-icon">
+            card.innerHTML = `
+                <div class="orgchart-icon">
                     <i class="ph ph-users-three"></i>
                 </div>
-                <div class="nested-team-info">
-                    <div class="nested-team-name">${teamData.entity.name}</div>
-                    ${teamData.roles ? `<div class="nested-team-meta">${teamData.roles.length} role${teamData.roles.length !== 1 ? 's' : ''}</div>` : ''}
-                </div>
-                <div class="nested-team-member-count" onclick="openEntityModal('${teamData.entity.id}', 'team')">
-                    <i class="ph ph-user"></i>
-                    ${peopleCount}
-                </div>
-                <i class="ph ph-caret-down nested-collapse-icon"></i>
+                <div class="orgchart-name">${teamData.entity.name}</div>
+                <div class="orgchart-meta">${peopleCount} member${peopleCount !== 1 ? 's' : ''}</div>
+                ${hasRoles ? `<div class="orgchart-collapse-btn" onclick="event.stopPropagation(); this.closest('.orgchart-node').classList.toggle('collapsed');"><i class="ph ph-caret-down"></i></div>` : ''}
             `;
-            container.appendChild(header);
+            node.appendChild(card);
 
-            // Team Body with Roles
-            const body = document.createElement('div');
-            body.className = 'nested-team-body';
-
-            if (teamData.roles && teamData.roles.length > 0) {
-                const rolesContainer = document.createElement('div');
-                rolesContainer.className = 'nested-team-roles';
+            // Roles container
+            if (hasRoles) {
+                const children = document.createElement('div');
+                children.className = 'orgchart-children' + (teamData.roles.length > 1 ? ' multiple' : '');
 
                 teamData.roles.forEach(roleData => {
-                    const roleEl = renderNestedRoleCard(roleData);
-                    rolesContainer.appendChild(roleEl);
+                    const roleEl = renderOrgChartRole(roleData);
+                    children.appendChild(roleEl);
                 });
 
-                body.appendChild(rolesContainer);
-            } else {
-                body.innerHTML = '<div class="nested-team-empty">No roles defined</div>';
+                node.appendChild(children);
             }
 
-            container.appendChild(body);
-            return container;
+            return node;
         }
 
-        // Render a nested role card with embedded people chips
-        function renderNestedRoleCard(roleData) {
-            const card = document.createElement('div');
-            card.className = 'nested-role-card';
+        // Render a role node with people nested inside
+        function renderOrgChartRole(roleData) {
+            const node = document.createElement('div');
+            node.className = 'orgchart-role-node';
 
             const hasPeople = roleData.people && roleData.people.length > 0;
 
-            // Role Header
-            const header = document.createElement('div');
-            header.className = 'nested-role-header';
-            header.onclick = () => openEntityModal(roleData.entity.id, 'role');
+            // Role card
+            const card = document.createElement('div');
+            card.className = 'orgchart-role-card';
 
+            // Role header
+            const header = document.createElement('div');
+            header.className = 'orgchart-role-header';
+            header.onclick = () => openEntityModal(roleData.entity.id, 'role');
             header.innerHTML = `
-                <div class="nested-role-icon">
+                <div class="orgchart-icon">
                     <i class="ph ph-identification-badge"></i>
                 </div>
-                <span class="nested-role-name">${roleData.entity.name}</span>
-                ${!hasPeople ? '<span class="nested-role-vacancy">Vacant</span>' : ''}
+                <div class="orgchart-name">${roleData.entity.name}</div>
+                ${!hasPeople ? '<span class="orgchart-role-vacancy">Vacant</span>' : ''}
             `;
             card.appendChild(header);
 
-            // People Chips (Embedded within role)
+            // People nested inside the role card
             if (hasPeople) {
                 const peopleContainer = document.createElement('div');
-                peopleContainer.className = 'nested-people-container';
+                peopleContainer.className = 'orgchart-role-people';
 
                 roleData.people.forEach(person => {
-                    const chip = document.createElement('div');
-                    chip.className = 'nested-person-chip';
-                    chip.onclick = (e) => {
+                    const personRow = document.createElement('div');
+                    personRow.className = 'orgchart-person-row';
+                    personRow.onclick = (e) => {
                         e.stopPropagation();
                         openEntityModal(person.id, 'person');
                     };
-                    chip.innerHTML = `
-                        <div class="nested-person-avatar">${getInitials(person.name)}</div>
-                        <span class="nested-person-name">${person.name}</span>
+                    personRow.innerHTML = `
+                        <div class="orgchart-person-avatar">${getInitials(person.name)}</div>
+                        <span class="orgchart-person-name">${person.name}</span>
                     `;
-                    peopleContainer.appendChild(chip);
+                    peopleContainer.appendChild(personRow);
                 });
 
                 card.appendChild(peopleContainer);
             }
 
-            return card;
+            node.appendChild(card);
+            return node;
         }
 
         // Helper function to get people who fill a role (for org chart)
