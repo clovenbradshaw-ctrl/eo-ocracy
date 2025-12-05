@@ -12206,6 +12206,12 @@ John Doe,Engineering,john@example.com"
             
             // Collaborative relationships
             relationships.push({ subject: 'r3', predicate: 'SYN', object: 'o4', id: 'rel8' }); // Case Manager synthesizes Schedule Management
+
+            // People assigned to Roles (INS = installs/assigns)
+            relationships.push({ subject: 'p1', predicate: 'INS', object: 'r1', id: 'rel_ins1' }); // Maria Santos fills Managing Attorney
+            relationships.push({ subject: 'p2', predicate: 'INS', object: 'r2', id: 'rel_ins2' }); // James Chen fills Associate Attorney
+            relationships.push({ subject: 'p3', predicate: 'INS', object: 'r3', id: 'rel_ins3' }); // Ana Rodriguez fills Case Manager
+            relationships.push({ subject: 'p2', predicate: 'INS', object: 'r4', id: 'rel_ins4' }); // James Chen also fills Lead Attorney
         }
 
         // Load sample data into current workspace (called from welcome banner)
@@ -14635,7 +14641,7 @@ John Doe,Engineering,john@example.com"
             object: true,
             activity: true
         };
-        let cardViewHierarchical = true; // Default to hierarchical view
+        let cardViewHierarchical = false; // Default to flat view (task-first discovery)
         let cardViewGroupBy = 'none'; // Group by: 'none', 'unit', 'team', 'role'
 
         function toggleCardViewMode(isHierarchical) {
