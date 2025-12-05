@@ -7007,6 +7007,7 @@
             </button>
             <button class="btn btn-small btn-outline" onclick="resetGraph()">Reset View</button>
             <button class="btn btn-small btn-outline" onclick="openBulkImportModal()"><i class="ph ph-upload-simple"></i> Import</button>
+            <button class="btn btn-small btn-outline" onclick="importData()"><i class="ph ph-download-simple"></i> Import Data</button>
             <button class="btn btn-small" onclick="exportData()">Export Data</button>
         </div>
     </div>
@@ -17419,6 +17420,78 @@ John Doe,Engineering,john@example.com"
             a.href = url;
             a.download = `${workspaceName.toLowerCase().replace(/\s+/g, '-')}-data.json`;
             a.click();
+        }
+
+        function importData() {
+            // Create a file input dynamically
+            const input = document.createElement('input');
+            input.type = 'file';
+            input.accept = '.json';
+
+            input.onchange = async (e) => {
+                const file = e.target.files[0];
+                if (!file) return;
+
+                try {
+                    const text = await file.text();
+                    const data = JSON.parse(text);
+
+                    // Validate the data structure
+                    if (!data.workspaceName || typeof data.workspaceName !== 'string') {
+                        alert('Invalid import file: missing or invalid workspaceName');
+                        return;
+                    }
+
+                    if (!data.entities || typeof data.entities !== 'object') {
+                        alert('Invalid import file: missing or invalid entities');
+                        return;
+                    }
+
+                    // Validate entity types
+                    const requiredTypes = ['unit', 'team', 'role', 'person', 'object'];
+                    for (const type of requiredTypes) {
+                        if (!Array.isArray(data.entities[type])) {
+                            // Initialize missing types as empty arrays
+                            data.entities[type] = [];
+                        }
+                    }
+
+                    if (!Array.isArray(data.relationships)) {
+                        // Initialize missing relationships as empty array
+                        data.relationships = [];
+                    }
+
+                    // Create a new workspace with the imported data
+                    const wsId = generateWorkspaceId();
+                    const importedName = data.workspaceName + ' (Imported)';
+
+                    workspaces[wsId] = {
+                        id: wsId,
+                        name: importedName,
+                        entities: JSON.parse(JSON.stringify(data.entities)),
+                        relationships: JSON.parse(JSON.stringify(data.relationships)),
+                        hasSampleData: false,
+                        createdAt: Date.now(),
+                        updatedAt: Date.now()
+                    };
+
+                    saveWorkspaces();
+                    switchWorkspace(wsId);
+                    renderWorkspaceList();
+
+                    // Log activity
+                    const totalEntities = Object.values(data.entities).reduce((sum, arr) => sum + arr.length, 0);
+                    logActivity('INS', 'system', null, `Imported workspace with ${totalEntities} entities and ${data.relationships.length} relationships`);
+
+                    alert(`Successfully imported "${data.workspaceName}" as a new workspace with ${totalEntities} entities and ${data.relationships.length} relationships.`);
+
+                } catch (err) {
+                    console.error('Import error:', err);
+                    alert('Failed to import file: ' + err.message);
+                }
+            };
+
+            input.click();
         }
 
         // ==========================================
