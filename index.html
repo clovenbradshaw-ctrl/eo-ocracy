@@ -2809,6 +2809,107 @@
             text-overflow: ellipsis;
         }
 
+        /* Object styling in org chart */
+        .orgchart-role-objects,
+        .orgchart-team-objects,
+        .orgchart-unit-objects {
+            display: flex;
+            flex-direction: column;
+            gap: 0.35rem;
+            padding: 0.5rem;
+            background: #FDF9F3;
+            border-top: 1px solid #E5DDD1;
+        }
+
+        .orgchart-objects-label {
+            font-size: 0.7rem;
+            color: #8B7355;
+            font-weight: 500;
+            margin-bottom: 0.25rem;
+        }
+
+        .orgchart-objects-container {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 0.5rem;
+        }
+
+        .orgchart-object-row,
+        .orgchart-object-item {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            padding: 0.4rem 0.5rem;
+            background: white;
+            border: 1px solid #E5DDD1;
+            border-radius: 6px;
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+
+        .orgchart-object-row:hover,
+        .orgchart-object-item:hover {
+            background: linear-gradient(135deg, #FDF8F0 0%, #F5EBD8 100%);
+            border-color: #C88F4A;
+        }
+
+        .orgchart-object-icon {
+            width: 26px;
+            height: 26px;
+            background: linear-gradient(135deg, #C88F4A 0%, #A67339 100%);
+            border-radius: 6px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            flex-shrink: 0;
+        }
+
+        .orgchart-object-icon i {
+            font-size: 0.85rem;
+        }
+
+        .orgchart-object-name {
+            font-size: 0.75rem;
+            color: #3D2E1F;
+            font-weight: 500;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+
+        .orgchart-orphan-object {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            padding: 0.5rem 0.75rem;
+            background: white;
+            border: 1px solid #E5DDD1;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+
+        .orgchart-orphan-object:hover {
+            background: linear-gradient(135deg, #FDF8F0 0%, #F5EBD8 100%);
+            border-color: #C88F4A;
+        }
+
+        .orgchart-orphan-icon.object-icon {
+            width: 32px;
+            height: 32px;
+            background: linear-gradient(135deg, #C88F4A 0%, #A67339 100%);
+            border-radius: 6px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+        }
+
+        .orgchart-orphan-icon.object-icon i {
+            font-size: 1rem;
+        }
+
         /* Children Container with Connecting Lines */
         .orgchart-children {
             display: flex;
@@ -7246,9 +7347,11 @@
                 <button class="view-toggle-btn active" data-view="card" onclick="switchView('card')">
                     <i class="ph ph-squares-four"></i> Cards
                 </button>
+                <!-- Graph button hidden - needs visual improvements
                 <button class="view-toggle-btn" data-view="graph" onclick="switchView('graph')">
                     <i class="ph ph-graph"></i> Graph
                 </button>
+                -->
                 <button class="view-toggle-btn" data-view="venn" onclick="switchView('venn')">
                     <i class="ph ph-circles-three"></i> Venn
                 </button>
@@ -14099,8 +14202,9 @@ John Doe,Engineering,john@example.com"
             const hasOrphanTeams = hierarchy.orphanTeams && hierarchy.orphanTeams.length > 0;
             const hasOrphanRoles = hierarchy.orphanRoles && hierarchy.orphanRoles.length > 0;
             const hasOrphanPeople = hierarchy.orphanPeople && hierarchy.orphanPeople.length > 0;
+            const hasOrphanObjects = hierarchy.orphanObjects && hierarchy.orphanObjects.length > 0;
 
-            if (!hasUnits && !hasOrphanTeams && !hasOrphanRoles && !hasOrphanPeople) {
+            if (!hasUnits && !hasOrphanTeams && !hasOrphanRoles && !hasOrphanPeople && !hasOrphanObjects) {
                 container.innerHTML = `
                     <div class="entity-orgchart-empty">
                         <i class="ph ph-flow-arrow"></i>
@@ -14224,6 +14328,35 @@ John Doe,Engineering,john@example.com"
                 chartContainer.appendChild(orphanSection);
             }
 
+            if (hasOrphanObjects) {
+                const orphanSection = document.createElement('div');
+                orphanSection.className = 'orgchart-orphan-section';
+                orphanSection.innerHTML = `
+                    <div class="orgchart-orphan-header">
+                        <i class="ph ph-cube"></i>
+                        <span class="orgchart-orphan-title">Unassigned Work Products</span>
+                    </div>
+                `;
+                const itemsContainer = document.createElement('div');
+                itemsContainer.className = 'orgchart-orphan-items';
+
+                hierarchy.orphanObjects.forEach(obj => {
+                    const objEl = document.createElement('div');
+                    objEl.className = 'orgchart-orphan-object';
+                    objEl.onclick = () => openEntityModal(obj.id, 'object');
+                    objEl.innerHTML = `
+                        <div class="orgchart-orphan-icon object-icon">
+                            <i class="ph ph-cube"></i>
+                        </div>
+                        <span class="orgchart-orphan-name">${obj.name}</span>
+                    `;
+                    itemsContainer.appendChild(objEl);
+                });
+
+                orphanSection.appendChild(itemsContainer);
+                chartContainer.appendChild(orphanSection);
+            }
+
             container.appendChild(chartContainer);
         }
 
@@ -14275,7 +14408,8 @@ John Doe,Engineering,john@example.com"
 
             const hasChildren = (unitNode.units && unitNode.units.length > 0) ||
                                (unitNode.teams && unitNode.teams.length > 0) ||
-                               (unitNode.roles && unitNode.roles.length > 0);
+                               (unitNode.roles && unitNode.roles.length > 0) ||
+                               (unitNode.objects && unitNode.objects.length > 0);
 
             // Unit card
             const card = document.createElement('div');
@@ -14300,7 +14434,8 @@ John Doe,Engineering,john@example.com"
             const children = document.createElement('div');
             const childCount = (unitNode.units ? unitNode.units.length : 0) +
                                (unitNode.teams ? unitNode.teams.length : 0) +
-                               (unitNode.roles && !unitNode.teams?.length ? 1 : 0);
+                               (unitNode.roles && !unitNode.teams?.length ? 1 : 0) +
+                               (unitNode.objects ? unitNode.objects.length : 0);
             children.className = 'orgchart-children' + (childCount > 1 ? ' multiple' : '');
 
             if (hasChildren) {
@@ -14343,6 +14478,30 @@ John Doe,Engineering,john@example.com"
                     directRolesSection.appendChild(rolesRow);
                     children.appendChild(directRolesSection);
                 }
+
+                // Objects directly under unit
+                if (unitNode.objects && unitNode.objects.length > 0) {
+                    const objectsSection = document.createElement('div');
+                    objectsSection.className = 'orgchart-unit-objects';
+                    objectsSection.innerHTML = `<div class="orgchart-objects-label">Work Products</div>`;
+                    const objectsContainer = document.createElement('div');
+                    objectsContainer.className = 'orgchart-objects-container';
+                    unitNode.objects.forEach(obj => {
+                        const objEl = document.createElement('div');
+                        objEl.className = 'orgchart-object-item';
+                        objEl.onclick = (e) => {
+                            e.stopPropagation();
+                            openEntityModal(obj.id, 'object');
+                        };
+                        objEl.innerHTML = `
+                            <div class="orgchart-object-icon"><i class="ph ph-cube"></i></div>
+                            <span class="orgchart-object-name">${obj.name}</span>
+                        `;
+                        objectsContainer.appendChild(objEl);
+                    });
+                    objectsSection.appendChild(objectsContainer);
+                    children.appendChild(objectsSection);
+                }
             } else {
                 // Show empty state for units with no children
                 const emptyState = document.createElement('div');
@@ -14362,6 +14521,8 @@ John Doe,Engineering,john@example.com"
             node.className = 'orgchart-team-node orgchart-node';
 
             const hasRoles = teamData.roles && teamData.roles.length > 0;
+            const hasObjects = teamData.objects && teamData.objects.length > 0;
+            const hasChildren = hasRoles || hasObjects;
             const peopleCount = teamData.roles ?
                 teamData.roles.reduce((sum, r) => sum + (r.people ? r.people.length : 0), 0) : 0;
 
@@ -14380,21 +14541,43 @@ John Doe,Engineering,john@example.com"
                 </div>
                 <div class="orgchart-name">${teamData.entity.name}</div>
                 <div class="orgchart-meta">${peopleCount} member${peopleCount !== 1 ? 's' : ''}</div>
-                ${hasRoles ? `<div class="orgchart-collapse-btn" onclick="event.stopPropagation(); this.closest('.orgchart-node').classList.toggle('collapsed');"><i class="ph ph-caret-down"></i></div>` : ''}
+                ${hasChildren ? `<div class="orgchart-collapse-btn" onclick="event.stopPropagation(); this.closest('.orgchart-node').classList.toggle('collapsed');"><i class="ph ph-caret-down"></i></div>` : ''}
             `;
             node.appendChild(card);
 
-            // Roles container - always show to display empty state if needed
+            // Children container - always show to display empty state if needed
             const children = document.createElement('div');
-            children.className = 'orgchart-children' + (teamData.roles && teamData.roles.length > 1 ? ' multiple' : '');
+            children.className = 'orgchart-children' + ((teamData.roles && teamData.roles.length > 1) || hasObjects ? ' multiple' : '');
 
             if (hasRoles) {
                 teamData.roles.forEach(roleData => {
                     const roleEl = renderOrgChartRole(roleData);
                     children.appendChild(roleEl);
                 });
-            } else {
-                // Show empty state for teams with no roles
+            }
+
+            // Objects directly under team
+            if (hasObjects) {
+                const objectsSection = document.createElement('div');
+                objectsSection.className = 'orgchart-team-objects';
+                teamData.objects.forEach(obj => {
+                    const objEl = document.createElement('div');
+                    objEl.className = 'orgchart-object-item';
+                    objEl.onclick = (e) => {
+                        e.stopPropagation();
+                        openEntityModal(obj.id, 'object');
+                    };
+                    objEl.innerHTML = `
+                        <div class="orgchart-object-icon"><i class="ph ph-cube"></i></div>
+                        <span class="orgchart-object-name">${obj.name}</span>
+                    `;
+                    objectsSection.appendChild(objEl);
+                });
+                children.appendChild(objectsSection);
+            }
+
+            if (!hasRoles && !hasObjects) {
+                // Show empty state for teams with no roles or objects
                 const emptyState = document.createElement('div');
                 emptyState.className = 'orgchart-empty-state';
                 emptyState.innerHTML = `<span>No roles defined</span>`;
@@ -14406,12 +14589,13 @@ John Doe,Engineering,john@example.com"
             return node;
         }
 
-        // Render a role node with people nested inside
+        // Render a role node with people and objects nested inside
         function renderOrgChartRole(roleData) {
             const node = document.createElement('div');
             node.className = 'orgchart-role-node';
 
             const hasPeople = roleData.people && roleData.people.length > 0;
+            const hasObjects = roleData.objects && roleData.objects.length > 0;
 
             // Role card
             const card = document.createElement('div');
@@ -14450,6 +14634,28 @@ John Doe,Engineering,john@example.com"
                 });
 
                 card.appendChild(peopleContainer);
+            }
+
+            // Objects (work products) nested inside the role card
+            if (hasObjects) {
+                const objectsContainer = document.createElement('div');
+                objectsContainer.className = 'orgchart-role-objects';
+
+                roleData.objects.forEach(obj => {
+                    const objRow = document.createElement('div');
+                    objRow.className = 'orgchart-object-row';
+                    objRow.onclick = (e) => {
+                        e.stopPropagation();
+                        openEntityModal(obj.id, 'object');
+                    };
+                    objRow.innerHTML = `
+                        <div class="orgchart-object-icon"><i class="ph ph-cube"></i></div>
+                        <span class="orgchart-object-name">${obj.name}</span>
+                    `;
+                    objectsContainer.appendChild(objRow);
+                });
+
+                card.appendChild(objectsContainer);
             }
 
             node.appendChild(card);
@@ -15025,10 +15231,16 @@ John Doe,Engineering,john@example.com"
                     .filter(e => e !== null && e.type === 'person');
             }
 
+            // Get objects (work products) under an entity (via DES relationships)
+            function getObjectsUnder(parentId) {
+                return getChildren(parentId).filter(e => e.type === 'object');
+            }
+
             // Recursively build unit node with nested units, teams, and roles
             function buildUnitNode(unit) {
                 const directTeams = getChildren(unit.id).filter(e => e.type === 'team');
                 const directRoles = getChildren(unit.id).filter(e => e.type === 'role');
+                const directObjects = getObjectsUnder(unit.id);
                 const childUnits = getChildren(unit.id).filter(e => e.type === 'unit');
 
                 return {
@@ -15036,18 +15248,23 @@ John Doe,Engineering,john@example.com"
                     units: childUnits.map(childUnit => buildUnitNode(childUnit)),
                     teams: directTeams.map(team => {
                         const teamRoles = getChildren(team.id).filter(e => e.type === 'role');
+                        const teamObjects = getObjectsUnder(team.id);
                         return {
                             entity: team,
                             roles: teamRoles.map(role => ({
                                 entity: role,
-                                people: getPeopleInRole(role.id)
-                            }))
+                                people: getPeopleInRole(role.id),
+                                objects: getObjectsUnder(role.id)
+                            })),
+                            objects: teamObjects
                         };
                     }),
                     roles: directRoles.map(role => ({
                         entity: role,
-                        people: getPeopleInRole(role.id)
-                    }))
+                        people: getPeopleInRole(role.id),
+                        objects: getObjectsUnder(role.id)
+                    })),
+                    objects: directObjects
                 };
             }
 
@@ -15064,6 +15281,7 @@ John Doe,Engineering,john@example.com"
             // Find orphan entities (no DES parent)
             const orphanTeams = entities.team.filter(t => !entitiesWithParents.has(t.id));
             const orphanRoles = entities.role.filter(r => !entitiesWithParents.has(r.id));
+            const orphanObjects = entities.object.filter(o => !entitiesWithParents.has(o.id));
             // People not assigned to any role (via INS relationship)
             const peopleWithRoles = new Set(
                 relationships.filter(r => r.predicate === 'INS').map(r => r.subject)
@@ -15075,7 +15293,7 @@ John Doe,Engineering,john@example.com"
                 orphanTeams,
                 orphanRoles,
                 orphanPeople,
-                objects: entities.object // Objects are always shown separately
+                orphanObjects
             };
         }
 
