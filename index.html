@@ -7021,10 +7021,9 @@
             <div id="welcomeBanner" class="welcome-banner">
                 <h3><i class="ph ph-hand-waving"></i> Getting Started</h3>
                 <ol>
-                    <li>Add your first unit (like a department)</li>
-                    <li>Add teams within it</li>
-                    <li>Define roles</li>
-                    <li>Create connections between them</li>
+                    <li>Assign tasks to roles (tag people)</li>
+                    <li>Workflows emerge from connections</li>
+                    <li>Structure reveals itself through use</li>
                 </ol>
                 <div class="actions">
                     <button class="btn btn-small" onclick="loadSampleData()">Load Sample</button>
@@ -7032,7 +7031,7 @@
                 </div>
             </div>
 
-            <div class="panel-title"><i class="ph ph-buildings"></i> Your Organization</div>
+            <div class="panel-title"><i class="ph ph-lightning"></i> Your Workspace</div>
 
             <div class="input-group">
                 <input type="text" id="entitySearch" placeholder="Search entities..." oninput="filterEntities()">
@@ -7046,16 +7045,10 @@
                 </div>
                 <div class="collapsible-content">
                     <div class="entity-type-selector">
-                        <button class="entity-type-btn active" data-type="unit" onclick="selectEntityType('unit')" title="Organizational unit or department">
-                            <i class="ph ph-buildings"></i> Unit
-                        </button>
-                        <button class="entity-type-btn" data-type="team" onclick="selectEntityType('team')" title="Working team or group">
-                            <i class="ph ph-users-three"></i> Team
-                        </button>
-                        <button class="entity-type-btn" data-type="role" onclick="selectEntityType('role')" title="Position or function">
+                        <button class="entity-type-btn active" data-type="role" onclick="selectEntityType('role')" title="Position or function - assign tasks here">
                             <i class="ph ph-briefcase"></i> Role
                         </button>
-                        <button class="entity-type-btn" data-type="person" onclick="selectEntityType('person')" title="Individual person">
+                        <button class="entity-type-btn" data-type="person" onclick="selectEntityType('person')" title="Individual person - tag to roles">
                             <i class="ph ph-user"></i> Person
                         </button>
                     </div>
@@ -7066,28 +7059,34 @@
                     </div>
 
                     <button class="btn" onclick="addEntity()" id="addEntityBtn" style="width: 100%; display: flex; align-items: center; justify-content: center; gap: 0.5rem;">
-                        <i class="ph ph-plus-circle" style="color: white; font-size: 1.25rem;"></i> Add Unit
+                        <i class="ph ph-plus-circle" style="color: white; font-size: 1.25rem;"></i> Add Role
                     </button>
 
-                    <!-- Advanced Options (collapsed by default) -->
+                    <!-- Structure Options (collapsed by default) -->
                     <button class="show-more-btn" onclick="toggleAdvancedEntityOptions()" id="advancedEntityToggle">
                         <i class="ph ph-plus"></i>
-                        Advanced options
+                        Structure options
                     </button>
                     <div id="advancedEntityOptions" style="display: none; margin-top: 0.75rem;">
-                        <div class="input-group" id="parentSelectGroup">
+                        <div class="entity-type-selector" style="margin-bottom: 0.75rem;">
+                            <button class="entity-type-btn" data-type="unit" onclick="selectEntityType('unit')" title="Organizational unit or department">
+                                <i class="ph ph-buildings"></i> Unit
+                            </button>
+                            <button class="entity-type-btn" data-type="team" onclick="selectEntityType('team')" title="Working team or group">
+                                <i class="ph ph-users-three"></i> Team
+                            </button>
+                            <button class="entity-type-btn" data-type="object" onclick="selectEntityType('object')" title="Work product or deliverable">
+                                <i class="ph ph-package"></i> Object
+                            </button>
+                        </div>
+                        <div class="help-text">Units and Teams organize roles. Objects are work products.</div>
+                        <div class="input-group" id="parentSelectGroup" style="margin-top: 0.75rem;">
                             <label>Parent Entity</label>
                             <select id="parentEntitySelect">
                                 <option value="">None - Top Level</option>
                             </select>
                             <div class="help-text">Place this entity under another one</div>
                         </div>
-                        <div class="entity-type-selector" style="margin-top: 0.75rem;">
-                            <button class="entity-type-btn" data-type="object" onclick="selectEntityType('object')" title="Work product or deliverable">
-                                <i class="ph ph-package"></i> Object
-                            </button>
-                        </div>
-                        <div class="help-text">Objects are work products or deliverables</div>
                     </div>
                 </div>
             </div>
@@ -8524,7 +8523,7 @@ John Doe,Engineering,john@example.com"
         const XANO_BASE_URL = 'https://xvkq-pq7i-idtl.n7d.xano.io/api:nrIL-Oi-';
         const APP_ID = 'holonic-org-graph'; // Your app identifier
 
-        let selectedEntityType = 'unit';
+        let selectedEntityType = 'role';
         let selectedPredicate = 'DES'; // Default to Define operator
         let focusedNode = null;
         let currentView = 'card';
@@ -12563,78 +12562,35 @@ John Doe,Engineering,john@example.com"
                 return container;
             }
 
-            // Find top-level units (not contained by any other unit)
-            const topLevelUnits = entities.unit.filter(unit => {
-                return !relationships.some(r => 
-                    r.object === unit.id && entities.unit.some(u => u.id === r.subject)
-                );
-            });
-
-            topLevelUnits.forEach(unit => {
-                const unitNode = renderEntityNode(unit, 0, searchTerm);
-                if (unitNode) {
-                    unitNode.style.marginBottom = '1rem';
-                    list.appendChild(unitNode);
-                }
-            });
-
-            // Show orphaned entities (not connected to anything or to non-existent parents)
-            const orphanedSection = document.createElement('div');
-            orphanedSection.style.marginTop = '1.5rem';
-            
-            // Orphaned teams (not connected to any unit or team)
-            const orphanedTeams = entities.team.filter(team => {
-                const isConnected = relationships.some(r => 
-                    (r.subject === team.id || r.object === team.id) &&
-                    (entities.unit.some(u => u.id === r.subject || u.id === r.object) ||
-                     entities.team.some(t => t.id === r.subject || t.id === r.object))
-                );
-                return !isConnected;
-            });
-
-            if (orphanedTeams.length > 0 && (!searchTerm || orphanedTeams.some(t => t.name.toLowerCase().includes(searchTerm)))) {
-                const header = document.createElement('div');
-                header.className = 'entity-section-header';
-                header.textContent = 'Unassigned Teams';
-                orphanedSection.appendChild(header);
-
-                orphanedTeams.forEach(team => {
-                    if (searchTerm && !team.name.toLowerCase().includes(searchTerm)) return;
-                    const node = document.createElement('div');
-                    node.className = 'entity-item team';
-                    node.style.cursor = 'pointer';
-                    node.onclick = (e) => {
-                        if (!e.target.closest('.btn-icon')) {
-                            openEntityModal(team.id, 'team');
-                        }
-                    };
-                    node.innerHTML = `
-                        <div class="entity-name"><i class="ph ph-users-three"></i> ${team.name}</div>
-                        <button class="btn-icon" onclick="event.stopPropagation(); deleteEntity('${team.id}', 'team')"><i class="ph ph-x"></i></button>
-                    `;
-                    orphanedSection.appendChild(node);
-                });
+            // Helper to get people assigned to a role (via INS relationship)
+            function getPeopleInRole(roleId) {
+                return relationships
+                    .filter(r => r.predicate === 'INS' && r.object === roleId)
+                    .map(r => findEntity(r.subject))
+                    .filter(e => e !== null && e.type === 'person');
             }
 
-            // Orphaned roles
-            const orphanedRoles = entities.role.filter(role => {
-                const isConnected = relationships.some(r => 
-                    (r.subject === role.id || r.object === role.id) &&
-                    (entities.team.some(t => t.id === r.subject || t.id === r.object))
-                );
-                return !isConnected;
-            });
-
-            if (orphanedRoles.length > 0 && (!searchTerm || orphanedRoles.some(r => r.name.toLowerCase().includes(searchTerm)))) {
+            // 1. ROLES - The primary entry point (with people tagged)
+            if (entities.role.length > 0 && (!searchTerm || entities.role.some(r => r.name.toLowerCase().includes(searchTerm)))) {
                 const section = document.createElement('div');
                 section.className = 'entity-section';
                 const header = document.createElement('div');
                 header.className = 'entity-section-header';
-                header.textContent = 'Unassigned Roles';
+                header.textContent = 'Roles';
                 section.appendChild(header);
 
-                orphanedRoles.forEach(role => {
+                entities.role.forEach(role => {
                     if (searchTerm && !role.name.toLowerCase().includes(searchTerm)) return;
+
+                    const peopleInRole = getPeopleInRole(role.id);
+                    const peopleBadges = peopleInRole.length > 0
+                        ? `<div style="display: flex; gap: 0.25rem; flex-wrap: wrap; margin-top: 0.25rem;">
+                            ${peopleInRole.map(person =>
+                                `<span style="font-size: 0.65rem; padding: 0.125rem 0.375rem; background: rgba(139, 111, 71, 0.1); color: #8B6F47; border-radius: 10px;"><i class="ph ph-user"></i> ${person.name}</span>`
+                            ).join('')}
+                           </div>`
+                        : '';
+
                     const node = document.createElement('div');
                     node.className = 'entity-item role';
                     node.style.cursor = 'pointer';
@@ -12644,15 +12600,18 @@ John Doe,Engineering,john@example.com"
                         }
                     };
                     node.innerHTML = `
-                        <div class="entity-name"><i class="ph ph-identification-badge"></i> ${role.name}</div>
+                        <div style="flex: 1;">
+                            <div class="entity-name"><i class="ph ph-briefcase"></i> ${role.name}</div>
+                            ${peopleBadges}
+                        </div>
                         <button class="btn-icon" onclick="event.stopPropagation(); deleteEntity('${role.id}', 'role')"><i class="ph ph-x"></i></button>
                     `;
                     section.appendChild(node);
                 });
-                orphanedSection.appendChild(section);
+                list.appendChild(section);
             }
 
-            // People
+            // 2. PEOPLE - Individuals (shown separately)
             if (entities.person.length > 0 && (!searchTerm || entities.person.some(p => p.name.toLowerCase().includes(searchTerm)))) {
                 const section = document.createElement('div');
                 section.className = 'entity-section';
@@ -12663,6 +12622,21 @@ John Doe,Engineering,john@example.com"
 
                 entities.person.forEach(person => {
                     if (searchTerm && !person.name.toLowerCase().includes(searchTerm)) return;
+
+                    // Find roles this person is assigned to
+                    const assignedRoles = relationships
+                        .filter(r => r.predicate === 'INS' && r.subject === person.id)
+                        .map(r => findEntity(r.object))
+                        .filter(e => e !== null && e.type === 'role');
+
+                    const roleBadges = assignedRoles.length > 0
+                        ? `<div style="display: flex; gap: 0.25rem; flex-wrap: wrap; margin-top: 0.25rem;">
+                            ${assignedRoles.map(role =>
+                                `<span style="font-size: 0.65rem; padding: 0.125rem 0.375rem; background: rgba(139, 111, 71, 0.1); color: #8B6F47; border-radius: 10px;"><i class="ph ph-briefcase"></i> ${role.name}</span>`
+                            ).join('')}
+                           </div>`
+                        : '';
+
                     const node = document.createElement('div');
                     node.className = 'entity-item person';
                     node.style.cursor = 'pointer';
@@ -12672,15 +12646,18 @@ John Doe,Engineering,john@example.com"
                         }
                     };
                     node.innerHTML = `
-                        <div class="entity-name"><i class="ph ph-user"></i> ${person.name}</div>
+                        <div style="flex: 1;">
+                            <div class="entity-name"><i class="ph ph-user"></i> ${person.name}</div>
+                            ${roleBadges}
+                        </div>
                         <button class="btn-icon" onclick="event.stopPropagation(); deleteEntity('${person.id}', 'person')"><i class="ph ph-x"></i></button>
                     `;
                     section.appendChild(node);
                 });
-                orphanedSection.appendChild(section);
+                list.appendChild(section);
             }
 
-            // Objects (shown separately since they can connect to multiple roles)
+            // 3. WORK PRODUCTS
             if (entities.object.length > 0 && (!searchTerm || entities.object.some(o => o.name.toLowerCase().includes(searchTerm)))) {
                 const section = document.createElement('div');
                 section.className = 'entity-section';
@@ -12713,7 +12690,7 @@ John Doe,Engineering,john@example.com"
                     const connectionBadges = connectedRoles.length > 0
                         ? `<div style="display: flex; gap: 0.25rem; flex-wrap: wrap; margin-top: 0.25rem;">
                             ${connectedRoles.map(role =>
-                                `<span style="font-size: 0.65rem; padding: 0.125rem 0.375rem; background: rgba(139, 111, 71, 0.1); color: #8B6F47; border-radius: 10px;"><i class="ph ph-identification-badge"></i> ${role.name}</span>`
+                                `<span style="font-size: 0.65rem; padding: 0.125rem 0.375rem; background: rgba(139, 111, 71, 0.1); color: #8B6F47; border-radius: 10px;"><i class="ph ph-briefcase"></i> ${role.name}</span>`
                             ).join('')}
                            </div>`
                         : '';
@@ -12727,11 +12704,71 @@ John Doe,Engineering,john@example.com"
                     `;
                     section.appendChild(node);
                 });
-                orphanedSection.appendChild(section);
+                list.appendChild(section);
             }
 
-            if (orphanedSection.children.length > 0) {
-                list.appendChild(orphanedSection);
+            // 4. STRUCTURE - Units and Teams (emergent organization)
+            const hasStructure = entities.unit.length > 0 || entities.team.length > 0;
+            if (hasStructure) {
+                const structureSection = document.createElement('div');
+                structureSection.className = 'entity-section';
+                structureSection.style.marginTop = '1rem';
+
+                const header = document.createElement('div');
+                header.className = 'entity-section-header';
+                header.innerHTML = '<i class="ph ph-tree-structure" style="margin-right: 0.25rem;"></i> Structure';
+                structureSection.appendChild(header);
+
+                // Find top-level units (not contained by any other unit)
+                const topLevelUnits = entities.unit.filter(unit => {
+                    return !relationships.some(r =>
+                        r.object === unit.id && entities.unit.some(u => u.id === r.subject)
+                    );
+                });
+
+                topLevelUnits.forEach(unit => {
+                    if (searchTerm && !unit.name.toLowerCase().includes(searchTerm)) {
+                        const hasMatchingChildren = findMatchingChildren(unit.id, searchTerm);
+                        if (!hasMatchingChildren) return;
+                    }
+                    const unitNode = renderEntityNode(unit, 0, searchTerm);
+                    if (unitNode) {
+                        structureSection.appendChild(unitNode);
+                    }
+                });
+
+                // Orphaned teams (not connected to any unit or team)
+                const orphanedTeams = entities.team.filter(team => {
+                    const isConnected = relationships.some(r =>
+                        (r.subject === team.id || r.object === team.id) &&
+                        (entities.unit.some(u => u.id === r.subject || u.id === r.object) ||
+                         entities.team.some(t => t.id === r.subject || t.id === r.object))
+                    );
+                    return !isConnected;
+                });
+
+                if (orphanedTeams.length > 0 && (!searchTerm || orphanedTeams.some(t => t.name.toLowerCase().includes(searchTerm)))) {
+                    orphanedTeams.forEach(team => {
+                        if (searchTerm && !team.name.toLowerCase().includes(searchTerm)) return;
+                        const node = document.createElement('div');
+                        node.className = 'entity-item team';
+                        node.style.cursor = 'pointer';
+                        node.onclick = (e) => {
+                            if (!e.target.closest('.btn-icon')) {
+                                openEntityModal(team.id, 'team');
+                            }
+                        };
+                        node.innerHTML = `
+                            <div class="entity-name"><i class="ph ph-users-three"></i> ${team.name}</div>
+                            <button class="btn-icon" onclick="event.stopPropagation(); deleteEntity('${team.id}', 'team')"><i class="ph ph-x"></i></button>
+                        `;
+                        structureSection.appendChild(node);
+                    });
+                }
+
+                if (structureSection.children.length > 1) { // More than just the header
+                    list.appendChild(structureSection);
+                }
             }
 
             if (list.children.length === 0) {
@@ -14817,12 +14854,12 @@ John Doe,Engineering,john@example.com"
             filterButtons.className = 'card-filter-buttons';
 
             const typeConfigs = [
-                { type: 'unit', label: 'Units', icon: getIcon('unit'), count: entities.unit.length },
-                { type: 'team', label: 'Teams', icon: getIcon('team'), count: entities.team.length },
+                { type: 'activity', label: 'Activities', icon: '⚡', count: relationships.length },
                 { type: 'role', label: 'Roles', icon: getIcon('role'), count: entities.role.length },
                 { type: 'person', label: 'People', icon: getIcon('person'), count: entities.person.length },
                 { type: 'object', label: 'Work Products', icon: getIcon('object'), count: entities.object.length },
-                { type: 'activity', label: 'Activities', icon: '⚡', count: relationships.length }
+                { type: 'team', label: 'Teams', icon: getIcon('team'), count: entities.team.length },
+                { type: 'unit', label: 'Units', icon: getIcon('unit'), count: entities.unit.length }
             ];
 
             typeConfigs.forEach(config => {
@@ -14887,27 +14924,16 @@ John Doe,Engineering,john@example.com"
         function renderFlatCardView(contentContainer, sidebarFilters) {
             let hasContent = false;
 
-            // Units
-            if (cardViewTypeFilters.unit && sidebarFilters.entities.unit && entities.unit.length > 0) {
-                let filteredUnits = filterEntitiesBySearch(entities.unit, cardViewSearchTerm);
-                filteredUnits = sortEntities(filteredUnits, cardViewSortOption);
-                if (filteredUnits.length > 0) {
-                    contentContainer.appendChild(createCardRow('Units', filteredUnits, getIcon('unit')));
+            // Activities (tasks) - shown first as the most familiar entry point
+            if (cardViewTypeFilters.activity && relationships.length > 0) {
+                const activityRow = createActivityCardRowFiltered();
+                if (activityRow) {
+                    contentContainer.appendChild(activityRow);
                     hasContent = true;
                 }
             }
 
-            // Teams
-            if (cardViewTypeFilters.team && sidebarFilters.entities.team && entities.team.length > 0) {
-                let filteredTeams = filterEntitiesBySearch(entities.team, cardViewSearchTerm);
-                filteredTeams = sortEntities(filteredTeams, cardViewSortOption);
-                if (filteredTeams.length > 0) {
-                    contentContainer.appendChild(createCardRow('Teams', filteredTeams, getIcon('team')));
-                    hasContent = true;
-                }
-            }
-
-            // Roles
+            // Roles - the core organizational unit where work is assigned
             if (cardViewTypeFilters.role && sidebarFilters.entities.role && entities.role.length > 0) {
                 let filteredRoles = filterEntitiesBySearch(entities.role, cardViewSearchTerm);
                 filteredRoles = sortEntities(filteredRoles, cardViewSortOption);
@@ -14917,7 +14943,7 @@ John Doe,Engineering,john@example.com"
                 }
             }
 
-            // People
+            // People - tagged to roles
             if (cardViewTypeFilters.person && sidebarFilters.entities.person && entities.person.length > 0) {
                 let filteredPeople = filterEntitiesBySearch(entities.person, cardViewSearchTerm);
                 filteredPeople = sortEntities(filteredPeople, cardViewSortOption);
@@ -14937,11 +14963,22 @@ John Doe,Engineering,john@example.com"
                 }
             }
 
-            // Activities
-            if (cardViewTypeFilters.activity && relationships.length > 0) {
-                const activityRow = createActivityCardRowFiltered();
-                if (activityRow) {
-                    contentContainer.appendChild(activityRow);
+            // Teams - emergent structure
+            if (cardViewTypeFilters.team && sidebarFilters.entities.team && entities.team.length > 0) {
+                let filteredTeams = filterEntitiesBySearch(entities.team, cardViewSearchTerm);
+                filteredTeams = sortEntities(filteredTeams, cardViewSortOption);
+                if (filteredTeams.length > 0) {
+                    contentContainer.appendChild(createCardRow('Teams', filteredTeams, getIcon('team')));
+                    hasContent = true;
+                }
+            }
+
+            // Units - deeper structure
+            if (cardViewTypeFilters.unit && sidebarFilters.entities.unit && entities.unit.length > 0) {
+                let filteredUnits = filterEntitiesBySearch(entities.unit, cardViewSearchTerm);
+                filteredUnits = sortEntities(filteredUnits, cardViewSortOption);
+                if (filteredUnits.length > 0) {
+                    contentContainer.appendChild(createCardRow('Units', filteredUnits, getIcon('unit')));
                     hasContent = true;
                 }
             }
