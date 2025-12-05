@@ -12927,7 +12927,85 @@ John Doe,Engineering,john@example.com"
                     .filter(e => e !== null && e.type === 'person');
             }
 
-            // 1. ROLES - The primary entry point (with people tagged)
+            // 1. TASKS - The primary entry point (what needs doing)
+            // Helper to get roles connected to a task
+            function getRolesForTask(taskId) {
+                return relationships
+                    .filter(r => (r.object === taskId && r.predicate === 'CON') ||
+                                (r.subject === taskId && r.predicate === 'CON'))
+                    .map(r => {
+                        const entityId = r.object === taskId ? r.subject : r.object;
+                        return findEntity(entityId);
+                    })
+                    .filter(e => e && e.type === 'role');
+            }
+            if (entities.object.length > 0 && (!searchTerm || entities.object.some(o => o.name.toLowerCase().includes(searchTerm)))) {
+                const section = document.createElement('div');
+                section.className = 'entity-section';
+                const header = document.createElement('div');
+                header.className = 'entity-section-header';
+                header.textContent = 'Tasks';
+                section.appendChild(header);
+
+                entities.object.forEach(obj => {
+                    if (searchTerm && !obj.name.toLowerCase().includes(searchTerm)) return;
+
+                    // Find roles connected to this task (via CON relationship)
+                    const connectedRoles = relationships
+                        .filter(r => (r.object === obj.id && r.predicate === 'CON') ||
+                                    (r.subject === obj.id && r.predicate === 'CON'))
+                        .map(r => {
+                            const entityId = r.object === obj.id ? r.subject : r.object;
+                            return findEntity(entityId);
+                        })
+                        .filter(e => e && e.type === 'role');
+
+                    // For each role, find assigned people
+                    const roleWithPeople = connectedRoles.map(role => {
+                        const people = relationships
+                            .filter(r => r.predicate === 'INS' && r.object === role.id)
+                            .map(r => findEntity(r.subject))
+                            .filter(p => p && p.type === 'person');
+                        return { role, people };
+                    });
+
+                    const node = document.createElement('div');
+                    node.className = 'entity-item object';
+                    node.style.cursor = 'pointer';
+                    node.onclick = (e) => {
+                        if (!e.target.closest('.btn-icon')) {
+                            openEntityModal(obj.id, 'object');
+                        }
+                    };
+
+                    // Build badge showing: Role → Person(s)
+                    let assignmentBadges = '';
+                    if (roleWithPeople.length > 0) {
+                        assignmentBadges = `<div style="display: flex; gap: 0.25rem; flex-wrap: wrap; margin-top: 0.25rem;">
+                            ${roleWithPeople.map(({ role, people }) => {
+                                const personNames = people.length > 0
+                                    ? ` (${people.map(p => p.name).join(', ')})`
+                                    : '';
+                                return `<span style="font-size: 0.65rem; padding: 0.125rem 0.375rem; background: rgba(139, 111, 71, 0.1); color: #8B6F47; border-radius: 10px;">
+                                    <i class="ph ph-briefcase"></i> ${role.name}${personNames}
+                                </span>`;
+                            }).join('')}
+                        </div>`;
+                    }
+
+                    node.innerHTML = `
+                        <div style="flex: 1;">
+                            <div class="entity-name"><i class="ph ph-check-square"></i> ${obj.name}</div>
+                            ${assignmentBadges}
+                        </div>
+                        <button class="btn-icon" onclick="event.stopPropagation(); deleteEntity('${obj.id}', 'object')"><i class="ph ph-x"></i></button>
+                    `;
+                    section.appendChild(node);
+                });
+                list.appendChild(section);
+            }
+
+            // 2. ROLES - Who handles the work (with people tagged)
             if (entities.role.length > 0 && (!searchTerm || entities.role.some(r => r.name.toLowerCase().includes(searchTerm)))) {
                 const section = document.createElement('div');
                 section.className = 'entity-section';
@@ -12968,7 +13046,7 @@ John Doe,Engineering,john@example.com"
                 list.appendChild(section);
             }
 
-            // 2. PEOPLE - Individuals (shown separately)
+            // 3. PEOPLE - Individuals (shown separately)
             if (entities.person.length > 0 && (!searchTerm || entities.person.some(p => p.name.toLowerCase().includes(searchTerm)))) {
                 const section = document.createElement('div');
                 section.className = 'entity-section';
@@ -13008,56 +13086,6 @@ John Doe,Engineering,john@example.com"
                             ${roleBadges}
                         </div>
                         <button class="btn-icon" onclick="event.stopPropagation(); deleteEntity('${person.id}', 'person')"><i class="ph ph-x"></i></button>
-                    `;
-                    section.appendChild(node);
-                });
-                list.appendChild(section);
-            }
-
-            // 3. WORK PRODUCTS
-            if (entities.object.length > 0 && (!searchTerm || entities.object.some(o => o.name.toLowerCase().includes(searchTerm)))) {
-                const section = document.createElement('div');
-                section.className = 'entity-section';
-                const header = document.createElement('div');
-                header.className = 'entity-section-header';
-                header.textContent = 'Work Products';
-                section.appendChild(header);
-
-                entities.object.forEach(obj => {
-                    if (searchTerm && !obj.name.toLowerCase().includes(searchTerm)) return;
-
-                    // Find roles connected to this object
-                    const connectedRoles = relationships
-                        .filter(r => r.object === obj.id || r.subject === obj.id)
-                        .map(r => {
-                            const entityId = r.object === obj.id ? r.subject : r.object;
-                            return findEntity(entityId);
-                        })
-                        .filter(e => e && e.type === 'role');
-
-                    const node = document.createElement('div');
-                    node.className = 'entity-item object';
-                    node.style.cursor = 'pointer';
-                    node.onclick = (e) => {
-                        if (!e.target.closest('.btn-icon')) {
-                            openEntityModal(obj.id, 'object');
-                        }
-                    };
-
-                    const connectionBadges = connectedRoles.length > 0
-                        ? `<div style="display: flex; gap: 0.25rem; flex-wrap: wrap; margin-top: 0.25rem;">
-                            ${connectedRoles.map(role =>
-                                `<span style="font-size: 0.65rem; padding: 0.125rem 0.375rem; background: rgba(139, 111, 71, 0.1); color: #8B6F47; border-radius: 10px;"><i class="ph ph-briefcase"></i> ${role.name}</span>`
-                            ).join('')}
-                           </div>`
-                        : '';
-
-                    node.innerHTML = `
-                        <div style="flex: 1;">
-                            <div class="entity-name"><i class="ph ph-package"></i> ${obj.name}</div>
-                            ${connectionBadges}
-                        </div>
-                        <button class="btn-icon" onclick="event.stopPropagation(); deleteEntity('${obj.id}', 'object')"><i class="ph ph-x"></i></button>
                     `;
                     section.appendChild(node);
                 });
