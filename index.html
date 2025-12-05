@@ -6948,6 +6948,268 @@
         .recycle-bin-actions .btn-icon.delete:hover {
             color: #d32f2f;
         }
+
+        /* Task Wizard Styles */
+        .task-wizard {
+            background: linear-gradient(135deg, #FFF9F0 0%, #FAF7F5 100%);
+            border: 2px solid #C88F4A;
+            border-radius: 12px;
+            padding: 1.5rem;
+            margin-bottom: 1.5rem;
+        }
+
+        .task-wizard-cta {
+            text-align: center;
+        }
+
+        .task-wizard-cta h3 {
+            color: #6B5642;
+            font-size: 1rem;
+            margin-bottom: 1rem;
+            font-weight: 500;
+        }
+
+        .task-wizard-cta .btn-create-task {
+            background: #C88F4A;
+            color: white;
+            border: none;
+            padding: 1rem 2rem;
+            font-size: 1.1rem;
+            font-weight: 600;
+            border-radius: 8px;
+            cursor: pointer;
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+            transition: all 0.2s;
+            box-shadow: 0 2px 8px rgba(200, 143, 74, 0.3);
+        }
+
+        .task-wizard-cta .btn-create-task:hover {
+            background: #B07D3A;
+            transform: translateY(-1px);
+            box-shadow: 0 4px 12px rgba(200, 143, 74, 0.4);
+        }
+
+        .task-wizard-cta .helper-links {
+            margin-top: 1rem;
+            font-size: 0.8rem;
+            color: #8B6F47;
+        }
+
+        .task-wizard-cta .helper-links a {
+            color: #C88F4A;
+            cursor: pointer;
+            text-decoration: underline;
+        }
+
+        .task-wizard-steps {
+            display: none;
+        }
+
+        .task-wizard-steps.active {
+            display: block;
+        }
+
+        .wizard-step {
+            display: none;
+        }
+
+        .wizard-step.active {
+            display: block;
+            animation: fadeIn 0.2s ease-out;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(-5px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .wizard-step-header {
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+            margin-bottom: 1rem;
+        }
+
+        .wizard-step-number {
+            background: #C88F4A;
+            color: white;
+            width: 28px;
+            height: 28px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 600;
+            font-size: 0.9rem;
+        }
+
+        .wizard-step-title {
+            color: #6B5642;
+            font-weight: 600;
+            font-size: 1rem;
+        }
+
+        .wizard-step-subtitle {
+            color: #8B6F47;
+            font-size: 0.85rem;
+            margin-left: auto;
+        }
+
+        .wizard-input {
+            width: 100%;
+            padding: 0.875rem;
+            border: 2px solid #E5DDD1;
+            border-radius: 8px;
+            font-size: 1rem;
+            transition: border-color 0.2s;
+        }
+
+        .wizard-input:focus {
+            outline: none;
+            border-color: #C88F4A;
+        }
+
+        .wizard-select-grid {
+            display: grid;
+            gap: 0.5rem;
+            margin-top: 0.75rem;
+        }
+
+        .wizard-select-option {
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+            padding: 0.75rem;
+            border: 2px solid #E5DDD1;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: all 0.15s;
+            background: white;
+        }
+
+        .wizard-select-option:hover {
+            border-color: #C88F4A;
+            background: #FFF9F0;
+        }
+
+        .wizard-select-option.selected {
+            border-color: #C88F4A;
+            background: #FFF9F0;
+        }
+
+        .wizard-select-option i {
+            font-size: 1.25rem;
+            color: #8B6F47;
+        }
+
+        .wizard-select-option.selected i {
+            color: #C88F4A;
+        }
+
+        .wizard-create-new {
+            border-style: dashed;
+            color: #8B6F47;
+        }
+
+        .wizard-create-new:hover {
+            border-style: solid;
+        }
+
+        .wizard-inline-create {
+            display: none;
+            margin-top: 0.75rem;
+            padding: 0.75rem;
+            background: white;
+            border-radius: 8px;
+            border: 1px solid #E5DDD1;
+        }
+
+        .wizard-inline-create.active {
+            display: block;
+        }
+
+        .wizard-actions {
+            display: flex;
+            gap: 0.75rem;
+            margin-top: 1.25rem;
+        }
+
+        .wizard-actions .btn {
+            flex: 1;
+        }
+
+        .wizard-actions .btn-back {
+            background: transparent;
+            color: #8B6F47;
+            border: 1px solid #E5DDD1;
+        }
+
+        .wizard-summary {
+            background: white;
+            border-radius: 8px;
+            padding: 1rem;
+            margin-bottom: 1rem;
+        }
+
+        .wizard-summary-item {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            padding: 0.5rem 0;
+            border-bottom: 1px solid #E5DDD1;
+        }
+
+        .wizard-summary-item:last-child {
+            border-bottom: none;
+        }
+
+        .wizard-summary-label {
+            color: #8B6F47;
+            font-size: 0.85rem;
+            min-width: 60px;
+        }
+
+        .wizard-summary-value {
+            color: #6B5642;
+            font-weight: 500;
+        }
+
+        .wizard-progress {
+            display: flex;
+            gap: 0.5rem;
+            margin-bottom: 1rem;
+        }
+
+        .wizard-progress-dot {
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+            background: #E5DDD1;
+            transition: all 0.2s;
+        }
+
+        .wizard-progress-dot.active {
+            background: #C88F4A;
+            transform: scale(1.25);
+        }
+
+        .wizard-progress-dot.completed {
+            background: #8B6F47;
+        }
+
+        .wizard-skip-hint {
+            text-align: center;
+            margin-top: 0.75rem;
+            font-size: 0.8rem;
+            color: #8B6F47;
+        }
+
+        .wizard-skip-hint a {
+            color: #C88F4A;
+            cursor: pointer;
+        }
     </style>
 </head>
 <body>
@@ -7017,17 +7279,112 @@
             <button class="panel-collapse-btn" onclick="togglePanel('left')" title="Collapse sidebar">
                 <i class="ph ph-caret-left"></i>
             </button>
-            <!-- Welcome Banner (dismissible) -->
-            <div id="welcomeBanner" class="welcome-banner">
-                <h3><i class="ph ph-hand-waving"></i> Getting Started</h3>
-                <ol>
-                    <li>Assign tasks to roles (tag people)</li>
-                    <li>Workflows emerge from connections</li>
-                    <li>Structure reveals itself through use</li>
-                </ol>
-                <div class="actions">
-                    <button class="btn btn-small" onclick="loadSampleData()">Load Sample</button>
-                    <button class="btn btn-small btn-secondary" onclick="dismissWelcomeBanner()">Got it!</button>
+            <!-- Task Wizard -->
+            <div id="taskWizard" class="task-wizard">
+                <!-- Initial CTA -->
+                <div id="wizardCTA" class="task-wizard-cta">
+                    <h3>What do you need to get done?</h3>
+                    <button class="btn-create-task" onclick="startTaskWizard()">
+                        <i class="ph ph-plus-circle"></i> Create a Task
+                    </button>
+                    <div class="helper-links">
+                        <a onclick="loadSampleData()">Load sample data</a> · <a onclick="dismissTaskWizard()">Skip intro</a>
+                    </div>
+                </div>
+
+                <!-- Wizard Steps -->
+                <div id="wizardSteps" class="task-wizard-steps">
+                    <div class="wizard-progress">
+                        <div class="wizard-progress-dot active" data-step="1"></div>
+                        <div class="wizard-progress-dot" data-step="2"></div>
+                        <div class="wizard-progress-dot" data-step="3"></div>
+                    </div>
+
+                    <!-- Step 1: Task Name -->
+                    <div id="wizardStep1" class="wizard-step active">
+                        <div class="wizard-step-header">
+                            <span class="wizard-step-number">1</span>
+                            <span class="wizard-step-title">What's the task?</span>
+                        </div>
+                        <input type="text"
+                               id="wizardTaskName"
+                               class="wizard-input"
+                               placeholder="e.g., Review contracts, Prepare report..."
+                               onkeypress="if(event.key==='Enter') wizardNextStep(2)">
+                        <div class="wizard-actions">
+                            <button class="btn btn-back" onclick="cancelTaskWizard()">Cancel</button>
+                            <button class="btn" onclick="wizardNextStep(2)">Next</button>
+                        </div>
+                    </div>
+
+                    <!-- Step 2: Assign to Role -->
+                    <div id="wizardStep2" class="wizard-step">
+                        <div class="wizard-step-header">
+                            <span class="wizard-step-number">2</span>
+                            <span class="wizard-step-title">Who handles this?</span>
+                            <span class="wizard-step-subtitle">Select or create a role</span>
+                        </div>
+                        <div id="wizardRoleList" class="wizard-select-grid">
+                            <!-- Populated dynamically -->
+                        </div>
+                        <div id="wizardCreateRole" class="wizard-inline-create">
+                            <input type="text"
+                                   id="wizardNewRoleName"
+                                   class="wizard-input"
+                                   placeholder="Role name..."
+                                   onkeypress="if(event.key==='Enter') createWizardRole()">
+                            <div class="wizard-actions" style="margin-top: 0.75rem;">
+                                <button class="btn btn-small btn-back" onclick="hideWizardCreateRole()">Cancel</button>
+                                <button class="btn btn-small" onclick="createWizardRole()">Create Role</button>
+                            </div>
+                        </div>
+                        <div class="wizard-actions">
+                            <button class="btn btn-back" onclick="wizardPrevStep(1)">Back</button>
+                            <button class="btn" onclick="wizardNextStep(3)" id="wizardStep2Next" disabled>Next</button>
+                        </div>
+                    </div>
+
+                    <!-- Step 3: Assign Person (optional) -->
+                    <div id="wizardStep3" class="wizard-step">
+                        <div class="wizard-step-header">
+                            <span class="wizard-step-number">3</span>
+                            <span class="wizard-step-title">Assign someone?</span>
+                            <span class="wizard-step-subtitle">Optional</span>
+                        </div>
+                        <div id="wizardPersonList" class="wizard-select-grid">
+                            <!-- Populated dynamically -->
+                        </div>
+                        <div id="wizardCreatePerson" class="wizard-inline-create">
+                            <input type="text"
+                                   id="wizardNewPersonName"
+                                   class="wizard-input"
+                                   placeholder="Person's name..."
+                                   onkeypress="if(event.key==='Enter') createWizardPerson()">
+                            <div class="wizard-actions" style="margin-top: 0.75rem;">
+                                <button class="btn btn-small btn-back" onclick="hideWizardCreatePerson()">Cancel</button>
+                                <button class="btn btn-small" onclick="createWizardPerson()">Add Person</button>
+                            </div>
+                        </div>
+                        <div class="wizard-summary" id="wizardSummary">
+                            <div class="wizard-summary-item">
+                                <span class="wizard-summary-label">Task:</span>
+                                <span class="wizard-summary-value" id="summaryTask"></span>
+                            </div>
+                            <div class="wizard-summary-item">
+                                <span class="wizard-summary-label">Role:</span>
+                                <span class="wizard-summary-value" id="summaryRole"></span>
+                            </div>
+                        </div>
+                        <div class="wizard-actions">
+                            <button class="btn btn-back" onclick="wizardPrevStep(2)">Back</button>
+                            <button class="btn" onclick="completeTaskWizard()">
+                                <i class="ph ph-check"></i> Create Task
+                            </button>
+                        </div>
+                        <div class="wizard-skip-hint">
+                            <a onclick="completeTaskWizard()">Skip - assign later</a>
+                        </div>
+                    </div>
                 </div>
             </div>
 
@@ -18280,21 +18637,362 @@ John Doe,Engineering,john@example.com"
             }
         }
 
-        // Welcome banner
-        function dismissWelcomeBanner() {
-            const banner = document.getElementById('welcomeBanner');
-            if (banner) {
-                banner.style.display = 'none';
-                localStorage.setItem('welcomeBannerDismissed', 'true');
+        // Task Wizard State
+        let wizardState = {
+            taskName: '',
+            selectedRole: null,
+            selectedPerson: null,
+            newRoleName: '',
+            newPersonName: ''
+        };
+
+        // Dismiss/hide the task wizard
+        function dismissTaskWizard() {
+            const wizard = document.getElementById('taskWizard');
+            if (wizard) {
+                wizard.style.display = 'none';
+                localStorage.setItem('taskWizardDismissed', 'true');
             }
         }
 
-        function checkWelcomeBanner() {
-            const banner = document.getElementById('welcomeBanner');
-            const dismissed = localStorage.getItem('welcomeBannerDismissed');
-            if (banner && dismissed === 'true') {
-                banner.style.display = 'none';
+        function checkTaskWizard() {
+            const wizard = document.getElementById('taskWizard');
+            const dismissed = localStorage.getItem('taskWizardDismissed');
+            // Also hide if there are existing entities
+            const hasEntities = Object.values(entities).some(arr => arr.length > 0);
+            if (wizard && (dismissed === 'true' || hasEntities)) {
+                wizard.style.display = 'none';
             }
+        }
+
+        // Start the wizard flow
+        function startTaskWizard() {
+            wizardState = {
+                taskName: '',
+                selectedRole: null,
+                selectedPerson: null,
+                newRoleName: '',
+                newPersonName: ''
+            };
+
+            document.getElementById('wizardCTA').style.display = 'none';
+            document.getElementById('wizardSteps').classList.add('active');
+            document.getElementById('wizardTaskName').value = '';
+            document.getElementById('wizardTaskName').focus();
+
+            updateWizardProgress(1);
+        }
+
+        // Cancel wizard and go back to CTA
+        function cancelTaskWizard() {
+            document.getElementById('wizardCTA').style.display = 'block';
+            document.getElementById('wizardSteps').classList.remove('active');
+            resetWizardSteps();
+        }
+
+        function resetWizardSteps() {
+            document.querySelectorAll('.wizard-step').forEach(step => step.classList.remove('active'));
+            document.getElementById('wizardStep1').classList.add('active');
+            document.getElementById('wizardCreateRole').classList.remove('active');
+            document.getElementById('wizardCreatePerson').classList.remove('active');
+        }
+
+        // Update progress dots
+        function updateWizardProgress(currentStep) {
+            document.querySelectorAll('.wizard-progress-dot').forEach(dot => {
+                const step = parseInt(dot.dataset.step);
+                dot.classList.remove('active', 'completed');
+                if (step === currentStep) {
+                    dot.classList.add('active');
+                } else if (step < currentStep) {
+                    dot.classList.add('completed');
+                }
+            });
+        }
+
+        // Navigate between steps
+        function wizardNextStep(step) {
+            // Validate current step
+            if (step === 2) {
+                const taskName = document.getElementById('wizardTaskName').value.trim();
+                if (!taskName) {
+                    document.getElementById('wizardTaskName').focus();
+                    return;
+                }
+                wizardState.taskName = taskName;
+                populateWizardRoles();
+            }
+
+            if (step === 3) {
+                if (!wizardState.selectedRole) return;
+                populateWizardPersons();
+                updateWizardSummary();
+            }
+
+            // Show the step
+            document.querySelectorAll('.wizard-step').forEach(s => s.classList.remove('active'));
+            document.getElementById(`wizardStep${step}`).classList.add('active');
+            updateWizardProgress(step);
+        }
+
+        function wizardPrevStep(step) {
+            document.querySelectorAll('.wizard-step').forEach(s => s.classList.remove('active'));
+            document.getElementById(`wizardStep${step}`).classList.add('active');
+            updateWizardProgress(step);
+        }
+
+        // Populate role options in step 2
+        function populateWizardRoles() {
+            const container = document.getElementById('wizardRoleList');
+            const roles = entities.role || [];
+
+            let html = '';
+
+            // Show existing roles
+            roles.forEach(role => {
+                const isSelected = wizardState.selectedRole && wizardState.selectedRole.id === role.id;
+                html += `
+                    <div class="wizard-select-option ${isSelected ? 'selected' : ''}"
+                         onclick="selectWizardRole('${role.id}')">
+                        <i class="ph ph-briefcase"></i>
+                        <span>${role.name}</span>
+                    </div>
+                `;
+            });
+
+            // Always show "create new" option
+            html += `
+                <div class="wizard-select-option wizard-create-new" onclick="showWizardCreateRole()">
+                    <i class="ph ph-plus-circle"></i>
+                    <span>Create new role...</span>
+                </div>
+            `;
+
+            container.innerHTML = html;
+        }
+
+        function selectWizardRole(roleId) {
+            const role = entities.role.find(r => r.id === roleId);
+            if (role) {
+                wizardState.selectedRole = role;
+                document.getElementById('wizardStep2Next').disabled = false;
+                populateWizardRoles(); // Re-render to show selection
+            }
+        }
+
+        function showWizardCreateRole() {
+            document.getElementById('wizardCreateRole').classList.add('active');
+            document.getElementById('wizardNewRoleName').focus();
+        }
+
+        function hideWizardCreateRole() {
+            document.getElementById('wizardCreateRole').classList.remove('active');
+            document.getElementById('wizardNewRoleName').value = '';
+        }
+
+        function createWizardRole() {
+            const name = document.getElementById('wizardNewRoleName').value.trim();
+            if (!name) return;
+
+            // Create the role entity
+            const roleId = 'role' + Date.now();
+            const newRole = {
+                id: roleId,
+                name: name,
+                type: 'role'
+            };
+            entities.role.push(newRole);
+
+            // Log to Xano
+            logActivityToXano({
+                event_verb: 'Add Entity',
+                object_type: 'role',
+                object_label: name
+            });
+
+            // Select it
+            wizardState.selectedRole = newRole;
+            document.getElementById('wizardStep2Next').disabled = false;
+
+            // Hide create form and refresh
+            hideWizardCreateRole();
+            populateWizardRoles();
+        }
+
+        // Populate person options in step 3
+        function populateWizardPersons() {
+            const container = document.getElementById('wizardPersonList');
+            const persons = entities.person || [];
+
+            let html = '';
+
+            // Show existing persons
+            persons.forEach(person => {
+                const isSelected = wizardState.selectedPerson && wizardState.selectedPerson.id === person.id;
+                html += `
+                    <div class="wizard-select-option ${isSelected ? 'selected' : ''}"
+                         onclick="selectWizardPerson('${person.id}')">
+                        <i class="ph ph-user"></i>
+                        <span>${person.name}</span>
+                    </div>
+                `;
+            });
+
+            // Always show "create new" option
+            html += `
+                <div class="wizard-select-option wizard-create-new" onclick="showWizardCreatePerson()">
+                    <i class="ph ph-user-plus"></i>
+                    <span>Add someone new...</span>
+                </div>
+            `;
+
+            container.innerHTML = html;
+        }
+
+        function selectWizardPerson(personId) {
+            const person = entities.person.find(p => p.id === personId);
+            if (person) {
+                wizardState.selectedPerson = person;
+                populateWizardPersons(); // Re-render to show selection
+            }
+        }
+
+        function showWizardCreatePerson() {
+            document.getElementById('wizardCreatePerson').classList.add('active');
+            document.getElementById('wizardNewPersonName').focus();
+        }
+
+        function hideWizardCreatePerson() {
+            document.getElementById('wizardCreatePerson').classList.remove('active');
+            document.getElementById('wizardNewPersonName').value = '';
+        }
+
+        function createWizardPerson() {
+            const name = document.getElementById('wizardNewPersonName').value.trim();
+            if (!name) return;
+
+            // Create the person entity
+            const personId = 'person' + Date.now();
+            const newPerson = {
+                id: personId,
+                name: name,
+                type: 'person'
+            };
+            entities.person.push(newPerson);
+
+            // Log to Xano
+            logActivityToXano({
+                event_verb: 'Add Entity',
+                object_type: 'person',
+                object_label: name
+            });
+
+            // Select it
+            wizardState.selectedPerson = newPerson;
+
+            // Hide create form and refresh
+            hideWizardCreatePerson();
+            populateWizardPersons();
+        }
+
+        // Update summary in step 3
+        function updateWizardSummary() {
+            document.getElementById('summaryTask').textContent = wizardState.taskName;
+            document.getElementById('summaryRole').textContent = wizardState.selectedRole?.name || '';
+        }
+
+        // Complete the wizard - create task and connections
+        function completeTaskWizard() {
+            const taskName = wizardState.taskName;
+            const role = wizardState.selectedRole;
+            const person = wizardState.selectedPerson;
+
+            if (!taskName || !role) {
+                console.error('Missing required data');
+                return;
+            }
+
+            // 1. Create task as a work object
+            const taskId = 'object' + Date.now();
+            const taskObject = {
+                id: taskId,
+                name: taskName,
+                type: 'object'
+            };
+            entities.object.push(taskObject);
+
+            logActivityToXano({
+                event_verb: 'Add Entity',
+                object_type: 'object',
+                object_label: taskName
+            });
+
+            // 2. Connect role to task (Role CON Task)
+            const roleTaskRel = {
+                id: 'rel' + Date.now(),
+                subject: role.id,
+                predicate: 'CON',
+                object: taskId,
+                description: ''
+            };
+            relationships.push(roleTaskRel);
+
+            logActivityToXano({
+                event_verb: 'Link Connection',
+                eo_operator: 'CON',
+                object_type: 'relationship',
+                object_label: `${role.name} → ${taskName}`
+            });
+
+            // 3. If person selected, assign to role (Person INS Role)
+            if (person) {
+                // Check if this assignment already exists
+                const existingAssignment = relationships.find(r =>
+                    r.subject === person.id &&
+                    r.predicate === 'INS' &&
+                    r.object === role.id
+                );
+
+                if (!existingAssignment) {
+                    const personRoleRel = {
+                        id: 'rel' + (Date.now() + 1),
+                        subject: person.id,
+                        predicate: 'INS',
+                        object: role.id,
+                        description: ''
+                    };
+                    relationships.push(personRoleRel);
+
+                    logActivityToXano({
+                        event_verb: 'Start Assignment',
+                        eo_operator: 'INS',
+                        object_type: 'relationship',
+                        object_label: `${person.name} → ${role.name}`
+                    });
+                }
+            }
+
+            // Save and refresh
+            saveToLocalStorage();
+            renderEntityList();
+            renderActivityList();
+            renderCurrentView();
+            populateSelects();
+
+            // Hide wizard
+            dismissTaskWizard();
+
+            // Show a brief success indicator (optional)
+            console.log('Task created:', taskName);
+        }
+
+        // Legacy compatibility
+        function dismissWelcomeBanner() {
+            dismissTaskWizard();
+        }
+
+        function checkWelcomeBanner() {
+            checkTaskWizard();
         }
 
         // Advanced entity options toggle
@@ -18306,8 +19004,8 @@ John Doe,Engineering,john@example.com"
                 options.style.display = isVisible ? 'none' : 'block';
                 toggleBtn.classList.toggle('expanded', !isVisible);
                 toggleBtn.innerHTML = isVisible
-                    ? '<i class="ph ph-plus"></i> Advanced options'
-                    : '<i class="ph ph-minus"></i> Hide advanced options';
+                    ? '<i class="ph ph-plus"></i> Structure options'
+                    : '<i class="ph ph-minus"></i> Hide structure options';
             }
         }
 
