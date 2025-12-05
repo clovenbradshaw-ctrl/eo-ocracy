@@ -9102,8 +9102,10 @@ John Doe,Engineering,john@example.com"
                 addActivityEl.innerHTML = renderCreateConnectionPanel(entityId, entityType);
             }
 
-            // Render artwork gallery section
-            renderArtworkGallery();
+            // Render artwork gallery section (not for person entities)
+            if (!isPerson) {
+                renderArtworkGallery();
+            }
 
             document.getElementById('entityModal').classList.add('active');
         }
