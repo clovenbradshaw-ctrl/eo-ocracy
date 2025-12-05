@@ -16873,6 +16873,17 @@ John Doe,Engineering,john@example.com"
             return icons[type] || '<i class="ph ph-question"></i>';
         }
 
+        function getEntityIcon(type) {
+            const icons = {
+                unit: 'ph-buildings',
+                team: 'ph-users-three',
+                role: 'ph-briefcase',
+                person: 'ph-user',
+                object: 'ph-package'
+            };
+            return icons[type] || 'ph-question';
+        }
+
         function getInitials(name) {
             return name.split(' ').map(n => n[0]).join('').toUpperCase().slice(0, 2);
         }
