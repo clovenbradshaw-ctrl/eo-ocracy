@@ -3836,6 +3836,60 @@
             flex: 1;
             overflow-y: auto;
             min-height: 0;
+            display: flex;
+            flex-direction: column;
+        }
+
+        /* Modal Tabs */
+        .modal-tabs {
+            display: flex;
+            gap: 0;
+            border-bottom: 2px solid #E5DDD1;
+            padding: 0 1.5rem;
+            background: #FAF7F5;
+            flex-shrink: 0;
+        }
+
+        .modal-tab {
+            padding: 0.75rem 1.25rem;
+            background: none;
+            border: none;
+            cursor: pointer;
+            font-size: 0.85rem;
+            color: #8B6F47;
+            border-bottom: 3px solid transparent;
+            margin-bottom: -2px;
+            transition: all 0.2s;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            font-weight: 500;
+        }
+
+        .modal-tab:hover {
+            color: #5A4A3A;
+            background: rgba(200, 143, 74, 0.1);
+        }
+
+        .modal-tab.active {
+            color: #C88F4A;
+            border-bottom-color: #C88F4A;
+            font-weight: 600;
+        }
+
+        .modal-tab i {
+            font-size: 1rem;
+        }
+
+        .modal-tab-content {
+            display: none;
+            flex: 1;
+            overflow-y: auto;
+            min-height: 0;
+        }
+
+        .modal-tab-content.active {
+            display: block;
         }
 
         .modal-section {
@@ -7377,12 +7431,39 @@
             <div class="modal-body">
                 <div class="modal-section" id="modalDescription"></div>
                 <div class="modal-section role-assignment-section" id="modalRoleAssignment"></div>
-                <div class="modal-section" id="modalNested"></div>
-                <div class="modal-section" id="modalAddNested"></div>
-                <div class="modal-section" id="modalNestUnder"></div>
-                <div class="modal-section" id="modalConnections"></div>
-                <div class="modal-section" id="modalActivities"></div>
-                <div class="modal-section" id="modalAddActivity"></div>
+
+                <!-- Modal Tabs -->
+                <div class="modal-tabs" id="modalTabs">
+                    <button class="modal-tab active" data-tab="connections" onclick="switchModalTab('connections')">
+                        <i class="ph ph-arrows-left-right"></i> Connections
+                    </button>
+                    <button class="modal-tab" data-tab="structure" onclick="switchModalTab('structure')">
+                        <i class="ph ph-tree-structure"></i> Structure
+                    </button>
+                    <button class="modal-tab" data-tab="connect" onclick="switchModalTab('connect')">
+                        <i class="ph ph-plus-circle"></i> Connect
+                    </button>
+                </div>
+
+                <!-- Tab Content: Connections -->
+                <div class="modal-tab-content active" id="tabConnections">
+                    <div class="modal-section" id="modalActivities"></div>
+                </div>
+
+                <!-- Tab Content: Structure -->
+                <div class="modal-tab-content" id="tabStructure">
+                    <div class="modal-section" id="modalNestUnder"></div>
+                    <div class="modal-section" id="modalNested"></div>
+                    <div class="modal-section" id="modalAddNested"></div>
+                </div>
+
+                <!-- Tab Content: Connect -->
+                <div class="modal-tab-content" id="tabConnect">
+                    <div class="modal-section" id="modalAddActivity"></div>
+                </div>
+
+                <!-- Hidden sections for compatibility -->
+                <div class="modal-section" id="modalConnections" style="display: none;"></div>
             </div>
             <div class="modal-actions" id="modalFooterButtons">
                 <button class="modal-action-btn danger" id="modalDeleteButton" onclick="openDeleteConfirmModal()">
@@ -8888,6 +8969,9 @@ John Doe,Engineering,john@example.com"
                 addActivityEl.innerHTML = renderCreateConnectionPanel(entityId, entityType);
             }
 
+            // Update tabs visibility based on entity type
+            updateModalTabsForEntityType(entityType);
+
             document.getElementById('entityModal').classList.add('active');
         }
 
@@ -8895,6 +8979,56 @@ John Doe,Engineering,john@example.com"
             document.getElementById('entityModal').classList.remove('active');
             // Close any open dropdowns
             closeModalParentDropdown();
+        }
+
+        // Switch modal tabs
+        function switchModalTab(tabName) {
+            // Update tab buttons
+            document.querySelectorAll('.modal-tab').forEach(tab => {
+                tab.classList.toggle('active', tab.dataset.tab === tabName);
+            });
+
+            // Update tab content
+            document.querySelectorAll('.modal-tab-content').forEach(content => {
+                content.classList.remove('active');
+            });
+
+            const tabMap = {
+                'connections': 'tabConnections',
+                'structure': 'tabStructure',
+                'connect': 'tabConnect'
+            };
+
+            const targetContent = document.getElementById(tabMap[tabName]);
+            if (targetContent) {
+                targetContent.classList.add('active');
+            }
+        }
+
+        // Update tabs visibility based on entity type
+        function updateModalTabsForEntityType(entityType) {
+            const tabsContainer = document.getElementById('modalTabs');
+            const isPerson = entityType === 'person';
+
+            if (isPerson) {
+                // Hide tabs for persons - they only have role assignment
+                tabsContainer.style.display = 'none';
+                document.querySelectorAll('.modal-tab-content').forEach(content => {
+                    content.classList.remove('active');
+                });
+                // Show the Connect tab content for "Assign to Role" form
+                document.getElementById('tabConnect').classList.add('active');
+            } else {
+                // Show tabs for other entity types
+                tabsContainer.style.display = 'flex';
+                // Reset to Connections tab
+                switchModalTab('connections');
+            }
+        }
+
+        // Reset modal tabs to default state
+        function resetModalTabs() {
+            switchModalTab('connections');
         }
 
         // ========================================
