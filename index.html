@@ -2746,6 +2746,19 @@
             display: inline-block;
         }
 
+        /* Empty State for Units/Teams */
+        .orgchart-empty-state {
+            font-size: 0.75rem;
+            color: #8B7355;
+            font-style: italic;
+            padding: 0.75rem 1rem;
+            text-align: center;
+            background: #FAF8F5;
+            border: 1px dashed #D5C9B8;
+            border-radius: 8px;
+            min-width: 120px;
+        }
+
         /* People Container inside Role */
         .orgchart-role-people {
             padding: 0.6rem;
@@ -14132,14 +14145,14 @@ John Doe,Engineering,john@example.com"
             `;
             node.appendChild(card);
 
-            // Children container
-            if (hasChildren) {
-                const children = document.createElement('div');
-                const childCount = (unitNode.units ? unitNode.units.length : 0) +
-                                   (unitNode.teams ? unitNode.teams.length : 0) +
-                                   (unitNode.roles && !unitNode.teams?.length ? 1 : 0);
-                children.className = 'orgchart-children' + (childCount > 1 ? ' multiple' : '');
+            // Children container - always show to display empty state if needed
+            const children = document.createElement('div');
+            const childCount = (unitNode.units ? unitNode.units.length : 0) +
+                               (unitNode.teams ? unitNode.teams.length : 0) +
+                               (unitNode.roles && !unitNode.teams?.length ? 1 : 0);
+            children.className = 'orgchart-children' + (childCount > 1 ? ' multiple' : '');
 
+            if (hasChildren) {
                 // Sub-units
                 if (unitNode.units && unitNode.units.length > 0) {
                     unitNode.units.forEach(subUnit => {
@@ -14179,9 +14192,15 @@ John Doe,Engineering,john@example.com"
                     directRolesSection.appendChild(rolesRow);
                     children.appendChild(directRolesSection);
                 }
-
-                node.appendChild(children);
+            } else {
+                // Show empty state for units with no children
+                const emptyState = document.createElement('div');
+                emptyState.className = 'orgchart-empty-state';
+                emptyState.innerHTML = `<span>No teams or roles</span>`;
+                children.appendChild(emptyState);
             }
+
+            node.appendChild(children);
 
             return node;
         }
@@ -14214,18 +14233,24 @@ John Doe,Engineering,john@example.com"
             `;
             node.appendChild(card);
 
-            // Roles container
-            if (hasRoles) {
-                const children = document.createElement('div');
-                children.className = 'orgchart-children' + (teamData.roles.length > 1 ? ' multiple' : '');
+            // Roles container - always show to display empty state if needed
+            const children = document.createElement('div');
+            children.className = 'orgchart-children' + (teamData.roles && teamData.roles.length > 1 ? ' multiple' : '');
 
+            if (hasRoles) {
                 teamData.roles.forEach(roleData => {
                     const roleEl = renderOrgChartRole(roleData);
                     children.appendChild(roleEl);
                 });
-
-                node.appendChild(children);
+            } else {
+                // Show empty state for teams with no roles
+                const emptyState = document.createElement('div');
+                emptyState.className = 'orgchart-empty-state';
+                emptyState.innerHTML = `<span>No roles defined</span>`;
+                children.appendChild(emptyState);
             }
+
+            node.appendChild(children);
 
             return node;
         }
