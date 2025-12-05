@@ -10441,10 +10441,23 @@ John Doe,Engineering,john@example.com"
         }
 
         // Render a unit with its nested children recursively
-        function renderNestedUnitItem(unit, centerEntityId, depth = 0) {
+        function renderNestedUnitItem(unit, centerEntityId, depth = 0, visited = new Set()) {
             const itemWrapper = document.createElement('div');
             itemWrapper.className = 'nested-unit-item';
             itemWrapper.style.marginLeft = depth > 0 ? `${depth * 1.25}rem` : '0';
+
+            // Cycle detection: if we've already visited this unit, don't recurse further
+            if (visited.has(unit.id)) {
+                const badge = document.createElement('div');
+                badge.className = 'connection-badge unit-badge';
+                badge.innerHTML = `${getIcon(unit.type)} ${unit.name} (circular)`;
+                badge.onclick = () => openEntityModal(unit.id, unit.type);
+                itemWrapper.appendChild(badge);
+                return itemWrapper;
+            }
+
+            // Mark this unit as visited
+            visited.add(unit.id);
 
             // Main badge for the unit
             const badge = document.createElement('div');
@@ -10467,7 +10480,7 @@ John Doe,Engineering,john@example.com"
 
                 // Render child units recursively
                 childUnits.forEach(childUnit => {
-                    childrenContainer.appendChild(renderNestedUnitItem(childUnit, centerEntityId, depth + 1));
+                    childrenContainer.appendChild(renderNestedUnitItem(childUnit, centerEntityId, depth + 1, visited));
                 });
 
                 // Render child teams
