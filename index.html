@@ -15667,9 +15667,9 @@ John Doe,Engineering,john@example.com"
             const card = document.createElement('div');
             card.className = 'hierarchy-card-container unit';
 
-            // Make entire card clickable, but prevent propagation from nested sections
+            // Make entire card clickable, stop propagation to prevent parent cards from firing
             card.onclick = (e) => {
-                if (e.target.closest('.nested-cards-section')) return;
+                e.stopPropagation();
                 openEntityModal(unit.id, 'unit');
             };
 
@@ -15773,7 +15773,7 @@ John Doe,Engineering,john@example.com"
             const card = document.createElement('div');
             card.className = 'nested-entity-card team';
             card.onclick = (e) => {
-                if (e.target.closest('.deep-nested-item')) return;
+                e.stopPropagation();
                 openEntityModal(team.id, 'team');
             };
 
@@ -15852,7 +15852,7 @@ John Doe,Engineering,john@example.com"
             const card = document.createElement('div');
             card.className = 'nested-entity-card role';
             card.onclick = (e) => {
-                if (e.target.closest('.deep-nested-item')) return;
+                e.stopPropagation();
                 openEntityModal(role.id, 'role');
             };
 
