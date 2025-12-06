@@ -7868,6 +7868,54 @@
             background: #B07D3A;
         }
 
+        .hero-task-date-input {
+            width: 100%;
+            padding: 0.875rem 1rem;
+            font-size: 1rem;
+            border: 2px solid #E5DDD1;
+            border-radius: 8px;
+            background: #FAF7F5;
+            color: #3D2E1F;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .hero-task-date-input:focus {
+            outline: none;
+            border-color: #C88F4A;
+            background: white;
+        }
+
+        .hero-task-dependency-warning {
+            margin-top: 0.5rem;
+            padding: 0.5rem 0.75rem;
+            background: #FFF3E0;
+            border: 1px solid #FFB74D;
+            border-radius: 6px;
+            font-size: 0.85rem;
+            color: #E65100;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .hero-task-dependency-warning i {
+            font-size: 1rem;
+        }
+
+        .hero-task-dependency-info {
+            margin-top: 0.5rem;
+            padding: 0.5rem 0.75rem;
+            background: #E8F5E9;
+            border: 1px solid #A5D6A7;
+            border-radius: 6px;
+            font-size: 0.85rem;
+            color: #2E7D32;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
         .hero-task-preview {
             background: linear-gradient(135deg, #FFF9F0 0%, #FAF7F5 100%);
             border: 2px dashed #E5DDD1;
@@ -7921,6 +7969,17 @@
         .hero-task-preview-item.person {
             border-color: #5AB07B;
             background: #F0FFF5;
+        }
+
+        .hero-task-preview-item.due-date {
+            border-color: #8B6F47;
+            background: #FFF9F0;
+        }
+
+        .hero-task-preview-item.dependency {
+            border-color: #1565C0;
+            background: #E3F2FD;
+            font-size: 0.85rem;
         }
 
         .hero-task-preview-arrow {
@@ -8204,8 +8263,88 @@
             border: 1px solid #B8E5C8;
         }
 
+        .task-board-card-tag.due-date {
+            background: #FFF9F0;
+            color: #8B6F47;
+            border: 1px solid #E5DDD1;
+        }
+
+        .task-board-card-tag.due-date.due-soon {
+            background: #FFF8E1;
+            color: #F57F17;
+            border: 1px solid #FFE082;
+        }
+
+        .task-board-card-tag.due-date.due-today {
+            background: #FFF3E0;
+            color: #E65100;
+            border: 1px solid #FFB74D;
+        }
+
+        .task-board-card-tag.due-date.overdue {
+            background: #FFEBEE;
+            color: #C62828;
+            border: 1px solid #EF9A9A;
+        }
+
         .task-board-card-tag i {
             font-size: 0.875rem;
+        }
+
+        .task-board-card-deps {
+            margin-top: 0.75rem;
+            padding-top: 0.75rem;
+            border-top: 1px dashed #E5DDD1;
+            display: flex;
+            flex-wrap: wrap;
+            gap: 0.5rem;
+        }
+
+        .task-dep-tag {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.375rem;
+            padding: 0.25rem 0.5rem;
+            border-radius: 4px;
+            font-size: 0.75rem;
+            font-weight: 500;
+        }
+
+        .task-dep-tag.predecessor {
+            background: #E3F2FD;
+            color: #1565C0;
+        }
+
+        .task-dep-tag.predecessor.conflict {
+            background: #FFEBEE;
+            color: #C62828;
+        }
+
+        .task-dep-tag.predecessor.conflict .ph-warning {
+            color: #C62828;
+            animation: pulse 1s infinite;
+        }
+
+        .task-dep-tag.dependents {
+            background: #E8F5E9;
+            color: #2E7D32;
+        }
+
+        @keyframes pulse {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.5; }
+        }
+
+        .task-board-card.overdue {
+            border-left: 3px solid #C62828;
+        }
+
+        .task-board-card.due-today {
+            border-left: 3px solid #E65100;
+        }
+
+        .task-board-card.due-soon {
+            border-left: 3px solid #F57F17;
         }
 
         /* Task View Toggle in Header */
@@ -10087,6 +10226,48 @@ John Doe,Engineering,john@example.com"
 
         function closeHowItWorks() {
             document.getElementById('howItWorksOverlay').classList.remove('active');
+        }
+
+        // Show entity details - helper function to open entity modal without knowing the type
+        function showEntityDetails(entityId) {
+            // Determine entity type from ID prefix or by searching
+            const typeMap = [
+                { prefix: 'object', type: 'object' },
+                { prefix: 'role', type: 'role' },
+                { prefix: 'u', type: 'unit' },
+                { prefix: 't', type: 'team' },
+                { prefix: 'p', type: 'person' },
+                { prefix: 'o', type: 'object' }
+            ];
+
+            let entityType = null;
+            let entity = null;
+
+            // Try to find by prefix
+            for (const mapping of typeMap) {
+                if (entityId.startsWith(mapping.prefix)) {
+                    entity = entities[mapping.type]?.find(e => e.id === entityId);
+                    if (entity) {
+                        entityType = mapping.type;
+                        break;
+                    }
+                }
+            }
+
+            // If not found by prefix, search all types
+            if (!entity) {
+                for (const type of ['unit', 'team', 'role', 'person', 'object']) {
+                    entity = entities[type]?.find(e => e.id === entityId);
+                    if (entity) {
+                        entityType = type;
+                        break;
+                    }
+                }
+            }
+
+            if (entity && entityType) {
+                openEntityModal(entityId, entityType);
+            }
         }
 
         // Entity Modal
@@ -20277,7 +20458,11 @@ John Doe,Engineering,john@example.com"
             const taskObject = {
                 id: taskId,
                 name: taskName,
-                type: 'object'
+                type: 'object',
+                dueDate: null,
+                predecessorId: null,
+                status: 'pending',
+                createdAt: new Date().toISOString()
             };
             entities.object.push(taskObject);
 
@@ -20338,6 +20523,12 @@ John Doe,Engineering,john@example.com"
             renderActivityList();
             renderCurrentView();
             populateSelects();
+            updateTaskCountBadge();
+
+            // If on task board view, refresh it
+            if (currentView === 'tasks') {
+                renderTaskBoardView();
+            }
 
             // Hide wizard
             dismissTaskWizard();
@@ -20385,8 +20576,11 @@ John Doe,Engineering,john@example.com"
             document.getElementById('heroTaskName').value = '';
             document.getElementById('heroTaskRole').value = '';
             document.getElementById('heroTaskPerson').value = '';
+            document.getElementById('heroTaskDueDate').value = '';
+            document.getElementById('heroTaskPredecessor').value = '';
             document.getElementById('heroTaskPreview').style.display = 'none';
             document.getElementById('heroTaskSubmitBtn').disabled = true;
+            document.getElementById('heroDependencyWarning').style.display = 'none';
 
             // Hide inline create forms
             document.getElementById('heroRoleCreate').classList.remove('active');
@@ -20404,10 +20598,12 @@ John Doe,Engineering,john@example.com"
         function populateHeroSelects() {
             const roleSelect = document.getElementById('heroTaskRole');
             const personSelect = document.getElementById('heroTaskPerson');
+            const predecessorSelect = document.getElementById('heroTaskPredecessor');
 
             // Clear existing options (except first)
             roleSelect.innerHTML = '<option value="">Select a role...</option>';
             personSelect.innerHTML = '<option value="">Select a person...</option>';
+            predecessorSelect.innerHTML = '<option value="">No dependency...</option>';
 
             // Add roles
             entities.role.forEach(role => {
@@ -20424,6 +20620,84 @@ John Doe,Engineering,john@example.com"
                 option.textContent = person.name;
                 personSelect.appendChild(option);
             });
+
+            // Add existing tasks as potential predecessors
+            const tasks = entities.object || [];
+            tasks.forEach(task => {
+                const option = document.createElement('option');
+                option.value = task.id;
+                option.textContent = task.name + (task.dueDate ? ` (due: ${formatDateShort(task.dueDate)})` : '');
+                predecessorSelect.appendChild(option);
+            });
+        }
+
+        // Format date for display
+        function formatDateShort(dateStr) {
+            if (!dateStr) return '';
+            const date = new Date(dateStr);
+            return date.toLocaleDateString('en-US', { month: 'short', day: 'numeric' });
+        }
+
+        // Get task due date status for styling
+        function getTaskDueDateStatus(task) {
+            if (!task.dueDate) return '';
+            if (task.status === 'completed') return 'completed';
+
+            const today = new Date();
+            today.setHours(0, 0, 0, 0);
+            const dueDate = new Date(task.dueDate);
+            dueDate.setHours(0, 0, 0, 0);
+
+            const diffDays = Math.ceil((dueDate - today) / (1000 * 60 * 60 * 24));
+
+            if (diffDays < 0) return 'overdue';
+            if (diffDays === 0) return 'due-today';
+            if (diffDays <= 3) return 'due-soon';
+            return '';
+        }
+
+        // Get dependent tasks that would be affected by date change
+        function getDependentTasksChain(taskId, visited = new Set()) {
+            if (visited.has(taskId)) return [];
+            visited.add(taskId);
+
+            const dependents = entities.object.filter(t => t.predecessorId === taskId);
+            let chain = [...dependents];
+
+            dependents.forEach(dep => {
+                chain = chain.concat(getDependentTasksChain(dep.id, visited));
+            });
+
+            return chain;
+        }
+
+        // Check for date conflicts with predecessor
+        function checkPredecessorDateConflict() {
+            const predecessorId = document.getElementById('heroTaskPredecessor').value;
+            const dueDate = document.getElementById('heroTaskDueDate').value;
+            const warningEl = document.getElementById('heroDependencyWarning');
+            const warningText = document.getElementById('heroDependencyWarningText');
+
+            if (!predecessorId || !dueDate) {
+                warningEl.style.display = 'none';
+                return;
+            }
+
+            const predecessor = entities.object.find(t => t.id === predecessorId);
+            if (!predecessor || !predecessor.dueDate) {
+                warningEl.style.display = 'none';
+                return;
+            }
+
+            const predDate = new Date(predecessor.dueDate);
+            const taskDate = new Date(dueDate);
+
+            if (taskDate <= predDate) {
+                warningEl.style.display = 'flex';
+                warningText.textContent = `This task is due before or on the same day as "${predecessor.name}" (${formatDateShort(predecessor.dueDate)})`;
+            } else {
+                warningEl.style.display = 'none';
+            }
         }
 
         // Toggle role inline create
@@ -20513,6 +20787,8 @@ John Doe,Engineering,john@example.com"
             const taskName = document.getElementById('heroTaskName').value.trim();
             const roleId = document.getElementById('heroTaskRole').value;
             const personId = document.getElementById('heroTaskPerson').value;
+            const dueDate = document.getElementById('heroTaskDueDate').value;
+            const predecessorId = document.getElementById('heroTaskPredecessor').value;
 
             const previewDiv = document.getElementById('heroTaskPreview');
             const previewContent = document.getElementById('heroTaskPreviewContent');
@@ -20520,6 +20796,9 @@ John Doe,Engineering,john@example.com"
 
             // Enable/disable submit based on required fields
             submitBtn.disabled = !(taskName && roleId);
+
+            // Check for date conflicts
+            checkPredecessorDateConflict();
 
             if (!taskName) {
                 previewDiv.style.display = 'none';
@@ -20530,6 +20809,7 @@ John Doe,Engineering,john@example.com"
 
             const role = entities.role.find(r => r.id === roleId);
             const person = entities.person.find(p => p.id === personId);
+            const predecessor = entities.object.find(t => t.id === predecessorId);
 
             let html = `
                 <span class="hero-task-preview-item role">
@@ -20553,6 +20833,26 @@ John Doe,Engineering,john@example.com"
                 ` + html;
             }
 
+            // Add due date if set
+            if (dueDate) {
+                html += `
+                    <span class="hero-task-preview-item due-date">
+                        <i class="ph ph-calendar"></i>
+                        ${formatDateShort(dueDate)}
+                    </span>
+                `;
+            }
+
+            // Add dependency indicator if set
+            if (predecessor) {
+                html += `
+                    <span class="hero-task-preview-item dependency">
+                        <i class="ph ph-link-simple"></i>
+                        After: ${predecessor.name}
+                    </span>
+                `;
+            }
+
             previewContent.innerHTML = html;
         }
 
@@ -20561,6 +20861,8 @@ John Doe,Engineering,john@example.com"
             const taskName = document.getElementById('heroTaskName').value.trim();
             const roleId = document.getElementById('heroTaskRole').value;
             const personId = document.getElementById('heroTaskPerson').value;
+            const dueDate = document.getElementById('heroTaskDueDate').value;
+            const predecessorId = document.getElementById('heroTaskPredecessor').value;
 
             if (!taskName || !roleId) {
                 return;
@@ -20569,12 +20871,16 @@ John Doe,Engineering,john@example.com"
             const role = entities.role.find(r => r.id === roleId);
             const person = personId ? entities.person.find(p => p.id === personId) : null;
 
-            // 1. Create task as a work object
+            // 1. Create task as a work object with due date and predecessor
             const taskId = 'object' + Date.now();
             const taskObject = {
                 id: taskId,
                 name: taskName,
-                type: 'object'
+                type: 'object',
+                dueDate: dueDate || null,
+                predecessorId: predecessorId || null,
+                status: 'pending',
+                createdAt: new Date().toISOString()
             };
             entities.object.push(taskObject);
 
@@ -20726,8 +21032,19 @@ John Doe,Engineering,john@example.com"
                     person = personRel ? entities.person.find(p => p.id === personRel.subject) : null;
                 }
 
+                // Find predecessor task
+                const predecessor = task.predecessorId ? entities.object.find(t => t.id === task.predecessorId) : null;
+
+                // Find dependent tasks (tasks that depend on this one)
+                const dependentTasks = entities.object.filter(t => t.predecessorId === task.id);
+
+                // Check date status
+                const dueDateStatus = getTaskDueDateStatus(task);
+                const hasDateConflict = predecessor && task.dueDate && predecessor.dueDate &&
+                    new Date(task.dueDate) <= new Date(predecessor.dueDate);
+
                 html += `
-                    <div class="task-board-card" onclick="showEntityDetails('${task.id}')">
+                    <div class="task-board-card ${dueDateStatus}" onclick="showEntityDetails('${task.id}')">
                         <div class="task-board-card-header">
                             <div class="task-board-card-title">
                                 <i class="ph ph-file-text"></i>
@@ -20750,7 +21067,30 @@ John Doe,Engineering,john@example.com"
                                     ${person.name}
                                 </span>
                             ` : ''}
+                            ${task.dueDate ? `
+                                <span class="task-board-card-tag due-date ${dueDateStatus}">
+                                    <i class="ph ph-calendar"></i>
+                                    ${formatDateShort(task.dueDate)}
+                                </span>
+                            ` : ''}
                         </div>
+                        ${predecessor || dependentTasks.length > 0 ? `
+                            <div class="task-board-card-deps">
+                                ${predecessor ? `
+                                    <span class="task-dep-tag predecessor ${hasDateConflict ? 'conflict' : ''}">
+                                        <i class="ph ph-arrow-left"></i>
+                                        After: ${predecessor.name}
+                                        ${hasDateConflict ? '<i class="ph ph-warning" title="Due date conflict"></i>' : ''}
+                                    </span>
+                                ` : ''}
+                                ${dependentTasks.length > 0 ? `
+                                    <span class="task-dep-tag dependents">
+                                        <i class="ph ph-arrow-right"></i>
+                                        ${dependentTasks.length} task${dependentTasks.length > 1 ? 's' : ''} depend${dependentTasks.length === 1 ? 's' : ''} on this
+                                    </span>
+                                ` : ''}
+                            </div>
+                        ` : ''}
                     </div>
                 `;
             });
@@ -21138,6 +21478,29 @@ John Doe,Engineering,john@example.com"
                                     <i class="ph ph-plus"></i>
                                 </button>
                             </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="hero-task-row">
+                    <div class="hero-task-input-group">
+                        <label class="hero-task-label"><i class="ph ph-calendar"></i> Due Date</label>
+                        <input type="date"
+                               id="heroTaskDueDate"
+                               class="hero-task-date-input"
+                               onchange="updateHeroTaskPreview()">
+                    </div>
+
+                    <div class="hero-task-input-group">
+                        <label class="hero-task-label"><i class="ph ph-link-simple"></i> Depends On (Optional)</label>
+                        <div class="hero-task-select-wrapper">
+                            <select id="heroTaskPredecessor" class="hero-task-select" onchange="updateHeroTaskPreview(); checkPredecessorDateConflict()">
+                                <option value="">No dependency...</option>
+                            </select>
+                        </div>
+                        <div class="hero-task-dependency-warning" id="heroDependencyWarning" style="display: none;">
+                            <i class="ph ph-warning"></i>
+                            <span id="heroDependencyWarningText"></span>
                         </div>
                     </div>
                 </div>
