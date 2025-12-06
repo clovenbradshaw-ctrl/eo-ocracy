@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Holonic Org Knowledge Graph</title>
+    <title>Taskflow - Work Shapes Structure</title>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/d3/7.8.5/d3.min.js"></script>
     <script src="https://unpkg.com/@phosphor-icons/web"></script>
     <style>
@@ -310,6 +310,241 @@
             background: white;
             color: #C88F4A;
             text-shadow: none;
+        }
+
+        /* View toggle "More" dropdown */
+        .view-toggle-more {
+            position: relative;
+        }
+
+        .view-toggle-dropdown {
+            position: absolute;
+            top: calc(100% + 0.5rem);
+            right: 0;
+            background: white;
+            border-radius: 8px;
+            box-shadow: 0 4px 16px rgba(0,0,0,0.15);
+            min-width: 150px;
+            z-index: 100;
+            display: none;
+            overflow: hidden;
+        }
+
+        .view-toggle-dropdown.open {
+            display: block;
+        }
+
+        .view-dropdown-item {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            width: 100%;
+            padding: 0.75rem 1rem;
+            border: none;
+            background: none;
+            cursor: pointer;
+            color: #3D2E1F;
+            font-size: 0.875rem;
+            transition: background 0.15s;
+            text-align: left;
+        }
+
+        .view-dropdown-item:hover {
+            background: #FAF7F5;
+        }
+
+        .view-dropdown-item.active {
+            background: #F5EFE6;
+            color: #C88F4A;
+        }
+
+        /* Header more menu dropdown */
+        .header-more-menu {
+            position: relative;
+        }
+
+        .header-dropdown {
+            position: absolute;
+            top: calc(100% + 0.5rem);
+            right: 0;
+            background: white;
+            border-radius: 8px;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.2);
+            min-width: 180px;
+            z-index: 100;
+            display: none;
+            overflow: hidden;
+        }
+
+        .header-dropdown.open {
+            display: block;
+        }
+
+        .header-dropdown-item {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            width: 100%;
+            padding: 0.75rem 1rem;
+            border: none;
+            background: none;
+            cursor: pointer;
+            color: #3D2E1F;
+            font-size: 0.875rem;
+            transition: background 0.15s;
+            text-align: left;
+        }
+
+        .header-dropdown-item:hover {
+            background: #FAF7F5;
+        }
+
+        .header-dropdown-item.danger {
+            color: #d32f2f;
+        }
+
+        .header-dropdown-item.danger:hover {
+            background: #ffebee;
+        }
+
+        .header-dropdown-divider {
+            height: 1px;
+            background: #E5DDD1;
+            margin: 0.25rem 0;
+        }
+
+        /* How It Works Modal */
+        .how-it-works-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(0,0,0,0.5);
+            display: none;
+            align-items: center;
+            justify-content: center;
+            z-index: 2000;
+        }
+
+        .how-it-works-overlay.active {
+            display: flex;
+        }
+
+        .how-it-works-modal {
+            background: white;
+            border-radius: 16px;
+            padding: 2rem;
+            max-width: 520px;
+            width: 90%;
+            max-height: 90vh;
+            overflow-y: auto;
+            position: relative;
+            animation: slideUp 0.3s ease-out;
+        }
+
+        .how-it-works-close {
+            position: absolute;
+            top: 1rem;
+            right: 1rem;
+            background: none;
+            border: none;
+            font-size: 1.5rem;
+            color: #8B6F47;
+            cursor: pointer;
+            padding: 0.25rem;
+            border-radius: 4px;
+        }
+
+        .how-it-works-close:hover {
+            background: #F5EFE6;
+            color: #C88F4A;
+        }
+
+        .how-it-works-modal h2 {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            color: #3D2E1F;
+            font-size: 1.5rem;
+            margin-bottom: 0.5rem;
+        }
+
+        .how-it-works-modal h2 i {
+            color: #C88F4A;
+        }
+
+        .how-it-works-tagline {
+            color: #8B6F47;
+            font-size: 1.1rem;
+            margin-bottom: 1.5rem;
+            font-style: italic;
+        }
+
+        .how-it-works-steps {
+            display: flex;
+            flex-direction: column;
+            gap: 1rem;
+            margin-bottom: 1.5rem;
+        }
+
+        .how-it-works-step {
+            display: flex;
+            gap: 1rem;
+            align-items: flex-start;
+        }
+
+        .how-it-works-step .step-icon {
+            width: 40px;
+            height: 40px;
+            background: linear-gradient(135deg, #FFF9F0 0%, #FAF7F5 100%);
+            border: 2px solid #E5DDD1;
+            border-radius: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            flex-shrink: 0;
+        }
+
+        .how-it-works-step .step-icon i {
+            font-size: 1.25rem;
+            color: #C88F4A;
+        }
+
+        .how-it-works-step .step-content h3 {
+            font-size: 0.95rem;
+            color: #3D2E1F;
+            margin-bottom: 0.25rem;
+        }
+
+        .how-it-works-step .step-content p {
+            font-size: 0.85rem;
+            color: #6B5642;
+            line-height: 1.4;
+        }
+
+        .how-it-works-insight {
+            background: linear-gradient(135deg, #FFF9F0 0%, #FAF7F5 100%);
+            border: 1px solid #E5DDD1;
+            border-radius: 8px;
+            padding: 1rem;
+            margin-bottom: 1.5rem;
+            font-size: 0.9rem;
+            color: #6B5642;
+            line-height: 1.5;
+        }
+
+        .how-it-works-insight strong {
+            color: #C88F4A;
+        }
+
+        .how-it-works-modal .btn {
+            width: 100%;
+            padding: 0.75rem;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 0.5rem;
         }
 
         .container {
@@ -7996,7 +8231,7 @@
 <body>
     <div class="header">
         <h1>
-            <i class="ph ph-buildings"></i>
+            <i class="ph ph-check-square"></i>
             <div class="workspace-selector">
                 <button class="workspace-dropdown-toggle" onclick="toggleWorkspaceDropdown(event)">
                     <span class="workspace-name" id="workspaceNameText">My Organization</span>
@@ -8021,43 +8256,62 @@
             </div>
             <div id="filterStatus" style="color: rgba(255,255,255,0.9); font-size: 0.875rem; margin-right: 0.5rem;"></div>
             <div class="view-toggle">
-                <button class="view-toggle-btn" data-view="tree" onclick="switchView('tree')">
-                    <i class="ph ph-tree-structure"></i> Tree
-                </button>
-                <button class="view-toggle-btn active" data-view="card" onclick="switchView('card')">
-                    <i class="ph ph-squares-four"></i> Cards
-                </button>
-                <!-- Graph button hidden - needs visual improvements
-                <button class="view-toggle-btn" data-view="graph" onclick="switchView('graph')">
-                    <i class="ph ph-graph"></i> Graph
-                </button>
-                -->
-                <button class="view-toggle-btn" data-view="venn" onclick="switchView('venn')">
-                    <i class="ph ph-circles-three"></i> Venn
-                </button>
-                <button class="view-toggle-btn" data-view="orgchart" onclick="switchView('orgchart')">
-                    <i class="ph ph-flow-arrow"></i> Org Chart
-                </button>
-                <button class="view-toggle-btn tasks-view-btn" data-view="tasks" onclick="switchView('tasks')">
+                <button class="view-toggle-btn tasks-view-btn active" data-view="tasks" onclick="switchView('tasks')">
                     <i class="ph ph-kanban"></i> Tasks
                     <span class="task-count-badge" id="taskCountBadge" style="display: none;">0</span>
                 </button>
+                <button class="view-toggle-btn" data-view="card" onclick="switchView('card')">
+                    <i class="ph ph-squares-four"></i> Cards
+                </button>
+                <div class="view-toggle-more" id="viewToggleMore">
+                    <button class="view-toggle-btn view-more-btn" onclick="toggleMoreViews(event)">
+                        <i class="ph ph-dots-three"></i> More
+                    </button>
+                    <div class="view-toggle-dropdown" id="viewToggleDropdown">
+                        <button class="view-dropdown-item" data-view="tree" onclick="switchView('tree'); closeMoreViews()">
+                            <i class="ph ph-tree-structure"></i> Tree
+                        </button>
+                        <button class="view-dropdown-item" data-view="orgchart" onclick="switchView('orgchart'); closeMoreViews()">
+                            <i class="ph ph-flow-arrow"></i> Org Chart
+                        </button>
+                        <button class="view-dropdown-item" data-view="venn" onclick="switchView('venn'); closeMoreViews()">
+                            <i class="ph ph-circles-three"></i> Venn
+                        </button>
+                    </div>
+                </div>
             </div>
             <button class="undo-btn" id="undoBtn" onclick="undo()" disabled title="Nothing to undo">
                 <i class="ph ph-arrow-counter-clockwise"></i>
                 Undo
                 <span class="undo-count" id="undoCount" style="display: none;">0</span>
             </button>
-            <button class="btn btn-small btn-outline" onclick="toggleSampleData()" id="sampleDataBtn">
-                <i class="ph ph-database"></i> <span id="sampleDataText">Clear Sample Data</span>
+            <button class="btn btn-small" onclick="exportData()">
+                <i class="ph ph-download"></i> Export
             </button>
-            <button class="btn btn-small btn-outline" onclick="clearAllData()">
-                <i class="ph ph-trash"></i> Clear All
-            </button>
-            <button class="btn btn-small btn-outline" onclick="resetGraph()">Reset View</button>
-            <button class="btn btn-small btn-outline" onclick="openBulkImportModal()"><i class="ph ph-upload-simple"></i> Import</button>
-            <button class="btn btn-small btn-outline" onclick="importData()"><i class="ph ph-download-simple"></i> Import Data</button>
-            <button class="btn btn-small" onclick="exportData()">Export Data</button>
+            <div class="header-more-menu">
+                <button class="btn btn-small btn-outline" onclick="toggleHeaderMenu(event)">
+                    <i class="ph ph-dots-three-outline"></i>
+                </button>
+                <div class="header-dropdown" id="headerDropdown">
+                    <button class="header-dropdown-item" onclick="importData(); closeHeaderMenu()">
+                        <i class="ph ph-upload"></i> Import Data
+                    </button>
+                    <button class="header-dropdown-item" onclick="openBulkImportModal(); closeHeaderMenu()">
+                        <i class="ph ph-upload-simple"></i> Bulk Import (CSV)
+                    </button>
+                    <div class="header-dropdown-divider"></div>
+                    <button class="header-dropdown-item" onclick="toggleSampleData(); closeHeaderMenu()" id="sampleDataBtn">
+                        <i class="ph ph-database"></i> <span id="sampleDataText">Toggle Sample Data</span>
+                    </button>
+                    <button class="header-dropdown-item" onclick="resetGraph(); closeHeaderMenu()">
+                        <i class="ph ph-arrows-clockwise"></i> Reset View
+                    </button>
+                    <div class="header-dropdown-divider"></div>
+                    <button class="header-dropdown-item danger" onclick="clearAllData(); closeHeaderMenu()">
+                        <i class="ph ph-trash"></i> Clear All Data
+                    </button>
+                </div>
+            </div>
         </div>
     </div>
 
@@ -8071,12 +8325,12 @@
             <div id="taskWizard" class="task-wizard">
                 <!-- Initial CTA -->
                 <div id="wizardCTA" class="task-wizard-cta">
-                    <h3>What do you need to get done?</h3>
+                    <h3>What needs to get done?</h3>
                     <button class="btn-create-task" onclick="startTaskWizard()">
                         <i class="ph ph-plus-circle"></i> Create a Task
                     </button>
                     <div class="helper-links">
-                        <a onclick="loadSampleData()">Load sample data</a> · <a onclick="dismissTaskWizard()">Skip intro</a>
+                        <a onclick="loadSampleData()">See example</a> · <a onclick="showHowItWorks()">How it works</a>
                     </div>
                 </div>
 
@@ -9711,7 +9965,7 @@ John Doe,Engineering,john@example.com"
         let selectedEntityType = 'role';
         let selectedPredicate = 'DES'; // Default to Define operator
         let focusedNode = null;
-        let currentView = 'card';
+        let currentView = 'tasks';
 
         // ==========================================
         // UNDO HISTORY & RECYCLE BIN
@@ -9780,9 +10034,61 @@ John Doe,Engineering,john@example.com"
                 document.getElementById('graphView').classList.add('active');
                 setTimeout(() => updateGraph(), 100);
             }
+
+            // Also update dropdown items if the selected view is in the dropdown
+            document.querySelectorAll('.view-dropdown-item').forEach(item => {
+                item.classList.remove('active');
+                if (item.dataset.view === view) {
+                    item.classList.add('active');
+                    // Also highlight the "More" button when a dropdown view is active
+                    document.querySelector('.view-more-btn')?.classList.add('active');
+                }
+            });
         }
 
-        // Initialize with sample data
+        // More views dropdown toggle
+        function toggleMoreViews(event) {
+            event.stopPropagation();
+            const dropdown = document.getElementById('viewToggleDropdown');
+            dropdown.classList.toggle('open');
+        }
+
+        function closeMoreViews() {
+            const dropdown = document.getElementById('viewToggleDropdown');
+            dropdown.classList.remove('open');
+        }
+
+        // Close dropdown when clicking outside
+        document.addEventListener('click', function(e) {
+            if (!e.target.closest('.view-toggle-more')) {
+                closeMoreViews();
+            }
+            if (!e.target.closest('.header-more-menu')) {
+                closeHeaderMenu();
+            }
+        });
+
+        // Header menu dropdown toggle
+        function toggleHeaderMenu(event) {
+            event.stopPropagation();
+            const dropdown = document.getElementById('headerDropdown');
+            dropdown.classList.toggle('open');
+        }
+
+        function closeHeaderMenu() {
+            const dropdown = document.getElementById('headerDropdown');
+            dropdown.classList.remove('open');
+        }
+
+        // How It Works modal
+        function showHowItWorks() {
+            document.getElementById('howItWorksOverlay').classList.add('active');
+        }
+
+        function closeHowItWorks() {
+            document.getElementById('howItWorksOverlay').classList.remove('active');
+        }
+
         // Entity Modal
         function openEntityModal(entityId, entityType) {
             const entity = entities[entityType]?.find(e => e.id === entityId);
@@ -20613,7 +20919,7 @@ John Doe,Engineering,john@example.com"
                 console.log(success ? '✅' : '❌', message);
             }
             
-            console.log('🔧 Initializing Holonic Knowledge Graph...');
+            console.log('🔧 Initializing Taskflow...');
             console.log('📍 Loading from:', window.location.protocol);
             console.log('🌐 D3.js loaded:', typeof d3 !== 'undefined');
             
@@ -20729,10 +21035,10 @@ John Doe,Engineering,john@example.com"
                 });
             }
             
-            // Show card view by default
+            // Show tasks view by default - work shapes structure
             try {
-                switchView('card');
-                console.log('✅ Card view activated');
+                switchView('tasks');
+                console.log('✅ Tasks view activated');
             } catch (e) {
                 console.error('❌ Error switching to card view:', e);
                 updateStatus('Error loading view', false);
@@ -20856,6 +21162,56 @@ John Doe,Engineering,john@example.com"
                     </button>
                 </div>
             </div>
+        </div>
+    </div>
+
+    <!-- How It Works Modal -->
+    <div class="how-it-works-overlay" id="howItWorksOverlay" onclick="if(event.target === this) closeHowItWorks()">
+        <div class="how-it-works-modal">
+            <button class="how-it-works-close" onclick="closeHowItWorks()">
+                <i class="ph ph-x"></i>
+            </button>
+            <h2><i class="ph ph-lightbulb"></i> How Taskflow Works</h2>
+            <p class="how-it-works-tagline">Start with tasks. Structure emerges.</p>
+
+            <div class="how-it-works-steps">
+                <div class="how-it-works-step">
+                    <div class="step-icon"><i class="ph ph-check-square"></i></div>
+                    <div class="step-content">
+                        <h3>1. Create Tasks</h3>
+                        <p>Start with what needs to get done. Tasks are work items, deliverables, or goals.</p>
+                    </div>
+                </div>
+                <div class="how-it-works-step">
+                    <div class="step-icon"><i class="ph ph-briefcase"></i></div>
+                    <div class="step-content">
+                        <h3>2. Assign to Roles</h3>
+                        <p>Every task belongs to a role. Roles represent functions - not specific people.</p>
+                    </div>
+                </div>
+                <div class="how-it-works-step">
+                    <div class="step-icon"><i class="ph ph-user"></i></div>
+                    <div class="step-content">
+                        <h3>3. Tag People (Optional)</h3>
+                        <p>Attach real people to roles. One person can fill many roles; one role can have many people.</p>
+                    </div>
+                </div>
+                <div class="how-it-works-step">
+                    <div class="step-icon"><i class="ph ph-tree-structure"></i></div>
+                    <div class="step-content">
+                        <h3>4. Structure Emerges</h3>
+                        <p>As you add tasks and roles, your organization's shape reveals itself. Use Cards, Tree, or Org Chart views to explore.</p>
+                    </div>
+                </div>
+            </div>
+
+            <div class="how-it-works-insight">
+                <strong>The insight:</strong> Traditional org charts start with structure. Taskflow starts with work, and structure follows naturally.
+            </div>
+
+            <button class="btn" onclick="closeHowItWorks(); startTaskWizard();">
+                <i class="ph ph-rocket"></i> Get Started
+            </button>
         </div>
     </div>
 </body>
