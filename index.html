@@ -7311,6 +7311,44 @@
             color: #C88F4A;
             cursor: pointer;
         }
+
+        /* Compact Task CTA - Always visible quick action */
+        .task-quick-cta {
+            background: linear-gradient(135deg, #FFF9F0 0%, #FAF7F5 100%);
+            border: 2px solid #C88F4A;
+            border-radius: 12px;
+            padding: 1rem;
+            margin-bottom: 1rem;
+            text-align: center;
+        }
+
+        .task-quick-cta .btn-create-task {
+            background: #C88F4A;
+            color: white;
+            border: none;
+            padding: 0.875rem 1.5rem;
+            font-size: 1rem;
+            font-weight: 600;
+            border-radius: 8px;
+            cursor: pointer;
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+            transition: all 0.2s;
+            box-shadow: 0 2px 8px rgba(200, 143, 74, 0.3);
+            width: 100%;
+            justify-content: center;
+        }
+
+        .task-quick-cta .btn-create-task:hover {
+            background: #B07D3A;
+            transform: translateY(-1px);
+            box-shadow: 0 4px 12px rgba(200, 143, 74, 0.4);
+        }
+
+        .task-quick-cta .btn-create-task i {
+            font-size: 1.25rem;
+        }
     </style>
 </head>
 <body>
@@ -7490,6 +7528,13 @@
                         </div>
                     </div>
                 </div>
+            </div>
+
+            <!-- Compact Task CTA - Shows when wizard is dismissed -->
+            <div id="taskQuickCTA" class="task-quick-cta" style="display: none;">
+                <button class="btn-create-task" onclick="startTaskWizard(); showFullWizard();">
+                    <i class="ph ph-plus-circle"></i> Create a Task
+                </button>
             </div>
 
             <div class="panel-title"><i class="ph ph-lightning"></i> Your Workspace</div>
@@ -18937,22 +18982,44 @@ John Doe,Engineering,john@example.com"
             newPersonName: ''
         };
 
-        // Dismiss/hide the task wizard
+        // Dismiss/hide the task wizard - show compact CTA instead
         function dismissTaskWizard() {
             const wizard = document.getElementById('taskWizard');
+            const quickCTA = document.getElementById('taskQuickCTA');
             if (wizard) {
                 wizard.style.display = 'none';
                 localStorage.setItem('taskWizardDismissed', 'true');
+            }
+            // Show the compact CTA so task creation is always accessible
+            if (quickCTA) {
+                quickCTA.style.display = 'block';
             }
         }
 
         function checkTaskWizard() {
             const wizard = document.getElementById('taskWizard');
+            const quickCTA = document.getElementById('taskQuickCTA');
             const dismissed = localStorage.getItem('taskWizardDismissed');
             // Also hide if there are existing entities
             const hasEntities = Object.values(entities).some(arr => arr.length > 0);
             if (wizard && (dismissed === 'true' || hasEntities)) {
                 wizard.style.display = 'none';
+                // Show compact CTA so task creation is always the first, prominent option
+                if (quickCTA) {
+                    quickCTA.style.display = 'block';
+                }
+            }
+        }
+
+        // Show full wizard from compact CTA
+        function showFullWizard() {
+            const wizard = document.getElementById('taskWizard');
+            const quickCTA = document.getElementById('taskQuickCTA');
+            if (wizard) {
+                wizard.style.display = 'block';
+            }
+            if (quickCTA) {
+                quickCTA.style.display = 'none';
             }
         }
 
@@ -18974,11 +19041,24 @@ John Doe,Engineering,john@example.com"
             updateWizardProgress(1);
         }
 
-        // Cancel wizard and go back to CTA
+        // Cancel wizard and go back to CTA (compact or full based on state)
         function cancelTaskWizard() {
-            document.getElementById('wizardCTA').style.display = 'block';
             document.getElementById('wizardSteps').classList.remove('active');
             resetWizardSteps();
+
+            // Show compact CTA if there are entities, otherwise show full wizard CTA
+            const hasEntities = Object.values(entities).some(arr => arr.length > 0);
+            const wizard = document.getElementById('taskWizard');
+            const quickCTA = document.getElementById('taskQuickCTA');
+
+            if (hasEntities) {
+                // Show compact CTA
+                if (wizard) wizard.style.display = 'none';
+                if (quickCTA) quickCTA.style.display = 'block';
+            } else {
+                // Show full wizard CTA
+                document.getElementById('wizardCTA').style.display = 'block';
+            }
         }
 
         function resetWizardSteps() {
