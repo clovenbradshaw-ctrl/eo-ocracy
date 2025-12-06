@@ -6416,6 +6416,191 @@
             background: rgba(255,255,255,0.3);
         }
 
+        /* Import Type Tabs (top-level) */
+        .import-type-tabs {
+            display: flex;
+            border-bottom: 2px solid #E5DDD1;
+            background: #FAF7F5;
+        }
+
+        .import-type-tab {
+            flex: 1;
+            padding: 1rem 1.5rem;
+            background: none;
+            border: none;
+            cursor: pointer;
+            font-size: 0.95rem;
+            font-weight: 500;
+            color: #8B6F47;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 0.5rem;
+            transition: all 0.2s;
+            border-bottom: 3px solid transparent;
+            margin-bottom: -2px;
+        }
+
+        .import-type-tab:hover {
+            background: rgba(200, 143, 74, 0.1);
+            color: #C88F4A;
+        }
+
+        .import-type-tab.active {
+            background: white;
+            color: #C88F4A;
+            border-bottom-color: #C88F4A;
+            font-weight: 600;
+        }
+
+        /* Workspace Import Styles */
+        .workspace-import-container {
+            padding: 1rem 0;
+        }
+
+        .workspace-import-intro {
+            background: #FFF9F0;
+            border: 1px solid #E5DDD1;
+            border-radius: 8px;
+            padding: 1rem;
+            margin-bottom: 1.5rem;
+            display: flex;
+            gap: 0.75rem;
+            align-items: flex-start;
+        }
+
+        .workspace-import-intro i {
+            color: #C88F4A;
+            font-size: 1.25rem;
+            flex-shrink: 0;
+        }
+
+        .workspace-import-intro p {
+            font-size: 0.875rem;
+            color: #6B5642;
+            margin: 0;
+            line-height: 1.5;
+        }
+
+        .workspace-import-upload {
+            border: 2px dashed #D4C4B0;
+            border-radius: 12px;
+            padding: 3rem 2rem;
+            text-align: center;
+            cursor: pointer;
+            transition: all 0.2s;
+            background: #FDFCFB;
+        }
+
+        .workspace-import-upload:hover {
+            border-color: #C88F4A;
+            background: #FFF9F0;
+        }
+
+        .workspace-import-upload i {
+            font-size: 3rem;
+            color: #C88F4A;
+            margin-bottom: 1rem;
+            display: block;
+        }
+
+        .workspace-import-file-preview {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+            padding: 1rem;
+            background: #FAF7F5;
+            border: 1px solid #E5DDD1;
+            border-radius: 8px;
+            margin-top: 1rem;
+        }
+
+        .workspace-import-file-icon {
+            width: 48px;
+            height: 48px;
+            background: #C88F4A;
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-size: 1.5rem;
+        }
+
+        .workspace-import-file-details {
+            flex: 1;
+        }
+
+        .workspace-import-file-name {
+            font-weight: 600;
+            color: #3D2E1F;
+            font-size: 0.95rem;
+        }
+
+        .workspace-import-file-meta {
+            font-size: 0.8rem;
+            color: #8B6F47;
+            margin-top: 0.25rem;
+        }
+
+        .workspace-import-file-remove {
+            width: 32px;
+            height: 32px;
+            border: none;
+            background: #E5DDD1;
+            border-radius: 50%;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: #6B5642;
+            transition: all 0.2s;
+        }
+
+        .workspace-import-file-remove:hover {
+            background: #D9534F;
+            color: white;
+        }
+
+        .workspace-import-preview-header {
+            font-size: 0.9rem;
+            font-weight: 600;
+            color: #6B5642;
+            margin-bottom: 0.75rem;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .workspace-import-preview-content {
+            background: #FAF7F5;
+            border: 1px solid #E5DDD1;
+            border-radius: 8px;
+            padding: 1rem;
+        }
+
+        .workspace-import-preview-row {
+            display: flex;
+            justify-content: space-between;
+            padding: 0.5rem 0;
+            border-bottom: 1px solid #E5DDD1;
+        }
+
+        .workspace-import-preview-row:last-child {
+            border-bottom: none;
+        }
+
+        .workspace-import-preview-label {
+            font-size: 0.875rem;
+            color: #8B6F47;
+        }
+
+        .workspace-import-preview-value {
+            font-size: 0.875rem;
+            font-weight: 600;
+            color: #3D2E1F;
+        }
+
         .bulk-import-body {
             padding: 1.5rem 2rem;
             overflow-y: auto;
@@ -8055,8 +8240,7 @@
                 <i class="ph ph-trash"></i> Clear All
             </button>
             <button class="btn btn-small btn-outline" onclick="resetGraph()">Reset View</button>
-            <button class="btn btn-small btn-outline" onclick="openBulkImportModal()"><i class="ph ph-upload-simple"></i> Import</button>
-            <button class="btn btn-small btn-outline" onclick="importData()"><i class="ph ph-download-simple"></i> Import Data</button>
+            <button class="btn btn-small btn-outline" onclick="openImportModal()"><i class="ph ph-upload-simple"></i> Import</button>
             <button class="btn btn-small" onclick="exportData()">Export Data</button>
         </div>
     </div>
@@ -8761,14 +8945,25 @@
     <div id="bulkImportModal" class="bulk-import-overlay" onclick="if(event.target === this) closeBulkImportModal()">
         <div class="bulk-import-modal">
             <div class="bulk-import-header">
-                <h2><i class="ph ph-upload-simple"></i> Bulk Import</h2>
+                <h2><i class="ph ph-upload-simple"></i> Import</h2>
                 <button class="bulk-import-close" onclick="closeBulkImportModal()">
                     <i class="ph ph-x"></i>
                 </button>
             </div>
+            <!-- Top-level Import Type Tabs -->
+            <div class="import-type-tabs">
+                <button class="import-type-tab active" data-import-type="bulk" onclick="switchImportType('bulk')">
+                    <i class="ph ph-list-plus"></i> Bulk Import
+                </button>
+                <button class="import-type-tab" data-import-type="workspace" onclick="switchImportType('workspace')">
+                    <i class="ph ph-folder-open"></i> Import Workspace
+                </button>
+            </div>
             <div class="bulk-import-body">
-                <!-- Step Indicator -->
-                <div class="bulk-import-steps">
+                <!-- Bulk Import Content -->
+                <div id="importTypeBulk">
+                    <!-- Step Indicator -->
+                    <div class="bulk-import-steps">
                     <div class="bulk-import-step active" id="bulkImportStep1">
                         <span class="bulk-import-step-number">1</span>
                         Select Type & Input Data
@@ -8951,22 +9146,91 @@ John Doe,Engineering,john@example.com"
                         </div>
                     </div>
                 </div>
+                </div><!-- End importTypeBulk -->
+
+                <!-- Import Workspace Content -->
+                <div id="importTypeWorkspace" style="display: none;">
+                    <div class="workspace-import-container">
+                        <div class="workspace-import-intro">
+                            <i class="ph ph-info"></i>
+                            <p>Import a previously exported workspace file (JSON format). This will create a new workspace with all entities and relationships from the file.</p>
+                        </div>
+
+                        <div class="workspace-import-upload" onclick="document.getElementById('workspaceImportFileInput').click()">
+                            <i class="ph ph-file-arrow-up"></i>
+                            <div><strong>Click to upload</strong> or drag and drop</div>
+                            <div style="font-size: 0.8rem; color: #8B6F47; margin-top: 0.5rem;">JSON workspace files (.json)</div>
+                            <input type="file" id="workspaceImportFileInput" accept=".json" onchange="handleWorkspaceImportFile(event)" style="display: none;">
+                        </div>
+
+                        <div id="workspaceImportFileInfo" style="display: none;">
+                            <div class="workspace-import-file-preview">
+                                <div class="workspace-import-file-icon">
+                                    <i class="ph ph-file-text"></i>
+                                </div>
+                                <div class="workspace-import-file-details">
+                                    <div class="workspace-import-file-name" id="workspaceImportFileName"></div>
+                                    <div class="workspace-import-file-meta" id="workspaceImportFileMeta"></div>
+                                </div>
+                                <button class="workspace-import-file-remove" onclick="clearWorkspaceImportFile()">
+                                    <i class="ph ph-x"></i>
+                                </button>
+                            </div>
+                        </div>
+
+                        <div id="workspaceImportPreview" style="display: none;">
+                            <div class="workspace-import-preview-header">
+                                <i class="ph ph-eye"></i> Preview
+                            </div>
+                            <div class="workspace-import-preview-content">
+                                <div class="workspace-import-preview-row">
+                                    <span class="workspace-import-preview-label">Workspace Name:</span>
+                                    <span id="workspaceImportPreviewName" class="workspace-import-preview-value"></span>
+                                </div>
+                                <div class="workspace-import-preview-row">
+                                    <span class="workspace-import-preview-label">Entities:</span>
+                                    <span id="workspaceImportPreviewEntities" class="workspace-import-preview-value"></span>
+                                </div>
+                                <div class="workspace-import-preview-row">
+                                    <span class="workspace-import-preview-label">Relationships:</span>
+                                    <span id="workspaceImportPreviewRelationships" class="workspace-import-preview-value"></span>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div id="workspaceImportSuccess" style="display: none;">
+                            <div class="bulk-import-success">
+                                <i class="ph ph-check-circle"></i>
+                                <h3>Workspace Imported!</h3>
+                                <p id="workspaceImportSuccessMessage">Successfully imported workspace.</p>
+                            </div>
+                        </div>
+                    </div>
+                </div><!-- End importTypeWorkspace -->
             </div>
             <div class="bulk-import-footer">
                 <div class="bulk-import-footer-info" id="bulkImportFooterInfo">
                     Select an entity type and paste or upload your data to continue.
                 </div>
                 <div class="bulk-import-footer-actions">
-                    <button class="bulk-import-btn secondary" id="bulkImportBackBtn" onclick="bulkImportBack()" style="display: none;">
+                    <!-- Bulk Import Buttons -->
+                    <button class="bulk-import-btn secondary bulk-import-action" id="bulkImportBackBtn" onclick="bulkImportBack()" style="display: none;">
                         <i class="ph ph-arrow-left"></i> Back
                     </button>
-                    <button class="bulk-import-btn primary" id="bulkImportNextBtn" onclick="bulkImportNext()" disabled>
+                    <button class="bulk-import-btn primary bulk-import-action" id="bulkImportNextBtn" onclick="bulkImportNext()" disabled>
                         <i class="ph ph-arrow-right"></i> Next
                     </button>
-                    <button class="bulk-import-btn primary" id="bulkImportImportBtn" onclick="executeBulkImport()" style="display: none;">
+                    <button class="bulk-import-btn primary bulk-import-action" id="bulkImportImportBtn" onclick="executeBulkImport()" style="display: none;">
                         <i class="ph ph-check"></i> Import
                     </button>
-                    <button class="bulk-import-btn primary" id="bulkImportDoneBtn" onclick="closeBulkImportModal()" style="display: none;">
+                    <button class="bulk-import-btn primary bulk-import-action" id="bulkImportDoneBtn" onclick="closeBulkImportModal()" style="display: none;">
+                        <i class="ph ph-check"></i> Done
+                    </button>
+                    <!-- Workspace Import Buttons -->
+                    <button class="bulk-import-btn primary workspace-import-action" id="workspaceImportBtn" onclick="executeWorkspaceImport()" style="display: none;" disabled>
+                        <i class="ph ph-check"></i> Import Workspace
+                    </button>
+                    <button class="bulk-import-btn primary workspace-import-action" id="workspaceImportDoneBtn" onclick="closeBulkImportModal()" style="display: none;">
                         <i class="ph ph-check"></i> Done
                     </button>
                 </div>
@@ -18725,78 +18989,6 @@ John Doe,Engineering,john@example.com"
             a.click();
         }
 
-        function importData() {
-            // Create a file input dynamically
-            const input = document.createElement('input');
-            input.type = 'file';
-            input.accept = '.json';
-
-            input.onchange = async (e) => {
-                const file = e.target.files[0];
-                if (!file) return;
-
-                try {
-                    const text = await file.text();
-                    const data = JSON.parse(text);
-
-                    // Validate the data structure
-                    if (!data.workspaceName || typeof data.workspaceName !== 'string') {
-                        alert('Invalid import file: missing or invalid workspaceName');
-                        return;
-                    }
-
-                    if (!data.entities || typeof data.entities !== 'object') {
-                        alert('Invalid import file: missing or invalid entities');
-                        return;
-                    }
-
-                    // Validate entity types
-                    const requiredTypes = ['unit', 'team', 'role', 'person', 'object'];
-                    for (const type of requiredTypes) {
-                        if (!Array.isArray(data.entities[type])) {
-                            // Initialize missing types as empty arrays
-                            data.entities[type] = [];
-                        }
-                    }
-
-                    if (!Array.isArray(data.relationships)) {
-                        // Initialize missing relationships as empty array
-                        data.relationships = [];
-                    }
-
-                    // Create a new workspace with the imported data
-                    const wsId = generateWorkspaceId();
-                    const importedName = data.workspaceName + ' (Imported)';
-
-                    workspaces[wsId] = {
-                        id: wsId,
-                        name: importedName,
-                        entities: JSON.parse(JSON.stringify(data.entities)),
-                        relationships: JSON.parse(JSON.stringify(data.relationships)),
-                        hasSampleData: false,
-                        createdAt: Date.now(),
-                        updatedAt: Date.now()
-                    };
-
-                    saveWorkspaces();
-                    switchWorkspace(wsId);
-                    renderWorkspaceList();
-
-                    // Log activity
-                    const totalEntities = Object.values(data.entities).reduce((sum, arr) => sum + arr.length, 0);
-                    logActivity('INS', 'system', null, `Imported workspace with ${totalEntities} entities and ${data.relationships.length} relationships`);
-
-                    alert(`Successfully imported "${data.workspaceName}" as a new workspace with ${totalEntities} entities and ${data.relationships.length} relationships.`);
-
-                } catch (err) {
-                    console.error('Import error:', err);
-                    alert('Failed to import file: ' + err.message);
-                }
-            };
-
-            input.click();
-        }
-
         // ==========================================
         // BULK IMPORT FUNCTIONALITY
         // ==========================================
@@ -18836,8 +19028,21 @@ John Doe,Engineering,john@example.com"
             ]
         };
 
-        function openBulkImportModal() {
-            // Reset state
+        // Workspace Import State
+        let workspaceImportState = {
+            file: null,
+            data: null,
+            fileName: ''
+        };
+
+        // Current import type ('bulk' or 'workspace')
+        let currentImportType = 'bulk';
+
+        // Open the unified import modal
+        function openImportModal(defaultTab = 'bulk') {
+            currentImportType = defaultTab;
+
+            // Reset bulk import state
             bulkImportState = {
                 step: 1,
                 entityType: 'person',
@@ -18849,7 +19054,14 @@ John Doe,Engineering,john@example.com"
                 processedData: []
             };
 
-            // Reset UI
+            // Reset workspace import state
+            workspaceImportState = {
+                file: null,
+                data: null,
+                fileName: ''
+            };
+
+            // Reset bulk import UI
             document.getElementById('bulkImportPasteArea').value = '';
             document.getElementById('bulkImportFileInput').value = '';
             document.getElementById('bulkImportFileName').textContent = '';
@@ -18860,14 +19072,210 @@ John Doe,Engineering,john@example.com"
                 btn.classList.toggle('active', btn.dataset.type === 'person');
             });
 
-            // Reset tabs
+            // Reset bulk import tabs
             switchBulkImportTab('paste');
 
             // Reset steps
             updateBulkImportStep(1);
 
+            // Reset workspace import UI
+            document.getElementById('workspaceImportFileInput').value = '';
+            document.getElementById('workspaceImportFileInfo').style.display = 'none';
+            document.getElementById('workspaceImportPreview').style.display = 'none';
+            document.getElementById('workspaceImportSuccess').style.display = 'none';
+            document.querySelector('.workspace-import-upload').style.display = 'block';
+            document.querySelector('.workspace-import-intro').style.display = 'flex';
+
+            // Switch to appropriate tab
+            switchImportType(defaultTab);
+
             // Show modal
             document.getElementById('bulkImportModal').classList.add('open');
+        }
+
+        // Switch between import types (bulk vs workspace)
+        function switchImportType(type) {
+            currentImportType = type;
+
+            // Update tab buttons
+            document.querySelectorAll('.import-type-tab').forEach(tab => {
+                tab.classList.toggle('active', tab.dataset.importType === type);
+            });
+
+            // Show/hide content
+            document.getElementById('importTypeBulk').style.display = type === 'bulk' ? 'block' : 'none';
+            document.getElementById('importTypeWorkspace').style.display = type === 'workspace' ? 'block' : 'none';
+
+            // Update footer buttons visibility
+            document.querySelectorAll('.bulk-import-action').forEach(btn => {
+                btn.style.display = type === 'bulk' ? '' : 'none';
+            });
+
+            const workspaceImportBtn = document.getElementById('workspaceImportBtn');
+            const workspaceImportDoneBtn = document.getElementById('workspaceImportDoneBtn');
+
+            if (type === 'workspace') {
+                // Show workspace import button if file is loaded, otherwise hide
+                const hasData = workspaceImportState.data !== null;
+                const showSuccess = document.getElementById('workspaceImportSuccess').style.display !== 'none';
+
+                if (showSuccess) {
+                    workspaceImportBtn.style.display = 'none';
+                    workspaceImportDoneBtn.style.display = 'inline-flex';
+                } else {
+                    workspaceImportBtn.style.display = 'inline-flex';
+                    workspaceImportBtn.disabled = !hasData;
+                    workspaceImportDoneBtn.style.display = 'none';
+                }
+            } else {
+                workspaceImportBtn.style.display = 'none';
+                workspaceImportDoneBtn.style.display = 'none';
+            }
+
+            // Update footer info text
+            if (type === 'bulk') {
+                document.getElementById('bulkImportFooterInfo').textContent =
+                    'Select an entity type and paste or upload your data to continue.';
+            } else {
+                document.getElementById('bulkImportFooterInfo').textContent =
+                    'Upload a previously exported workspace JSON file.';
+            }
+        }
+
+        // Handle workspace import file selection
+        async function handleWorkspaceImportFile(event) {
+            const file = event.target.files[0];
+            if (!file) return;
+
+            try {
+                const text = await file.text();
+                const data = JSON.parse(text);
+
+                // Validate the data structure
+                if (!data.workspaceName || typeof data.workspaceName !== 'string') {
+                    alert('Invalid import file: missing or invalid workspaceName');
+                    event.target.value = '';
+                    return;
+                }
+
+                if (!data.entities || typeof data.entities !== 'object') {
+                    alert('Invalid import file: missing or invalid entities');
+                    event.target.value = '';
+                    return;
+                }
+
+                // Validate entity types (initialize missing ones)
+                const requiredTypes = ['unit', 'team', 'role', 'person', 'object'];
+                for (const type of requiredTypes) {
+                    if (!Array.isArray(data.entities[type])) {
+                        data.entities[type] = [];
+                    }
+                }
+
+                if (!Array.isArray(data.relationships)) {
+                    data.relationships = [];
+                }
+
+                // Store the data
+                workspaceImportState = {
+                    file: file,
+                    data: data,
+                    fileName: file.name
+                };
+
+                // Update UI
+                document.getElementById('workspaceImportFileName').textContent = file.name;
+
+                const totalEntities = Object.values(data.entities).reduce((sum, arr) => sum + arr.length, 0);
+                document.getElementById('workspaceImportFileMeta').textContent =
+                    `${(file.size / 1024).toFixed(1)} KB • ${totalEntities} entities • ${data.relationships.length} relationships`;
+
+                document.getElementById('workspaceImportFileInfo').style.display = 'block';
+
+                // Show preview
+                document.getElementById('workspaceImportPreviewName').textContent = data.workspaceName;
+
+                const entityBreakdown = requiredTypes
+                    .filter(type => data.entities[type].length > 0)
+                    .map(type => `${data.entities[type].length} ${type}${data.entities[type].length !== 1 ? 's' : ''}`)
+                    .join(', ') || 'None';
+                document.getElementById('workspaceImportPreviewEntities').textContent = entityBreakdown;
+                document.getElementById('workspaceImportPreviewRelationships').textContent = data.relationships.length;
+
+                document.getElementById('workspaceImportPreview').style.display = 'block';
+
+                // Enable import button
+                document.getElementById('workspaceImportBtn').disabled = false;
+
+            } catch (err) {
+                console.error('Error parsing workspace file:', err);
+                alert('Failed to parse file: ' + err.message);
+                event.target.value = '';
+            }
+        }
+
+        // Clear workspace import file
+        function clearWorkspaceImportFile() {
+            workspaceImportState = {
+                file: null,
+                data: null,
+                fileName: ''
+            };
+
+            document.getElementById('workspaceImportFileInput').value = '';
+            document.getElementById('workspaceImportFileInfo').style.display = 'none';
+            document.getElementById('workspaceImportPreview').style.display = 'none';
+            document.getElementById('workspaceImportBtn').disabled = true;
+        }
+
+        // Execute workspace import
+        function executeWorkspaceImport() {
+            const data = workspaceImportState.data;
+            if (!data) {
+                alert('No workspace file loaded');
+                return;
+            }
+
+            // Create a new workspace with the imported data
+            const wsId = generateWorkspaceId();
+            const importedName = data.workspaceName + ' (Imported)';
+
+            workspaces[wsId] = {
+                id: wsId,
+                name: importedName,
+                entities: JSON.parse(JSON.stringify(data.entities)),
+                relationships: JSON.parse(JSON.stringify(data.relationships)),
+                hasSampleData: false,
+                createdAt: Date.now(),
+                updatedAt: Date.now()
+            };
+
+            saveWorkspaces();
+            switchWorkspace(wsId);
+            renderWorkspaceList();
+
+            // Log activity
+            const totalEntities = Object.values(data.entities).reduce((sum, arr) => sum + arr.length, 0);
+            logActivity('INS', 'system', null, `Imported workspace with ${totalEntities} entities and ${data.relationships.length} relationships`);
+
+            // Show success state
+            document.querySelector('.workspace-import-upload').style.display = 'none';
+            document.querySelector('.workspace-import-intro').style.display = 'none';
+            document.getElementById('workspaceImportFileInfo').style.display = 'none';
+            document.getElementById('workspaceImportPreview').style.display = 'none';
+
+            document.getElementById('workspaceImportSuccessMessage').textContent =
+                `Successfully imported "${data.workspaceName}" with ${totalEntities} entities and ${data.relationships.length} relationships.`;
+            document.getElementById('workspaceImportSuccess').style.display = 'block';
+
+            // Update footer buttons
+            document.getElementById('workspaceImportBtn').style.display = 'none';
+            document.getElementById('workspaceImportDoneBtn').style.display = 'inline-flex';
+        }
+
+        // Legacy function - redirects to new unified import modal
+        function openBulkImportModal() {
+            openImportModal('bulk');
         }
 
         function closeBulkImportModal() {
