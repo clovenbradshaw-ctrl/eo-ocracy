@@ -7349,6 +7349,648 @@
         .task-quick-cta .btn-create-task i {
             font-size: 1.25rem;
         }
+
+        /* ============================================
+           HERO TASK CREATION STYLES
+           ============================================ */
+
+        /* Floating Action Button (FAB) */
+        .task-fab {
+            position: fixed;
+            bottom: 2rem;
+            right: 2rem;
+            width: 64px;
+            height: 64px;
+            background: linear-gradient(135deg, #C88F4A 0%, #B87B5B 100%);
+            border: none;
+            border-radius: 50%;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            box-shadow: 0 4px 20px rgba(200, 143, 74, 0.4), 0 8px 32px rgba(0, 0, 0, 0.15);
+            z-index: 1000;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        .task-fab:hover {
+            transform: scale(1.1);
+            box-shadow: 0 6px 28px rgba(200, 143, 74, 0.5), 0 12px 40px rgba(0, 0, 0, 0.2);
+        }
+
+        .task-fab i {
+            font-size: 2rem;
+            color: white;
+        }
+
+        .task-fab-label {
+            position: absolute;
+            right: 80px;
+            background: #3D2E1F;
+            color: white;
+            padding: 0.5rem 1rem;
+            border-radius: 6px;
+            font-size: 0.875rem;
+            font-weight: 500;
+            white-space: nowrap;
+            opacity: 0;
+            transform: translateX(10px);
+            transition: all 0.3s;
+            pointer-events: none;
+        }
+
+        .task-fab:hover .task-fab-label {
+            opacity: 1;
+            transform: translateX(0);
+        }
+
+        .task-fab-pulse {
+            animation: fabPulse 2s infinite;
+        }
+
+        @keyframes fabPulse {
+            0%, 100% { box-shadow: 0 4px 20px rgba(200, 143, 74, 0.4), 0 8px 32px rgba(0, 0, 0, 0.15); }
+            50% { box-shadow: 0 4px 20px rgba(200, 143, 74, 0.6), 0 8px 32px rgba(0, 0, 0, 0.15), 0 0 0 8px rgba(200, 143, 74, 0.15); }
+        }
+
+        /* Hero Task Modal */
+        .hero-task-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(61, 46, 31, 0.7);
+            backdrop-filter: blur(4px);
+            z-index: 2000;
+            display: none;
+            align-items: center;
+            justify-content: center;
+            animation: fadeIn 0.2s ease-out;
+        }
+
+        .hero-task-overlay.active {
+            display: flex;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
+
+        .hero-task-modal {
+            background: white;
+            border-radius: 16px;
+            width: 90%;
+            max-width: 700px;
+            max-height: 90vh;
+            overflow: hidden;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+            animation: slideUp 0.3s ease-out;
+        }
+
+        @keyframes slideUp {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .hero-task-header {
+            background: linear-gradient(135deg, #C88F4A 0%, #B87B5B 100%);
+            color: white;
+            padding: 1.5rem 2rem;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+
+        .hero-task-header h2 {
+            font-size: 1.5rem;
+            font-weight: 600;
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+        }
+
+        .hero-task-header h2 i {
+            font-size: 1.75rem;
+        }
+
+        .hero-task-close {
+            background: rgba(255, 255, 255, 0.2);
+            border: none;
+            color: white;
+            width: 36px;
+            height: 36px;
+            border-radius: 50%;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.2s;
+        }
+
+        .hero-task-close:hover {
+            background: rgba(255, 255, 255, 0.3);
+        }
+
+        .hero-task-body {
+            padding: 2rem;
+        }
+
+        .hero-task-input-group {
+            margin-bottom: 1.5rem;
+        }
+
+        .hero-task-label {
+            display: block;
+            font-size: 0.875rem;
+            font-weight: 600;
+            color: #6B5642;
+            margin-bottom: 0.5rem;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .hero-task-main-input {
+            width: 100%;
+            padding: 1.25rem 1rem;
+            font-size: 1.25rem;
+            border: 2px solid #E5DDD1;
+            border-radius: 12px;
+            background: #FAF7F5;
+            color: #3D2E1F;
+            transition: all 0.2s;
+        }
+
+        .hero-task-main-input:focus {
+            outline: none;
+            border-color: #C88F4A;
+            background: white;
+            box-shadow: 0 0 0 4px rgba(200, 143, 74, 0.15);
+        }
+
+        .hero-task-main-input::placeholder {
+            color: #A99D8F;
+        }
+
+        .hero-task-row {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 1.5rem;
+        }
+
+        .hero-task-select-wrapper {
+            position: relative;
+        }
+
+        .hero-task-select {
+            width: 100%;
+            padding: 0.875rem 1rem;
+            font-size: 1rem;
+            border: 2px solid #E5DDD1;
+            border-radius: 8px;
+            background: #FAF7F5;
+            color: #3D2E1F;
+            cursor: pointer;
+            transition: all 0.2s;
+            appearance: none;
+            padding-right: 2.5rem;
+        }
+
+        .hero-task-select:focus {
+            outline: none;
+            border-color: #C88F4A;
+            background: white;
+        }
+
+        .hero-task-select-wrapper::after {
+            content: '▼';
+            position: absolute;
+            right: 1rem;
+            top: 50%;
+            transform: translateY(-50%);
+            font-size: 0.75rem;
+            color: #6B5642;
+            pointer-events: none;
+        }
+
+        .hero-task-or-create {
+            margin-top: 0.5rem;
+            font-size: 0.875rem;
+            color: #8B6F47;
+        }
+
+        .hero-task-or-create a {
+            color: #C88F4A;
+            cursor: pointer;
+            font-weight: 500;
+        }
+
+        .hero-task-or-create a:hover {
+            text-decoration: underline;
+        }
+
+        .hero-task-inline-create {
+            margin-top: 0.75rem;
+            display: none;
+        }
+
+        .hero-task-inline-create.active {
+            display: block;
+        }
+
+        .hero-task-inline-row {
+            display: flex;
+            gap: 0.5rem;
+        }
+
+        .hero-task-inline-input {
+            flex: 1;
+            padding: 0.75rem 1rem;
+            font-size: 0.9rem;
+            border: 2px solid #C88F4A;
+            border-radius: 8px;
+            background: #FFF9F0;
+        }
+
+        .hero-task-inline-input:focus {
+            outline: none;
+            background: white;
+        }
+
+        .hero-task-inline-btn {
+            padding: 0.75rem 1rem;
+            background: #C88F4A;
+            color: white;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            font-weight: 500;
+            transition: all 0.2s;
+        }
+
+        .hero-task-inline-btn:hover {
+            background: #B07D3A;
+        }
+
+        .hero-task-preview {
+            background: linear-gradient(135deg, #FFF9F0 0%, #FAF7F5 100%);
+            border: 2px dashed #E5DDD1;
+            border-radius: 12px;
+            padding: 1.25rem;
+            margin-top: 1.5rem;
+        }
+
+        .hero-task-preview-title {
+            font-size: 0.75rem;
+            font-weight: 600;
+            color: #8B6F47;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            margin-bottom: 0.75rem;
+        }
+
+        .hero-task-preview-content {
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+            flex-wrap: wrap;
+        }
+
+        .hero-task-preview-item {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            background: white;
+            padding: 0.5rem 0.75rem;
+            border-radius: 6px;
+            font-size: 0.9rem;
+            color: #3D2E1F;
+            border: 1px solid #E5DDD1;
+        }
+
+        .hero-task-preview-item i {
+            font-size: 1rem;
+        }
+
+        .hero-task-preview-item.task {
+            border-color: #C88F4A;
+            background: #FFF9F0;
+        }
+
+        .hero-task-preview-item.role {
+            border-color: #4A90C8;
+            background: #F0F7FF;
+        }
+
+        .hero-task-preview-item.person {
+            border-color: #5AB07B;
+            background: #F0FFF5;
+        }
+
+        .hero-task-preview-arrow {
+            color: #C88F4A;
+            font-weight: bold;
+        }
+
+        .hero-task-footer {
+            padding: 1.5rem 2rem;
+            background: #FAF7F5;
+            border-top: 1px solid #E5DDD1;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+
+        .hero-task-shortcut-hint {
+            font-size: 0.8rem;
+            color: #8B6F47;
+        }
+
+        .hero-task-shortcut-hint kbd {
+            background: white;
+            border: 1px solid #E5DDD1;
+            padding: 0.2rem 0.5rem;
+            border-radius: 4px;
+            font-family: monospace;
+            font-size: 0.75rem;
+        }
+
+        .hero-task-actions {
+            display: flex;
+            gap: 0.75rem;
+        }
+
+        .hero-task-btn {
+            padding: 0.875rem 1.5rem;
+            font-size: 1rem;
+            font-weight: 600;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: all 0.2s;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .hero-task-btn-secondary {
+            background: white;
+            border: 2px solid #E5DDD1;
+            color: #6B5642;
+        }
+
+        .hero-task-btn-secondary:hover {
+            background: #FAF7F5;
+            border-color: #C88F4A;
+        }
+
+        .hero-task-btn-primary {
+            background: linear-gradient(135deg, #C88F4A 0%, #B87B5B 100%);
+            border: none;
+            color: white;
+            box-shadow: 0 2px 8px rgba(200, 143, 74, 0.3);
+        }
+
+        .hero-task-btn-primary:hover {
+            transform: translateY(-1px);
+            box-shadow: 0 4px 12px rgba(200, 143, 74, 0.4);
+        }
+
+        .hero-task-btn-primary:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+            transform: none;
+        }
+
+        /* ============================================
+           TASK BOARD VIEW STYLES
+           ============================================ */
+
+        .task-board-view {
+            display: none;
+            flex-direction: column;
+            height: 100%;
+            background: #FAF7F5;
+        }
+
+        .task-board-view.active {
+            display: flex;
+        }
+
+        .task-board-header {
+            padding: 1.5rem;
+            background: white;
+            border-bottom: 1px solid #E5DDD1;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+
+        .task-board-title {
+            font-size: 1.25rem;
+            font-weight: 600;
+            color: #3D2E1F;
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+        }
+
+        .task-board-title i {
+            color: #C88F4A;
+        }
+
+        .task-board-stats {
+            display: flex;
+            gap: 1.5rem;
+        }
+
+        .task-board-stat {
+            text-align: center;
+        }
+
+        .task-board-stat-value {
+            font-size: 1.5rem;
+            font-weight: 700;
+            color: #C88F4A;
+        }
+
+        .task-board-stat-label {
+            font-size: 0.75rem;
+            color: #8B6F47;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .task-board-controls {
+            padding: 1rem 1.5rem;
+            background: white;
+            border-bottom: 1px solid #E5DDD1;
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+        }
+
+        .task-board-search {
+            flex: 1;
+            max-width: 300px;
+            padding: 0.625rem 1rem;
+            border: 1px solid #E5DDD1;
+            border-radius: 6px;
+            font-size: 0.9rem;
+        }
+
+        .task-board-search:focus {
+            outline: none;
+            border-color: #C88F4A;
+        }
+
+        .task-board-filter {
+            padding: 0.625rem 1rem;
+            border: 1px solid #E5DDD1;
+            border-radius: 6px;
+            background: white;
+            font-size: 0.9rem;
+            cursor: pointer;
+        }
+
+        .task-board-content {
+            flex: 1;
+            overflow-y: auto;
+            padding: 1.5rem;
+        }
+
+        .task-board-empty {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            height: 100%;
+            text-align: center;
+            color: #8B6F47;
+        }
+
+        .task-board-empty i {
+            font-size: 4rem;
+            margin-bottom: 1rem;
+            color: #C88F4A;
+            opacity: 0.5;
+        }
+
+        .task-board-empty h3 {
+            font-size: 1.25rem;
+            margin-bottom: 0.5rem;
+            color: #3D2E1F;
+        }
+
+        .task-board-empty p {
+            font-size: 0.9rem;
+            margin-bottom: 1.5rem;
+        }
+
+        .task-board-list {
+            display: flex;
+            flex-direction: column;
+            gap: 1rem;
+        }
+
+        .task-board-card {
+            background: white;
+            border-radius: 12px;
+            padding: 1.25rem;
+            border: 1px solid #E5DDD1;
+            transition: all 0.2s;
+            cursor: pointer;
+        }
+
+        .task-board-card:hover {
+            border-color: #C88F4A;
+            box-shadow: 0 4px 12px rgba(200, 143, 74, 0.15);
+        }
+
+        .task-board-card-header {
+            display: flex;
+            align-items: flex-start;
+            justify-content: space-between;
+            margin-bottom: 0.75rem;
+        }
+
+        .task-board-card-title {
+            font-size: 1rem;
+            font-weight: 600;
+            color: #3D2E1F;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .task-board-card-title i {
+            color: #C88F4A;
+        }
+
+        .task-board-card-menu {
+            background: none;
+            border: none;
+            color: #8B6F47;
+            cursor: pointer;
+            padding: 0.25rem;
+            border-radius: 4px;
+        }
+
+        .task-board-card-menu:hover {
+            background: #FAF7F5;
+        }
+
+        .task-board-card-meta {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 0.75rem;
+            align-items: center;
+        }
+
+        .task-board-card-tag {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.375rem;
+            padding: 0.375rem 0.75rem;
+            border-radius: 20px;
+            font-size: 0.8rem;
+            font-weight: 500;
+        }
+
+        .task-board-card-tag.role {
+            background: #F0F7FF;
+            color: #4A7EC8;
+            border: 1px solid #BDD7F5;
+        }
+
+        .task-board-card-tag.person {
+            background: #F0FFF5;
+            color: #3D9960;
+            border: 1px solid #B8E5C8;
+        }
+
+        .task-board-card-tag i {
+            font-size: 0.875rem;
+        }
+
+        /* Task View Toggle in Header */
+        .view-btn.tasks-view-btn {
+            position: relative;
+        }
+
+        .view-btn.tasks-view-btn .task-count-badge {
+            position: absolute;
+            top: -4px;
+            right: -4px;
+            background: #C88F4A;
+            color: white;
+            font-size: 0.625rem;
+            font-weight: 700;
+            padding: 0.125rem 0.375rem;
+            border-radius: 10px;
+            min-width: 16px;
+            text-align: center;
+        }
     </style>
 </head>
 <body>
@@ -7395,6 +8037,10 @@
                 </button>
                 <button class="view-toggle-btn" data-view="orgchart" onclick="switchView('orgchart')">
                     <i class="ph ph-flow-arrow"></i> Org Chart
+                </button>
+                <button class="view-toggle-btn tasks-view-btn" data-view="tasks" onclick="switchView('tasks')">
+                    <i class="ph ph-kanban"></i> Tasks
+                    <span class="task-count-badge" id="taskCountBadge" style="display: none;">0</span>
                 </button>
             </div>
             <button class="undo-btn" id="undoBtn" onclick="undo()" disabled title="Nothing to undo">
@@ -7681,6 +8327,39 @@
 
             <!-- Org Chart View -->
             <div id="orgchartView" class="orgchart-view"></div>
+
+            <!-- Task Board View -->
+            <div id="taskBoardView" class="task-board-view">
+                <div class="task-board-header">
+                    <div class="task-board-title">
+                        <i class="ph ph-kanban"></i>
+                        <span>Tasks</span>
+                    </div>
+                    <div class="task-board-stats">
+                        <div class="task-board-stat">
+                            <div class="task-board-stat-value" id="taskBoardTotal">0</div>
+                            <div class="task-board-stat-label">Total</div>
+                        </div>
+                    </div>
+                </div>
+                <div class="task-board-controls">
+                    <input type="text"
+                           id="taskBoardSearch"
+                           class="task-board-search"
+                           placeholder="Search tasks..."
+                           oninput="filterTaskBoard()">
+                    <select id="taskBoardFilter" class="task-board-filter" onchange="filterTaskBoard()">
+                        <option value="all">All Tasks</option>
+                        <option value="unassigned">Unassigned</option>
+                    </select>
+                    <button class="hero-task-btn hero-task-btn-primary" onclick="openHeroTaskModal()" style="padding: 0.625rem 1rem;">
+                        <i class="ph ph-plus"></i> New Task
+                    </button>
+                </div>
+                <div class="task-board-content" id="taskBoardContent">
+                    <!-- Populated dynamically -->
+                </div>
+            </div>
         </div>
 
         <!-- Right Panel: Relationships -->
@@ -9080,6 +9759,7 @@ John Doe,Engineering,john@example.com"
             document.getElementById('graphView').classList.remove('active');
             document.getElementById('vennView').classList.remove('active');
             document.getElementById('orgchartView').classList.remove('active');
+            document.getElementById('taskBoardView').classList.remove('active');
 
             if (view === 'tree') {
                 document.getElementById('treeView').classList.add('active');
@@ -9093,6 +9773,9 @@ John Doe,Engineering,john@example.com"
             } else if (view === 'orgchart') {
                 document.getElementById('orgchartView').classList.add('active');
                 renderOrgChartView();
+            } else if (view === 'tasks') {
+                document.getElementById('taskBoardView').classList.add('active');
+                renderTaskBoardView();
             } else {
                 document.getElementById('graphView').classList.add('active');
                 setTimeout(() => updateGraph(), 100);
@@ -19366,6 +20049,456 @@ John Doe,Engineering,john@example.com"
             checkTaskWizard();
         }
 
+        // ============================================
+        // HERO TASK MODAL FUNCTIONS
+        // ============================================
+
+        // Open the hero task modal
+        function openHeroTaskModal() {
+            const overlay = document.getElementById('heroTaskOverlay');
+            overlay.classList.add('active');
+
+            // Populate role and person selects
+            populateHeroSelects();
+
+            // Focus on task input
+            setTimeout(() => {
+                document.getElementById('heroTaskName').focus();
+            }, 100);
+
+            // Remove pulse animation from FAB after first use
+            document.querySelector('.task-fab').classList.remove('task-fab-pulse');
+        }
+
+        // Close the hero task modal
+        function closeHeroTaskModal() {
+            const overlay = document.getElementById('heroTaskOverlay');
+            overlay.classList.remove('active');
+
+            // Reset form
+            document.getElementById('heroTaskName').value = '';
+            document.getElementById('heroTaskRole').value = '';
+            document.getElementById('heroTaskPerson').value = '';
+            document.getElementById('heroTaskPreview').style.display = 'none';
+            document.getElementById('heroTaskSubmitBtn').disabled = true;
+
+            // Hide inline create forms
+            document.getElementById('heroRoleCreate').classList.remove('active');
+            document.getElementById('heroPersonCreate').classList.remove('active');
+        }
+
+        // Close on backdrop click
+        function closeHeroTaskModalOnBackdrop(event) {
+            if (event.target === event.currentTarget) {
+                closeHeroTaskModal();
+            }
+        }
+
+        // Populate role and person selects in hero modal
+        function populateHeroSelects() {
+            const roleSelect = document.getElementById('heroTaskRole');
+            const personSelect = document.getElementById('heroTaskPerson');
+
+            // Clear existing options (except first)
+            roleSelect.innerHTML = '<option value="">Select a role...</option>';
+            personSelect.innerHTML = '<option value="">Select a person...</option>';
+
+            // Add roles
+            entities.role.forEach(role => {
+                const option = document.createElement('option');
+                option.value = role.id;
+                option.textContent = role.name;
+                roleSelect.appendChild(option);
+            });
+
+            // Add people
+            entities.person.forEach(person => {
+                const option = document.createElement('option');
+                option.value = person.id;
+                option.textContent = person.name;
+                personSelect.appendChild(option);
+            });
+        }
+
+        // Toggle role inline create
+        function toggleHeroRoleCreate() {
+            const createDiv = document.getElementById('heroRoleCreate');
+            createDiv.classList.toggle('active');
+            if (createDiv.classList.contains('active')) {
+                document.getElementById('heroNewRoleName').focus();
+            }
+        }
+
+        // Toggle person inline create
+        function toggleHeroPersonCreate() {
+            const createDiv = document.getElementById('heroPersonCreate');
+            createDiv.classList.toggle('active');
+            if (createDiv.classList.contains('active')) {
+                document.getElementById('heroNewPersonName').focus();
+            }
+        }
+
+        // Create new role from hero modal
+        function createHeroRole() {
+            const nameInput = document.getElementById('heroNewRoleName');
+            const name = nameInput.value.trim();
+
+            if (!name) return;
+
+            // Create role entity
+            const roleId = 'role' + Date.now();
+            const role = { id: roleId, name: name, type: 'role' };
+            entities.role.push(role);
+
+            logActivityToXano({
+                event_verb: 'Add Entity',
+                object_type: 'role',
+                object_label: name
+            });
+
+            saveToLocalStorage();
+            renderEntityList();
+
+            // Refresh selects and select the new role
+            populateHeroSelects();
+            document.getElementById('heroTaskRole').value = roleId;
+
+            // Clear and hide inline create
+            nameInput.value = '';
+            document.getElementById('heroRoleCreate').classList.remove('active');
+
+            updateHeroTaskPreview();
+        }
+
+        // Create new person from hero modal
+        function createHeroPerson() {
+            const nameInput = document.getElementById('heroNewPersonName');
+            const name = nameInput.value.trim();
+
+            if (!name) return;
+
+            // Create person entity
+            const personId = 'person' + Date.now();
+            const person = { id: personId, name: name, type: 'person' };
+            entities.person.push(person);
+
+            logActivityToXano({
+                event_verb: 'Add Entity',
+                object_type: 'person',
+                object_label: name
+            });
+
+            saveToLocalStorage();
+            renderEntityList();
+
+            // Refresh selects and select the new person
+            populateHeroSelects();
+            document.getElementById('heroTaskPerson').value = personId;
+
+            // Clear and hide inline create
+            nameInput.value = '';
+            document.getElementById('heroPersonCreate').classList.remove('active');
+
+            updateHeroTaskPreview();
+        }
+
+        // Update preview as user fills in form
+        function updateHeroTaskPreview() {
+            const taskName = document.getElementById('heroTaskName').value.trim();
+            const roleId = document.getElementById('heroTaskRole').value;
+            const personId = document.getElementById('heroTaskPerson').value;
+
+            const previewDiv = document.getElementById('heroTaskPreview');
+            const previewContent = document.getElementById('heroTaskPreviewContent');
+            const submitBtn = document.getElementById('heroTaskSubmitBtn');
+
+            // Enable/disable submit based on required fields
+            submitBtn.disabled = !(taskName && roleId);
+
+            if (!taskName) {
+                previewDiv.style.display = 'none';
+                return;
+            }
+
+            previewDiv.style.display = 'block';
+
+            const role = entities.role.find(r => r.id === roleId);
+            const person = entities.person.find(p => p.id === personId);
+
+            let html = `
+                <span class="hero-task-preview-item role">
+                    <i class="ph ph-briefcase"></i>
+                    ${role ? role.name : 'No role selected'}
+                </span>
+                <span class="hero-task-preview-arrow">→</span>
+                <span class="hero-task-preview-item task">
+                    <i class="ph ph-file-text"></i>
+                    ${taskName}
+                </span>
+            `;
+
+            if (person) {
+                html = `
+                    <span class="hero-task-preview-item person">
+                        <i class="ph ph-user"></i>
+                        ${person.name}
+                    </span>
+                    <span class="hero-task-preview-arrow">→</span>
+                ` + html;
+            }
+
+            previewContent.innerHTML = html;
+        }
+
+        // Submit hero task
+        function submitHeroTask() {
+            const taskName = document.getElementById('heroTaskName').value.trim();
+            const roleId = document.getElementById('heroTaskRole').value;
+            const personId = document.getElementById('heroTaskPerson').value;
+
+            if (!taskName || !roleId) {
+                return;
+            }
+
+            const role = entities.role.find(r => r.id === roleId);
+            const person = personId ? entities.person.find(p => p.id === personId) : null;
+
+            // 1. Create task as a work object
+            const taskId = 'object' + Date.now();
+            const taskObject = {
+                id: taskId,
+                name: taskName,
+                type: 'object'
+            };
+            entities.object.push(taskObject);
+
+            logActivityToXano({
+                event_verb: 'Add Entity',
+                object_type: 'object',
+                object_label: taskName
+            });
+
+            // 2. Connect role to task (Role CON Task)
+            const roleTaskRel = {
+                id: 'rel' + Date.now(),
+                subject: role.id,
+                predicate: 'CON',
+                object: taskId,
+                description: ''
+            };
+            relationships.push(roleTaskRel);
+
+            logActivityToXano({
+                event_verb: 'Link Connection',
+                eo_operator: 'CON',
+                object_type: 'relationship',
+                object_label: `${role.name} → ${taskName}`
+            });
+
+            // 3. If person selected, assign to role (Person INS Role)
+            if (person) {
+                const existingAssignment = relationships.find(r =>
+                    r.subject === person.id &&
+                    r.predicate === 'INS' &&
+                    r.object === role.id
+                );
+
+                if (!existingAssignment) {
+                    const personRoleRel = {
+                        id: 'rel' + (Date.now() + 1),
+                        subject: person.id,
+                        predicate: 'INS',
+                        object: role.id,
+                        description: ''
+                    };
+                    relationships.push(personRoleRel);
+
+                    logActivityToXano({
+                        event_verb: 'Start Assignment',
+                        eo_operator: 'INS',
+                        object_type: 'relationship',
+                        object_label: `${person.name} → ${role.name}`
+                    });
+                }
+            }
+
+            // Save and refresh
+            saveToLocalStorage();
+            renderEntityList();
+            renderActivityList();
+            renderCurrentView();
+            populateSelects();
+            updateTaskCountBadge();
+
+            // If on task board view, refresh it
+            if (currentView === 'tasks') {
+                renderTaskBoardView();
+            }
+
+            // Close modal
+            closeHeroTaskModal();
+
+            console.log('Task created via hero modal:', taskName);
+        }
+
+        // ============================================
+        // TASK BOARD VIEW FUNCTIONS
+        // ============================================
+
+        // Render the task board view
+        function renderTaskBoardView() {
+            const content = document.getElementById('taskBoardContent');
+            const tasks = entities.object || [];
+
+            // Update total count
+            document.getElementById('taskBoardTotal').textContent = tasks.length;
+            updateTaskCountBadge();
+
+            if (tasks.length === 0) {
+                content.innerHTML = `
+                    <div class="task-board-empty">
+                        <i class="ph ph-clipboard-text"></i>
+                        <h3>No tasks yet</h3>
+                        <p>Create your first task to get started</p>
+                        <button class="hero-task-btn hero-task-btn-primary" onclick="openHeroTaskModal()">
+                            <i class="ph ph-plus"></i> Create Task
+                        </button>
+                    </div>
+                `;
+                return;
+            }
+
+            // Get search/filter values
+            const searchTerm = (document.getElementById('taskBoardSearch').value || '').toLowerCase();
+            const filterValue = document.getElementById('taskBoardFilter').value;
+
+            // Filter tasks
+            let filteredTasks = tasks.filter(task => {
+                // Search filter
+                if (searchTerm && !task.name.toLowerCase().includes(searchTerm)) {
+                    return false;
+                }
+
+                // Role filter
+                if (filterValue === 'unassigned') {
+                    const hasRole = relationships.some(r =>
+                        r.object === task.id && r.predicate === 'CON'
+                    );
+                    if (hasRole) return false;
+                }
+
+                return true;
+            });
+
+            if (filteredTasks.length === 0) {
+                content.innerHTML = `
+                    <div class="task-board-empty">
+                        <i class="ph ph-magnifying-glass"></i>
+                        <h3>No matching tasks</h3>
+                        <p>Try adjusting your search or filters</p>
+                    </div>
+                `;
+                return;
+            }
+
+            // Build task cards
+            let html = '<div class="task-board-list">';
+
+            filteredTasks.forEach(task => {
+                // Find connected role
+                const roleRel = relationships.find(r =>
+                    r.object === task.id && r.predicate === 'CON'
+                );
+                const role = roleRel ? entities.role.find(r => r.id === roleRel.subject) : null;
+
+                // Find person assigned to role
+                let person = null;
+                if (role) {
+                    const personRel = relationships.find(r =>
+                        r.object === role.id && r.predicate === 'INS'
+                    );
+                    person = personRel ? entities.person.find(p => p.id === personRel.subject) : null;
+                }
+
+                html += `
+                    <div class="task-board-card" onclick="showEntityDetails('${task.id}')">
+                        <div class="task-board-card-header">
+                            <div class="task-board-card-title">
+                                <i class="ph ph-file-text"></i>
+                                ${task.name}
+                            </div>
+                            <button class="task-board-card-menu" onclick="event.stopPropagation(); showTaskCardMenu('${task.id}')">
+                                <i class="ph ph-dots-three-vertical"></i>
+                            </button>
+                        </div>
+                        <div class="task-board-card-meta">
+                            ${role ? `
+                                <span class="task-board-card-tag role">
+                                    <i class="ph ph-briefcase"></i>
+                                    ${role.name}
+                                </span>
+                            ` : ''}
+                            ${person ? `
+                                <span class="task-board-card-tag person">
+                                    <i class="ph ph-user"></i>
+                                    ${person.name}
+                                </span>
+                            ` : ''}
+                        </div>
+                    </div>
+                `;
+            });
+
+            html += '</div>';
+            content.innerHTML = html;
+        }
+
+        // Filter task board
+        function filterTaskBoard() {
+            renderTaskBoardView();
+        }
+
+        // Update task count badge
+        function updateTaskCountBadge() {
+            const badge = document.getElementById('taskCountBadge');
+            const count = (entities.object || []).length;
+
+            if (count > 0) {
+                badge.textContent = count;
+                badge.style.display = 'block';
+            } else {
+                badge.style.display = 'none';
+            }
+        }
+
+        // Show task card menu (placeholder for future enhancement)
+        function showTaskCardMenu(taskId) {
+            // For now, show entity details
+            showEntityDetails(taskId);
+        }
+
+        // Keyboard shortcut for hero task modal
+        document.addEventListener('keydown', function(event) {
+            // Don't trigger if in an input field
+            if (event.target.tagName === 'INPUT' || event.target.tagName === 'TEXTAREA' || event.target.tagName === 'SELECT') {
+                return;
+            }
+
+            // 'T' key opens hero task modal
+            if (event.key === 't' || event.key === 'T') {
+                event.preventDefault();
+                openHeroTaskModal();
+            }
+
+            // Escape closes modal
+            if (event.key === 'Escape') {
+                const overlay = document.getElementById('heroTaskOverlay');
+                if (overlay.classList.contains('active')) {
+                    closeHeroTaskModal();
+                }
+            }
+        });
+
         // Advanced entity options toggle
         function toggleAdvancedEntityOptions() {
             const options = document.getElementById('advancedEntityOptions');
@@ -19574,6 +20707,7 @@ John Doe,Engineering,john@example.com"
                 updateParentOptions();
                 renderActivityList();
                 updateFilterStatus();
+                updateTaskCountBadge();
                 console.log('✅ UI rendered');
                 updateStatus('Ready');
 
@@ -19625,5 +20759,104 @@ John Doe,Engineering,john@example.com"
             }, 3000);
         });
     </script>
+
+    <!-- Hero Task Creation FAB -->
+    <button class="task-fab task-fab-pulse" onclick="openHeroTaskModal()" title="Create a new task (Press T)">
+        <span class="task-fab-label">Create Task</span>
+        <i class="ph ph-plus"></i>
+    </button>
+
+    <!-- Hero Task Modal -->
+    <div class="hero-task-overlay" id="heroTaskOverlay" onclick="closeHeroTaskModalOnBackdrop(event)">
+        <div class="hero-task-modal" onclick="event.stopPropagation()">
+            <div class="hero-task-header">
+                <h2><i class="ph ph-lightning"></i> Create a Task</h2>
+                <button class="hero-task-close" onclick="closeHeroTaskModal()">
+                    <i class="ph ph-x"></i>
+                </button>
+            </div>
+            <div class="hero-task-body">
+                <div class="hero-task-input-group">
+                    <label class="hero-task-label">What needs to get done?</label>
+                    <input type="text"
+                           id="heroTaskName"
+                           class="hero-task-main-input"
+                           placeholder="e.g., Review contracts, Prepare report, Draft proposal..."
+                           onkeypress="if(event.key==='Enter') submitHeroTask()"
+                           oninput="updateHeroTaskPreview()">
+                </div>
+
+                <div class="hero-task-row">
+                    <div class="hero-task-input-group">
+                        <label class="hero-task-label">Assign to Role</label>
+                        <div class="hero-task-select-wrapper">
+                            <select id="heroTaskRole" class="hero-task-select" onchange="updateHeroTaskPreview()">
+                                <option value="">Select a role...</option>
+                            </select>
+                        </div>
+                        <div class="hero-task-or-create">
+                            or <a onclick="toggleHeroRoleCreate()">create new role</a>
+                        </div>
+                        <div class="hero-task-inline-create" id="heroRoleCreate">
+                            <div class="hero-task-inline-row">
+                                <input type="text"
+                                       id="heroNewRoleName"
+                                       class="hero-task-inline-input"
+                                       placeholder="Role name..."
+                                       onkeypress="if(event.key==='Enter') createHeroRole()">
+                                <button class="hero-task-inline-btn" onclick="createHeroRole()">
+                                    <i class="ph ph-plus"></i>
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="hero-task-input-group">
+                        <label class="hero-task-label">Assign to Person (Optional)</label>
+                        <div class="hero-task-select-wrapper">
+                            <select id="heroTaskPerson" class="hero-task-select" onchange="updateHeroTaskPreview()">
+                                <option value="">Select a person...</option>
+                            </select>
+                        </div>
+                        <div class="hero-task-or-create">
+                            or <a onclick="toggleHeroPersonCreate()">add new person</a>
+                        </div>
+                        <div class="hero-task-inline-create" id="heroPersonCreate">
+                            <div class="hero-task-inline-row">
+                                <input type="text"
+                                       id="heroNewPersonName"
+                                       class="hero-task-inline-input"
+                                       placeholder="Person's name..."
+                                       onkeypress="if(event.key==='Enter') createHeroPerson()">
+                                <button class="hero-task-inline-btn" onclick="createHeroPerson()">
+                                    <i class="ph ph-plus"></i>
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="hero-task-preview" id="heroTaskPreview" style="display: none;">
+                    <div class="hero-task-preview-title">Preview</div>
+                    <div class="hero-task-preview-content" id="heroTaskPreviewContent">
+                        <!-- Populated dynamically -->
+                    </div>
+                </div>
+            </div>
+            <div class="hero-task-footer">
+                <div class="hero-task-shortcut-hint">
+                    <kbd>T</kbd> to open &middot; <kbd>Esc</kbd> to close &middot; <kbd>Enter</kbd> to create
+                </div>
+                <div class="hero-task-actions">
+                    <button class="hero-task-btn hero-task-btn-secondary" onclick="closeHeroTaskModal()">
+                        Cancel
+                    </button>
+                    <button class="hero-task-btn hero-task-btn-primary" id="heroTaskSubmitBtn" onclick="submitHeroTask()" disabled>
+                        <i class="ph ph-check"></i> Create Task
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
 </body>
 </html>
