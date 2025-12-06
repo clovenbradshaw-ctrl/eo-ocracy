@@ -4458,6 +4458,44 @@
             color: #8B6F47;
         }
 
+        .connection-badge-content {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            cursor: pointer;
+        }
+
+        .connection-remove-btn {
+            background: transparent;
+            border: none;
+            color: #A89B8C;
+            width: 20px;
+            height: 20px;
+            border-radius: 50%;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-left: 0.25rem;
+            padding: 0;
+            transition: all 0.2s;
+            opacity: 0;
+        }
+
+        .connection-badge:hover .connection-remove-btn {
+            opacity: 1;
+        }
+
+        .connection-remove-btn:hover {
+            background: #F0E6DC;
+            color: #C75050;
+        }
+
+        .connection-remove-btn i {
+            font-size: 0.75rem;
+            color: inherit;
+        }
+
         /* Orbital Connections Visualization */
         .orbital-container {
             position: relative;
@@ -11892,12 +11930,27 @@ John Doe,Engineering,john@example.com"
                             items.appendChild(renderNestedUnitItem(conn, centerEntityId, 0));
                         });
                     } else {
-                        // For other types, render as flat badges
+                        // For other types, render as flat badges with remove button
                         grouped[type].forEach(conn => {
                             const badge = document.createElement('div');
                             badge.className = 'connection-badge';
-                            badge.innerHTML = `${getIcon(conn.type)} ${conn.name}`;
-                            badge.onclick = () => openEntityModal(conn.id, conn.type);
+
+                            const badgeContent = document.createElement('span');
+                            badgeContent.className = 'connection-badge-content';
+                            badgeContent.innerHTML = `${getIcon(conn.type)} ${conn.name}`;
+                            badgeContent.onclick = () => openEntityModal(conn.id, conn.type);
+                            badge.appendChild(badgeContent);
+
+                            const removeBtn = document.createElement('button');
+                            removeBtn.className = 'connection-remove-btn';
+                            removeBtn.innerHTML = '<i class="ph ph-x"></i>';
+                            removeBtn.title = 'Remove connection';
+                            removeBtn.onclick = (e) => {
+                                e.stopPropagation();
+                                removeActivityConnection(centerEntityId, conn.id);
+                            };
+                            badge.appendChild(removeBtn);
+
                             items.appendChild(badge);
                         });
                     }
@@ -12241,6 +12294,29 @@ John Doe,Engineering,john@example.com"
                 render();
                 // Use currentModalEntityType since this is called from the modal context
                 openEntityModal(childId, currentModalEntityType);
+            }
+        }
+
+        // Remove an activity connection (non-DES relationship) between two entities
+        function removeActivityConnection(entityId, connectedId) {
+            // Find the non-DES relationship between these entities (in either direction)
+            const relIndex = relationships.findIndex(r =>
+                r.predicate !== 'DES' && (
+                    (r.subject === entityId && r.object === connectedId) ||
+                    (r.subject === connectedId && r.object === entityId)
+                )
+            );
+
+            if (relIndex !== -1) {
+                const removedRel = relationships.splice(relIndex, 1)[0];
+
+                // Log to Xano
+                logToXano({ action: 'delete_relationship', data: removedRel });
+
+                // Refresh views
+                render();
+                // Refresh the modal to show updated connections
+                openEntityModal(entityId, currentModalEntityType);
             }
         }
 
