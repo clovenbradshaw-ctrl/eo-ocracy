@@ -8658,11 +8658,11 @@
                             <button class="entity-type-btn" data-type="team" onclick="selectEntityType('team')" title="Working team or group">
                                 <i class="ph ph-users-three"></i> Team
                             </button>
-                            <button class="entity-type-btn" data-type="object" onclick="selectEntityType('object')" title="Work product or deliverable">
-                                <i class="ph ph-package"></i> Object
+                            <button class="entity-type-btn" data-type="product" onclick="selectEntityType('product')" title="Work product or deliverable">
+                                <i class="ph ph-package"></i> Product
                             </button>
                         </div>
-                        <div class="help-text">Units and Teams organize roles. Objects are work products.</div>
+                        <div class="help-text">Units and Teams organize roles. Products are work deliverables.</div>
                         <div class="input-group" id="parentSelectGroup" style="margin-top: 0.75rem;">
                             <label>Parent Entity</label>
                             <select id="parentEntitySelect">
@@ -8880,8 +8880,16 @@
                                 <span>People</span>
                             </label>
                             <label class="filter-pill" style="flex: 0 0 auto;">
-                                <input type="checkbox" id="filterObject" checked onchange="applyFilters()">
-                                <span>Objects</span>
+                                <input type="checkbox" id="filterTask" checked onchange="applyFilters()">
+                                <span>Tasks</span>
+                            </label>
+                            <label class="filter-pill" style="flex: 0 0 auto;">
+                                <input type="checkbox" id="filterProduct" checked onchange="applyFilters()">
+                                <span>Products</span>
+                            </label>
+                            <label class="filter-pill" style="flex: 0 0 auto;">
+                                <input type="checkbox" id="filterWorkflow" checked onchange="applyFilters()">
+                                <span>Workflows</span>
                             </label>
                         </div>
                     </div>
@@ -9233,8 +9241,8 @@
                             <button class="bulk-import-entity-btn active" data-type="person" onclick="selectBulkImportType('person')">
                                 <i class="ph ph-user"></i> People
                             </button>
-                            <button class="bulk-import-entity-btn" data-type="object" onclick="selectBulkImportType('object')">
-                                <i class="ph ph-package"></i> Objects
+                            <button class="bulk-import-entity-btn" data-type="product" onclick="selectBulkImportType('product')">
+                                <i class="ph ph-package"></i> Products
                             </button>
                         </div>
                     </div>
@@ -9444,7 +9452,7 @@ John Doe,Engineering,john@example.com"
                     workspaces[wsId] = {
                         id: wsId,
                         name: parsed.workspaceName || 'My Organization',
-                        entities: parsed.entities || { unit: [], team: [], role: [], person: [], object: [] },
+                        entities: parsed.entities || { unit: [], team: [], role: [], person: [], task: [], product: [], workflow: [] },
                         relationships: parsed.relationships || [],
                         hasSampleData: parsed.hasSampleData || false,
                         createdAt: Date.now(),
@@ -9494,7 +9502,7 @@ John Doe,Engineering,john@example.com"
             const ws = workspaces[workspaceId];
 
             // Load workspace data
-            entities = JSON.parse(JSON.stringify(ws.entities || { unit: [], team: [], role: [], person: [], object: [] }));
+            entities = JSON.parse(JSON.stringify(ws.entities || { unit: [], team: [], role: [], person: [], task: [], product: [], workflow: [] }));
             relationships = JSON.parse(JSON.stringify(ws.relationships || []));
             hasSampleData = ws.hasSampleData || false;
 
@@ -9538,7 +9546,7 @@ John Doe,Engineering,john@example.com"
             workspaces[wsId] = {
                 id: wsId,
                 name: name.trim() || 'New Workspace',
-                entities: { unit: [], team: [], role: [], person: [], object: [] },
+                entities: { unit: [], team: [], role: [], person: [], task: [], product: [], workflow: [] },
                 relationships: [],
                 hasSampleData: false,
                 createdAt: Date.now(),
@@ -10007,12 +10015,22 @@ John Doe,Engineering,john@example.com"
         // ==========================================
 
         // Data structure
+        // Conceptual model:
+        // - Tasks produce Work Products
+        // - Tasks follow Workflows
+        // - Workflows connect Roles to Work Products (and possibly other roles)
+        // - Roles are assigned People
+        // - Roles are within Teams
+        // - Teams can be within Teams (hierarchical)
+        // - Teams are within Units
         let entities = {
             unit: [],
             team: [],
             role: [],
             person: [],
-            object: []
+            task: [],
+            product: [],
+            workflow: []
         };
 
         let relationships = [];
@@ -10026,7 +10044,9 @@ John Doe,Engineering,john@example.com"
             peopleGroupBy: 'role', // 'role', 'alphabetical', 'none'
             sectionsExpanded: {
                 people: true,
-                objects: true,
+                tasks: true,
+                products: true,
+                workflows: true,
                 unassignedTeams: true,
                 unassignedRoles: true
             }
@@ -10270,12 +10290,15 @@ John Doe,Engineering,john@example.com"
         function showEntityDetails(entityId) {
             // Determine entity type from ID prefix or by searching
             const typeMap = [
-                { prefix: 'object', type: 'object' },
+                { prefix: 'task', type: 'task' },
+                { prefix: 'prod', type: 'product' },
+                { prefix: 'workflow', type: 'workflow' },
+                { prefix: 'wf', type: 'workflow' },
                 { prefix: 'role', type: 'role' },
                 { prefix: 'u', type: 'unit' },
                 { prefix: 't', type: 'team' },
                 { prefix: 'p', type: 'person' },
-                { prefix: 'o', type: 'object' }
+                { prefix: 'o', type: 'product' } // Legacy: old 'o' prefix objects become products
             ];
 
             let entityType = null;
@@ -10294,7 +10317,7 @@ John Doe,Engineering,john@example.com"
 
             // If not found by prefix, search all types
             if (!entity) {
-                for (const type of ['unit', 'team', 'role', 'person', 'object']) {
+                for (const type of ['unit', 'team', 'role', 'person', 'task', 'product', 'workflow']) {
                     entity = entities[type]?.find(e => e.id === entityId);
                     if (entity) {
                         entityType = type;
@@ -13934,12 +13957,59 @@ John Doe,Engineering,john@example.com"
             entities.person.push({ id: 'p2', name: 'James Chen', type: 'person', description: 'Specializes in employment-based immigration and investor visas.' });
             entities.person.push({ id: 'p3', name: 'Ana Rodriguez', type: 'person', description: 'Bilingual case manager with expertise in asylum documentation.' });
 
-            // Objects (work items)
-            entities.object.push({ id: 'o1', name: 'Court Filings', type: 'object', description: 'Legal documents submitted to immigration courts and USCIS.' });
-            entities.object.push({ id: 'o2', name: 'Client Interviews', type: 'object', description: 'Initial consultations and ongoing case review meetings.' });
-            entities.object.push({ id: 'o3', name: 'Case Preparation', type: 'object', description: 'Document compilation, evidence gathering, and legal research.' });
-            entities.object.push({ id: 'o4', name: 'Schedule Management', type: 'object', description: 'Calendar coordination for hearings, deadlines, and appointments.' });
-            
+            // Work Products (deliverables/outputs)
+            entities.product.push({ id: 'prod1', name: 'Court Filings', type: 'product', description: 'Legal documents submitted to immigration courts and USCIS.' });
+            entities.product.push({ id: 'prod2', name: 'Client Interview Notes', type: 'product', description: 'Documentation from initial consultations and case review meetings.' });
+            entities.product.push({ id: 'prod3', name: 'Case Brief', type: 'product', description: 'Compiled case documentation, evidence, and legal research summary.' });
+            entities.product.push({ id: 'prod4', name: 'Case Calendar', type: 'product', description: 'Schedule of hearings, deadlines, and appointments.' });
+
+            // Workflows (connect roles to products)
+            entities.workflow.push({ id: 'wf1', name: 'Court Filing Process', type: 'workflow', description: 'Standard workflow for preparing and submitting court filings.' });
+            entities.workflow.push({ id: 'wf2', name: 'Client Intake Process', type: 'workflow', description: 'Initial client consultation and case assessment workflow.' });
+            entities.workflow.push({ id: 'wf3', name: 'Case Preparation Workflow', type: 'workflow', description: 'Document compilation and evidence gathering process.' });
+
+            // Tasks (activities that produce work products)
+            const today = new Date();
+            const nextWeek = new Date(today.getTime() + 7 * 24 * 60 * 60 * 1000);
+            const nextMonth = new Date(today.getTime() + 30 * 24 * 60 * 60 * 1000);
+
+            entities.task.push({
+                id: 'task1',
+                name: 'Prepare asylum application',
+                type: 'task',
+                description: 'Compile documentation for asylum case filing.',
+                dueDate: nextWeek.toISOString().split('T')[0],
+                predecessorId: null,
+                status: 'pending',
+                producesProductId: 'prod1',
+                followsWorkflowId: 'wf1',
+                createdAt: new Date().toISOString()
+            });
+            entities.task.push({
+                id: 'task2',
+                name: 'Conduct client interview',
+                type: 'task',
+                description: 'Initial consultation with new asylum seeker.',
+                dueDate: today.toISOString().split('T')[0],
+                predecessorId: null,
+                status: 'pending',
+                producesProductId: 'prod2',
+                followsWorkflowId: 'wf2',
+                createdAt: new Date().toISOString()
+            });
+            entities.task.push({
+                id: 'task3',
+                name: 'Research case precedents',
+                type: 'task',
+                description: 'Legal research for case preparation.',
+                dueDate: nextMonth.toISOString().split('T')[0],
+                predecessorId: 'task2',
+                status: 'pending',
+                producesProductId: 'prod3',
+                followsWorkflowId: 'wf3',
+                createdAt: new Date().toISOString()
+            });
+
             // Hierarchical relationships (Unit DESignates Teams, Teams DESignate Roles)
             relationships.push({ subject: 'u1', predicate: 'DES', object: 't1', id: 'rel_h1' }); // Immigration Practice designates Asylum Team
             relationships.push({ subject: 'u1', predicate: 'DES', object: 't2', id: 'rel_h2' }); // Immigration Practice designates Family Petitions Team
@@ -13947,17 +14017,28 @@ John Doe,Engineering,john@example.com"
             relationships.push({ subject: 't1', predicate: 'DES', object: 'r2', id: 'rel_h4' }); // Asylum Team designates Associate Attorney
             relationships.push({ subject: 't1', predicate: 'DES', object: 'r3', id: 'rel_h5' }); // Asylum Team designates Case Manager
             relationships.push({ subject: 't2', predicate: 'DES', object: 'r4', id: 'rel_h6' }); // Family Petitions Team designates Lead Attorney
-            
-            // Work relationships (Roles CONnected to Objects)
-            relationships.push({ subject: 'r1', predicate: 'SUP', object: 'o1', id: 'rel1' }); // Managing Attorney supervises Court Filings
-            relationships.push({ subject: 'r2', predicate: 'CON', object: 'o3', id: 'rel2' }); // Associate Attorney connects to Case Preparation
-            relationships.push({ subject: 'r3', predicate: 'CON', object: 'o4', id: 'rel3' }); // Case Manager connects to Schedule Management
+
+            // Workflow relationships (Workflows CONnect Roles to Products)
+            relationships.push({ subject: 'wf1', predicate: 'CON', object: 'r1', id: 'rel_wf1' }); // Court Filing Process connects to Managing Attorney
+            relationships.push({ subject: 'wf1', predicate: 'CON', object: 'prod1', id: 'rel_wf2' }); // Court Filing Process connects to Court Filings product
+            relationships.push({ subject: 'wf2', predicate: 'CON', object: 'r2', id: 'rel_wf3' }); // Client Intake connects to Associate Attorney
+            relationships.push({ subject: 'wf2', predicate: 'CON', object: 'prod2', id: 'rel_wf4' }); // Client Intake connects to Interview Notes product
+            relationships.push({ subject: 'wf3', predicate: 'CON', object: 'r2', id: 'rel_wf5' }); // Case Prep connects to Associate Attorney
+            relationships.push({ subject: 'wf3', predicate: 'CON', object: 'prod3', id: 'rel_wf6' }); // Case Prep connects to Case Brief product
+
+            // Task relationships (Roles CONnected to Tasks)
+            relationships.push({ subject: 'r1', predicate: 'CON', object: 'task1', id: 'rel1' }); // Managing Attorney connected to asylum application task
+            relationships.push({ subject: 'r2', predicate: 'CON', object: 'task2', id: 'rel2' }); // Associate Attorney connected to client interview task
+            relationships.push({ subject: 'r2', predicate: 'CON', object: 'task3', id: 'rel3' }); // Associate Attorney connected to research task
+            relationships.push({ subject: 'r3', predicate: 'CON', object: 'prod4', id: 'rel4' }); // Case Manager connected to Case Calendar product
 
             // Oversight relationships
-            relationships.push({ subject: 'r1', predicate: 'SUP', object: 'r2', id: 'rel4' }); // Managing Attorney supersedes Associate Attorney
-            
-            // Collaborative relationships
-            relationships.push({ subject: 'r3', predicate: 'SYN', object: 'o4', id: 'rel8' }); // Case Manager synthesizes Schedule Management
+            relationships.push({ subject: 'r1', predicate: 'SUP', object: 'r2', id: 'rel5' }); // Managing Attorney supersedes Associate Attorney
+
+            // Person to Role assignments
+            relationships.push({ subject: 'p1', predicate: 'INS', object: 'r1', id: 'rel_p1' }); // Maria Santos assigned to Managing Attorney
+            relationships.push({ subject: 'p2', predicate: 'INS', object: 'r2', id: 'rel_p2' }); // James Chen assigned to Associate Attorney
+            relationships.push({ subject: 'p3', predicate: 'INS', object: 'r3', id: 'rel_p3' }); // Ana Rodriguez assigned to Case Manager
         }
 
         // Load sample data into current workspace (called from welcome banner)
@@ -13998,7 +14079,7 @@ John Doe,Engineering,john@example.com"
             // Update add button text based on type
             const addBtn = document.getElementById('addEntityBtn');
             if (addBtn) {
-                const typeLabels = { unit: 'Unit', team: 'Team', role: 'Role', person: 'Person', object: 'Object' };
+                const typeLabels = { unit: 'Unit', team: 'Team', role: 'Role', person: 'Person', task: 'Task', product: 'Product', workflow: 'Workflow' };
                 addBtn.innerHTML = `<i class="ph ph-plus-circle" style="color: white; font-size: 1.25rem;"></i> Add ${typeLabels[type] || 'Entity'}`;
             }
         }
@@ -14022,8 +14103,12 @@ John Doe,Engineering,john@example.com"
                 validParentTypes = ['unit', 'team']; // Teams can be under units or other teams
             } else if (selectedEntityType === 'role') {
                 validParentTypes = ['unit', 'team']; // Roles can be under units or teams
-            } else if (selectedEntityType === 'object') {
-                validParentTypes = ['role']; // Objects can be under roles
+            } else if (selectedEntityType === 'product') {
+                validParentTypes = ['role', 'workflow']; // Products can be under roles or workflows
+            } else if (selectedEntityType === 'task') {
+                validParentTypes = ['role', 'workflow']; // Tasks can be under roles or workflows
+            } else if (selectedEntityType === 'workflow') {
+                validParentTypes = ['role', 'team']; // Workflows can be under roles or teams
             } else if (selectedEntityType === 'unit') {
                 validParentTypes = ['unit']; // Units can be under other units
             }
@@ -14410,7 +14495,7 @@ John Doe,Engineering,john@example.com"
             }
 
             // 3. WORK PRODUCTS
-            if (entities.object.length > 0 && (!searchTerm || entities.object.some(o => o.name.toLowerCase().includes(searchTerm)))) {
+            if (entities.product.length > 0 && (!searchTerm || entities.product.some(o => o.name.toLowerCase().includes(searchTerm)))) {
                 const section = document.createElement('div');
                 section.className = 'entity-section';
                 const header = document.createElement('div');
@@ -14418,10 +14503,10 @@ John Doe,Engineering,john@example.com"
                 header.textContent = 'Work Products';
                 section.appendChild(header);
 
-                entities.object.forEach(obj => {
+                entities.product.forEach(obj => {
                     if (searchTerm && !obj.name.toLowerCase().includes(searchTerm)) return;
 
-                    // Find roles connected to this object
+                    // Find roles connected to this product
                     const connectedRoles = relationships
                         .filter(r => r.object === obj.id || r.subject === obj.id)
                         .map(r => {
@@ -14431,11 +14516,11 @@ John Doe,Engineering,john@example.com"
                         .filter(e => e && e.type === 'role');
 
                     const node = document.createElement('div');
-                    node.className = 'entity-item object';
+                    node.className = 'entity-item product';
                     node.style.cursor = 'pointer';
                     node.onclick = (e) => {
                         if (!e.target.closest('.btn-icon')) {
-                            openEntityModal(obj.id, 'object');
+                            openEntityModal(obj.id, 'product');
                         }
                     };
 
@@ -14623,7 +14708,9 @@ John Doe,Engineering,john@example.com"
             document.getElementById('filterTeam').checked = false;
             document.getElementById('filterRole').checked = false;
             document.getElementById('filterPerson').checked = false;
-            document.getElementById('filterObject').checked = false;
+            document.getElementById('filterTask').checked = false;
+            document.getElementById('filterProduct').checked = false;
+            document.getElementById('filterWorkflow').checked = false;
             applyFilters();
         }
 
@@ -14638,7 +14725,9 @@ John Doe,Engineering,john@example.com"
             document.getElementById('filterTeam').checked = true;
             document.getElementById('filterRole').checked = true;
             document.getElementById('filterPerson').checked = true;
-            document.getElementById('filterObject').checked = true;
+            document.getElementById('filterTask').checked = true;
+            document.getElementById('filterProduct').checked = true;
+            document.getElementById('filterWorkflow').checked = true;
             applyFilters();
         }
 
@@ -14661,7 +14750,7 @@ John Doe,Engineering,john@example.com"
             Object.keys(eoOperators).forEach(op => {
                 relationshipsFilter[op] = document.getElementById(`filter${op}`)?.checked !== false;
             });
-            
+
             return {
                 relationships: relationshipsFilter,
                 entities: {
@@ -14669,7 +14758,9 @@ John Doe,Engineering,john@example.com"
                     team: document.getElementById('filterTeam')?.checked !== false,
                     role: document.getElementById('filterRole')?.checked !== false,
                     person: document.getElementById('filterPerson')?.checked !== false,
-                    object: document.getElementById('filterObject')?.checked !== false
+                    task: document.getElementById('filterTask')?.checked !== false,
+                    product: document.getElementById('filterProduct')?.checked !== false,
+                    workflow: document.getElementById('filterWorkflow')?.checked !== false
                 }
             };
         }
@@ -14951,8 +15042,8 @@ John Doe,Engineering,john@example.com"
                 });
             });
 
-            // Work Products: only objects
-            entities.object.forEach(entity => {
+            // Work Products: only products
+            entities.product.forEach(entity => {
                 const option = document.createElement('option');
                 option.value = entity.id;
                 option.textContent = entity.name;
@@ -14960,7 +15051,7 @@ John Doe,Engineering,john@example.com"
             });
         }
 
-        // Quick create for work objects only
+        // Quick create for work products only
         function toggleQuickCreateObject() {
             const quickCreate = document.getElementById('quickCreateObject');
             quickCreate.style.display = quickCreate.style.display === 'none' ? 'block' : 'none';
@@ -14973,25 +15064,25 @@ John Doe,Engineering,john@example.com"
             const name = document.getElementById('quickObjectName').value.trim();
 
             if (!name) {
-                alert('Please enter a name for the work object');
+                alert('Please enter a name for the work product');
                 return;
             }
 
-            const id = 'o' + Date.now();
-            const entity = { id, name, type: 'object', description: '' };
-            entities.object.push(entity);
+            const id = 'prod' + Date.now();
+            const entity = { id, name, type: 'product', description: '' };
+            entities.product.push(entity);
 
             // Log to Xano
             logActivityToXano({
                 event_verb: 'Start Entity',
                 eo_operator: 'INS',
-                object_type: 'object',
+                object_type: 'product',
                 object_id: id,
                 object_label: name,
                 data_json: {
-                    entity_type: 'object',
+                    entity_type: 'product',
                     entity_name: name,
-                    created_from: 'quick_create_object'
+                    created_from: 'quick_create_product'
                 }
             });
 
@@ -15053,7 +15144,7 @@ John Doe,Engineering,john@example.com"
 
         function renderWorkProductList(searchTerm = '') {
             const content = document.getElementById('workProductSelectorContent');
-            const workProducts = entities.object || [];
+            const workProducts = entities.product || [];
 
             // Filter by search term
             const filteredProducts = workProducts.filter(wp =>
@@ -15207,19 +15298,19 @@ John Doe,Engineering,john@example.com"
                 return;
             }
 
-            const id = 'o' + Date.now();
-            const entity = { id, name, type: 'object', description: '' };
-            entities.object.push(entity);
+            const id = 'prod' + Date.now();
+            const entity = { id, name, type: 'product', description: '' };
+            entities.product.push(entity);
 
             // Log to Xano
             logActivityToXano({
                 event_verb: 'Start Entity',
                 eo_operator: 'INS',
-                object_type: 'object',
+                object_type: 'product',
                 object_id: id,
                 object_label: name,
                 data_json: {
-                    entity_type: 'object',
+                    entity_type: 'product',
                     entity_name: name,
                     created_from: 'work_product_modal'
                 }
@@ -15355,9 +15446,9 @@ John Doe,Engineering,john@example.com"
         }
 
         function findEntity(id) {
-            const types = ['unit', 'team', 'role', 'person', 'object'];
+            const types = ['unit', 'team', 'role', 'person', 'task', 'product', 'workflow'];
             for (let type of types) {
-                const entity = entities[type].find(e => e.id === id);
+                const entity = entities[type]?.find(e => e.id === id);
                 if (entity) return entity;
             }
             return null;
@@ -16487,7 +16578,9 @@ John Doe,Engineering,john@example.com"
             team: true,
             role: true,
             person: true,
-            object: true,
+            task: true,
+            product: true,
+            workflow: true,
             activity: true
         };
         let cardViewHierarchical = true; // Default to hierarchical view
@@ -16572,7 +16665,9 @@ John Doe,Engineering,john@example.com"
             // Find orphan entities (no DES parent)
             const orphanTeams = entities.team.filter(t => !entitiesWithParents.has(t.id));
             const orphanRoles = entities.role.filter(r => !entitiesWithParents.has(r.id));
-            const orphanObjects = entities.object.filter(o => !entitiesWithParents.has(o.id));
+            const orphanTasks = entities.task.filter(t => !entitiesWithParents.has(t.id));
+            const orphanProducts = entities.product.filter(p => !entitiesWithParents.has(p.id));
+            const orphanWorkflows = entities.workflow.filter(w => !entitiesWithParents.has(w.id));
             // People not assigned to any role (via INS relationship)
             const peopleWithRoles = new Set(
                 relationships.filter(r => r.predicate === 'INS').map(r => r.subject)
@@ -16584,7 +16679,9 @@ John Doe,Engineering,john@example.com"
                 orphanTeams,
                 orphanRoles,
                 orphanPeople,
-                orphanObjects
+                orphanTasks,
+                orphanProducts,
+                orphanWorkflows
             };
         }
 
@@ -16724,7 +16821,9 @@ John Doe,Engineering,john@example.com"
                 { type: 'activity', label: 'Activities', icon: '⚡', count: relationships.length },
                 { type: 'role', label: 'Roles', icon: getIcon('role'), count: entities.role.length },
                 { type: 'person', label: 'People', icon: getIcon('person'), count: entities.person.length },
-                { type: 'object', label: 'Work Products', icon: getIcon('object'), count: entities.object.length },
+                { type: 'task', label: 'Tasks', icon: getIcon('task'), count: entities.task.length },
+                { type: 'product', label: 'Products', icon: getIcon('product'), count: entities.product.length },
+                { type: 'workflow', label: 'Workflows', icon: getIcon('workflow'), count: entities.workflow.length },
                 { type: 'team', label: 'Teams', icon: getIcon('team'), count: entities.team.length },
                 { type: 'unit', label: 'Units', icon: getIcon('unit'), count: entities.unit.length }
             ];
@@ -16820,12 +16919,32 @@ John Doe,Engineering,john@example.com"
                 }
             }
 
+            // Tasks
+            if (cardViewTypeFilters.task && sidebarFilters.entities.task && entities.task.length > 0) {
+                let filteredTasks = filterEntitiesBySearch(entities.task, cardViewSearchTerm);
+                filteredTasks = sortEntities(filteredTasks, cardViewSortOption);
+                if (filteredTasks.length > 0) {
+                    contentContainer.appendChild(createCardRow('Tasks', filteredTasks, getIcon('task')));
+                    hasContent = true;
+                }
+            }
+
             // Work Products
-            if (cardViewTypeFilters.object && sidebarFilters.entities.object && entities.object.length > 0) {
-                let filteredObjects = filterEntitiesBySearch(entities.object, cardViewSearchTerm);
-                filteredObjects = sortEntities(filteredObjects, cardViewSortOption);
-                if (filteredObjects.length > 0) {
-                    contentContainer.appendChild(createCardRow('Work Products', filteredObjects, getIcon('object')));
+            if (cardViewTypeFilters.product && sidebarFilters.entities.product && entities.product.length > 0) {
+                let filteredProducts = filterEntitiesBySearch(entities.product, cardViewSearchTerm);
+                filteredProducts = sortEntities(filteredProducts, cardViewSortOption);
+                if (filteredProducts.length > 0) {
+                    contentContainer.appendChild(createCardRow('Work Products', filteredProducts, getIcon('product')));
+                    hasContent = true;
+                }
+            }
+
+            // Workflows
+            if (cardViewTypeFilters.workflow && sidebarFilters.entities.workflow && entities.workflow.length > 0) {
+                let filteredWorkflows = filterEntitiesBySearch(entities.workflow, cardViewSearchTerm);
+                filteredWorkflows = sortEntities(filteredWorkflows, cardViewSortOption);
+                if (filteredWorkflows.length > 0) {
+                    contentContainer.appendChild(createCardRow('Workflows', filteredWorkflows, getIcon('workflow')));
                     hasContent = true;
                 }
             }
@@ -17073,13 +17192,32 @@ John Doe,Engineering,john@example.com"
                 }
             }
 
-            // Work Products - can potentially be grouped (via CON relationships)
-            // For now, render normally
-            if (cardViewTypeFilters.object && sidebarFilters.entities.object && entities.object.length > 0) {
-                let filteredObjects = filterEntitiesBySearch(entities.object, cardViewSearchTerm);
-                filteredObjects = sortEntities(filteredObjects, cardViewSortOption);
-                if (filteredObjects.length > 0) {
-                    contentContainer.appendChild(createCardRow('Work Products', filteredObjects, getIcon('object')));
+            // Tasks
+            if (cardViewTypeFilters.task && sidebarFilters.entities.task && entities.task.length > 0) {
+                let filteredTasks = filterEntitiesBySearch(entities.task, cardViewSearchTerm);
+                filteredTasks = sortEntities(filteredTasks, cardViewSortOption);
+                if (filteredTasks.length > 0) {
+                    contentContainer.appendChild(createCardRow('Tasks', filteredTasks, getIcon('task')));
+                    hasContent = true;
+                }
+            }
+
+            // Work Products
+            if (cardViewTypeFilters.product && sidebarFilters.entities.product && entities.product.length > 0) {
+                let filteredProducts = filterEntitiesBySearch(entities.product, cardViewSearchTerm);
+                filteredProducts = sortEntities(filteredProducts, cardViewSortOption);
+                if (filteredProducts.length > 0) {
+                    contentContainer.appendChild(createCardRow('Work Products', filteredProducts, getIcon('product')));
+                    hasContent = true;
+                }
+            }
+
+            // Workflows
+            if (cardViewTypeFilters.workflow && sidebarFilters.entities.workflow && entities.workflow.length > 0) {
+                let filteredWorkflows = filterEntitiesBySearch(entities.workflow, cardViewSearchTerm);
+                filteredWorkflows = sortEntities(filteredWorkflows, cardViewSortOption);
+                if (filteredWorkflows.length > 0) {
+                    contentContainer.appendChild(createCardRow('Workflows', filteredWorkflows, getIcon('workflow')));
                     hasContent = true;
                 }
             }
@@ -17295,12 +17433,32 @@ John Doe,Engineering,john@example.com"
                 }
             }
 
+            // Render tasks (always flat, not part of hierarchy)
+            if (cardViewTypeFilters.task && sidebarFilters.entities.task && hierarchy.orphanTasks.length > 0) {
+                let filteredTasks = filterEntitiesBySearch(hierarchy.orphanTasks, cardViewSearchTerm);
+                filteredTasks = sortEntities(filteredTasks, cardViewSortOption);
+                if (filteredTasks.length > 0) {
+                    contentContainer.appendChild(createCardRow('Tasks', filteredTasks, getIcon('task')));
+                    hasContent = true;
+                }
+            }
+
             // Render work products (always flat, not part of hierarchy)
-            if (cardViewTypeFilters.object && sidebarFilters.entities.object && hierarchy.orphanObjects.length > 0) {
-                let filteredObjects = filterEntitiesBySearch(hierarchy.orphanObjects, cardViewSearchTerm);
-                filteredObjects = sortEntities(filteredObjects, cardViewSortOption);
-                if (filteredObjects.length > 0) {
-                    contentContainer.appendChild(createCardRow('Work Products', filteredObjects, getIcon('object')));
+            if (cardViewTypeFilters.product && sidebarFilters.entities.product && hierarchy.orphanProducts.length > 0) {
+                let filteredProducts = filterEntitiesBySearch(hierarchy.orphanProducts, cardViewSearchTerm);
+                filteredProducts = sortEntities(filteredProducts, cardViewSortOption);
+                if (filteredProducts.length > 0) {
+                    contentContainer.appendChild(createCardRow('Work Products', filteredProducts, getIcon('product')));
+                    hasContent = true;
+                }
+            }
+
+            // Render workflows (always flat, not part of hierarchy)
+            if (cardViewTypeFilters.workflow && sidebarFilters.entities.workflow && hierarchy.orphanWorkflows.length > 0) {
+                let filteredWorkflows = filterEntitiesBySearch(hierarchy.orphanWorkflows, cardViewSearchTerm);
+                filteredWorkflows = sortEntities(filteredWorkflows, cardViewSortOption);
+                if (filteredWorkflows.length > 0) {
+                    contentContainer.appendChild(createCardRow('Workflows', filteredWorkflows, getIcon('workflow')));
                     hasContent = true;
                 }
             }
@@ -17896,7 +18054,7 @@ John Doe,Engineering,john@example.com"
 
             const filters = getActiveFilters();
 
-            if (entities.unit.length === 0 && entities.team.length === 0 && entities.role.length === 0 && entities.person.length === 0 && entities.object.length === 0) {
+            if (entities.unit.length === 0 && entities.team.length === 0 && entities.role.length === 0 && entities.person.length === 0 && entities.task.length === 0 && entities.product.length === 0 && entities.workflow.length === 0) {
                 container.innerHTML = '<div style="text-align: center; padding: 3rem; color: #8B6F47;">No entities created yet. Add entities to get started.</div>';
                 return;
             }
@@ -18039,33 +18197,101 @@ John Doe,Engineering,john@example.com"
                 container.appendChild(section);
             }
 
-            // Show all objects with collapsible section
-            if (entities.object.length > 0 && filters.entities.object) {
+            // Show all tasks with collapsible section
+            if (entities.task.length > 0 && filters.entities.task) {
                 const section = document.createElement('div');
                 section.className = 'tree-section';
 
                 const header = document.createElement('div');
                 header.className = 'tree-section-header';
                 header.innerHTML = `
-                    <span class="tree-expand-icon ${treeViewState.sectionsExpanded.objects ? 'expanded' : ''}">▶</span>
-                    <span style="font-size: 1.2rem;">📦</span>
-                    <span class="tree-section-title">Objects</span>
-                    <span class="tree-section-count">${entities.object.length}</span>
+                    <span class="tree-expand-icon ${treeViewState.sectionsExpanded.tasks ? 'expanded' : ''}">▶</span>
+                    ${getIcon('task')}
+                    <span class="tree-section-title">Tasks</span>
+                    <span class="tree-section-count">${entities.task.length}</span>
                 `;
                 section.appendChild(header);
 
                 const content = document.createElement('div');
-                content.className = `tree-section-content ${treeViewState.sectionsExpanded.objects ? 'expanded' : ''}`;
+                content.className = `tree-section-content ${treeViewState.sectionsExpanded.tasks ? 'expanded' : ''}`;
 
-                entities.object.forEach(obj => {
-                    const objEl = createTreeNodeDetailed(obj, filters);
-                    content.appendChild(objEl);
+                entities.task.forEach(task => {
+                    const taskEl = createTreeNodeDetailed(task, filters);
+                    content.appendChild(taskEl);
                 });
 
                 section.appendChild(content);
 
                 header.onclick = () => {
-                    treeViewState.sectionsExpanded.objects = !treeViewState.sectionsExpanded.objects;
+                    treeViewState.sectionsExpanded.tasks = !treeViewState.sectionsExpanded.tasks;
+                    content.classList.toggle('expanded');
+                    header.querySelector('.tree-expand-icon').classList.toggle('expanded');
+                };
+
+                container.appendChild(section);
+            }
+
+            // Show all products with collapsible section
+            if (entities.product.length > 0 && filters.entities.product) {
+                const section = document.createElement('div');
+                section.className = 'tree-section';
+
+                const header = document.createElement('div');
+                header.className = 'tree-section-header';
+                header.innerHTML = `
+                    <span class="tree-expand-icon ${treeViewState.sectionsExpanded.products ? 'expanded' : ''}">▶</span>
+                    ${getIcon('product')}
+                    <span class="tree-section-title">Work Products</span>
+                    <span class="tree-section-count">${entities.product.length}</span>
+                `;
+                section.appendChild(header);
+
+                const content = document.createElement('div');
+                content.className = `tree-section-content ${treeViewState.sectionsExpanded.products ? 'expanded' : ''}`;
+
+                entities.product.forEach(product => {
+                    const productEl = createTreeNodeDetailed(product, filters);
+                    content.appendChild(productEl);
+                });
+
+                section.appendChild(content);
+
+                header.onclick = () => {
+                    treeViewState.sectionsExpanded.products = !treeViewState.sectionsExpanded.products;
+                    content.classList.toggle('expanded');
+                    header.querySelector('.tree-expand-icon').classList.toggle('expanded');
+                };
+
+                container.appendChild(section);
+            }
+
+            // Show all workflows with collapsible section
+            if (entities.workflow.length > 0 && filters.entities.workflow) {
+                const section = document.createElement('div');
+                section.className = 'tree-section';
+
+                const header = document.createElement('div');
+                header.className = 'tree-section-header';
+                header.innerHTML = `
+                    <span class="tree-expand-icon ${treeViewState.sectionsExpanded.workflows ? 'expanded' : ''}">▶</span>
+                    ${getIcon('workflow')}
+                    <span class="tree-section-title">Workflows</span>
+                    <span class="tree-section-count">${entities.workflow.length}</span>
+                `;
+                section.appendChild(header);
+
+                const content = document.createElement('div');
+                content.className = `tree-section-content ${treeViewState.sectionsExpanded.workflows ? 'expanded' : ''}`;
+
+                entities.workflow.forEach(workflow => {
+                    const workflowEl = createTreeNodeDetailed(workflow, filters);
+                    content.appendChild(workflowEl);
+                });
+
+                section.appendChild(content);
+
+                header.onclick = () => {
+                    treeViewState.sectionsExpanded.workflows = !treeViewState.sectionsExpanded.workflows;
                     content.classList.toggle('expanded');
                     header.querySelector('.tree-expand-icon').classList.toggle('expanded');
                 };
@@ -19178,7 +19404,10 @@ John Doe,Engineering,john@example.com"
                 team: '<i class="ph ph-users-three"></i>',
                 role: '<i class="ph ph-briefcase"></i>',
                 person: '<i class="ph ph-user"></i>',
-                object: '<i class="ph ph-package"></i>'
+                task: '<i class="ph ph-check-square"></i>',
+                product: '<i class="ph ph-package"></i>',
+                workflow: '<i class="ph ph-flow-arrow"></i>',
+                object: '<i class="ph ph-package"></i>' // Legacy support
             };
             return icons[type] || '<i class="ph ph-question"></i>';
         }
@@ -19189,7 +19418,10 @@ John Doe,Engineering,john@example.com"
                 team: 'ph-users-three',
                 role: 'ph-briefcase',
                 person: 'ph-user',
-                object: 'ph-package'
+                task: 'ph-check-square',
+                product: 'ph-package',
+                workflow: 'ph-flow-arrow',
+                object: 'ph-package' // Legacy support
             };
             return icons[type] || 'ph-question';
         }
@@ -20061,9 +20293,11 @@ John Doe,Engineering,john@example.com"
                 entities.team = [];
                 entities.role = [];
                 entities.person = [];
-                entities.object = [];
+                entities.task = [];
+                entities.product = [];
+                entities.workflow = [];
                 relationships = [];
-                
+
                 hasSampleData = false;
                 document.getElementById('sampleDataText').textContent = 'Load Sample Data';
                 document.getElementById('sampleDataBtn').innerHTML = '<i class="ph ph-database"></i> <span id="sampleDataText">Load Sample Data</span>';
@@ -20092,12 +20326,14 @@ John Doe,Engineering,john@example.com"
 
         function clearAllData() {
             if (!confirm('Clear ALL data including your custom entities? This cannot be undone.')) return;
-            
+
             entities.unit = [];
             entities.team = [];
             entities.role = [];
             entities.person = [];
-            entities.object = [];
+            entities.task = [];
+            entities.product = [];
+            entities.workflow = [];
             relationships = [];
             hasSampleData = false;
             
@@ -20132,7 +20368,7 @@ John Doe,Engineering,john@example.com"
                 const ws = workspaces[currentWorkspaceId];
 
                 // Load current workspace data
-                entities = JSON.parse(JSON.stringify(ws.entities || { unit: [], team: [], role: [], person: [], object: [] }));
+                entities = JSON.parse(JSON.stringify(ws.entities || { unit: [], team: [], role: [], person: [], task: [], product: [], workflow: [] }));
                 relationships = JSON.parse(JSON.stringify(ws.relationships || []));
                 hasSampleData = ws.hasSampleData || false;
 
@@ -20529,22 +20765,24 @@ John Doe,Engineering,john@example.com"
                 return;
             }
 
-            // 1. Create task as a work object
-            const taskId = 'object' + Date.now();
+            // 1. Create task entity (tasks are activities that produce work products)
+            const taskId = 'task' + Date.now();
             const taskObject = {
                 id: taskId,
                 name: taskName,
-                type: 'object',
+                type: 'task',
                 dueDate: null,
                 predecessorId: null,
                 status: 'pending',
+                producesProductId: null,
+                followsWorkflowId: null,
                 createdAt: new Date().toISOString()
             };
-            entities.object.push(taskObject);
+            entities.task.push(taskObject);
 
             logActivityToXano({
                 event_verb: 'Add Entity',
-                object_type: 'object',
+                object_type: 'task',
                 object_label: taskName
             });
 
@@ -20698,7 +20936,7 @@ John Doe,Engineering,john@example.com"
             });
 
             // Add existing tasks as potential predecessors
-            const tasks = entities.object || [];
+            const tasks = entities.task || [];
             tasks.forEach(task => {
                 const option = document.createElement('option');
                 option.value = task.id;
@@ -20737,7 +20975,7 @@ John Doe,Engineering,john@example.com"
             if (visited.has(taskId)) return [];
             visited.add(taskId);
 
-            const dependents = entities.object.filter(t => t.predecessorId === taskId);
+            const dependents = entities.task.filter(t => t.predecessorId === taskId);
             let chain = [...dependents];
 
             dependents.forEach(dep => {
@@ -20759,7 +20997,7 @@ John Doe,Engineering,john@example.com"
                 return;
             }
 
-            const predecessor = entities.object.find(t => t.id === predecessorId);
+            const predecessor = entities.task.find(t => t.id === predecessorId);
             if (!predecessor || !predecessor.dueDate) {
                 warningEl.style.display = 'none';
                 return;
@@ -20885,7 +21123,7 @@ John Doe,Engineering,john@example.com"
 
             const role = entities.role.find(r => r.id === roleId);
             const person = entities.person.find(p => p.id === personId);
-            const predecessor = entities.object.find(t => t.id === predecessorId);
+            const predecessor = entities.task.find(t => t.id === predecessorId);
 
             let html = `
                 <span class="hero-task-preview-item role">
@@ -20947,22 +21185,24 @@ John Doe,Engineering,john@example.com"
             const role = entities.role.find(r => r.id === roleId);
             const person = personId ? entities.person.find(p => p.id === personId) : null;
 
-            // 1. Create task as a work object with due date and predecessor
-            const taskId = 'object' + Date.now();
+            // 1. Create task entity (tasks are activities that produce work products)
+            const taskId = 'task' + Date.now();
             const taskObject = {
                 id: taskId,
                 name: taskName,
-                type: 'object',
+                type: 'task',
                 dueDate: dueDate || null,
                 predecessorId: predecessorId || null,
                 status: 'pending',
+                producesProductId: null,
+                followsWorkflowId: null,
                 createdAt: new Date().toISOString()
             };
-            entities.object.push(taskObject);
+            entities.task.push(taskObject);
 
             logActivityToXano({
                 event_verb: 'Add Entity',
-                object_type: 'object',
+                object_type: 'task',
                 object_label: taskName
             });
 
@@ -21036,7 +21276,7 @@ John Doe,Engineering,john@example.com"
         // Render the task board view
         function renderTaskBoardView() {
             const content = document.getElementById('taskBoardContent');
-            const tasks = entities.object || [];
+            const tasks = entities.task || [];
 
             // Update total count
             document.getElementById('taskBoardTotal').textContent = tasks.length;
@@ -21109,10 +21349,10 @@ John Doe,Engineering,john@example.com"
                 }
 
                 // Find predecessor task
-                const predecessor = task.predecessorId ? entities.object.find(t => t.id === task.predecessorId) : null;
+                const predecessor = task.predecessorId ? entities.task.find(t => t.id === task.predecessorId) : null;
 
                 // Find dependent tasks (tasks that depend on this one)
-                const dependentTasks = entities.object.filter(t => t.predecessorId === task.id);
+                const dependentTasks = entities.task.filter(t => t.predecessorId === task.id);
 
                 // Check date status
                 const dueDateStatus = getTaskDueDateStatus(task);
@@ -21183,7 +21423,7 @@ John Doe,Engineering,john@example.com"
         // Update task count badge
         function updateTaskCountBadge() {
             const badge = document.getElementById('taskCountBadge');
-            const count = (entities.object || []).length;
+            const count = (entities.task || []).length;
 
             if (count > 0) {
                 badge.textContent = count;
@@ -21378,7 +21618,7 @@ John Doe,Engineering,john@example.com"
                     workspaces[wsId] = {
                         id: wsId,
                         name: 'My Organization',
-                        entities: { unit: [], team: [], role: [], person: [], object: [] },
+                        entities: { unit: [], team: [], role: [], person: [], task: [], product: [], workflow: [] },
                         relationships: [],
                         hasSampleData: true,
                         createdAt: Date.now(),
@@ -21403,7 +21643,9 @@ John Doe,Engineering,john@example.com"
                         teams: entities.team.length,
                         roles: entities.role.length,
                         people: entities.person.length,
-                        objects: entities.object.length
+                        tasks: entities.task.length,
+                        products: entities.product.length,
+                        workflows: entities.workflow.length
                     });
                     console.log('✅ Relationships:', relationships.length);
                     updateStatus('Sample data loaded');
@@ -21467,7 +21709,9 @@ John Doe,Engineering,john@example.com"
                     teams: entities.team.length,
                     roles: entities.role.length,
                     people: entities.person.length,
-                    objects: entities.object.length
+                    tasks: entities.task.length,
+                    products: entities.product.length,
+                    workflows: entities.workflow.length
                 },
                 relationships: relationships.length,
                 hasSampleData: hasSampleData
