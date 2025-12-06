@@ -16050,8 +16050,8 @@ John Doe,Engineering,john@example.com"
             }
 
             // Render work products (always flat, not part of hierarchy)
-            if (cardViewTypeFilters.object && sidebarFilters.entities.object && hierarchy.objects.length > 0) {
-                let filteredObjects = filterEntitiesBySearch(hierarchy.objects, cardViewSearchTerm);
+            if (cardViewTypeFilters.object && sidebarFilters.entities.object && hierarchy.orphanObjects.length > 0) {
+                let filteredObjects = filterEntitiesBySearch(hierarchy.orphanObjects, cardViewSearchTerm);
                 filteredObjects = sortEntities(filteredObjects, cardViewSortOption);
                 if (filteredObjects.length > 0) {
                     contentContainer.appendChild(createCardRow('Work Products', filteredObjects, getIcon('object')));
