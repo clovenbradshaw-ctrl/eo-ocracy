@@ -11007,10 +11007,12 @@ John Doe,Engineering,john@example.com"
             setUser(userData) {
                 if (!userData) return;
 
+                // Prioritize Softr's standard fields (softr_user_*) over custom Airtable fields
+                // Note: userData.Name may contain role/group info, not the actual user name
                 this.currentUser = {
-                    id: userData.id || userData.record_id || userData.user_id || null,
-                    email: userData.email || userData.Email || null,
-                    name: userData.name || userData.Name || userData.full_name || userData.Full_Name || null,
+                    id: userData.id || userData.record_id || userData.user_id || userData.airtable_record_id || null,
+                    email: userData.softr_user_email || userData.email || userData.Email || null,
+                    name: userData.softr_user_full_name || userData.name || userData.full_name || userData.Full_Name || null,
                     role: userData.role || userData.Role || null,
                     // Store all original data for potential future use
                     _raw: userData,
