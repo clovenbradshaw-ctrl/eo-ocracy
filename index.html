@@ -10526,6 +10526,10 @@
                     <i class="ph ph-trash"></i>
                     Delete
                 </button>
+                <button class="modal-action-btn" id="modalViewFromButton" onclick="openViewFromEntity(currentModalEntity?.id, currentModalEntityType)" style="display: none;">
+                    <i class="ph ph-squares-four"></i>
+                    View
+                </button>
                 <div class="modal-action-spacer"></div>
                 <button class="modal-action-btn secondary" onclick="closeEntityModal()">
                     Close
@@ -12059,6 +12063,10 @@ John Doe,Engineering,john@example.com"
             // Show edit and delete buttons for entities
             document.getElementById('modalEditButton').style.display = 'inline-flex';
             document.getElementById('modalDeleteButton').style.display = 'inline-flex';
+
+            // Show "View from" button only for entity types that can be grouped by (unit, team, role)
+            const canViewFrom = ['unit', 'team', 'role'].includes(entityType);
+            document.getElementById('modalViewFromButton').style.display = canViewFrom ? 'inline-flex' : 'none';
 
             // Display description with inline editing support
             const descriptionEl = document.getElementById('modalDescription');
@@ -18611,6 +18619,7 @@ John Doe,Engineering,john@example.com"
         };
         let cardViewHierarchical = true; // Default to hierarchical view
         let cardViewGroupBy = 'none'; // Group by: 'none', 'unit', 'team', 'role'
+        let cardViewFirstColumnEntity = null; // Entity to show as first column when grouping
 
         function toggleCardViewMode(isHierarchical) {
             cardViewHierarchical = isHierarchical;
@@ -18764,12 +18773,40 @@ John Doe,Engineering,john@example.com"
 
         function handleCardViewGroupBy(event) {
             cardViewGroupBy = event.target.value;
+            // Clear first column entity when user manually changes groupBy
+            cardViewFirstColumnEntity = null;
             renderCardViewContent();
         }
 
         function toggleCardViewTypeFilter(type) {
             cardViewTypeFilters[type] = !cardViewTypeFilters[type];
             renderCardView();
+        }
+
+        // Open card view with a specific entity as the first column
+        function openViewFromEntity(entityId, entityType) {
+            const entity = entities[entityType]?.find(e => e.id === entityId);
+            if (!entity) return;
+
+            // Set the first column entity
+            cardViewFirstColumnEntity = entity;
+
+            // Set groupBy based on entity type (units, teams, and roles can be grouped by)
+            if (entityType === 'unit' || entityType === 'team' || entityType === 'role') {
+                cardViewGroupBy = entityType;
+            }
+
+            // Switch to flat view so grouping is visible
+            cardViewHierarchical = false;
+
+            // Close the modal and switch to card view
+            closeEntityModal();
+            switchView('card');
+        }
+
+        // Clear the first column entity (called when manually changing groupBy)
+        function clearFirstColumnEntity() {
+            cardViewFirstColumnEntity = null;
         }
 
         // Card View Rendering
@@ -19104,9 +19141,16 @@ John Doe,Engineering,john@example.com"
                 `;
                 section.appendChild(header);
 
-                // Sort groups by parent name
+                // Sort groups by parent name, but put first column entity first
                 const sortedGroups = Array.from(groups.values())
-                    .sort((a, b) => a.parent.name.localeCompare(b.parent.name));
+                    .sort((a, b) => {
+                        // If cardViewFirstColumnEntity is set, put it first
+                        if (cardViewFirstColumnEntity) {
+                            if (a.parent.id === cardViewFirstColumnEntity.id) return -1;
+                            if (b.parent.id === cardViewFirstColumnEntity.id) return 1;
+                        }
+                        return a.parent.name.localeCompare(b.parent.name);
+                    });
 
                 // Render each group
                 sortedGroups.forEach(group => {
