@@ -8663,6 +8663,404 @@
         }
 
         /* ============================================
+           WORKFLOW SUGGESTION MODAL STYLES
+           ============================================ */
+
+        .workflow-suggestion-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(61, 46, 31, 0.7);
+            backdrop-filter: blur(4px);
+            z-index: 2100;
+            display: none;
+            align-items: center;
+            justify-content: center;
+            animation: fadeIn 0.2s ease-out;
+        }
+
+        .workflow-suggestion-overlay.active {
+            display: flex;
+        }
+
+        .workflow-suggestion-modal {
+            background: white;
+            border-radius: 16px;
+            width: 90%;
+            max-width: 500px;
+            max-height: 80vh;
+            overflow: hidden;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+            animation: slideUp 0.3s ease-out;
+        }
+
+        .workflow-suggestion-header {
+            background: linear-gradient(135deg, #7B95A3 0%, #6B8593 100%);
+            color: white;
+            padding: 1.25rem 1.5rem;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+
+        .workflow-suggestion-header h3 {
+            font-size: 1.125rem;
+            font-weight: 600;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .workflow-suggestion-close {
+            background: rgba(255, 255, 255, 0.2);
+            border: none;
+            color: white;
+            width: 32px;
+            height: 32px;
+            border-radius: 50%;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .workflow-suggestion-close:hover {
+            background: rgba(255, 255, 255, 0.3);
+        }
+
+        .workflow-suggestion-body {
+            padding: 1.5rem;
+        }
+
+        .workflow-suggestion-message {
+            font-size: 0.95rem;
+            color: #3D2E1F;
+            margin-bottom: 1rem;
+            line-height: 1.5;
+        }
+
+        .workflow-suggestion-tasks {
+            background: #FAF7F5;
+            border-radius: 8px;
+            padding: 1rem;
+            margin-bottom: 1.25rem;
+            max-height: 200px;
+            overflow-y: auto;
+        }
+
+        .workflow-suggestion-task {
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+            padding: 0.625rem;
+            background: white;
+            border-radius: 6px;
+            margin-bottom: 0.5rem;
+            border: 1px solid #E5DDD1;
+        }
+
+        .workflow-suggestion-task:last-child {
+            margin-bottom: 0;
+        }
+
+        .suggestion-task-order {
+            background: #C88F4A;
+            color: white;
+            width: 24px;
+            height: 24px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 0.75rem;
+            font-weight: 600;
+            flex-shrink: 0;
+        }
+
+        .suggestion-task-name {
+            flex: 1;
+            font-size: 0.9rem;
+            color: #3D2E1F;
+        }
+
+        .suggestion-similarity {
+            font-size: 0.75rem;
+            color: #7B95A3;
+            background: #F0F4F6;
+            padding: 0.25rem 0.5rem;
+            border-radius: 4px;
+        }
+
+        .workflow-suggestion-input {
+            width: 100%;
+            padding: 0.875rem 1rem;
+            border: 2px solid #E5DDD1;
+            border-radius: 8px;
+            font-size: 0.95rem;
+            margin-bottom: 1rem;
+            transition: border-color 0.2s;
+        }
+
+        .workflow-suggestion-input:focus {
+            outline: none;
+            border-color: #7B95A3;
+        }
+
+        .workflow-suggestion-footer {
+            display: flex;
+            gap: 0.75rem;
+            justify-content: flex-end;
+        }
+
+        .workflow-suggestion-btn {
+            padding: 0.75rem 1.5rem;
+            border-radius: 8px;
+            font-size: 0.9rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.2s;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .workflow-suggestion-btn-secondary {
+            background: #FAF7F5;
+            border: 1px solid #E5DDD1;
+            color: #6B5642;
+        }
+
+        .workflow-suggestion-btn-secondary:hover {
+            background: #F5F0EB;
+        }
+
+        .workflow-suggestion-btn-primary {
+            background: #7B95A3;
+            border: none;
+            color: white;
+        }
+
+        .workflow-suggestion-btn-primary:hover {
+            background: #6B8593;
+        }
+
+        /* ============================================
+           TASK LINK MODAL STYLES
+           ============================================ */
+
+        .task-link-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(61, 46, 31, 0.7);
+            backdrop-filter: blur(4px);
+            z-index: 2100;
+            display: none;
+            align-items: center;
+            justify-content: center;
+            animation: fadeIn 0.2s ease-out;
+        }
+
+        .task-link-overlay.active {
+            display: flex;
+        }
+
+        .task-link-modal {
+            background: white;
+            border-radius: 16px;
+            width: 90%;
+            max-width: 450px;
+            overflow: hidden;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+            animation: slideUp 0.3s ease-out;
+        }
+
+        .task-link-header {
+            background: linear-gradient(135deg, #C88F4A 0%, #B87B5B 100%);
+            color: white;
+            padding: 1.25rem 1.5rem;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+
+        .task-link-header h3 {
+            font-size: 1.125rem;
+            font-weight: 600;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .task-link-close {
+            background: rgba(255, 255, 255, 0.2);
+            border: none;
+            color: white;
+            width: 32px;
+            height: 32px;
+            border-radius: 50%;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .task-link-body {
+            padding: 1.5rem;
+        }
+
+        .task-link-select-group {
+            margin-bottom: 1.25rem;
+        }
+
+        .task-link-label {
+            display: block;
+            font-size: 0.875rem;
+            font-weight: 600;
+            color: #6B5642;
+            margin-bottom: 0.5rem;
+        }
+
+        .task-link-select {
+            width: 100%;
+            padding: 0.75rem;
+            border: 2px solid #E5DDD1;
+            border-radius: 8px;
+            font-size: 0.9rem;
+            background: white;
+        }
+
+        .task-link-select:focus {
+            outline: none;
+            border-color: #C88F4A;
+        }
+
+        .task-link-option-group {
+            margin-bottom: 1.25rem;
+        }
+
+        .task-link-option {
+            display: flex;
+            align-items: flex-start;
+            gap: 0.75rem;
+            padding: 0.875rem;
+            border: 2px solid #E5DDD1;
+            border-radius: 8px;
+            margin-bottom: 0.5rem;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .task-link-option:hover {
+            border-color: #C88F4A;
+            background: #FAF7F5;
+        }
+
+        .task-link-option.selected {
+            border-color: #C88F4A;
+            background: #FDF8F3;
+        }
+
+        .task-link-option input[type="radio"] {
+            margin-top: 2px;
+        }
+
+        .task-link-option-content {
+            flex: 1;
+        }
+
+        .task-link-option-title {
+            font-weight: 600;
+            color: #3D2E1F;
+            font-size: 0.95rem;
+            margin-bottom: 0.25rem;
+        }
+
+        .task-link-option-desc {
+            font-size: 0.8rem;
+            color: #8B6F47;
+        }
+
+        .task-link-footer {
+            display: flex;
+            gap: 0.75rem;
+            justify-content: flex-end;
+            padding-top: 0.5rem;
+        }
+
+        .task-link-btn {
+            padding: 0.75rem 1.5rem;
+            border-radius: 8px;
+            font-size: 0.9rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .task-link-btn-secondary {
+            background: #FAF7F5;
+            border: 1px solid #E5DDD1;
+            color: #6B5642;
+        }
+
+        .task-link-btn-primary {
+            background: #C88F4A;
+            border: none;
+            color: white;
+        }
+
+        .task-link-btn-primary:hover {
+            background: #B87B5B;
+        }
+
+        /* ============================================
+           VIOLATION BADGE STYLES
+           ============================================ */
+
+        .violation-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.375rem;
+            padding: 0.375rem 0.625rem;
+            background: #FEF3C7;
+            color: #92400E;
+            border-radius: 6px;
+            font-size: 0.75rem;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .violation-badge:hover {
+            background: #FDE68A;
+        }
+
+        .violation-badge i {
+            font-size: 0.875rem;
+        }
+
+        .task-linked-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.375rem;
+            padding: 0.375rem 0.625rem;
+            background: #DBEAFE;
+            color: #1E40AF;
+            border-radius: 6px;
+            font-size: 0.75rem;
+            font-weight: 500;
+        }
+
+        .task-linked-badge.hard-link {
+            background: #FEE2E2;
+            color: #991B1B;
+        }
+
+        /* ============================================
            TASK BOARD VIEW STYLES
            ============================================ */
 
@@ -11970,6 +12368,12 @@ John Doe,Engineering,john@example.com"
                     workspaces[currentWorkspaceId].relationships = JSON.parse(JSON.stringify(relationships));
                     workspaces[currentWorkspaceId].hasSampleData = hasSampleData;
                     workspaces[currentWorkspaceId].updatedAt = Date.now();
+
+                    // Save workflow system data
+                    workspaces[currentWorkspaceId].workflowTemplates = JSON.parse(JSON.stringify(workflowTemplates));
+                    workspaces[currentWorkspaceId].workflowInstances = JSON.parse(JSON.stringify(workflowInstances));
+                    workspaces[currentWorkspaceId].workflowViolations = JSON.parse(JSON.stringify(workflowViolations));
+                    workspaces[currentWorkspaceId].taskLinks = JSON.parse(JSON.stringify(taskLinks));
                 }
 
                 const data = {
@@ -11996,6 +12400,12 @@ John Doe,Engineering,john@example.com"
             entities = normalizeEntities(JSON.parse(JSON.stringify(ws.entities || {})));
             relationships = JSON.parse(JSON.stringify(ws.relationships || []));
             hasSampleData = ws.hasSampleData || false;
+
+            // Load workflow system data
+            workflowTemplates = JSON.parse(JSON.stringify(ws.workflowTemplates || []));
+            workflowInstances = JSON.parse(JSON.stringify(ws.workflowInstances || []));
+            workflowViolations = JSON.parse(JSON.stringify(ws.workflowViolations || []));
+            taskLinks = JSON.parse(JSON.stringify(ws.taskLinks || []));
 
             // Update UI
             document.getElementById('workspaceNameText').textContent = ws.name;
@@ -12782,6 +13192,859 @@ John Doe,Engineering,john@example.com"
         // Xano configuration
         const XANO_BASE_URL = 'https://xvkq-pq7i-idtl.n7d.xano.io/api:nrIL-Oi-';
         const APP_ID = 'holonic-org-graph'; // Your app identifier
+
+        // ==========================================
+        // EMERGENT WORKFLOW SYSTEM
+        // ==========================================
+        //
+        // Philosophy: Structure can emerge bottom-up OR be imposed top-down
+        // - Bottom-up: Tasks → Links → Patterns → Workflows
+        // - Top-down: Workflow Templates → Task Instances (with constraints)
+        //
+        // Task Links: Multiple links between tasks with optional date linking
+        // Workflow Templates: Define patterns with roles and constraints
+        // Workflow Instances: Bind existing or new tasks to templates
+        // Violation Detection: Flag tasks that don't match workflow rules
+
+        // Task Links - extends basic predecessorId with rich linking
+        // Stored as array on task entity: linkedTasks[]
+        // Each link: { taskId, linkType: 'soft'|'hard', direction: 'blocks'|'blocked_by', createdAt }
+        // - soft: logical sequence ("B happens after A")
+        // - hard: date dependency ("if A slips, B slips too")
+
+        // Workflow Templates - emergent or defined patterns
+        // {
+        //   id, name, description, createdBy, status: 'draft'|'active'|'inactive',
+        //   taskPatterns: [{ order, namePattern, roleConstraints: [roleId], requiredFields: [] }],
+        //   roleRequirements: [{ roleId, permissions: [] }],
+        //   approvals: [{ teamId, approvedBy, approvedAt }], // For future approval feature
+        //   createdAt, version
+        // }
+
+        // Workflow Instances - binds tasks to a template
+        // {
+        //   id, workflowTemplateId, tasks: [taskId],
+        //   status: 'in_progress'|'completed'|'abandoned',
+        //   createdAt, templateVersion
+        // }
+
+        // Workflow Violations - tracks rule mismatches for reconciliation
+        // {
+        //   id, taskId, workflowTemplateId, violationType,
+        //   status: 'pending'|'resolved'|'exception_granted',
+        //   createdBy, resolvedBy, resolvedAt, notes
+        // }
+
+        // Storage for workflow system (will be merged into entities structure)
+        let workflowTemplates = [];  // Enhanced workflow definitions
+        let workflowInstances = [];  // Task groupings bound to templates
+        let workflowViolations = []; // Rule mismatches pending reconciliation
+        let taskLinks = [];          // Rich task-to-task links with metadata
+
+        // ==========================================
+        // FUZZY MATCHING FOR TASK SIMILARITY
+        // ==========================================
+
+        // Calculate Levenshtein distance between two strings
+        function levenshteinDistance(str1, str2) {
+            const m = str1.length;
+            const n = str2.length;
+            const dp = Array(m + 1).fill(null).map(() => Array(n + 1).fill(0));
+
+            for (let i = 0; i <= m; i++) dp[i][0] = i;
+            for (let j = 0; j <= n; j++) dp[0][j] = j;
+
+            for (let i = 1; i <= m; i++) {
+                for (let j = 1; j <= n; j++) {
+                    if (str1[i - 1].toLowerCase() === str2[j - 1].toLowerCase()) {
+                        dp[i][j] = dp[i - 1][j - 1];
+                    } else {
+                        dp[i][j] = 1 + Math.min(dp[i - 1][j], dp[i][j - 1], dp[i - 1][j - 1]);
+                    }
+                }
+            }
+            return dp[m][n];
+        }
+
+        // Calculate similarity score (0-1, higher = more similar)
+        function calculateSimilarity(str1, str2) {
+            if (!str1 || !str2) return 0;
+            const maxLen = Math.max(str1.length, str2.length);
+            if (maxLen === 0) return 1;
+            const distance = levenshteinDistance(str1, str2);
+            return 1 - (distance / maxLen);
+        }
+
+        // Tokenize and compare for semantic similarity
+        function tokenSimilarity(str1, str2) {
+            if (!str1 || !str2) return 0;
+            const tokens1 = str1.toLowerCase().split(/\s+/).filter(t => t.length > 2);
+            const tokens2 = str2.toLowerCase().split(/\s+/).filter(t => t.length > 2);
+            if (tokens1.length === 0 || tokens2.length === 0) return 0;
+
+            let matches = 0;
+            for (const t1 of tokens1) {
+                for (const t2 of tokens2) {
+                    if (t1 === t2 || calculateSimilarity(t1, t2) > 0.8) {
+                        matches++;
+                        break;
+                    }
+                }
+            }
+            return matches / Math.max(tokens1.length, tokens2.length);
+        }
+
+        // Find similar tasks (potential duplicates or patterns)
+        // Returns array of { task, score, matchType: 'name'|'description'|'both' }
+        function findSimilarTasks(targetTask, threshold = 0.6) {
+            const similar = [];
+            const allTasks = entities.task || [];
+
+            for (const task of allTasks) {
+                if (task.id === targetTask.id) continue;
+
+                const nameScore = calculateSimilarity(targetTask.name, task.name);
+                const tokenScore = tokenSimilarity(targetTask.name, task.name);
+                const descScore = calculateSimilarity(targetTask.description || '', task.description || '');
+
+                // Combined score with weighting
+                const combinedNameScore = Math.max(nameScore, tokenScore);
+
+                let matchType = null;
+                let finalScore = 0;
+
+                if (combinedNameScore >= threshold && descScore >= threshold) {
+                    matchType = 'both';
+                    finalScore = (combinedNameScore * 0.6) + (descScore * 0.4);
+                } else if (combinedNameScore >= threshold) {
+                    matchType = 'name';
+                    finalScore = combinedNameScore;
+                } else if (descScore >= threshold) {
+                    matchType = 'description';
+                    finalScore = descScore;
+                }
+
+                if (matchType) {
+                    similar.push({ task, score: finalScore, matchType });
+                }
+            }
+
+            return similar.sort((a, b) => b.score - a.score);
+        }
+
+        // ==========================================
+        // TASK LINKING FUNCTIONS
+        // ==========================================
+
+        // Add a link between two tasks
+        function addTaskLink(sourceTaskId, targetTaskId, linkType = 'soft', direction = 'blocked_by') {
+            // Validate tasks exist
+            const sourceTask = entities.task.find(t => t.id === sourceTaskId);
+            const targetTask = entities.task.find(t => t.id === targetTaskId);
+            if (!sourceTask || !targetTask) return null;
+
+            // Check for existing link
+            const existingLink = taskLinks.find(l =>
+                (l.sourceTaskId === sourceTaskId && l.targetTaskId === targetTaskId) ||
+                (l.sourceTaskId === targetTaskId && l.targetTaskId === sourceTaskId)
+            );
+            if (existingLink) return existingLink;
+
+            const link = {
+                id: 'tlink' + Date.now(),
+                sourceTaskId,
+                targetTaskId,
+                linkType, // 'soft' or 'hard' (date dependency)
+                direction, // 'blocks' or 'blocked_by'
+                createdAt: new Date().toISOString()
+            };
+
+            taskLinks.push(link);
+            saveToLocalStorage();
+
+            // Log activity
+            logActivityToXano({
+                event_verb: 'Link Tasks',
+                eo_operator: 'CON',
+                object_type: 'task_link',
+                object_label: `${sourceTask.name} → ${targetTask.name}`,
+                details: JSON.stringify({ linkType, direction })
+            });
+
+            // Check for pattern emergence
+            checkForPatternEmergence(sourceTaskId);
+
+            return link;
+        }
+
+        // Get all links for a task
+        function getTaskLinks(taskId) {
+            return taskLinks.filter(l => l.sourceTaskId === taskId || l.targetTaskId === taskId);
+        }
+
+        // Get linked task chain (follows links recursively)
+        function getLinkedTaskChain(taskId, visited = new Set()) {
+            if (visited.has(taskId)) return [];
+            visited.add(taskId);
+
+            const chain = [taskId];
+            const links = getTaskLinks(taskId);
+
+            for (const link of links) {
+                const linkedId = link.sourceTaskId === taskId ? link.targetTaskId : link.sourceTaskId;
+                chain.push(...getLinkedTaskChain(linkedId, visited));
+            }
+
+            return [...new Set(chain)];
+        }
+
+        // Propagate date changes for hard-linked tasks
+        function propagateDateChange(taskId, newDate, daysDelta) {
+            const links = taskLinks.filter(l =>
+                l.linkType === 'hard' &&
+                (l.sourceTaskId === taskId || l.targetTaskId === taskId)
+            );
+
+            for (const link of links) {
+                const linkedId = link.sourceTaskId === taskId ? link.targetTaskId : link.sourceTaskId;
+                const linkedTask = entities.task.find(t => t.id === linkedId);
+
+                if (linkedTask && linkedTask.dueDate) {
+                    const linkedDate = new Date(linkedTask.dueDate);
+                    linkedDate.setDate(linkedDate.getDate() + daysDelta);
+                    linkedTask.dueDate = linkedDate.toISOString().split('T')[0];
+
+                    // Log the cascading change
+                    logActivityToXano({
+                        event_verb: 'Cascade Date Change',
+                        eo_operator: 'ALT',
+                        object_type: 'task',
+                        object_id: linkedId,
+                        object_label: linkedTask.name,
+                        details: `Date cascaded from linked task: ${newDate}`
+                    });
+                }
+            }
+
+            saveToLocalStorage();
+        }
+
+        // ==========================================
+        // PATTERN DETECTION & WORKFLOW SUGGESTION
+        // ==========================================
+
+        // Check if linked tasks or similar tasks form a pattern worth suggesting as workflow
+        function checkForPatternEmergence(taskId) {
+            const task = entities.task.find(t => t.id === taskId);
+            if (!task) return;
+
+            // Check 1: Linked task chain (3+ tasks linked together)
+            const chain = getLinkedTaskChain(taskId);
+            if (chain.length >= 3) {
+                suggestWorkflowFromChain(chain);
+                return;
+            }
+
+            // Check 2: Similar tasks (fuzzy match)
+            const similarTasks = findSimilarTasks(task, 0.65);
+            if (similarTasks.length >= 2) {
+                suggestWorkflowFromSimilarity(task, similarTasks);
+            }
+        }
+
+        // Show workflow suggestion modal for a task chain
+        function suggestWorkflowFromChain(taskIds) {
+            const tasks = taskIds.map(id => entities.task.find(t => t.id === id)).filter(Boolean);
+            if (tasks.length < 3) return;
+
+            // Don't suggest if already part of a workflow instance
+            const alreadyInWorkflow = workflowInstances.some(wi =>
+                taskIds.some(id => wi.tasks.includes(id))
+            );
+            if (alreadyInWorkflow) return;
+
+            showWorkflowSuggestionModal({
+                type: 'chain',
+                tasks,
+                message: `These ${tasks.length} linked tasks look like a repeating pattern. Would you like to make this a workflow?`
+            });
+        }
+
+        // Show workflow suggestion modal for similar tasks
+        function suggestWorkflowFromSimilarity(task, similarTasks) {
+            // Don't suggest if already in a workflow instance
+            const allTaskIds = [task.id, ...similarTasks.map(s => s.task.id)];
+            const alreadyInWorkflow = workflowInstances.some(wi =>
+                allTaskIds.some(id => wi.tasks.includes(id))
+            );
+            if (alreadyInWorkflow) return;
+
+            showWorkflowSuggestionModal({
+                type: 'similarity',
+                tasks: [task, ...similarTasks.map(s => s.task)],
+                similarityScores: similarTasks,
+                message: `Found ${similarTasks.length} similar task(s). Is this a pattern of work?`
+            });
+        }
+
+        // Track dismissed suggestions to avoid re-showing
+        let dismissedWorkflowSuggestions = new Set();
+
+        // Show the workflow suggestion modal
+        function showWorkflowSuggestionModal(suggestion) {
+            // Generate a key for this suggestion to track dismissals
+            const suggestionKey = suggestion.tasks.map(t => t.id).sort().join('-');
+            if (dismissedWorkflowSuggestions.has(suggestionKey)) return;
+
+            const overlay = document.getElementById('workflowSuggestionOverlay');
+            if (!overlay) return; // UI not ready yet
+
+            const content = document.getElementById('workflowSuggestionContent');
+            const taskList = document.getElementById('workflowSuggestionTasks');
+            const messageEl = document.getElementById('workflowSuggestionMessage');
+
+            messageEl.textContent = suggestion.message;
+
+            // Render task list
+            taskList.innerHTML = suggestion.tasks.map((task, idx) => `
+                <div class="workflow-suggestion-task">
+                    <span class="suggestion-task-order">${idx + 1}</span>
+                    <span class="suggestion-task-name">${task.name}</span>
+                    ${suggestion.similarityScores && suggestion.similarityScores[idx - 1] ?
+                        `<span class="suggestion-similarity">${Math.round(suggestion.similarityScores[idx - 1].score * 100)}% similar</span>` :
+                        ''}
+                </div>
+            `).join('');
+
+            // Store suggestion data for later use
+            overlay.dataset.suggestionKey = suggestionKey;
+            overlay.dataset.suggestionData = JSON.stringify({
+                type: suggestion.type,
+                taskIds: suggestion.tasks.map(t => t.id)
+            });
+
+            overlay.classList.add('active');
+        }
+
+        // Dismiss workflow suggestion
+        function dismissWorkflowSuggestion() {
+            const overlay = document.getElementById('workflowSuggestionOverlay');
+            const suggestionKey = overlay.dataset.suggestionKey;
+            if (suggestionKey) {
+                dismissedWorkflowSuggestions.add(suggestionKey);
+            }
+            overlay.classList.remove('active');
+        }
+
+        // Accept workflow suggestion and create workflow
+        function acceptWorkflowSuggestion() {
+            const overlay = document.getElementById('workflowSuggestionOverlay');
+            const suggestionData = JSON.parse(overlay.dataset.suggestionData || '{}');
+
+            if (!suggestionData.taskIds || suggestionData.taskIds.length === 0) {
+                overlay.classList.remove('active');
+                return;
+            }
+
+            const workflowName = document.getElementById('workflowSuggestionName').value.trim();
+            if (!workflowName) {
+                alert('Please enter a workflow name');
+                return;
+            }
+
+            // Create workflow template from the pattern
+            createWorkflowFromTasks(workflowName, suggestionData.taskIds);
+
+            overlay.classList.remove('active');
+        }
+
+        // ==========================================
+        // WORKFLOW TEMPLATE MANAGEMENT
+        // ==========================================
+
+        // Create a workflow template from existing tasks (emergent workflow)
+        function createWorkflowFromTasks(name, taskIds) {
+            const tasks = taskIds.map(id => entities.task.find(t => t.id === id)).filter(Boolean);
+            if (tasks.length === 0) return null;
+
+            // Extract patterns from the tasks
+            const taskPatterns = tasks.map((task, idx) => {
+                // Get roles connected to this task
+                const connectedRoles = relationships
+                    .filter(r => (r.subject === task.id || r.object === task.id) && r.predicate === 'CON')
+                    .map(r => {
+                        const otherId = r.subject === task.id ? r.object : r.subject;
+                        return findEntity(otherId);
+                    })
+                    .filter(e => e && e.type === 'role')
+                    .map(r => r.id);
+
+                return {
+                    order: idx + 1,
+                    namePattern: task.name,
+                    roleConstraints: connectedRoles,
+                    requiredFields: task.dueDate ? ['dueDate'] : []
+                };
+            });
+
+            // Create the workflow template
+            const templateId = 'wftemplate' + Date.now();
+            const template = {
+                id: templateId,
+                name,
+                description: `Workflow created from ${tasks.length} tasks`,
+                createdBy: getCurrentUserId(),
+                status: 'active', // Could be 'draft' if approval required
+                taskPatterns,
+                roleRequirements: [], // Extract unique roles from patterns
+                approvals: [], // For future approval feature
+                createdAt: new Date().toISOString(),
+                version: 1
+            };
+
+            // Extract unique roles
+            const uniqueRoles = [...new Set(taskPatterns.flatMap(p => p.roleConstraints))];
+            template.roleRequirements = uniqueRoles.map(roleId => ({
+                roleId,
+                permissions: [] // Placeholder for future permissions
+            }));
+
+            workflowTemplates.push(template);
+
+            // Also create a basic workflow entity for backwards compatibility
+            const workflowId = 'workflow' + Date.now();
+            const workflowEntity = {
+                id: workflowId,
+                name,
+                type: 'workflow',
+                description: template.description,
+                templateId: templateId // Link to the template
+            };
+            entities.workflow.push(workflowEntity);
+
+            // Create workflow instance binding existing tasks retroactively
+            const instance = createWorkflowInstance(templateId, taskIds);
+
+            // Update tasks to reference this workflow
+            tasks.forEach(task => {
+                task.followsWorkflowId = workflowId;
+            });
+
+            saveToLocalStorage();
+
+            // Log activity
+            logActivityToXano({
+                event_verb: 'Create Workflow Template',
+                eo_operator: 'INS',
+                object_type: 'workflow_template',
+                object_id: templateId,
+                object_label: name,
+                details: JSON.stringify({ taskCount: tasks.length, fromEmergence: true })
+            });
+
+            // Refresh views
+            renderEntityList();
+            renderCurrentView();
+            populateSelects();
+
+            showToast(`Workflow "${name}" created from ${tasks.length} tasks!`, 'success');
+
+            return template;
+        }
+
+        // ==========================================
+        // WORKFLOW INSTANCE MANAGEMENT
+        // ==========================================
+
+        // Create a workflow instance (binds tasks to a template)
+        function createWorkflowInstance(templateId, taskIds) {
+            const template = workflowTemplates.find(t => t.id === templateId);
+            if (!template) return null;
+
+            const instance = {
+                id: 'wfinst' + Date.now(),
+                workflowTemplateId: templateId,
+                tasks: taskIds,
+                status: 'in_progress',
+                createdAt: new Date().toISOString(),
+                templateVersion: template.version
+            };
+
+            workflowInstances.push(instance);
+
+            // Check for violations in bound tasks
+            taskIds.forEach(taskId => {
+                checkTaskViolations(taskId, templateId);
+            });
+
+            saveToLocalStorage();
+
+            logActivityToXano({
+                event_verb: 'Create Workflow Instance',
+                eo_operator: 'CON',
+                object_type: 'workflow_instance',
+                object_id: instance.id,
+                details: JSON.stringify({ templateId, taskCount: taskIds.length })
+            });
+
+            return instance;
+        }
+
+        // Add task to existing workflow instance
+        function addTaskToWorkflowInstance(instanceId, taskId) {
+            const instance = workflowInstances.find(i => i.id === instanceId);
+            if (!instance || instance.tasks.includes(taskId)) return;
+
+            instance.tasks.push(taskId);
+
+            // Check violations
+            checkTaskViolations(taskId, instance.workflowTemplateId);
+
+            // Update task's workflow reference
+            const task = entities.task.find(t => t.id === taskId);
+            const template = workflowTemplates.find(t => t.id === instance.workflowTemplateId);
+            if (task && template) {
+                const workflowEntity = entities.workflow.find(w => w.templateId === template.id);
+                if (workflowEntity) {
+                    task.followsWorkflowId = workflowEntity.id;
+                }
+            }
+
+            saveToLocalStorage();
+        }
+
+        // ==========================================
+        // VIOLATION DETECTION & RECONCILIATION
+        // ==========================================
+
+        // Check if a task violates workflow template rules
+        function checkTaskViolations(taskId, templateId) {
+            const task = entities.task.find(t => t.id === taskId);
+            const template = workflowTemplates.find(t => t.id === templateId);
+            if (!task || !template) return;
+
+            const violations = [];
+
+            // Get task's connected roles
+            const taskRoles = relationships
+                .filter(r => (r.subject === task.id || r.object === task.id) && r.predicate === 'CON')
+                .map(r => {
+                    const otherId = r.subject === task.id ? r.object : r.subject;
+                    return findEntity(otherId);
+                })
+                .filter(e => e && e.type === 'role')
+                .map(r => r.id);
+
+            // Check role constraints
+            const requiredRoles = template.roleRequirements.map(r => r.roleId);
+            if (requiredRoles.length > 0) {
+                const hasRequiredRole = taskRoles.some(r => requiredRoles.includes(r));
+                if (!hasRequiredRole) {
+                    violations.push({
+                        type: 'missing_role',
+                        message: 'Task is not assigned to a role defined in the workflow',
+                        requiredRoles
+                    });
+                }
+            }
+
+            // Check if assigned person is in the right team (placeholder for team restriction)
+            // This is where team-based assignment rules would be enforced
+
+            // Record violations
+            violations.forEach(v => {
+                const existingViolation = workflowViolations.find(wv =>
+                    wv.taskId === taskId &&
+                    wv.workflowTemplateId === templateId &&
+                    wv.violationType === v.type &&
+                    wv.status === 'pending'
+                );
+
+                if (!existingViolation) {
+                    workflowViolations.push({
+                        id: 'violation' + Date.now() + Math.random().toString(36).substr(2, 5),
+                        taskId,
+                        workflowTemplateId: templateId,
+                        violationType: v.type,
+                        message: v.message,
+                        details: v,
+                        status: 'pending',
+                        createdBy: getCurrentUserId(),
+                        createdAt: new Date().toISOString(),
+                        resolvedBy: null,
+                        resolvedAt: null,
+                        notes: ''
+                    });
+                }
+            });
+
+            saveToLocalStorage();
+            return violations;
+        }
+
+        // Get pending violations for a task
+        function getTaskViolations(taskId) {
+            return workflowViolations.filter(v => v.taskId === taskId && v.status === 'pending');
+        }
+
+        // Resolve a violation
+        function resolveViolation(violationId, resolution, notes = '') {
+            const violation = workflowViolations.find(v => v.id === violationId);
+            if (!violation) return;
+
+            violation.status = resolution; // 'resolved' or 'exception_granted'
+            violation.resolvedBy = getCurrentUserId();
+            violation.resolvedAt = new Date().toISOString();
+            violation.notes = notes;
+
+            saveToLocalStorage();
+
+            logActivityToXano({
+                event_verb: 'Resolve Workflow Violation',
+                eo_operator: 'ALT',
+                object_type: 'workflow_violation',
+                object_id: violationId,
+                details: JSON.stringify({ resolution, notes })
+            });
+        }
+
+        // Get workflow template creator info
+        function getWorkflowOwner(templateId) {
+            const template = workflowTemplates.find(t => t.id === templateId);
+            if (!template) return null;
+
+            // Try to find the person who created it
+            const creatorId = template.createdBy;
+            if (creatorId) {
+                return entities.person.find(p => p.id === creatorId) || { name: 'Unknown', id: creatorId };
+            }
+            return null;
+        }
+
+        // Helper to get current user ID (from Softr context)
+        function getCurrentUserId() {
+            return window.loggedInUser?.softr_user_id || 'anonymous';
+        }
+
+        // ==========================================
+        // SAVE/LOAD WORKFLOW DATA
+        // ==========================================
+
+        // Extended save to include workflow system data
+        function saveWorkflowData() {
+            const workspaceId = currentWorkspaceId;
+            if (!workspaceId) return;
+
+            try {
+                localStorage.setItem(`workflowTemplates_${workspaceId}`, JSON.stringify(workflowTemplates));
+                localStorage.setItem(`workflowInstances_${workspaceId}`, JSON.stringify(workflowInstances));
+                localStorage.setItem(`workflowViolations_${workspaceId}`, JSON.stringify(workflowViolations));
+                localStorage.setItem(`taskLinks_${workspaceId}`, JSON.stringify(taskLinks));
+            } catch (e) {
+                console.error('Error saving workflow data:', e);
+            }
+        }
+
+        // Extended load to include workflow system data
+        function loadWorkflowData() {
+            const workspaceId = currentWorkspaceId;
+            if (!workspaceId) return;
+
+            try {
+                workflowTemplates = JSON.parse(localStorage.getItem(`workflowTemplates_${workspaceId}`)) || [];
+                workflowInstances = JSON.parse(localStorage.getItem(`workflowInstances_${workspaceId}`)) || [];
+                workflowViolations = JSON.parse(localStorage.getItem(`workflowViolations_${workspaceId}`)) || [];
+                taskLinks = JSON.parse(localStorage.getItem(`taskLinks_${workspaceId}`)) || [];
+            } catch (e) {
+                console.error('Error loading workflow data:', e);
+                workflowTemplates = [];
+                workflowInstances = [];
+                workflowViolations = [];
+                taskLinks = [];
+            }
+        }
+
+        // ==========================================
+        // TASK LINK MODAL FUNCTIONS
+        // ==========================================
+
+        let currentLinkSourceTaskId = null;
+
+        // Open task link modal
+        function openTaskLinkModal(sourceTaskId) {
+            currentLinkSourceTaskId = sourceTaskId;
+            const sourceTask = entities.task.find(t => t.id === sourceTaskId);
+            if (!sourceTask) return;
+
+            // Populate target task select
+            const select = document.getElementById('taskLinkTargetSelect');
+            select.innerHTML = '<option value="">Select a task...</option>';
+
+            // Get tasks that aren't already linked to this one
+            const existingLinks = getTaskLinks(sourceTaskId);
+            const linkedIds = new Set(existingLinks.map(l =>
+                l.sourceTaskId === sourceTaskId ? l.targetTaskId : l.sourceTaskId
+            ));
+
+            entities.task
+                .filter(t => t.id !== sourceTaskId && !linkedIds.has(t.id))
+                .forEach(task => {
+                    const option = document.createElement('option');
+                    option.value = task.id;
+                    option.textContent = task.name;
+                    select.appendChild(option);
+                });
+
+            // Reset form
+            document.getElementById('linkTypeSoft').checked = true;
+            updateLinkTypeSelection('soft');
+
+            // Show modal
+            document.getElementById('taskLinkOverlay').classList.add('active');
+        }
+
+        // Close task link modal
+        function closeTaskLinkModal() {
+            document.getElementById('taskLinkOverlay').classList.remove('active');
+            currentLinkSourceTaskId = null;
+        }
+
+        // Select link type (soft or hard)
+        function selectLinkType(type) {
+            document.getElementById('linkTypeSoft').checked = (type === 'soft');
+            document.getElementById('linkTypeHard').checked = (type === 'hard');
+            updateLinkTypeSelection(type);
+        }
+
+        function updateLinkTypeSelection(type) {
+            document.querySelectorAll('.task-link-option').forEach(opt => {
+                opt.classList.remove('selected');
+            });
+            const selectedRadio = document.querySelector(`input[name="linkType"][value="${type}"]`);
+            if (selectedRadio) {
+                selectedRadio.closest('.task-link-option').classList.add('selected');
+            }
+        }
+
+        // Submit task link
+        function submitTaskLink() {
+            const targetTaskId = document.getElementById('taskLinkTargetSelect').value;
+            if (!targetTaskId || !currentLinkSourceTaskId) {
+                showToast('Please select a task to link to', 'error');
+                return;
+            }
+
+            const linkType = document.querySelector('input[name="linkType"]:checked').value;
+
+            const link = addTaskLink(currentLinkSourceTaskId, targetTaskId, linkType, 'blocked_by');
+
+            if (link) {
+                showToast('Tasks linked successfully!', 'success');
+                closeTaskLinkModal();
+
+                // Refresh task modal if open
+                if (currentModalEntity && currentModalEntityType === 'task') {
+                    openEntityModal(currentModalEntity.id, 'task');
+                }
+
+                // Refresh views
+                if (currentView === 'tasks') {
+                    renderTaskBoardView();
+                }
+            }
+        }
+
+        // ==========================================
+        // TOAST NOTIFICATION SYSTEM
+        // ==========================================
+
+        function showToast(message, type = 'info') {
+            // Remove existing toasts
+            const existingToast = document.querySelector('.toast-notification');
+            if (existingToast) {
+                existingToast.remove();
+            }
+
+            const toast = document.createElement('div');
+            toast.className = `toast-notification toast-${type}`;
+            toast.innerHTML = `
+                <i class="ph ph-${type === 'success' ? 'check-circle' : type === 'error' ? 'x-circle' : 'info'}"></i>
+                <span>${message}</span>
+            `;
+
+            // Add toast styles if not present
+            if (!document.getElementById('toast-styles')) {
+                const style = document.createElement('style');
+                style.id = 'toast-styles';
+                style.textContent = `
+                    .toast-notification {
+                        position: fixed;
+                        bottom: 24px;
+                        left: 50%;
+                        transform: translateX(-50%);
+                        padding: 12px 20px;
+                        border-radius: 8px;
+                        display: flex;
+                        align-items: center;
+                        gap: 10px;
+                        font-size: 14px;
+                        font-weight: 500;
+                        z-index: 10000;
+                        animation: toastSlideUp 0.3s ease-out;
+                        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+                    }
+                    .toast-success {
+                        background: #10B981;
+                        color: white;
+                    }
+                    .toast-error {
+                        background: #EF4444;
+                        color: white;
+                    }
+                    .toast-info {
+                        background: #3B82F6;
+                        color: white;
+                    }
+                    @keyframes toastSlideUp {
+                        from { opacity: 0; transform: translateX(-50%) translateY(20px); }
+                        to { opacity: 1; transform: translateX(-50%) translateY(0); }
+                    }
+                `;
+                document.head.appendChild(style);
+            }
+
+            document.body.appendChild(toast);
+
+            // Auto-remove after 3 seconds
+            setTimeout(() => {
+                toast.style.animation = 'toastSlideUp 0.3s ease-out reverse';
+                setTimeout(() => toast.remove(), 300);
+            }, 3000);
+        }
+
+        // ==========================================
+        // HELPER: Render current view
+        // ==========================================
+
+        function renderCurrentView() {
+            if (currentView === 'graph') {
+                updateGraph();
+            } else if (currentView === 'tree') {
+                renderTreeView();
+            } else if (currentView === 'card' || currentView === 'cards') {
+                renderCardView();
+            } else if (currentView === 'venn') {
+                renderVennView();
+            } else if (currentView === 'orgchart') {
+                renderOrgChartView();
+            } else if (currentView === 'tasks') {
+                renderTaskBoardView();
+            } else if (currentView === 'flow') {
+                renderFlowView();
+            } else if (currentView === 'shape') {
+                renderShapeView();
+            }
+        }
 
         let selectedEntityType = 'role';
         let selectedPredicate = 'DES'; // Default to Define operator
@@ -24310,6 +25573,12 @@ Cmd/Ctrl + K - Command palette
                 relationships = JSON.parse(JSON.stringify(ws.relationships || []));
                 hasSampleData = ws.hasSampleData || false;
 
+                // Load workflow system data
+                workflowTemplates = JSON.parse(JSON.stringify(ws.workflowTemplates || []));
+                workflowInstances = JSON.parse(JSON.stringify(ws.workflowInstances || []));
+                workflowViolations = JSON.parse(JSON.stringify(ws.workflowViolations || []));
+                taskLinks = JSON.parse(JSON.stringify(ws.taskLinks || []));
+
                 // Update UI
                 const nameEl = document.getElementById('workspaceNameText');
                 if (nameEl) {
@@ -24940,6 +26209,16 @@ Cmd/Ctrl + K - Command palette
             // Get dependent tasks (tasks that depend on this one)
             const dependents = entities.task.filter(t => t.predecessorId === task.id);
 
+            // Get linked tasks (from emergent workflow system)
+            const linkedTasksData = getTaskLinks(task.id).map(link => {
+                const linkedId = link.sourceTaskId === task.id ? link.targetTaskId : link.sourceTaskId;
+                const linkedTask = entities.task.find(t => t.id === linkedId);
+                return linkedTask ? { task: linkedTask, link } : null;
+            }).filter(Boolean);
+
+            // Get violations for this task
+            const violations = getTaskViolations(task.id);
+
             // Get connected roles through relationships
             const connectedRoles = relationships
                 .filter(r => (r.subject === task.id || r.object === task.id) && r.predicate !== 'DES')
@@ -24977,6 +26256,24 @@ Cmd/Ctrl + K - Command palette
 
             return `
                 <div class="task-modal-info">
+                    <!-- Violations Alert -->
+                    ${violations.length > 0 ? `
+                    <div class="task-violations-alert" style="background: #FEF3C7; border: 1px solid #F59E0B; border-radius: 8px; padding: 0.875rem; margin-bottom: 1rem;">
+                        <div style="display: flex; align-items: flex-start; gap: 0.75rem;">
+                            <i class="ph ph-warning" style="color: #D97706; font-size: 1.25rem; margin-top: 2px;"></i>
+                            <div style="flex: 1;">
+                                <div style="font-weight: 600; color: #92400E; margin-bottom: 0.25rem;">Workflow Mismatch</div>
+                                <div style="font-size: 0.875rem; color: #B45309;">${violations[0].message}</div>
+                                <div style="margin-top: 0.5rem;">
+                                    <button onclick="showViolationReconciliation('${task.id}')" style="background: #D97706; color: white; border: none; padding: 0.375rem 0.75rem; border-radius: 4px; font-size: 0.8rem; cursor: pointer;">
+                                        <i class="ph ph-chat-circle"></i> Reconcile
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    ` : ''}
+
                     <!-- Status Toggle -->
                     <div class="task-status-section">
                         <div class="task-status-toggle">
@@ -25027,7 +26324,39 @@ Cmd/Ctrl + K - Command palette
                         ` : ''}
                     </div>
 
-                    <!-- Dependencies -->
+                    <!-- Linked Tasks Section -->
+                    <div class="task-links-section" style="margin-top: 1rem; padding-top: 1rem; border-top: 1px solid #E5DDD1;">
+                        <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 0.75rem;">
+                            <div style="font-size: 0.875rem; font-weight: 600; color: #6B5642; display: flex; align-items: center; gap: 0.5rem;">
+                                <i class="ph ph-link"></i> Linked Tasks
+                            </div>
+                            <button onclick="openTaskLinkModal('${task.id}')" style="background: #7B95A3; color: white; border: none; padding: 0.375rem 0.75rem; border-radius: 6px; font-size: 0.8rem; cursor: pointer; display: flex; align-items: center; gap: 0.375rem;">
+                                <i class="ph ph-plus"></i> Link Task
+                            </button>
+                        </div>
+                        ${linkedTasksData.length > 0 ? `
+                        <div class="task-links-list">
+                            ${linkedTasksData.map(({ task: lt, link }) => `
+                                <div class="task-dep-item ${lt.status === 'completed' ? 'completed' : ''}" style="display: flex; align-items: center; gap: 0.75rem; padding: 0.625rem; background: #FAF7F5; border-radius: 6px; margin-bottom: 0.5rem; cursor: pointer;" onclick="openEntityModal('${lt.id}', 'task')">
+                                    <div class="dep-checkbox ${lt.status === 'completed' ? 'completed' : ''}" style="width: 20px; height: 20px; border-radius: 50%; border: 2px solid ${lt.status === 'completed' ? '#10B981' : '#E5DDD1'}; display: flex; align-items: center; justify-content: center; flex-shrink: 0;">
+                                        ${lt.status === 'completed' ? '<i class="ph ph-check" style="color: #10B981; font-size: 12px;"></i>' : ''}
+                                    </div>
+                                    <span style="flex: 1; font-size: 0.9rem; color: #3D2E1F;">${lt.name}</span>
+                                    <span class="task-linked-badge ${link.linkType === 'hard' ? 'hard-link' : ''}">
+                                        <i class="ph ph-${link.linkType === 'hard' ? 'calendar-check' : 'link-simple'}"></i>
+                                        ${link.linkType === 'hard' ? 'Dates Linked' : 'Linked'}
+                                    </span>
+                                </div>
+                            `).join('')}
+                        </div>
+                        ` : `
+                        <div style="padding: 0.75rem; background: #FAF7F5; border-radius: 6px; text-align: center; color: #8B6F47; font-size: 0.875rem;">
+                            <em>No linked tasks yet</em>
+                        </div>
+                        `}
+                    </div>
+
+                    <!-- Dependencies (legacy predecessorId support) -->
                     ${predecessor || dependents.length > 0 ? `
                     <div class="task-dependencies-section">
                         ${predecessor ? `
@@ -25070,6 +26399,33 @@ Cmd/Ctrl + K - Command palette
                     ` : ''}
                 </div>
             `;
+        }
+
+        // Show violation reconciliation dialog
+        function showViolationReconciliation(taskId) {
+            const violations = getTaskViolations(taskId);
+            if (violations.length === 0) return;
+
+            const violation = violations[0];
+            const template = workflowTemplates.find(t => t.id === violation.workflowTemplateId);
+            const owner = getWorkflowOwner(violation.workflowTemplateId);
+
+            const message = `This task doesn't match the workflow rules.
+
+${violation.message}
+
+${owner ? `Workflow created by: ${owner.name || 'Unknown'}` : ''}
+
+Options:
+• Adjust your task to fit the workflow rules
+• Request an exception from the workflow owner
+• Propose a change to the workflow`;
+
+            if (confirm(message + '\n\nClick OK to grant an exception for this task.')) {
+                resolveViolation(violation.id, 'exception_granted', 'Exception granted by user');
+                showToast('Exception granted for this task', 'success');
+                openEntityModal(taskId, 'task');
+            }
         }
 
         // Update task status
@@ -25857,6 +27213,12 @@ Cmd/Ctrl + K - Command palette
 
             // Close modal
             closeHeroTaskModal();
+
+            // Check for pattern emergence (similar tasks or linked chains)
+            // Use setTimeout to allow UI to update first
+            setTimeout(() => {
+                checkForPatternEmergence(taskId);
+            }, 500);
 
             console.log('Task created via hero modal:', taskName);
         }
@@ -27307,5 +28669,84 @@ Cmd/Ctrl + K - Command palette
             <button class="btn" onclick="closeHowItWorks(); startTaskWizard();">
                 <i class="ph ph-rocket"></i> Get Started
             </button>
+        </div>
+    </div>
+
+    <!-- Workflow Suggestion Modal -->
+    <div class="workflow-suggestion-overlay" id="workflowSuggestionOverlay" onclick="if(event.target === this) dismissWorkflowSuggestion()">
+        <div class="workflow-suggestion-modal" onclick="event.stopPropagation()">
+            <div class="workflow-suggestion-header">
+                <h3><i class="ph ph-sparkle"></i> Pattern Detected</h3>
+                <button class="workflow-suggestion-close" onclick="dismissWorkflowSuggestion()">
+                    <i class="ph ph-x"></i>
+                </button>
+            </div>
+            <div class="workflow-suggestion-body">
+                <p class="workflow-suggestion-message" id="workflowSuggestionMessage">
+                    These tasks look like a repeating pattern. Would you like to make this a workflow?
+                </p>
+                <div class="workflow-suggestion-tasks" id="workflowSuggestionTasks">
+                    <!-- Populated dynamically -->
+                </div>
+                <input type="text"
+                       class="workflow-suggestion-input"
+                       id="workflowSuggestionName"
+                       placeholder="Name this workflow...">
+                <div class="workflow-suggestion-footer">
+                    <button class="workflow-suggestion-btn workflow-suggestion-btn-secondary" onclick="dismissWorkflowSuggestion()">
+                        Not Now
+                    </button>
+                    <button class="workflow-suggestion-btn workflow-suggestion-btn-primary" onclick="acceptWorkflowSuggestion()">
+                        <i class="ph ph-git-branch"></i> Create Workflow
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Task Link Modal -->
+    <div class="task-link-overlay" id="taskLinkOverlay" onclick="if(event.target === this) closeTaskLinkModal()">
+        <div class="task-link-modal" onclick="event.stopPropagation()">
+            <div class="task-link-header">
+                <h3><i class="ph ph-link"></i> Link Tasks</h3>
+                <button class="task-link-close" onclick="closeTaskLinkModal()">
+                    <i class="ph ph-x"></i>
+                </button>
+            </div>
+            <div class="task-link-body">
+                <div class="task-link-select-group">
+                    <label class="task-link-label">Link to Task</label>
+                    <select class="task-link-select" id="taskLinkTargetSelect">
+                        <option value="">Select a task...</option>
+                    </select>
+                </div>
+
+                <div class="task-link-option-group">
+                    <label class="task-link-label">Should dates be linked?</label>
+                    <div class="task-link-option" onclick="selectLinkType('soft')">
+                        <input type="radio" name="linkType" value="soft" id="linkTypeSoft" checked>
+                        <div class="task-link-option-content">
+                            <div class="task-link-option-title">Soft Link (Sequence Only)</div>
+                            <div class="task-link-option-desc">Tasks are related but dates are independent. "B happens after A" without date coupling.</div>
+                        </div>
+                    </div>
+                    <div class="task-link-option" onclick="selectLinkType('hard')">
+                        <input type="radio" name="linkType" value="hard" id="linkTypeHard">
+                        <div class="task-link-option-content">
+                            <div class="task-link-option-title">Hard Link (Dates Coupled)</div>
+                            <div class="task-link-option-desc">If one task's date changes, linked tasks adjust automatically.</div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="task-link-footer">
+                    <button class="task-link-btn task-link-btn-secondary" onclick="closeTaskLinkModal()">
+                        Cancel
+                    </button>
+                    <button class="task-link-btn task-link-btn-primary" onclick="submitTaskLink()">
+                        <i class="ph ph-link"></i> Create Link
+                    </button>
+                </div>
+            </div>
         </div>
     </div>
