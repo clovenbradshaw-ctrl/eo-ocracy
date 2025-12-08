@@ -8776,6 +8776,265 @@
             color: #C88F4A;
         }
 
+        /* Role Work Dashboard Styles */
+        .role-work-dashboard {
+            display: flex;
+            flex-direction: column;
+            gap: 1rem;
+        }
+
+        .role-work-section {
+            background: #FAF7F5;
+            border-radius: 12px;
+            padding: 1rem;
+        }
+
+        .role-work-section-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-bottom: 0.75rem;
+        }
+
+        .role-work-section-title {
+            font-size: 0.75rem;
+            font-weight: 600;
+            text-transform: uppercase;
+            color: #8B6F47;
+            letter-spacing: 0.05em;
+            display: flex;
+            align-items: center;
+            gap: 0.375rem;
+        }
+
+        .role-work-section-title i {
+            font-size: 0.875rem;
+        }
+
+        .role-work-count {
+            font-size: 0.75rem;
+            color: #A89984;
+            font-weight: 500;
+        }
+
+        /* Assigned People */
+        .role-people-list {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 0.5rem;
+        }
+
+        .role-person-chip {
+            display: flex;
+            align-items: center;
+            gap: 0.375rem;
+            padding: 0.375rem 0.75rem;
+            background: white;
+            border: 1px solid #E5DDD1;
+            border-radius: 20px;
+            font-size: 0.875rem;
+            color: #3D2E1F;
+            cursor: pointer;
+            transition: all 0.15s;
+        }
+
+        .role-person-chip:hover {
+            border-color: #C88F4A;
+            background: #FFFBF7;
+        }
+
+        .role-person-chip i {
+            color: #C88F4A;
+        }
+
+        .role-empty-state {
+            padding: 0.75rem;
+            text-align: center;
+            color: #A89984;
+            font-size: 0.875rem;
+            font-style: italic;
+        }
+
+        /* Role Tasks */
+        .role-task-list {
+            display: flex;
+            flex-direction: column;
+            gap: 0.5rem;
+        }
+
+        .role-task-item {
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+            padding: 0.625rem 0.75rem;
+            background: white;
+            border-radius: 8px;
+            border: 1px solid #E5DDD1;
+            cursor: pointer;
+            transition: all 0.15s;
+        }
+
+        .role-task-item:hover {
+            border-color: #C88F4A;
+            background: #FFFBF7;
+        }
+
+        .role-task-status {
+            width: 20px;
+            height: 20px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            flex-shrink: 0;
+        }
+
+        .role-task-status.pending {
+            border: 2px solid #A89984;
+            color: #A89984;
+        }
+
+        .role-task-status.in_progress {
+            border: 2px solid #1565C0;
+            background: #E3F2FD;
+            color: #1565C0;
+        }
+
+        .role-task-status.completed {
+            border: 2px solid #2E7D32;
+            background: #E8F5E9;
+            color: #2E7D32;
+        }
+
+        .role-task-status i {
+            font-size: 0.75rem;
+        }
+
+        .role-task-info {
+            flex: 1;
+            min-width: 0;
+        }
+
+        .role-task-name {
+            font-size: 0.875rem;
+            color: #3D2E1F;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+
+        .role-task-meta {
+            font-size: 0.75rem;
+            color: #8B6F47;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            margin-top: 0.125rem;
+        }
+
+        .role-task-due {
+            display: flex;
+            align-items: center;
+            gap: 0.25rem;
+        }
+
+        .role-task-due.overdue {
+            color: #C62828;
+        }
+
+        .role-task-due.due-today {
+            color: #E65100;
+        }
+
+        .role-task-due.due-soon {
+            color: #F57F17;
+        }
+
+        /* Role Workflows */
+        .role-workflow-list {
+            display: flex;
+            flex-direction: column;
+            gap: 0.5rem;
+        }
+
+        .role-workflow-item {
+            display: flex;
+            flex-direction: column;
+            gap: 0.5rem;
+            padding: 0.75rem;
+            background: white;
+            border-radius: 8px;
+            border: 1px solid #E5DDD1;
+            cursor: pointer;
+            transition: all 0.15s;
+        }
+
+        .role-workflow-item:hover {
+            border-color: #C88F4A;
+            background: #FFFBF7;
+        }
+
+        .role-workflow-header {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .role-workflow-header i {
+            color: #C88F4A;
+        }
+
+        .role-workflow-name {
+            font-size: 0.875rem;
+            font-weight: 500;
+            color: #3D2E1F;
+        }
+
+        .role-workflow-roles {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 0.375rem;
+            padding-left: 1.5rem;
+        }
+
+        .role-workflow-role-chip {
+            font-size: 0.75rem;
+            padding: 0.125rem 0.5rem;
+            background: #F5EDE4;
+            border-radius: 12px;
+            color: #6B5642;
+        }
+
+        .role-workflow-role-chip.current {
+            background: #C88F4A;
+            color: white;
+        }
+
+        /* Task Status Summary */
+        .role-task-summary {
+            display: flex;
+            gap: 1rem;
+            padding: 0.75rem 1rem;
+            background: white;
+            border-radius: 8px;
+            margin-bottom: 0.75rem;
+        }
+
+        .role-task-stat {
+            display: flex;
+            align-items: center;
+            gap: 0.375rem;
+            font-size: 0.8125rem;
+        }
+
+        .role-task-stat-count {
+            font-weight: 600;
+        }
+
+        .role-task-stat.pending { color: #8B6F47; }
+        .role-task-stat.in_progress { color: #1565C0; }
+        .role-task-stat.completed { color: #2E7D32; }
+
         @media (max-width: 480px) {
             .task-meta-grid {
                 grid-template-columns: 1fr;
@@ -11517,8 +11776,12 @@ John Doe,Engineering,john@example.com"
             const isTask = entityType === 'task';
 
             // Persons cannot have activities - hide the section entirely
+            const isRole = entityType === 'role';
             if (isPerson) {
                 activitiesEl.innerHTML = '';
+            } else if (isRole) {
+                // Roles: show work-focused dashboard with people, tasks, and workflows
+                activitiesEl.innerHTML = renderRoleWorkContent(entityId);
             } else if (isTask) {
                 // Tasks: show simplified connected entities view
                 const connectedRoles = activityEntities.filter(e => e.type === 'role');
@@ -11705,13 +11968,20 @@ John Doe,Engineering,john@example.com"
                 const connectionsLabel = connectionsTab?.querySelector('.tab-label');
 
                 // Show/hide tabs and set contextual labels
-                if (entityType === 'unit' || entityType === 'team' || entityType === 'role') {
+                if (entityType === 'unit' || entityType === 'team') {
                     // Structure entities: show structure tab, call it "Structure"
                     if (structureTab) structureTab.style.display = '';
                     if (structureLabel) structureLabel.textContent = 'Structure';
                     if (connectionsLabel) connectionsLabel.textContent = 'Work';
                     // Default to structure tab
                     switchModalTab('structure');
+                } else if (entityType === 'role') {
+                    // Roles: show both tabs but default to Work (the dashboard)
+                    if (structureTab) structureTab.style.display = '';
+                    if (structureLabel) structureLabel.textContent = 'Structure';
+                    if (connectionsLabel) connectionsLabel.textContent = 'Work';
+                    // Default to connections/work tab - the new dashboard
+                    switchModalTab('connections');
                 } else if (entityType === 'workflow') {
                     // Workflows: hide structure tab, show related as "Process"
                     if (structureTab) structureTab.style.display = 'none';
@@ -22207,6 +22477,167 @@ John Doe,Engineering,john@example.com"
             if (document.getElementById('taskBoardView')?.classList.contains('active')) {
                 renderTaskBoard();
             }
+        }
+
+        // Render role work dashboard content - shows people, tasks, and workflows
+        function renderRoleWorkContent(roleId) {
+            const role = entities.role.find(r => r.id === roleId);
+            if (!role) return '';
+
+            // Get assigned people (INS relationships where role is the object)
+            const assignedPeople = relationships
+                .filter(r => r.predicate === 'INS' && r.object === roleId)
+                .map(r => findEntity(r.subject))
+                .filter(p => p && p.type === 'person');
+
+            // Get connected tasks (CON relationships)
+            const connectedTasks = relationships
+                .filter(r => r.predicate === 'CON' && (r.subject === roleId || r.object === roleId))
+                .map(r => {
+                    const otherId = r.subject === roleId ? r.object : r.subject;
+                    return findEntity(otherId);
+                })
+                .filter(e => e && e.type === 'task');
+
+            // Get connected workflows
+            const connectedWorkflows = relationships
+                .filter(r => r.predicate === 'CON' && (r.subject === roleId || r.object === roleId))
+                .map(r => {
+                    const otherId = r.subject === roleId ? r.object : r.subject;
+                    return findEntity(otherId);
+                })
+                .filter(e => e && e.type === 'workflow');
+
+            // Calculate task stats
+            const taskStats = {
+                pending: connectedTasks.filter(t => t.status === 'pending').length,
+                in_progress: connectedTasks.filter(t => t.status === 'in_progress').length,
+                completed: connectedTasks.filter(t => t.status === 'completed').length
+            };
+
+            // Get other roles in the same workflows
+            function getWorkflowRoles(workflowId) {
+                return relationships
+                    .filter(r => r.predicate === 'CON' && (r.subject === workflowId || r.object === workflowId))
+                    .map(r => {
+                        const otherId = r.subject === workflowId ? r.object : r.subject;
+                        return findEntity(otherId);
+                    })
+                    .filter(e => e && e.type === 'role');
+            }
+
+            return `
+                <div class="role-work-dashboard">
+                    <!-- Assigned People Section -->
+                    <div class="role-work-section">
+                        <div class="role-work-section-header">
+                            <div class="role-work-section-title">
+                                <i class="ph ph-users"></i> Assigned People
+                            </div>
+                            <span class="role-work-count">${assignedPeople.length}</span>
+                        </div>
+                        ${assignedPeople.length > 0 ? `
+                            <div class="role-people-list">
+                                ${assignedPeople.map(person => `
+                                    <div class="role-person-chip" onclick="openEntityModal('${person.id}', 'person')">
+                                        <i class="ph ph-user"></i>
+                                        ${person.name}
+                                    </div>
+                                `).join('')}
+                            </div>
+                        ` : `
+                            <div class="role-empty-state">No one assigned to this role</div>
+                        `}
+                    </div>
+
+                    <!-- Tasks Section -->
+                    <div class="role-work-section">
+                        <div class="role-work-section-header">
+                            <div class="role-work-section-title">
+                                <i class="ph ph-check-square"></i> Tasks
+                            </div>
+                            <span class="role-work-count">${connectedTasks.length}</span>
+                        </div>
+                        ${connectedTasks.length > 0 ? `
+                            <div class="role-task-summary">
+                                <div class="role-task-stat pending">
+                                    <i class="ph ph-circle-dashed"></i>
+                                    <span class="role-task-stat-count">${taskStats.pending}</span> pending
+                                </div>
+                                <div class="role-task-stat in_progress">
+                                    <i class="ph ph-spinner"></i>
+                                    <span class="role-task-stat-count">${taskStats.in_progress}</span> active
+                                </div>
+                                <div class="role-task-stat completed">
+                                    <i class="ph ph-check-circle"></i>
+                                    <span class="role-task-stat-count">${taskStats.completed}</span> done
+                                </div>
+                            </div>
+                            <div class="role-task-list">
+                                ${connectedTasks.map(task => {
+                                    const dueDateStatus = getTaskDueDateStatus(task);
+                                    const dueLabel = task.dueDate ? formatDateShort(task.dueDate) : '';
+                                    const statusIcon = task.status === 'completed' ? 'ph-check' :
+                                                       task.status === 'in_progress' ? 'ph-spinner' : '';
+                                    return `
+                                    <div class="role-task-item" onclick="openEntityModal('${task.id}', 'task')">
+                                        <div class="role-task-status ${task.status}">
+                                            ${statusIcon ? `<i class="ph ${statusIcon}"></i>` : ''}
+                                        </div>
+                                        <div class="role-task-info">
+                                            <div class="role-task-name">${task.name}</div>
+                                            ${task.dueDate ? `
+                                                <div class="role-task-meta">
+                                                    <span class="role-task-due ${dueDateStatus}">
+                                                        <i class="ph ph-calendar"></i> ${dueLabel}
+                                                    </span>
+                                                </div>
+                                            ` : ''}
+                                        </div>
+                                    </div>
+                                    `;
+                                }).join('')}
+                            </div>
+                        ` : `
+                            <div class="role-empty-state">No tasks assigned to this role</div>
+                        `}
+                    </div>
+
+                    <!-- Workflows Section -->
+                    <div class="role-work-section">
+                        <div class="role-work-section-header">
+                            <div class="role-work-section-title">
+                                <i class="ph ph-git-branch"></i> Workflows
+                            </div>
+                            <span class="role-work-count">${connectedWorkflows.length}</span>
+                        </div>
+                        ${connectedWorkflows.length > 0 ? `
+                            <div class="role-workflow-list">
+                                ${connectedWorkflows.map(workflow => {
+                                    const workflowRoles = getWorkflowRoles(workflow.id);
+                                    return `
+                                    <div class="role-workflow-item" onclick="openEntityModal('${workflow.id}', 'workflow')">
+                                        <div class="role-workflow-header">
+                                            <i class="ph ph-git-branch"></i>
+                                            <span class="role-workflow-name">${workflow.name}</span>
+                                        </div>
+                                        ${workflowRoles.length > 0 ? `
+                                            <div class="role-workflow-roles">
+                                                ${workflowRoles.map(r => `
+                                                    <span class="role-workflow-role-chip ${r.id === roleId ? 'current' : ''}">${r.name}</span>
+                                                `).join('')}
+                                            </div>
+                                        ` : ''}
+                                    </div>
+                                    `;
+                                }).join('')}
+                            </div>
+                        ` : `
+                            <div class="role-empty-state">No workflows connected</div>
+                        `}
+                    </div>
+                </div>
+            `;
         }
 
         // Render simplified quick actions for task modal
