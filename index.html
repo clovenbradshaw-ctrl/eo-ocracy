@@ -26042,14 +26042,11 @@ Cmd/Ctrl + K - Command palette
             saveToLocalStorage();
             renderEntityList();
             renderActivityList();
-            renderCurrentView();
             populateSelects();
             updateTaskCountBadge();
 
-            // If on task board view, refresh it
-            if (currentView === 'tasks') {
-                renderTaskBoardView();
-            }
+            // Refresh task board view
+            renderTaskBoardView();
 
             // Hide wizard
             dismissTaskWizard();
@@ -27202,14 +27199,11 @@ Options:
             saveToLocalStorage();
             renderEntityList();
             renderActivityList();
-            renderCurrentView();
             populateSelects();
             updateTaskCountBadge();
 
-            // If on task board view, refresh it
-            if (currentView === 'tasks') {
-                renderTaskBoardView();
-            }
+            // Refresh task board view
+            renderTaskBoardView();
 
             // Close modal
             closeHeroTaskModal();
