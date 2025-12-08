@@ -10594,10 +10594,13 @@
                 </button>
                 <div class="header-dropdown" id="headerDropdown">
                     <button class="header-dropdown-item" onclick="importData(); closeHeaderMenu()">
-                        <i class="ph ph-upload"></i> Import Data
+                        <i class="ph ph-upload"></i> Import Data (JSON)
                     </button>
                     <button class="header-dropdown-item" onclick="openBulkImportModal(); closeHeaderMenu()">
                         <i class="ph ph-upload-simple"></i> Bulk Import (CSV)
+                    </button>
+                    <button class="header-dropdown-item" onclick="restoreFromXano(); closeHeaderMenu()">
+                        <i class="ph ph-cloud-arrow-down"></i> Restore from Xano
                     </button>
                     <div class="header-dropdown-divider"></div>
                     <button class="header-dropdown-item" onclick="toggleSampleData(); closeHeaderMenu()" id="sampleDataBtn">
@@ -11298,6 +11301,10 @@
                     <button class="command-palette-item" data-action="import" onclick="executeCommand('import')">
                         <i class="ph ph-upload"></i>
                         <span>Import data</span>
+                    </button>
+                    <button class="command-palette-item" data-action="restore" onclick="executeCommand('restore')">
+                        <i class="ph ph-cloud-arrow-down"></i>
+                        <span>Restore from Xano</span>
                     </button>
                 </div>
             </div>
@@ -12973,6 +12980,9 @@ John Doe,Engineering,john@example.com"
                     break;
                 case 'import':
                     importData();
+                    break;
+                case 'restore':
+                    restoreFromXano();
                     break;
             }
         }
@@ -17364,6 +17374,243 @@ Cmd/Ctrl + K - Command palette
                 console.error('Error fetching activities from Xano:', error);
                 updateXanoStatusIndicator('disconnected');
                 return [];
+            }
+        }
+
+        // Reconstruct entities from Xano activity history
+        // This enables data recovery when localStorage is empty or cleared
+        function reconstructEntitiesFromActivities(activities) {
+            console.log('🔄 Reconstructing entities from', activities.length, 'activities...');
+
+            const reconstructedEntities = {
+                unit: [],
+                team: [],
+                role: [],
+                person: [],
+                task: [],
+                product: [],
+                workflow: []
+            };
+            const reconstructedRelationships = [];
+            const deletedEntityIds = new Set();
+            const deletedRelationshipIds = new Set();
+            const entityMap = new Map(); // Track entities by ID for updates
+            const relationshipMap = new Map(); // Track relationships by ID
+
+            // Sort activities by created_at to process in chronological order
+            const sortedActivities = [...activities].sort((a, b) => {
+                const dateA = new Date(a.created_at || 0);
+                const dateB = new Date(b.created_at || 0);
+                return dateA - dateB;
+            });
+
+            for (const activity of sortedActivities) {
+                const operator = activity.eo_operator || activity.event_type;
+                const objectType = activity.object_type;
+                const objectId = activity.object_id || activity.entity_id;
+                const objectLabel = activity.object_label;
+
+                // Skip if missing essential data
+                if (!objectType || !objectId) continue;
+
+                // Handle entity creation (INS operator)
+                if (operator === 'INS' && objectType !== 'relationship') {
+                    // Check if this entity type is valid
+                    if (!reconstructedEntities[objectType]) continue;
+
+                    // Skip if already deleted
+                    if (deletedEntityIds.has(objectId)) continue;
+
+                    // Check if entity already exists (update it)
+                    if (entityMap.has(objectId)) {
+                        const existing = entityMap.get(objectId);
+                        if (objectLabel) existing.name = objectLabel;
+                        continue;
+                    }
+
+                    // Create new entity
+                    const entity = {
+                        id: objectId,
+                        name: objectLabel || activity.entity_name || 'Untitled',
+                        type: objectType,
+                        description: activity.description || '',
+                        createdAt: activity.created_at
+                    };
+
+                    // Copy additional fields from activity data
+                    if (activity.dueDate) entity.dueDate = activity.dueDate;
+                    if (activity.status) entity.status = activity.status;
+                    if (activity.predecessorId) entity.predecessorId = activity.predecessorId;
+
+                    reconstructedEntities[objectType].push(entity);
+                    entityMap.set(objectId, entity);
+                }
+
+                // Handle entity deletion (NUL operator)
+                else if (operator === 'NUL') {
+                    if (objectType === 'relationship') {
+                        deletedRelationshipIds.add(objectId);
+                        relationshipMap.delete(objectId);
+                    } else {
+                        deletedEntityIds.add(objectId);
+                        entityMap.delete(objectId);
+                    }
+                }
+
+                // Handle relationship creation (DES, CON, etc.)
+                else if (objectType === 'relationship' && (operator === 'DES' || operator === 'CON')) {
+                    // Skip if already deleted
+                    if (deletedRelationshipIds.has(objectId)) continue;
+
+                    const subjectId = activity.subject_id;
+                    const predicate = activity.predicate || operator;
+                    const relObjectId = activity.object_id !== objectId ? activity.object_id : activity.target_id;
+
+                    if (!subjectId) continue;
+
+                    // Check if relationship already exists
+                    if (relationshipMap.has(objectId)) continue;
+
+                    const relationship = {
+                        id: objectId,
+                        subject: subjectId,
+                        predicate: predicate,
+                        object: relObjectId || activity.entity_id,
+                        description: activity.description || ''
+                    };
+
+                    reconstructedRelationships.push(relationship);
+                    relationshipMap.set(objectId, relationship);
+                }
+
+                // Handle entity updates (ALT operator)
+                else if (operator === 'ALT' && objectType !== 'relationship') {
+                    if (entityMap.has(objectId)) {
+                        const existing = entityMap.get(objectId);
+                        if (objectLabel) existing.name = objectLabel;
+                        if (activity.description) existing.description = activity.description;
+                        if (activity.status) existing.status = activity.status;
+                        if (activity.dueDate) existing.dueDate = activity.dueDate;
+                    }
+                }
+            }
+
+            // Remove deleted entities from reconstructed lists
+            for (const type of Object.keys(reconstructedEntities)) {
+                reconstructedEntities[type] = reconstructedEntities[type].filter(
+                    e => !deletedEntityIds.has(e.id)
+                );
+            }
+
+            // Remove deleted relationships
+            const finalRelationships = reconstructedRelationships.filter(
+                r => !deletedRelationshipIds.has(r.id)
+            );
+
+            const totalEntities = Object.values(reconstructedEntities).reduce(
+                (sum, arr) => sum + arr.length, 0
+            );
+
+            console.log('✅ Reconstructed', totalEntities, 'entities and', finalRelationships.length, 'relationships from Xano activities');
+
+            return {
+                entities: reconstructedEntities,
+                relationships: finalRelationships
+            };
+        }
+
+        // Restore data from Xano activities (user-initiated)
+        async function restoreFromXano() {
+            const loadingStatus = document.getElementById('loadingStatus');
+            if (loadingStatus) {
+                loadingStatus.style.display = 'block';
+                loadingStatus.innerHTML = '<i class="ph ph-spinner"></i> Restoring from Xano...';
+                loadingStatus.style.background = 'rgba(200, 143, 74, 0.3)';
+            }
+
+            try {
+                const xanoActivities = await getActivitiesFromXano();
+
+                if (!xanoActivities || xanoActivities.length === 0) {
+                    showActivityToast('warning', 'No Data Found', 'No activities found in Xano to restore');
+                    if (loadingStatus) {
+                        loadingStatus.innerHTML = '<i class="ph ph-warning-circle"></i> No data to restore';
+                        loadingStatus.style.background = 'rgba(244, 67, 54, 0.3)';
+                    }
+                    return false;
+                }
+
+                const reconstructed = reconstructEntitiesFromActivities(xanoActivities);
+
+                const totalEntities = Object.values(reconstructed.entities).reduce(
+                    (sum, arr) => sum + arr.length, 0
+                );
+
+                if (totalEntities === 0) {
+                    showActivityToast('warning', 'No Entities Found', 'Activities found but no entities could be reconstructed');
+                    if (loadingStatus) {
+                        loadingStatus.innerHTML = '<i class="ph ph-warning-circle"></i> No entities to restore';
+                        loadingStatus.style.background = 'rgba(244, 67, 54, 0.3)';
+                    }
+                    return false;
+                }
+
+                // Create a new workspace with restored data
+                const wsId = generateWorkspaceId();
+                const timestamp = new Date().toLocaleString();
+
+                workspaces[wsId] = {
+                    id: wsId,
+                    name: `Restored from Xano (${timestamp})`,
+                    entities: reconstructed.entities,
+                    relationships: reconstructed.relationships,
+                    hasSampleData: false,
+                    createdAt: Date.now(),
+                    updatedAt: Date.now()
+                };
+
+                // Switch to the new workspace
+                currentWorkspaceId = wsId;
+                entities = normalizeEntities(JSON.parse(JSON.stringify(reconstructed.entities)));
+                relationships = JSON.parse(JSON.stringify(reconstructed.relationships));
+                hasSampleData = false;
+
+                saveWorkspaces();
+
+                // Update UI
+                const nameEl = document.getElementById('workspaceNameText');
+                if (nameEl) nameEl.textContent = workspaces[wsId].name;
+
+                renderEntityList();
+                updateSelects();
+                updateParentOptions();
+                renderActivityList();
+                updateFilterStatus();
+                updateTaskCountBadge();
+                renderWorkspaceList();
+
+                if (currentView === 'graph') updateGraph();
+                else if (currentView === 'tree') renderTreeView();
+                else if (currentView === 'card') renderCardView();
+                else if (currentView === 'tasks') renderTasksView();
+
+                showActivityToast('success', 'Data Restored', `Restored ${totalEntities} entities from Xano`);
+
+                if (loadingStatus) {
+                    loadingStatus.innerHTML = `<i class="ph ph-check-circle"></i> Restored ${totalEntities} entities`;
+                    loadingStatus.style.background = 'rgba(76, 175, 80, 0.3)';
+                    setTimeout(() => { loadingStatus.style.display = 'none'; }, 3000);
+                }
+
+                return true;
+            } catch (error) {
+                console.error('Error restoring from Xano:', error);
+                showActivityToast('error', 'Restore Failed', 'Could not restore data from Xano');
+                if (loadingStatus) {
+                    loadingStatus.innerHTML = '<i class="ph ph-warning-circle"></i> Restore failed';
+                    loadingStatus.style.background = 'rgba(244, 67, 54, 0.3)';
+                }
+                return false;
             }
         }
 
@@ -26666,23 +26913,8 @@ Cmd/Ctrl + K - Command palette
                 }
             }
 
-            // Always try to fetch activities from Xano (for activity log and debugging)
-            updateStatus('Connecting to Xano...');
-            getActivitiesFromXano().then(xanoActivities => {
-                if (xanoActivities && xanoActivities.length > 0) {
-                    console.log('✅ Connected to Xano. Found', xanoActivities.length, 'activities');
-                    updateStatus('Xano connected (' + xanoActivities.length + ' activities)');
-                } else {
-                    console.log('ℹ️ Xano connected but no activities found for this app');
-                    updateStatus('Xano connected (no activities yet)');
-                }
-            }).catch(err => {
-                console.error('❌ Xano connection failed:', err);
-                updateStatus('Xano connection failed - check CORS settings', false);
-            });
-
-            // If no stored data, create default workspace and load sample data
-            if (!hasStoredData) {
+            // Function to load sample data as fallback
+            function loadSampleDataFallback() {
                 updateStatus('Loading sample data...');
                 console.log('📝 Creating default workspace with sample data...');
                 try {
@@ -26727,76 +26959,154 @@ Cmd/Ctrl + K - Command palette
                     updateStatus('Error loading sample data', false);
                     alert('Error loading sample data. Check console for details.');
                 }
+            }
+
+            // Function to complete initialization after data is loaded
+            function completeInitialization() {
+                // Load undo history and recycle bin for current workspace
+                loadUndoHistory();
+
+                // Render everything
+                try {
+                    updateStatus('Rendering interface...');
+                    console.log('🎨 Rendering UI...');
+                    renderEntityList();
+                    updateSelects();
+                    updateParentOptions();
+                    renderActivityList();
+                    updateFilterStatus();
+                    updateTaskCountBadge();
+                    console.log('✅ UI rendered');
+                    updateStatus('Ready');
+
+                    // Initialize simplified UX
+                    checkWelcomeBanner();
+                    restorePanelStates();
+                    updateStructureSectionVisibility();
+                } catch (e) {
+                    console.error('❌ Error rendering UI:', e);
+                    updateStatus('Error rendering UI', false);
+                    alert('Error rendering interface. Check console for details.');
+                }
+
+                // Character counter for description
+                const descriptionField = document.getElementById('activityDescription');
+                const charCount = document.getElementById('charCount');
+                if (descriptionField && charCount) {
+                    descriptionField.addEventListener('input', () => {
+                        charCount.textContent = descriptionField.value.length;
+                    });
+                }
+
+                // Show tasks view by default - work shapes structure
+                try {
+                    switchView('tasks');
+                    console.log('✅ Tasks view activated');
+                } catch (e) {
+                    console.error('❌ Error switching to card view:', e);
+                    updateStatus('Error loading view', false);
+                }
+
+                console.log('🎉 Initialization complete!');
+                console.log('📊 Current state:', {
+                    entities: {
+                        units: entities.unit.length,
+                        teams: entities.team.length,
+                        roles: entities.role.length,
+                        people: entities.person.length,
+                        tasks: entities.task.length,
+                        products: entities.product.length,
+                        workflows: entities.workflow.length
+                    },
+                    relationships: relationships.length,
+                    hasSampleData: hasSampleData
+                });
+
+                // Hide loading status after 3 seconds if successful
+                setTimeout(() => {
+                    if (loadingStatus && loadingStatus.textContent.includes('Ready')) {
+                        loadingStatus.style.display = 'none';
+                    }
+                }, 3000);
+            }
+
+            // If no stored data, try to restore from Xano first
+            if (!hasStoredData) {
+                updateStatus('Checking Xano for existing data...');
+                console.log('📡 No localStorage data - checking Xano for existing data...');
+
+                getActivitiesFromXano().then(xanoActivities => {
+                    if (xanoActivities && xanoActivities.length > 0) {
+                        console.log('✅ Found', xanoActivities.length, 'activities in Xano');
+                        updateStatus('Restoring data from Xano...');
+
+                        // Try to reconstruct entities from activities
+                        const reconstructed = reconstructEntitiesFromActivities(xanoActivities);
+                        const totalEntities = Object.values(reconstructed.entities).reduce(
+                            (sum, arr) => sum + arr.length, 0
+                        );
+
+                        if (totalEntities > 0) {
+                            // Create workspace with reconstructed data
+                            const wsId = generateWorkspaceId();
+                            workspaces[wsId] = {
+                                id: wsId,
+                                name: 'Restored Data',
+                                entities: reconstructed.entities,
+                                relationships: reconstructed.relationships,
+                                hasSampleData: false,
+                                createdAt: Date.now(),
+                                updatedAt: Date.now()
+                            };
+                            currentWorkspaceId = wsId;
+                            entities = normalizeEntities(JSON.parse(JSON.stringify(reconstructed.entities)));
+                            relationships = JSON.parse(JSON.stringify(reconstructed.relationships));
+                            hasSampleData = false;
+                            saveWorkspaces();
+
+                            console.log('✅ Restored', totalEntities, 'entities from Xano');
+                            updateStatus(`Restored ${totalEntities} entities from Xano`);
+
+                            // Update UI
+                            const nameEl = document.getElementById('workspaceNameText');
+                            if (nameEl) nameEl.textContent = workspaces[wsId].name;
+
+                            completeInitialization();
+                        } else {
+                            // Activities exist but no entities could be reconstructed
+                            console.log('⚠️ Activities found but no entities to restore - loading sample data');
+                            loadSampleDataFallback();
+                            completeInitialization();
+                        }
+                    } else {
+                        // No Xano data - load sample data
+                        console.log('ℹ️ No existing data in Xano - loading sample data');
+                        loadSampleDataFallback();
+                        completeInitialization();
+                    }
+                }).catch(err => {
+                    console.error('❌ Xano connection failed:', err);
+                    updateStatus('Xano unavailable - loading sample data', false);
+                    loadSampleDataFallback();
+                    completeInitialization();
+                });
             } else {
                 updateStatus('Loaded from storage');
                 console.log('✅ Loaded data from localStorage');
-            }
 
-            // Load undo history and recycle bin for current workspace
-            loadUndoHistory();
-
-            // Render everything
-            try {
-                updateStatus('Rendering interface...');
-                console.log('🎨 Rendering UI...');
-                renderEntityList();
-                updateSelects();
-                updateParentOptions();
-                renderActivityList();
-                updateFilterStatus();
-                updateTaskCountBadge();
-                console.log('✅ UI rendered');
-                updateStatus('Ready');
-
-                // Initialize simplified UX
-                checkWelcomeBanner();
-                restorePanelStates();
-                updateStructureSectionVisibility();
-            } catch (e) {
-                console.error('❌ Error rendering UI:', e);
-                updateStatus('Error rendering UI', false);
-                alert('Error rendering interface. Check console for details.');
-            }
-            
-            // Character counter for description
-            const descriptionField = document.getElementById('activityDescription');
-            const charCount = document.getElementById('charCount');
-            if (descriptionField && charCount) {
-                descriptionField.addEventListener('input', () => {
-                    charCount.textContent = descriptionField.value.length;
+                // Still connect to Xano for activity logging
+                getActivitiesFromXano().then(xanoActivities => {
+                    if (xanoActivities && xanoActivities.length > 0) {
+                        console.log('✅ Connected to Xano. Found', xanoActivities.length, 'activities');
+                    } else {
+                        console.log('ℹ️ Xano connected but no activities found for this app');
+                    }
+                }).catch(err => {
+                    console.error('⚠️ Xano connection failed (data loaded from localStorage):', err);
                 });
-            }
-            
-            // Show tasks view by default - work shapes structure
-            try {
-                switchView('tasks');
-                console.log('✅ Tasks view activated');
-            } catch (e) {
-                console.error('❌ Error switching to card view:', e);
-                updateStatus('Error loading view', false);
-            }
-            
-            console.log('🎉 Initialization complete!');
-            console.log('📊 Current state:', {
-                entities: {
-                    units: entities.unit.length,
-                    teams: entities.team.length,
-                    roles: entities.role.length,
-                    people: entities.person.length,
-                    tasks: entities.task.length,
-                    products: entities.product.length,
-                    workflows: entities.workflow.length
-                },
-                relationships: relationships.length,
-                hasSampleData: hasSampleData
-            });
 
-            // Hide loading status after 3 seconds if successful
-            setTimeout(() => {
-                if (loadingStatus && loadingStatus.textContent.includes('Ready')) {
-                    loadingStatus.style.display = 'none';
-                }
-            }, 3000);
+                completeInitialization();
+            }
         });
     </script>
 
