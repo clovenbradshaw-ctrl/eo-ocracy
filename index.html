@@ -15040,7 +15040,7 @@ John Doe,Engineering,john@example.com"
             objectSelect.innerHTML = '<option value="">Select work product...</option>';
 
             // Subject: all entity types
-            const types = ['unit', 'team', 'role', 'person', 'object'];
+            const types = ['unit', 'team', 'role', 'person', 'task', 'product', 'workflow'];
             types.forEach(type => {
                 entities[type].forEach(entity => {
                     const option = document.createElement('option');
