@@ -22563,7 +22563,27 @@ John Doe,Engineering,john@example.com"
 
         // Keyboard shortcut for hero task modal
         document.addEventListener('keydown', function(event) {
-            // Don't trigger if in an input field
+            const overlay = document.getElementById('heroTaskOverlay');
+            const modalActive = overlay && overlay.classList.contains('active');
+
+            // Handle Enter key to submit task when modal is active
+            if (event.key === 'Enter' && modalActive) {
+                // Check if we're in an inline create input (these have their own Enter handlers)
+                const inlineCreateInputs = ['heroNewWorkflowName', 'heroNewRoleName', 'heroNewPersonName'];
+                if (inlineCreateInputs.includes(event.target.id)) {
+                    return; // Let the inline input's own handler deal with it
+                }
+
+                // For main task input, selects, and date input - submit the form
+                const formElements = ['heroTaskName', 'heroTaskWorkflow', 'heroTaskRole', 'heroTaskPerson', 'heroTaskDueDate', 'heroTaskPredecessor'];
+                if (formElements.includes(event.target.id)) {
+                    event.preventDefault();
+                    submitHeroTask();
+                    return;
+                }
+            }
+
+            // Don't trigger T shortcut if in an input field
             if (event.target.tagName === 'INPUT' || event.target.tagName === 'TEXTAREA' || event.target.tagName === 'SELECT') {
                 return;
             }
@@ -22576,8 +22596,7 @@ John Doe,Engineering,john@example.com"
 
             // Escape closes modal
             if (event.key === 'Escape') {
-                const overlay = document.getElementById('heroTaskOverlay');
-                if (overlay.classList.contains('active')) {
+                if (modalActive) {
                     closeHeroTaskModal();
                 }
             }
