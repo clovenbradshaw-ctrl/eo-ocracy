@@ -531,9 +531,10 @@
             opacity: 0.8;
         }
 
-        /* Xano Connection Status Indicator */
+        /* Xano Connection Status Indicator - Hidden (shows only on error via JS) */
         .xano-status-indicator {
-            display: flex;
+            display: none !important; /* Hidden by default - implementation detail */
+            /* Previously: display: flex; */
             align-items: center;
             gap: 0.4rem;
             background: rgba(255,255,255,0.1);
@@ -797,7 +798,7 @@
 
         .container {
             display: grid;
-            grid-template-columns: 300px 1fr 320px;
+            grid-template-columns: 300px 1fr;
             height: calc(100vh - 65px);
         }
 
@@ -813,6 +814,7 @@
 
         .panel-right {
             border-left: 1px solid #E5DDD1;
+            display: none; /* Hidden - functionality moved to command palette */
         }
 
         /* Collapsible Sidebar Styles */
@@ -895,15 +897,16 @@
         }
 
         .container.left-collapsed {
-            grid-template-columns: 48px 1fr 320px;
+            grid-template-columns: 48px 1fr;
         }
 
+        /* Right panel removed - no longer needed */
         .container.right-collapsed {
-            grid-template-columns: 300px 1fr 48px;
+            grid-template-columns: 300px 1fr;
         }
 
         .container.left-collapsed.right-collapsed {
-            grid-template-columns: 48px 1fr 48px;
+            grid-template-columns: 48px 1fr;
         }
 
         .panel-title {
@@ -4439,9 +4442,9 @@
             flex-direction: column;
         }
 
-        /* Modal Tabs */
+        /* Modal Tabs - Hidden for simplified single-view layout */
         .modal-tabs {
-            display: flex;
+            display: none; /* Tabs removed - all content shown in single scrollable view */
             gap: 0;
             border-bottom: 2px solid #E5DDD1;
             padding: 0 1.5rem;
@@ -4481,14 +4484,39 @@
         }
 
         .modal-tab-content {
-            display: none;
-            flex: 1;
-            overflow-y: auto;
+            display: block; /* All content visible - no tabs */
+            flex: none; /* Don't flex - let container scroll */
+            overflow-y: visible;
             min-height: 0;
         }
 
         .modal-tab-content.active {
             display: block;
+        }
+
+        /* Hide the "Add" tab content - duplicates inline functionality */
+        #tabConnect {
+            display: none !important;
+        }
+
+        /* Section headers for unified modal view */
+        .modal-section-header {
+            padding: 0.75rem 2rem;
+            font-size: 0.8rem;
+            font-weight: 600;
+            color: #8B6F47;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+            background: #FAF7F5;
+            border-bottom: 1px solid #E5DDD1;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .modal-section-header i {
+            font-size: 1rem;
+            opacity: 0.7;
         }
 
         .modal-section {
@@ -7605,11 +7633,11 @@
 
         /* Task Wizard Styles */
         .task-wizard {
-            background: linear-gradient(135deg, #FFF9F0 0%, #FAF7F5 100%);
-            border: 2px solid #C88F4A;
-            border-radius: 12px;
-            padding: 1.5rem;
-            margin-bottom: 1.5rem;
+            background: transparent;
+            border: none;
+            border-radius: 0;
+            padding: 0;
+            margin-bottom: 1rem;
         }
 
         .task-wizard-cta {
@@ -7617,10 +7645,7 @@
         }
 
         .task-wizard-cta h3 {
-            color: #6B5642;
-            font-size: 1rem;
-            margin-bottom: 1rem;
-            font-weight: 500;
+            display: none; /* Simplified - just show button */
         }
 
         .task-wizard-cta .btn-create-task {
@@ -7646,9 +7671,7 @@
         }
 
         .task-wizard-cta .helper-links {
-            margin-top: 1rem;
-            font-size: 0.8rem;
-            color: #8B6F47;
+            display: none; /* Simplified - hide helper links */
         }
 
         .task-wizard-cta .helper-links a {
@@ -10422,21 +10445,13 @@
                 </button>
             </div>
 
-            <div class="panel-title"><i class="ph ph-lightning"></i> Your Workspace</div>
-
-            <div class="input-group">
+            <!-- Search at top -->
+            <div class="input-group" style="margin-bottom: 1rem;">
                 <input type="text" id="entitySearch" placeholder="Search..." oninput="filterEntities()">
             </div>
 
-            <!-- Primary: Add Work (Task) -->
-            <div class="work-first-section">
-                <button class="btn work-primary-btn" onclick="openHeroTaskModal()" style="width: 100%; display: flex; align-items: center; justify-content: center; gap: 0.5rem; margin-bottom: 0.75rem;">
-                    <i class="ph ph-plus-circle" style="color: white; font-size: 1.25rem;"></i> Add Work
-                </button>
-            </div>
-
-            <!-- Secondary: Who does it (Role/Person) - collapsed -->
-            <div class="collapsible-section collapsed" id="addEntitySection">
+            <!-- Hidden: Entity creation sections (functionality available in modals) -->
+            <div class="collapsible-section collapsed" id="addEntitySection" style="display: none;">
                 <div class="collapsible-header" onclick="toggleCollapsible('addEntitySection')">
                     <span><i class="ph ph-user-circle"></i> Who does it</span>
                     <i class="ph ph-caret-down collapse-icon"></i>
@@ -10462,7 +10477,7 @@
                 </div>
             </div>
 
-            <!-- Tertiary: Structure (deeply hidden) - only shows after roles exist -->
+            <!-- Hidden: Structure section (functionality available in modals) -->
             <div class="collapsible-section collapsed" id="structureSection" style="display: none;">
                 <div class="collapsible-header" onclick="toggleCollapsible('structureSection')">
                     <span><i class="ph ph-tree-structure"></i> Organize structure</span>
@@ -10492,8 +10507,6 @@
                     </div>
                 </div>
             </div>
-
-            <div class="panel-title" style="font-size: 1rem;">All Entities</div>
             <div id="entityList" class="entity-list"></div>
 
             <!-- Recycle Bin Section -->
@@ -10785,15 +10798,21 @@
                     </button>
                 </div>
 
-                <!-- Tab Content: Structure (parent/nested - for units/teams/roles) -->
+                <!-- Structure Section (parent/nested - for units/teams/roles) -->
                 <div class="modal-tab-content" id="tabStructure">
+                    <div class="modal-section-header">
+                        <i class="ph ph-tree-structure"></i> Structure
+                    </div>
                     <div class="modal-section" id="modalNestUnder"></div>
                     <div class="modal-section" id="modalNested"></div>
                     <div class="modal-section" id="modalAddNested"></div>
                 </div>
 
-                <!-- Tab Content: Related (activities/relationships) -->
+                <!-- Work Section (activities/relationships) -->
                 <div class="modal-tab-content" id="tabConnections">
+                    <div class="modal-section-header">
+                        <i class="ph ph-briefcase"></i> Work
+                    </div>
                     <div class="modal-section" id="modalActivities"></div>
                 </div>
 
