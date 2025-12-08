@@ -16156,6 +16156,7 @@ John Doe,Engineering,john@example.com"
 
                 const response = await fetch(`${XANO_BASE_URL}/activity_store`, {
                     method: 'POST',
+                    mode: 'cors',
                     headers: {
                         'Content-Type': 'application/json'
                     },
@@ -16178,10 +16179,17 @@ John Doe,Engineering,john@example.com"
 
         async function getActivitiesFromXano() {
             try {
-                const response = await fetch(`${XANO_BASE_URL}/activity_store`);
+                console.log('🔄 Fetching activities from Xano...');
+                const response = await fetch(`${XANO_BASE_URL}/activity_store`, {
+                    method: 'GET',
+                    mode: 'cors',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    }
+                });
 
                 if (!response.ok) {
-                    console.error('Failed to fetch activities:', response.statusText);
+                    console.error('❌ Failed to fetch activities:', response.statusText, response.status);
                     return [];
                 }
 
@@ -16244,6 +16252,7 @@ John Doe,Engineering,john@example.com"
 
                 const response = await fetch(`${XANO_BASE_URL}/activity_store/${activityId}`, {
                     method: 'PUT',
+                    mode: 'cors',
                     headers: {
                         'Content-Type': 'application/json'
                     },
@@ -25418,9 +25427,15 @@ John Doe,Engineering,john@example.com"
             console.log('📍 Loading from:', window.location.protocol);
             console.log('🌐 D3.js loaded:', typeof d3 !== 'undefined');
 
+            // Detect iframe/embed context
+            const isInIframe = window.parent !== window;
+            const isSoftrEmbed = isInIframe || window.location.hostname.includes('softr');
+            console.log('🖼️ Running in iframe:', isInIframe);
+            console.log('🔗 Softr embed detected:', isSoftrEmbed);
+
             // Initialize Softr user identity detection
             SoftrIdentity.init();
-            
+
             // Check if essential libraries loaded
             if (typeof d3 === 'undefined') {
                 updateStatus('D3.js failed to load - Internet required', false);
@@ -25428,7 +25443,7 @@ John Doe,Engineering,john@example.com"
             } else {
                 updateStatus('Libraries loaded');
             }
-            
+
             // Close modal on outside click
             document.getElementById('entityModal').addEventListener('click', (e) => {
                 if (e.target.id === 'entityModal') {
@@ -25436,20 +25451,52 @@ John Doe,Engineering,john@example.com"
                 }
             });
 
+            // Check localStorage availability (may be blocked in cross-origin iframes)
+            let localStorageAvailable = true;
+            try {
+                const testKey = '__storage_test__';
+                localStorage.setItem(testKey, testKey);
+                localStorage.removeItem(testKey);
+                console.log('💾 localStorage available: true');
+            } catch (e) {
+                localStorageAvailable = false;
+                console.warn('⚠️ localStorage not available (possibly blocked in iframe):', e.message);
+                if (isInIframe) {
+                    updateStatus('Storage limited in embed mode', false);
+                }
+            }
+
             // Try to load from localStorage first
             updateStatus('Checking saved data...');
             let hasStoredData = false;
-            try {
-                hasStoredData = loadFromLocalStorage();
-                console.log('📦 Has stored data:', hasStoredData);
-            } catch (e) {
-                console.error('❌ localStorage error:', e);
-                if (window.location.protocol === 'file:') {
-                    updateStatus('localStorage restricted (file:// URL)', false);
-                    console.warn('⚠️ Note: Some browsers restrict localStorage for file:// URLs');
+            if (localStorageAvailable) {
+                try {
+                    hasStoredData = loadFromLocalStorage();
+                    console.log('📦 Has stored data:', hasStoredData);
+                } catch (e) {
+                    console.error('❌ localStorage error:', e);
+                    if (window.location.protocol === 'file:') {
+                        updateStatus('localStorage restricted (file:// URL)', false);
+                        console.warn('⚠️ Note: Some browsers restrict localStorage for file:// URLs');
+                    }
                 }
             }
-            
+
+            // Always try to fetch activities from Xano (for activity log and debugging)
+            updateStatus('Connecting to Xano...');
+            getActivitiesFromXano().then(xanoActivities => {
+                if (xanoActivities && xanoActivities.length > 0) {
+                    console.log('✅ Connected to Xano. Found', xanoActivities.length, 'activities');
+                    updateStatus('Xano connected (' + xanoActivities.length + ' activities)');
+                } else {
+                    console.log('ℹ️ Xano connected but no activities found for this app');
+                    updateStatus('Xano connected (no activities yet)');
+                }
+            }).catch(err => {
+                console.error('❌ Xano connection failed:', err);
+                updateStatus('Xano connection failed - check CORS settings', false);
+            });
+
             // If no stored data, create default workspace and load sample data
             if (!hasStoredData) {
                 updateStatus('Loading sample data...');
