@@ -21431,7 +21431,13 @@ John Doe,Engineering,john@example.com"
             document.getElementById('taskBoardTotal').textContent = tasks.length;
             updateTaskCountBadge();
 
+            // Get the FAB element
+            const fab = document.querySelector('.task-fab');
+
             if (tasks.length === 0) {
+                // Hide FAB when empty state is shown (empty state has its own Create Task button)
+                if (fab) fab.style.display = 'none';
+
                 content.innerHTML = `
                     <div class="task-board-empty">
                         <i class="ph ph-clipboard-text"></i>
@@ -21444,6 +21450,9 @@ John Doe,Engineering,john@example.com"
                 `;
                 return;
             }
+
+            // Show FAB when there are tasks
+            if (fab) fab.style.display = 'flex';
 
             // Get search/filter values
             const searchTerm = (document.getElementById('taskBoardSearch').value || '').toLowerCase();
