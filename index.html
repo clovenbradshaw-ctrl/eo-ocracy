@@ -8441,6 +8441,357 @@
         }
 
         /* ============================================
+           TASK MODAL SPECIFIC STYLES
+           ============================================ */
+
+        .task-modal-info {
+            background: #FAF7F5;
+            border-radius: 12px;
+            padding: 1.25rem;
+            margin-bottom: 1rem;
+        }
+
+        .task-status-section {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            margin-bottom: 1rem;
+            padding-bottom: 1rem;
+            border-bottom: 1px solid #E5DDD1;
+        }
+
+        .task-status-toggle {
+            display: flex;
+            gap: 0.25rem;
+            background: #E5DDD1;
+            border-radius: 8px;
+            padding: 0.25rem;
+        }
+
+        .task-status-btn {
+            padding: 0.5rem 1rem;
+            border: none;
+            background: transparent;
+            border-radius: 6px;
+            font-size: 0.875rem;
+            font-weight: 500;
+            color: #6B5642;
+            cursor: pointer;
+            transition: all 0.2s;
+            display: flex;
+            align-items: center;
+            gap: 0.375rem;
+        }
+
+        .task-status-btn:hover {
+            background: rgba(255, 255, 255, 0.5);
+        }
+
+        .task-status-btn.active {
+            background: white;
+            color: #3D2E1F;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+        }
+
+        .task-status-btn.active.pending {
+            color: #8B6F47;
+        }
+
+        .task-status-btn.active.in-progress {
+            color: #1565C0;
+        }
+
+        .task-status-btn.active.completed {
+            color: #2E7D32;
+        }
+
+        .task-meta-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 1rem;
+        }
+
+        .task-meta-item {
+            display: flex;
+            flex-direction: column;
+            gap: 0.25rem;
+        }
+
+        .task-meta-label {
+            font-size: 0.75rem;
+            font-weight: 600;
+            text-transform: uppercase;
+            color: #8B6F47;
+            letter-spacing: 0.05em;
+        }
+
+        .task-meta-value {
+            font-size: 0.9375rem;
+            color: #3D2E1F;
+            display: flex;
+            align-items: center;
+            gap: 0.375rem;
+        }
+
+        .task-meta-value.empty {
+            color: #A89984;
+            font-style: italic;
+        }
+
+        .task-meta-value.clickable {
+            cursor: pointer;
+            padding: 0.25rem 0.5rem;
+            margin: -0.25rem -0.5rem;
+            border-radius: 6px;
+            transition: background 0.15s;
+        }
+
+        .task-meta-value.clickable:hover {
+            background: rgba(200, 143, 74, 0.1);
+        }
+
+        .task-meta-value i {
+            color: #C88F4A;
+        }
+
+        .task-due-date {
+            padding: 0.25rem 0.5rem;
+            border-radius: 6px;
+            font-weight: 500;
+        }
+
+        .task-due-date.pending {
+            background: #F5F5F5;
+            color: #6B5642;
+        }
+
+        .task-due-date.due-soon {
+            background: #FFF8E1;
+            color: #F57F17;
+        }
+
+        .task-due-date.due-today {
+            background: #FFF3E0;
+            color: #E65100;
+        }
+
+        .task-due-date.overdue {
+            background: #FFEBEE;
+            color: #C62828;
+        }
+
+        .task-due-date.completed {
+            background: #E8F5E9;
+            color: #2E7D32;
+        }
+
+        .task-dependencies-section {
+            margin-top: 1rem;
+            padding-top: 1rem;
+            border-top: 1px solid #E5DDD1;
+        }
+
+        .task-dep-group {
+            margin-bottom: 0.75rem;
+        }
+
+        .task-dep-group:last-child {
+            margin-bottom: 0;
+        }
+
+        .task-dep-label {
+            font-size: 0.75rem;
+            font-weight: 600;
+            text-transform: uppercase;
+            color: #8B6F47;
+            letter-spacing: 0.05em;
+            margin-bottom: 0.5rem;
+            display: flex;
+            align-items: center;
+            gap: 0.375rem;
+        }
+
+        .task-dep-label i {
+            font-size: 0.875rem;
+        }
+
+        .task-dep-list {
+            display: flex;
+            flex-direction: column;
+            gap: 0.375rem;
+        }
+
+        .task-dep-item {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            padding: 0.5rem 0.75rem;
+            background: white;
+            border-radius: 8px;
+            border: 1px solid #E5DDD1;
+            cursor: pointer;
+            transition: all 0.15s;
+        }
+
+        .task-dep-item:hover {
+            border-color: #C88F4A;
+            background: #FFFBF7;
+        }
+
+        .task-dep-item .dep-checkbox {
+            width: 18px;
+            height: 18px;
+            border-radius: 4px;
+            border: 2px solid #C88F4A;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            flex-shrink: 0;
+        }
+
+        .task-dep-item .dep-checkbox.completed {
+            background: #2E7D32;
+            border-color: #2E7D32;
+        }
+
+        .task-dep-item .dep-name {
+            flex: 1;
+            font-size: 0.875rem;
+            color: #3D2E1F;
+        }
+
+        .task-dep-item.completed .dep-name {
+            text-decoration: line-through;
+            color: #8B6F47;
+        }
+
+        .task-dep-item .dep-due {
+            font-size: 0.75rem;
+            color: #8B6F47;
+        }
+
+        .task-dep-empty {
+            font-size: 0.875rem;
+            color: #A89984;
+            font-style: italic;
+            padding: 0.5rem 0;
+        }
+
+        /* Task Quick Actions */
+        .task-quick-actions {
+            display: flex;
+            flex-direction: column;
+            gap: 0.5rem;
+            margin-bottom: 1rem;
+        }
+
+        .task-quick-action {
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+            padding: 0.75rem 1rem;
+            background: #FAF7F5;
+            border: 1px dashed #D4C4B0;
+            border-radius: 8px;
+            color: #6B5642;
+            font-size: 0.875rem;
+            cursor: pointer;
+            transition: all 0.15s;
+        }
+
+        .task-quick-action:hover {
+            background: #FFFBF7;
+            border-color: #C88F4A;
+            color: #C88F4A;
+        }
+
+        .task-quick-action i {
+            font-size: 1.125rem;
+        }
+
+        /* Task Modal Footer */
+        .task-modal-footer {
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+            padding-top: 1rem;
+            border-top: 1px solid #E5DDD1;
+            margin-top: 1rem;
+        }
+
+        .task-complete-btn {
+            flex: 1;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 0.5rem;
+            padding: 0.875rem 1.5rem;
+            background: #2E7D32;
+            color: white;
+            border: none;
+            border-radius: 8px;
+            font-size: 0.9375rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.15s;
+        }
+
+        .task-complete-btn:hover {
+            background: #1B5E20;
+        }
+
+        .task-complete-btn.completed {
+            background: #8B6F47;
+        }
+
+        .task-complete-btn.completed:hover {
+            background: #6B5642;
+        }
+
+        /* Connected Entities List (simpler than grouped) */
+        .task-connected-list {
+            display: flex;
+            flex-direction: column;
+            gap: 0.5rem;
+        }
+
+        .task-connected-item {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            padding: 0.5rem 0.75rem;
+            background: #FAF7F5;
+            border-radius: 8px;
+            font-size: 0.875rem;
+            cursor: pointer;
+            transition: background 0.15s;
+        }
+
+        .task-connected-item:hover {
+            background: #F0E9E0;
+        }
+
+        .task-connected-item i {
+            color: #C88F4A;
+        }
+
+        @media (max-width: 480px) {
+            .task-meta-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .task-status-toggle {
+                flex-wrap: wrap;
+            }
+
+            .task-status-btn {
+                flex: 1;
+                justify-content: center;
+            }
+        }
+
+        /* ============================================
            FLOW VIEW STYLES
            ============================================ */
 
@@ -10975,6 +11326,9 @@ John Doe,Engineering,john@example.com"
                         </div>
                     `;
                 }
+            } else if (entityType === 'task') {
+                // Task-specific info section
+                roleAssignmentEl.innerHTML = renderTaskModalInfo(entity);
             } else {
                 roleAssignmentEl.innerHTML = '';
             }
@@ -11160,10 +11514,46 @@ John Doe,Engineering,john@example.com"
 
             // Render Activities section (non-DES relationships) - hidden for persons
             const activitiesEl = document.getElementById('modalActivities');
+            const isTask = entityType === 'task';
 
             // Persons cannot have activities - hide the section entirely
             if (isPerson) {
                 activitiesEl.innerHTML = '';
+            } else if (isTask) {
+                // Tasks: show simplified connected entities view
+                const connectedRoles = activityEntities.filter(e => e.type === 'role');
+                const otherConnections = activityEntities.filter(e => e.type !== 'role');
+
+                if (activityEntities.length > 0) {
+                    activitiesEl.innerHTML = `
+                        <div class="modal-section-title" style="margin-bottom: 0.75rem;">
+                            <i class="ph ph-link"></i> Connected
+                        </div>
+                        <div class="task-connected-list">
+                            ${connectedRoles.map(role => `
+                                <div class="task-connected-item" onclick="openEntityModal('${role.id}', 'role')">
+                                    <i class="ph ph-briefcase"></i>
+                                    <span>${role.name}</span>
+                                </div>
+                            `).join('')}
+                            ${otherConnections.map(conn => `
+                                <div class="task-connected-item" onclick="openEntityModal('${conn.id}', '${conn.type}')">
+                                    ${getIcon(conn.type)}
+                                    <span>${conn.name}</span>
+                                </div>
+                            `).join('')}
+                        </div>
+                    `;
+                } else {
+                    activitiesEl.innerHTML = `
+                        <div class="modal-section-title" style="margin-bottom: 0.75rem;">
+                            <i class="ph ph-link"></i> Connected
+                        </div>
+                        <div class="task-dep-empty">
+                            No connections yet. Use the Add tab to connect roles.
+                        </div>
+                    `;
+                }
             } else {
                 const inlineActivityFormHtml = `
                     <div id="inlineActivityForm" class="inline-add-form hidden">
@@ -11244,6 +11634,9 @@ John Doe,Engineering,john@example.com"
                         </div>
                     </div>
                 `;
+            } else if (entityType === 'task') {
+                // Tasks: show simplified quick actions
+                addActivityEl.innerHTML = renderTaskQuickActions(entityId);
             } else {
                 // Use the new Create Connection panel for non-person entities
                 addActivityEl.innerHTML = renderCreateConnectionPanel(entityId, entityType);
@@ -21760,6 +22153,371 @@ John Doe,Engineering,john@example.com"
             if (diffDays === 0) return 'due-today';
             if (diffDays <= 3) return 'due-soon';
             return '';
+        }
+
+        // Render task-specific modal info section
+        function renderTaskModalInfo(task) {
+            const dueDateStatus = getTaskDueDateStatus(task);
+
+            // Get predecessor task
+            const predecessor = task.predecessorId ? entities.task.find(t => t.id === task.predecessorId) : null;
+
+            // Get dependent tasks (tasks that depend on this one)
+            const dependents = entities.task.filter(t => t.predecessorId === task.id);
+
+            // Get connected roles through relationships
+            const connectedRoles = relationships
+                .filter(r => (r.subject === task.id || r.object === task.id) && r.predicate !== 'DES')
+                .map(r => {
+                    const otherId = r.subject === task.id ? r.object : r.subject;
+                    return findEntity(otherId);
+                })
+                .filter(e => e && e.type === 'role');
+
+            // Get workflow connection
+            const workflow = task.followsWorkflowId ? entities.workflow?.find(w => w.id === task.followsWorkflowId) : null;
+
+            // Format due date display
+            let dueDateDisplay = 'Not set';
+            let dueDateClass = 'empty';
+            if (task.dueDate) {
+                const date = new Date(task.dueDate);
+                const today = new Date();
+                today.setHours(0, 0, 0, 0);
+                date.setHours(0, 0, 0, 0);
+                const diffDays = Math.ceil((date - today) / (1000 * 60 * 60 * 24));
+
+                dueDateDisplay = formatDateShort(task.dueDate);
+                if (task.status === 'completed') {
+                    dueDateDisplay += ' (done)';
+                } else if (diffDays < 0) {
+                    dueDateDisplay += ` (${Math.abs(diffDays)} day${Math.abs(diffDays) !== 1 ? 's' : ''} overdue)`;
+                } else if (diffDays === 0) {
+                    dueDateDisplay += ' (today)';
+                } else if (diffDays <= 3) {
+                    dueDateDisplay += ` (in ${diffDays} day${diffDays !== 1 ? 's' : ''})`;
+                }
+                dueDateClass = dueDateStatus || 'pending';
+            }
+
+            return `
+                <div class="task-modal-info">
+                    <!-- Status Toggle -->
+                    <div class="task-status-section">
+                        <div class="task-status-toggle">
+                            <button class="task-status-btn ${task.status === 'pending' ? 'active pending' : ''}"
+                                    onclick="updateTaskStatus('${task.id}', 'pending')">
+                                <i class="ph ph-circle-dashed"></i> Pending
+                            </button>
+                            <button class="task-status-btn ${task.status === 'in_progress' ? 'active in-progress' : ''}"
+                                    onclick="updateTaskStatus('${task.id}', 'in_progress')">
+                                <i class="ph ph-spinner"></i> In Progress
+                            </button>
+                            <button class="task-status-btn ${task.status === 'completed' ? 'active completed' : ''}"
+                                    onclick="updateTaskStatus('${task.id}', 'completed')">
+                                <i class="ph ph-check-circle"></i> Done
+                            </button>
+                        </div>
+                    </div>
+
+                    <!-- Meta Grid -->
+                    <div class="task-meta-grid">
+                        <div class="task-meta-item">
+                            <div class="task-meta-label">Due Date</div>
+                            <div class="task-meta-value ${task.dueDate ? '' : 'empty'}">
+                                ${task.dueDate ? `
+                                    <span class="task-due-date ${dueDateClass}">
+                                        <i class="ph ph-calendar"></i> ${dueDateDisplay}
+                                    </span>
+                                ` : '<i class="ph ph-calendar-blank"></i> Not set'}
+                            </div>
+                        </div>
+                        <div class="task-meta-item">
+                            <div class="task-meta-label">Assigned Role</div>
+                            <div class="task-meta-value ${connectedRoles.length ? 'clickable' : 'empty'}"
+                                 ${connectedRoles.length ? `onclick="openEntityModal('${connectedRoles[0].id}', 'role')"` : ''}>
+                                ${connectedRoles.length ? `
+                                    <i class="ph ph-briefcase"></i> ${connectedRoles[0].name}
+                                    ${connectedRoles.length > 1 ? `<span style="color:#8B6F47;font-size:0.8rem;">+${connectedRoles.length - 1}</span>` : ''}
+                                ` : '<i class="ph ph-user-circle"></i> Unassigned'}
+                            </div>
+                        </div>
+                        ${workflow ? `
+                        <div class="task-meta-item" style="grid-column: span 2;">
+                            <div class="task-meta-label">Workflow</div>
+                            <div class="task-meta-value clickable" onclick="openEntityModal('${workflow.id}', 'workflow')">
+                                <i class="ph ph-git-branch"></i> ${workflow.name}
+                            </div>
+                        </div>
+                        ` : ''}
+                    </div>
+
+                    <!-- Dependencies -->
+                    ${predecessor || dependents.length > 0 ? `
+                    <div class="task-dependencies-section">
+                        ${predecessor ? `
+                        <div class="task-dep-group">
+                            <div class="task-dep-label">
+                                <i class="ph ph-arrow-bend-left-up"></i> Blocked By
+                            </div>
+                            <div class="task-dep-list">
+                                <div class="task-dep-item ${predecessor.status === 'completed' ? 'completed' : ''}"
+                                     onclick="openEntityModal('${predecessor.id}', 'task')">
+                                    <div class="dep-checkbox ${predecessor.status === 'completed' ? 'completed' : ''}">
+                                        ${predecessor.status === 'completed' ? '<i class="ph ph-check"></i>' : ''}
+                                    </div>
+                                    <span class="dep-name">${predecessor.name}</span>
+                                    ${predecessor.dueDate ? `<span class="dep-due">${formatDateShort(predecessor.dueDate)}</span>` : ''}
+                                </div>
+                            </div>
+                        </div>
+                        ` : ''}
+                        ${dependents.length > 0 ? `
+                        <div class="task-dep-group">
+                            <div class="task-dep-label">
+                                <i class="ph ph-arrow-bend-right-down"></i> Blocking (${dependents.length})
+                            </div>
+                            <div class="task-dep-list">
+                                ${dependents.map(dep => `
+                                    <div class="task-dep-item ${dep.status === 'completed' ? 'completed' : ''}"
+                                         onclick="openEntityModal('${dep.id}', 'task')">
+                                        <div class="dep-checkbox ${dep.status === 'completed' ? 'completed' : ''}">
+                                            ${dep.status === 'completed' ? '<i class="ph ph-check"></i>' : ''}
+                                        </div>
+                                        <span class="dep-name">${dep.name}</span>
+                                        ${dep.dueDate ? `<span class="dep-due">${formatDateShort(dep.dueDate)}</span>` : ''}
+                                    </div>
+                                `).join('')}
+                            </div>
+                        </div>
+                        ` : ''}
+                    </div>
+                    ` : ''}
+                </div>
+            `;
+        }
+
+        // Update task status
+        function updateTaskStatus(taskId, newStatus) {
+            const task = entities.task.find(t => t.id === taskId);
+            if (!task) return;
+
+            task.status = newStatus;
+            saveData();
+
+            // Log activity
+            logActivityToXano({
+                event_verb: 'Update Task Status',
+                event_object: JSON.stringify({ taskId, name: task.name, status: newStatus }),
+                details: `Changed status to ${newStatus}`
+            });
+
+            // Re-render the modal to update the UI
+            openEntityModal(taskId, 'task');
+
+            // Update task board if visible
+            if (document.getElementById('taskBoardView')?.classList.contains('active')) {
+                renderTaskBoard();
+            }
+        }
+
+        // Render simplified quick actions for task modal
+        function renderTaskQuickActions(taskId) {
+            const task = entities.task.find(t => t.id === taskId);
+            if (!task) return '';
+
+            // Get connected entities
+            const connectedRoles = relationships
+                .filter(r => (r.subject === taskId || r.object === taskId) && r.predicate !== 'DES')
+                .map(r => {
+                    const otherId = r.subject === taskId ? r.object : r.subject;
+                    return findEntity(otherId);
+                })
+                .filter(e => e && e.type === 'role');
+
+            return `
+                <div class="task-quick-actions-panel">
+                    <div class="modal-section-title" style="margin-bottom: 0.75rem;">
+                        <i class="ph ph-lightning"></i> Quick Actions
+                    </div>
+
+                    <!-- Assign Role -->
+                    <div class="task-quick-action-section">
+                        <div class="task-quick-action-label">
+                            <i class="ph ph-briefcase"></i> Assign Role
+                        </div>
+                        <div class="task-quick-action-row">
+                            <select id="taskQuickRoleSelect" class="task-quick-select">
+                                <option value="">Select role...</option>
+                                ${entities.role.map(role => {
+                                    const isConnected = connectedRoles.some(r => r.id === role.id);
+                                    return `<option value="${role.id}" ${isConnected ? 'disabled' : ''}>${role.name}${isConnected ? ' (connected)' : ''}</option>`;
+                                }).join('')}
+                            </select>
+                            <button class="task-quick-action-btn" onclick="assignRoleToTask('${taskId}')">
+                                <i class="ph ph-plus"></i>
+                            </button>
+                        </div>
+                        ${connectedRoles.length > 0 ? `
+                        <div class="task-connected-list" style="margin-top: 0.5rem;">
+                            ${connectedRoles.map(role => `
+                                <div class="task-connected-item">
+                                    <i class="ph ph-briefcase"></i>
+                                    <span style="flex: 1;" onclick="openEntityModal('${role.id}', 'role')">${role.name}</span>
+                                    <button class="connection-remove-btn" onclick="removeTaskRoleConnection('${taskId}', '${role.id}')" style="margin-left: auto;">
+                                        <i class="ph ph-x"></i>
+                                    </button>
+                                </div>
+                            `).join('')}
+                        </div>
+                        ` : ''}
+                    </div>
+
+                    <!-- Add Predecessor -->
+                    <div class="task-quick-action-section" style="margin-top: 1rem;">
+                        <div class="task-quick-action-label">
+                            <i class="ph ph-arrow-bend-left-up"></i> Add Dependency (Blocked By)
+                        </div>
+                        ${task.predecessorId ? `
+                            <div class="task-connected-list">
+                                ${(() => {
+                                    const pred = entities.task.find(t => t.id === task.predecessorId);
+                                    return pred ? `
+                                        <div class="task-connected-item">
+                                            <i class="ph ph-check-square"></i>
+                                            <span style="flex: 1;" onclick="openEntityModal('${pred.id}', 'task')">${pred.name}</span>
+                                            <button class="connection-remove-btn" onclick="removeTaskPredecessor('${taskId}')" style="margin-left: auto;">
+                                                <i class="ph ph-x"></i>
+                                            </button>
+                                        </div>
+                                    ` : '';
+                                })()}
+                            </div>
+                        ` : `
+                            <div class="task-quick-action-row">
+                                <select id="taskQuickPredecessorSelect" class="task-quick-select">
+                                    <option value="">Select task to depend on...</option>
+                                    ${entities.task
+                                        .filter(t => t.id !== taskId)
+                                        .map(t => `<option value="${t.id}">${t.name}</option>`)
+                                        .join('')}
+                                </select>
+                                <button class="task-quick-action-btn" onclick="setTaskPredecessor('${taskId}')">
+                                    <i class="ph ph-plus"></i>
+                                </button>
+                            </div>
+                        `}
+                    </div>
+                </div>
+
+                <style>
+                    .task-quick-actions-panel {
+                        padding: 0;
+                    }
+                    .task-quick-action-section {
+                        background: #FAF7F5;
+                        border-radius: 8px;
+                        padding: 1rem;
+                    }
+                    .task-quick-action-label {
+                        font-size: 0.8rem;
+                        font-weight: 600;
+                        color: #6B5642;
+                        margin-bottom: 0.5rem;
+                        display: flex;
+                        align-items: center;
+                        gap: 0.375rem;
+                    }
+                    .task-quick-action-row {
+                        display: flex;
+                        gap: 0.5rem;
+                    }
+                    .task-quick-select {
+                        flex: 1;
+                        padding: 0.5rem 0.75rem;
+                        border: 1px solid #E5DDD1;
+                        border-radius: 6px;
+                        font-size: 0.875rem;
+                        background: white;
+                    }
+                    .task-quick-select:focus {
+                        outline: none;
+                        border-color: #C88F4A;
+                    }
+                    .task-quick-action-btn {
+                        padding: 0.5rem 0.75rem;
+                        background: #C88F4A;
+                        color: white;
+                        border: none;
+                        border-radius: 6px;
+                        cursor: pointer;
+                        display: flex;
+                        align-items: center;
+                        justify-content: center;
+                    }
+                    .task-quick-action-btn:hover {
+                        background: #B87D3A;
+                    }
+                </style>
+            `;
+        }
+
+        // Assign role to task
+        function assignRoleToTask(taskId) {
+            const select = document.getElementById('taskQuickRoleSelect');
+            const roleId = select?.value;
+            if (!roleId) return;
+
+            // Create CON relationship
+            const relId = 'rel' + Date.now();
+            relationships.push({
+                id: relId,
+                subject: taskId,
+                predicate: 'CON',
+                object: roleId,
+                description: ''
+            });
+
+            saveData();
+            openEntityModal(taskId, 'task');
+        }
+
+        // Remove role connection from task
+        function removeTaskRoleConnection(taskId, roleId) {
+            const relIndex = relationships.findIndex(r =>
+                ((r.subject === taskId && r.object === roleId) ||
+                 (r.subject === roleId && r.object === taskId)) &&
+                r.predicate !== 'DES'
+            );
+            if (relIndex > -1) {
+                relationships.splice(relIndex, 1);
+                saveData();
+                openEntityModal(taskId, 'task');
+            }
+        }
+
+        // Set task predecessor
+        function setTaskPredecessor(taskId) {
+            const select = document.getElementById('taskQuickPredecessorSelect');
+            const predecessorId = select?.value;
+            if (!predecessorId) return;
+
+            const task = entities.task.find(t => t.id === taskId);
+            if (task) {
+                task.predecessorId = predecessorId;
+                saveData();
+                openEntityModal(taskId, 'task');
+            }
+        }
+
+        // Remove task predecessor
+        function removeTaskPredecessor(taskId) {
+            const task = entities.task.find(t => t.id === taskId);
+            if (task) {
+                task.predecessorId = null;
+                saveData();
+                openEntityModal(taskId, 'task');
+            }
         }
 
         // Get dependent tasks that would be affected by date change
