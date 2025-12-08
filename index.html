@@ -7169,6 +7169,23 @@
             font-style: italic;
         }
 
+        .bulk-import-preview-table .row-number {
+            color: #B8A99A;
+            font-size: 0.7rem;
+            font-weight: 400;
+            text-align: center;
+            width: 30px;
+            padding-right: 0.5rem;
+        }
+
+        .bulk-import-preview-table th.row-number-header {
+            color: #B8A99A;
+            font-size: 0.7rem;
+            font-weight: 400;
+            text-align: center;
+            width: 30px;
+        }
+
         .bulk-import-footer {
             padding: 1rem 2rem;
             background: #FAF7F5;
@@ -22298,6 +22315,7 @@ John Doe,Engineering,john@example.com"
 
             // Build table
             let html = '<thead><tr>';
+            html += '<th class="row-number-header"></th>';
             bulkImportState.headers.forEach(h => {
                 html += `<th>${escapeHtml(h)}</th>`;
             });
@@ -22305,8 +22323,9 @@ John Doe,Engineering,john@example.com"
 
             // Show first 10 rows
             const previewRows = bulkImportState.parsedData.slice(0, 10);
-            previewRows.forEach(row => {
+            previewRows.forEach((row, idx) => {
                 html += '<tr>';
+                html += `<td class="row-number">${idx + 1}</td>`;
                 bulkImportState.headers.forEach(h => {
                     html += `<td>${escapeHtml(row[h] || '')}</td>`;
                 });
@@ -22314,7 +22333,7 @@ John Doe,Engineering,john@example.com"
             });
 
             if (bulkImportState.parsedData.length > 10) {
-                html += `<tr><td colspan="${bulkImportState.headers.length}" style="text-align: center; color: #8B6F47; font-style: italic;">... and ${bulkImportState.parsedData.length - 10} more rows</td></tr>`;
+                html += `<tr><td colspan="${bulkImportState.headers.length + 1}" style="text-align: center; color: #8B6F47; font-style: italic;">... and ${bulkImportState.parsedData.length - 10} more rows</td></tr>`;
             }
 
             html += '</tbody>';
@@ -22520,6 +22539,7 @@ John Doe,Engineering,john@example.com"
 
             // Build header
             let html = '<thead><tr>';
+            html += '<th class="row-number-header"></th>';
             fields.forEach(f => {
                 html += `<th>${f.label}</th>`;
             });
@@ -22527,8 +22547,9 @@ John Doe,Engineering,john@example.com"
 
             // Process and show preview
             const previewRows = bulkImportState.parsedData.slice(0, 10);
-            previewRows.forEach(row => {
+            previewRows.forEach((row, idx) => {
                 html += '<tr>';
+                html += `<td class="row-number">${idx + 1}</td>`;
                 fields.forEach(f => {
                     let value = '';
                     const setAll = bulkImportState.setAllValues[f.key];
@@ -22549,7 +22570,7 @@ John Doe,Engineering,john@example.com"
             });
 
             if (bulkImportState.parsedData.length > 10) {
-                html += `<tr><td colspan="${fields.length}" style="text-align: center; color: #8B6F47; font-style: italic;">... and ${bulkImportState.parsedData.length - 10} more rows</td></tr>`;
+                html += `<tr><td colspan="${fields.length + 1}" style="text-align: center; color: #8B6F47; font-style: italic;">... and ${bulkImportState.parsedData.length - 10} more rows</td></tr>`;
             }
 
             html += '</tbody>';
@@ -22635,7 +22656,7 @@ John Doe,Engineering,john@example.com"
             const fields = bulkImportFields[bulkImportState.entityType];
 
             let html = '<thead><tr>';
-            html += '<th style="width: 40px;">#</th>';
+            html += '<th class="row-number-header"></th>';
             fields.forEach(f => {
                 html += `<th>${f.label}</th>`;
             });
@@ -22645,7 +22666,7 @@ John Doe,Engineering,john@example.com"
             bulkImportState.processedData.forEach((row, idx) => {
                 const hasErrors = row._errors.length > 0;
                 html += `<tr class="${hasErrors ? 'error' : ''}">`;
-                html += `<td>${idx + 1}</td>`;
+                html += `<td class="row-number">${idx + 1}</td>`;
                 fields.forEach(f => {
                     const value = row[f.key];
                     const isSetAll = row[`${f.key}_isSetAll`];
