@@ -7906,6 +7906,24 @@
             background: #B07D3A;
         }
 
+        .hero-task-workflow-prompt {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            margin-top: 0.75rem;
+            padding: 0.75rem 1rem;
+            background: linear-gradient(135deg, #FFF9F0 0%, #F5EDE0 100%);
+            border: 1px dashed #C88F4A;
+            border-radius: 8px;
+            color: #8B6914;
+            font-size: 0.85rem;
+        }
+
+        .hero-task-workflow-prompt i {
+            color: #C88F4A;
+            font-size: 1.1rem;
+        }
+
         .hero-task-date-input {
             width: 100%;
             padding: 0.875rem 1rem;
@@ -8007,6 +8025,11 @@
         .hero-task-preview-item.person {
             border-color: #5AB07B;
             background: #F0FFF5;
+        }
+
+        .hero-task-preview-item.workflow {
+            border-color: #9C27B0;
+            background: #F3E5F5;
         }
 
         .hero-task-preview-item.due-date {
@@ -20907,6 +20930,7 @@ John Doe,Engineering,john@example.com"
 
             // Reset form
             document.getElementById('heroTaskName').value = '';
+            document.getElementById('heroTaskWorkflow').value = '';
             document.getElementById('heroTaskRole').value = '';
             document.getElementById('heroTaskPerson').value = '';
             document.getElementById('heroTaskDueDate').value = '';
@@ -20916,6 +20940,7 @@ John Doe,Engineering,john@example.com"
             document.getElementById('heroDependencyWarning').style.display = 'none';
 
             // Hide inline create forms
+            document.getElementById('heroWorkflowCreate').classList.remove('active');
             document.getElementById('heroRoleCreate').classList.remove('active');
             document.getElementById('heroPersonCreate').classList.remove('active');
         }
@@ -20932,11 +20957,30 @@ John Doe,Engineering,john@example.com"
             const roleSelect = document.getElementById('heroTaskRole');
             const personSelect = document.getElementById('heroTaskPerson');
             const predecessorSelect = document.getElementById('heroTaskPredecessor');
+            const workflowSelect = document.getElementById('heroTaskWorkflow');
+            const workflowPrompt = document.getElementById('heroWorkflowPrompt');
 
             // Clear existing options (except first)
             roleSelect.innerHTML = '<option value="">Select a role...</option>';
             personSelect.innerHTML = '<option value="">Select a person...</option>';
             predecessorSelect.innerHTML = '<option value="">No dependency...</option>';
+            workflowSelect.innerHTML = '<option value="">Select a workflow...</option>';
+
+            // Add workflows
+            const workflows = entities.workflow || [];
+            workflows.forEach(workflow => {
+                const option = document.createElement('option');
+                option.value = workflow.id;
+                option.textContent = workflow.name;
+                workflowSelect.appendChild(option);
+            });
+
+            // Show prompt if no workflows exist
+            if (workflows.length === 0) {
+                workflowPrompt.style.display = 'flex';
+            } else {
+                workflowPrompt.style.display = 'none';
+            }
 
             // Add roles
             entities.role.forEach(role => {
@@ -21115,6 +21159,47 @@ John Doe,Engineering,john@example.com"
             updateHeroTaskPreview();
         }
 
+        // Toggle workflow inline create
+        function toggleHeroWorkflowCreate() {
+            const createDiv = document.getElementById('heroWorkflowCreate');
+            createDiv.classList.toggle('active');
+            if (createDiv.classList.contains('active')) {
+                document.getElementById('heroNewWorkflowName').focus();
+            }
+        }
+
+        // Create new workflow from hero modal
+        function createHeroWorkflow() {
+            const nameInput = document.getElementById('heroNewWorkflowName');
+            const name = nameInput.value.trim();
+
+            if (!name) return;
+
+            // Create workflow entity
+            const workflowId = 'workflow' + Date.now();
+            const workflow = { id: workflowId, name: name, type: 'workflow', description: '' };
+            entities.workflow.push(workflow);
+
+            logActivityToXano({
+                event_verb: 'Add Entity',
+                object_type: 'workflow',
+                object_label: name
+            });
+
+            saveToLocalStorage();
+            renderEntityList();
+
+            // Refresh selects and select the new workflow
+            populateHeroSelects();
+            document.getElementById('heroTaskWorkflow').value = workflowId;
+
+            // Clear and hide inline create
+            nameInput.value = '';
+            document.getElementById('heroWorkflowCreate').classList.remove('active');
+
+            updateHeroTaskPreview();
+        }
+
         // Update preview as user fills in form
         function updateHeroTaskPreview() {
             const taskName = document.getElementById('heroTaskName').value.trim();
@@ -21122,13 +21207,14 @@ John Doe,Engineering,john@example.com"
             const personId = document.getElementById('heroTaskPerson').value;
             const dueDate = document.getElementById('heroTaskDueDate').value;
             const predecessorId = document.getElementById('heroTaskPredecessor').value;
+            const workflowId = document.getElementById('heroTaskWorkflow').value;
 
             const previewDiv = document.getElementById('heroTaskPreview');
             const previewContent = document.getElementById('heroTaskPreviewContent');
             const submitBtn = document.getElementById('heroTaskSubmitBtn');
 
-            // Enable/disable submit based on required fields
-            submitBtn.disabled = !(taskName && roleId);
+            // Enable/disable submit based on required fields (workflow is now required)
+            submitBtn.disabled = !(taskName && roleId && workflowId);
 
             // Check for date conflicts
             checkPredecessorDateConflict();
@@ -21143,6 +21229,7 @@ John Doe,Engineering,john@example.com"
             const role = entities.role.find(r => r.id === roleId);
             const person = entities.person.find(p => p.id === personId);
             const predecessor = entities.task.find(t => t.id === predecessorId);
+            const workflow = entities.workflow.find(w => w.id === workflowId);
 
             let html = `
                 <span class="hero-task-preview-item role">
@@ -21161,6 +21248,17 @@ John Doe,Engineering,john@example.com"
                     <span class="hero-task-preview-item person">
                         <i class="ph ph-user"></i>
                         ${person.name}
+                    </span>
+                    <span class="hero-task-preview-arrow">→</span>
+                ` + html;
+            }
+
+            // Add workflow at the beginning if selected
+            if (workflow) {
+                html = `
+                    <span class="hero-task-preview-item workflow">
+                        <i class="ph ph-flow-arrow"></i>
+                        ${workflow.name}
                     </span>
                     <span class="hero-task-preview-arrow">→</span>
                 ` + html;
@@ -21196,15 +21294,17 @@ John Doe,Engineering,john@example.com"
             const personId = document.getElementById('heroTaskPerson').value;
             const dueDate = document.getElementById('heroTaskDueDate').value;
             const predecessorId = document.getElementById('heroTaskPredecessor').value;
+            const workflowId = document.getElementById('heroTaskWorkflow').value;
 
-            if (!taskName || !roleId) {
+            if (!taskName || !roleId || !workflowId) {
                 return;
             }
 
             const role = entities.role.find(r => r.id === roleId);
             const person = personId ? entities.person.find(p => p.id === personId) : null;
+            const workflow = entities.workflow.find(w => w.id === workflowId);
 
-            // 1. Create task entity (tasks are activities that produce work products)
+            // 1. Create task entity (tasks are instances of workflows)
             const taskId = 'task' + Date.now();
             const taskObject = {
                 id: taskId,
@@ -21214,7 +21314,7 @@ John Doe,Engineering,john@example.com"
                 predecessorId: predecessorId || null,
                 status: 'pending',
                 producesProductId: null,
-                followsWorkflowId: null,
+                followsWorkflowId: workflowId,
                 createdAt: new Date().toISOString()
             };
             entities.task.push(taskObject);
@@ -21225,9 +21325,26 @@ John Doe,Engineering,john@example.com"
                 object_label: taskName
             });
 
-            // 2. Connect role to task (Role CON Task)
-            const roleTaskRel = {
+            // 2. Connect workflow to task (Workflow CON Task - task is instance of workflow)
+            const workflowTaskRel = {
                 id: 'rel' + Date.now(),
+                subject: workflowId,
+                predicate: 'CON',
+                object: taskId,
+                description: ''
+            };
+            relationships.push(workflowTaskRel);
+
+            logActivityToXano({
+                event_verb: 'Link Connection',
+                eo_operator: 'CON',
+                object_type: 'relationship',
+                object_label: `${workflow.name} → ${taskName}`
+            });
+
+            // 3. Connect role to task (Role CON Task)
+            const roleTaskRel = {
+                id: 'rel' + (Date.now() + 1),
                 subject: role.id,
                 predicate: 'CON',
                 object: taskId,
@@ -21242,7 +21359,7 @@ John Doe,Engineering,john@example.com"
                 object_label: `${role.name} → ${taskName}`
             });
 
-            // 3. If person selected, assign to role (Person INS Role)
+            // 4. If person selected, assign to role (Person INS Role)
             if (person) {
                 const existingAssignment = relationships.find(r =>
                     r.subject === person.id &&
@@ -21769,6 +21886,34 @@ John Doe,Engineering,john@example.com"
                            placeholder="e.g., Review contracts, Prepare report, Draft proposal..."
                            onkeypress="if(event.key==='Enter') submitHeroTask()"
                            oninput="updateHeroTaskPreview()">
+                </div>
+
+                <div class="hero-task-input-group">
+                    <label class="hero-task-label"><i class="ph ph-flow-arrow"></i> Part of Workflow</label>
+                    <div class="hero-task-select-wrapper">
+                        <select id="heroTaskWorkflow" class="hero-task-select" onchange="updateHeroTaskPreview()">
+                            <option value="">Select a workflow...</option>
+                        </select>
+                    </div>
+                    <div class="hero-task-or-create">
+                        or <a onclick="toggleHeroWorkflowCreate()">create new workflow</a>
+                    </div>
+                    <div class="hero-task-inline-create" id="heroWorkflowCreate">
+                        <div class="hero-task-inline-row">
+                            <input type="text"
+                                   id="heroNewWorkflowName"
+                                   class="hero-task-inline-input"
+                                   placeholder="Workflow name..."
+                                   onkeypress="if(event.key==='Enter') createHeroWorkflow()">
+                            <button class="hero-task-inline-btn" onclick="createHeroWorkflow()">
+                                <i class="ph ph-plus"></i>
+                            </button>
+                        </div>
+                    </div>
+                    <div class="hero-task-workflow-prompt" id="heroWorkflowPrompt" style="display: none;">
+                        <i class="ph ph-info"></i>
+                        <span>No workflows yet. Create one to organize related tasks.</span>
+                    </div>
                 </div>
 
                 <div class="hero-task-row">
