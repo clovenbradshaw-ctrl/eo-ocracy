@@ -14312,6 +14312,9 @@ John Doe,Engineering,john@example.com"
             const modalOpen = document.querySelector('.modal-overlay.open, .entity-edit-modal-overlay.open, .delete-confirm-overlay.open');
             if (modalOpen) return;
 
+            // Allow browser shortcuts with modifier keys (like Ctrl+R for refresh)
+            if (e.ctrlKey || e.metaKey || e.altKey) return;
+
             // Global shortcuts (when not typing)
             switch(e.key.toLowerCase()) {
                 case 't':
