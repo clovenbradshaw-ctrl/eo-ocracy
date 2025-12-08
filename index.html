@@ -24283,8 +24283,8 @@ John Doe,Engineering,john@example.com"
             const previewContent = document.getElementById('heroTaskPreviewContent');
             const submitBtn = document.getElementById('heroTaskSubmitBtn');
 
-            // Enable/disable submit based on required fields (workflow is now required)
-            submitBtn.disabled = !(taskName && roleId && workflowId);
+            // Enable/disable submit based on required fields (workflow is required, role is optional)
+            submitBtn.disabled = !(taskName && workflowId);
 
             // Check for date conflicts
             checkPredecessorDateConflict();
@@ -24301,18 +24301,26 @@ John Doe,Engineering,john@example.com"
             const predecessor = entities.task.find(t => t.id === predecessorId);
             const workflow = entities.workflow.find(w => w.id === workflowId);
 
+            // Build preview starting with the task
             let html = `
-                <span class="hero-task-preview-item role">
-                    <i class="ph ph-briefcase"></i>
-                    ${role ? role.name : 'No role selected'}
-                </span>
-                <span class="hero-task-preview-arrow">→</span>
                 <span class="hero-task-preview-item task">
                     <i class="ph ph-file-text"></i>
                     ${taskName}
                 </span>
             `;
 
+            // Add role before task if selected
+            if (role) {
+                html = `
+                    <span class="hero-task-preview-item role">
+                        <i class="ph ph-briefcase"></i>
+                        ${role.name}
+                    </span>
+                    <span class="hero-task-preview-arrow">→</span>
+                ` + html;
+            }
+
+            // Add person before role/task if selected
             if (person) {
                 html = `
                     <span class="hero-task-preview-item person">
@@ -24366,7 +24374,7 @@ John Doe,Engineering,john@example.com"
             const predecessorId = document.getElementById('heroTaskPredecessor').value;
             const workflowId = document.getElementById('heroTaskWorkflow').value;
 
-            if (!taskName || !roleId || !workflowId) {
+            if (!taskName || !workflowId) {
                 return;
             }
 
@@ -24412,25 +24420,27 @@ John Doe,Engineering,john@example.com"
                 object_label: `${workflow.name} → ${taskName}`
             });
 
-            // 3. Connect role to task (Role CON Task)
-            const roleTaskRel = {
-                id: 'rel' + (Date.now() + 1),
-                subject: role.id,
-                predicate: 'CON',
-                object: taskId,
-                description: ''
-            };
-            relationships.push(roleTaskRel);
+            // 3. Connect role to task (Role CON Task) - only if role is selected
+            if (role) {
+                const roleTaskRel = {
+                    id: 'rel' + (Date.now() + 1),
+                    subject: role.id,
+                    predicate: 'CON',
+                    object: taskId,
+                    description: ''
+                };
+                relationships.push(roleTaskRel);
 
-            logActivityToXano({
-                event_verb: 'Link Connection',
-                eo_operator: 'CON',
-                object_type: 'relationship',
-                object_label: `${role.name} → ${taskName}`
-            });
+                logActivityToXano({
+                    event_verb: 'Link Connection',
+                    eo_operator: 'CON',
+                    object_type: 'relationship',
+                    object_label: `${role.name} → ${taskName}`
+                });
+            }
 
-            // 4. If person selected, assign to role (Person INS Role)
-            if (person) {
+            // 4. If person selected and role selected, assign person to role (Person INS Role)
+            if (person && role) {
                 const existingAssignment = relationships.find(r =>
                     r.subject === person.id &&
                     r.predicate === 'INS' &&
@@ -25702,7 +25712,7 @@ John Doe,Engineering,john@example.com"
 
                 <div class="hero-task-row">
                     <div class="hero-task-input-group">
-                        <label class="hero-task-label">Assign to Role</label>
+                        <label class="hero-task-label">Assign to Role (Optional)</label>
                         <div class="hero-task-select-wrapper">
                             <select id="heroTaskRole" class="hero-task-select" onchange="updateHeroTaskPreview()">
                                 <option value="">Select a role...</option>
