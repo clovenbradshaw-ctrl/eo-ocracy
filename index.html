@@ -7618,6 +7618,106 @@
             opacity: 1;
         }
 
+        /* Activity Feed Section Styles */
+        .activity-feed-section {
+            margin-top: 1rem;
+            border-top: 1px solid #E5DDD1;
+            padding-top: 1rem;
+        }
+
+        .activity-feed-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            cursor: pointer;
+            padding: 0.5rem;
+            border-radius: 6px;
+            transition: background 0.15s;
+        }
+
+        .activity-feed-header:hover {
+            background: #FAF7F5;
+        }
+
+        .activity-feed-title {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            font-weight: 600;
+            color: #6B5642;
+            font-size: 0.85rem;
+        }
+
+        .activity-feed-count {
+            background: #E8B86D;
+            color: white;
+            border-radius: 10px;
+            padding: 0.1rem 0.5rem;
+            font-size: 0.7rem;
+            font-weight: 600;
+        }
+
+        .activity-feed-toggle {
+            color: #8B6F47;
+            transition: transform 0.2s;
+        }
+
+        .activity-feed-section.collapsed .activity-feed-toggle {
+            transform: rotate(-90deg);
+        }
+
+        .activity-feed-list {
+            max-height: 200px;
+            overflow-y: auto;
+            margin-top: 0.5rem;
+        }
+
+        .activity-feed-section.collapsed .activity-feed-list {
+            display: none;
+        }
+
+        .activity-feed-empty {
+            text-align: center;
+            padding: 1rem;
+            color: #8B6F47;
+            font-size: 0.8rem;
+        }
+
+        .activity-feed-item {
+            display: flex;
+            align-items: flex-start;
+            gap: 0.5rem;
+            padding: 0.5rem;
+            border-radius: 6px;
+            font-size: 0.8rem;
+            color: #5A4A3A;
+            transition: background 0.15s;
+        }
+
+        .activity-feed-item:hover {
+            background: #FAF7F5;
+        }
+
+        .activity-feed-item i {
+            color: #C88F4A;
+            font-size: 0.9rem;
+            margin-top: 0.1rem;
+        }
+
+        .activity-feed-item-content {
+            flex: 1;
+        }
+
+        .activity-feed-item-text {
+            line-height: 1.3;
+        }
+
+        .activity-feed-item-time {
+            font-size: 0.7rem;
+            color: #8B6F47;
+            margin-top: 0.15rem;
+        }
+
         /* Recycle Bin Section Styles */
         .recycle-bin-section {
             margin-top: 1rem;
@@ -8685,6 +8785,22 @@
         .task-board-empty p {
             font-size: 0.9rem;
             margin-bottom: 1.5rem;
+            line-height: 1.5;
+        }
+
+        .empty-state-hint {
+            margin-top: 1.5rem;
+            font-size: 0.8rem;
+            color: #A09080;
+        }
+
+        .empty-state-hint kbd {
+            padding: 0.2rem 0.4rem;
+            background: #F5F2ED;
+            border: 1px solid #E5DDD1;
+            border-radius: 4px;
+            font-family: inherit;
+            font-size: 0.75rem;
         }
 
         .task-board-empty .hero-task-btn {
@@ -10685,6 +10801,23 @@
             </div>
             <div id="entityList" class="entity-list"></div>
 
+            <!-- Activity Feed Section -->
+            <div class="activity-feed-section" id="activityFeedSection">
+                <div class="activity-feed-header" onclick="toggleActivityFeed()">
+                    <div class="activity-feed-title">
+                        <i class="ph ph-clock-counter-clockwise"></i>
+                        Recent Activity
+                        <span class="activity-feed-count" id="activityFeedCount">0</span>
+                    </div>
+                    <i class="ph ph-caret-down activity-feed-toggle"></i>
+                </div>
+                <div class="activity-feed-list" id="activityFeedList">
+                    <div class="activity-feed-empty">
+                        <p>No recent activity</p>
+                    </div>
+                </div>
+            </div>
+
             <!-- Recycle Bin Section -->
             <div class="recycle-bin-section">
                 <div class="recycle-bin-header">
@@ -12186,6 +12319,10 @@ John Doe,Engineering,john@example.com"
                 undoCount.textContent = undoHistory.length;
                 undoCount.style.display = undoHistory.length > 0 ? 'inline' : 'none';
             }
+            // Update activity feed
+            if (typeof renderActivityFeed === 'function') {
+                renderActivityFeed();
+            }
         }
 
         function updateRedoButton() {
@@ -12858,12 +12995,16 @@ John Doe,Engineering,john@example.com"
             });
         }
 
-        // Keyboard shortcut for command palette
+        // Keyboard shortcuts
         document.addEventListener('keydown', function(e) {
-            // Cmd+K or Ctrl+K
+            // Ignore if user is typing in an input/textarea
+            const isTyping = e.target.tagName === 'INPUT' || e.target.tagName === 'TEXTAREA' || e.target.isContentEditable;
+
+            // Cmd+K or Ctrl+K - Command palette
             if ((e.metaKey || e.ctrlKey) && e.key === 'k') {
                 e.preventDefault();
                 openCommandPalette();
+                return;
             }
 
             // Handle command palette navigation
@@ -12888,8 +13029,75 @@ John Doe,Engineering,john@example.com"
                         executeCommand(action);
                     }
                 }
+                return;
+            }
+
+            // Skip shortcuts if typing
+            if (isTyping) return;
+
+            // Check if any modal is open
+            const modalOpen = document.querySelector('.modal-overlay.open, .entity-edit-modal-overlay.open, .delete-confirm-overlay.open');
+            if (modalOpen) return;
+
+            // Global shortcuts (when not typing)
+            switch(e.key.toLowerCase()) {
+                case 't':
+                    e.preventDefault();
+                    openHeroTaskModal();
+                    break;
+                case 'r':
+                    e.preventDefault();
+                    const roleName = prompt('Enter role name:');
+                    if (roleName && roleName.trim()) {
+                        createEntity('role', roleName.trim());
+                    }
+                    break;
+                case 'p':
+                    e.preventDefault();
+                    const personName = prompt('Enter person name:');
+                    if (personName && personName.trim()) {
+                        createEntity('person', personName.trim());
+                    }
+                    break;
+                case '1':
+                    e.preventDefault();
+                    switchView('tasks');
+                    break;
+                case '2':
+                    e.preventDefault();
+                    switchView('flow');
+                    break;
+                case '3':
+                    e.preventDefault();
+                    switchView('shape');
+                    break;
+                case '4':
+                    e.preventDefault();
+                    switchView('graph');
+                    break;
+                case '?':
+                    e.preventDefault();
+                    showKeyboardShortcuts();
+                    break;
             }
         });
+
+        // Show keyboard shortcuts help
+        function showKeyboardShortcuts() {
+            alert(`Keyboard Shortcuts:
+
+T - Create new task
+R - Create new role
+P - Create new person
+
+1 - Work view
+2 - Flow view
+3 - Shape view
+4 - Graph view
+
+Cmd/Ctrl + K - Command palette
+? - Show this help`);
+        }
 
         // How It Works modal
         function showHowItWorks() {
@@ -12898,6 +13106,74 @@ John Doe,Engineering,john@example.com"
 
         function closeHowItWorks() {
             document.getElementById('howItWorksOverlay').classList.remove('active');
+        }
+
+        // Activity Feed functions
+        function toggleActivityFeed() {
+            const section = document.getElementById('activityFeedSection');
+            section.classList.toggle('collapsed');
+        }
+
+        function renderActivityFeed() {
+            const list = document.getElementById('activityFeedList');
+            const countEl = document.getElementById('activityFeedCount');
+
+            // Get recent history items (last 10)
+            const recentActions = undoHistory.slice(-10).reverse();
+
+            if (recentActions.length === 0) {
+                list.innerHTML = '<div class="activity-feed-empty"><p>No recent activity</p></div>';
+                countEl.textContent = '0';
+                return;
+            }
+
+            countEl.textContent = recentActions.length;
+
+            let html = '';
+            recentActions.forEach(action => {
+                const icon = getActivityIcon(action.type);
+                const timeAgo = action.timestamp ? formatTimeAgo(action.timestamp) : 'just now';
+
+                html += `
+                    <div class="activity-feed-item">
+                        <i class="ph ${icon}"></i>
+                        <div class="activity-feed-item-content">
+                            <div class="activity-feed-item-text">${action.description || 'Action performed'}</div>
+                            <div class="activity-feed-item-time">${timeAgo}</div>
+                        </div>
+                    </div>
+                `;
+            });
+
+            list.innerHTML = html;
+        }
+
+        function getActivityIcon(actionType) {
+            const icons = {
+                'create': 'ph-plus-circle',
+                'delete': 'ph-trash',
+                'update': 'ph-pencil-simple',
+                'connect': 'ph-link',
+                'disconnect': 'ph-link-break',
+                'nest': 'ph-tree-structure',
+                'unnest': 'ph-arrow-up',
+                'assign': 'ph-user-plus',
+                'unassign': 'ph-user-minus'
+            };
+            return icons[actionType] || 'ph-clock-counter-clockwise';
+        }
+
+        function formatTimeAgo(timestamp) {
+            const now = Date.now();
+            const diff = now - timestamp;
+            const seconds = Math.floor(diff / 1000);
+            const minutes = Math.floor(seconds / 60);
+            const hours = Math.floor(minutes / 60);
+
+            if (seconds < 60) return 'just now';
+            if (minutes < 60) return `${minutes}m ago`;
+            if (hours < 24) return `${hours}h ago`;
+            return new Date(timestamp).toLocaleDateString();
         }
 
         // Show entity details - helper function to open entity modal without knowing the type
@@ -25362,10 +25638,13 @@ John Doe,Engineering,john@example.com"
                     <div class="task-board-empty">
                         <i class="ph ph-clipboard-text"></i>
                         <h3>No tasks yet</h3>
-                        <p>Create your first task to get started</p>
+                        <p>Start by creating a task. As you assign roles and people,<br>your organizational structure will emerge.</p>
                         <button class="hero-task-btn hero-task-btn-primary" onclick="openHeroTaskModal()" style="padding: 0.75rem 1.25rem;">
                             <i class="ph ph-plus"></i> Create Task
                         </button>
+                        <div class="empty-state-hint">
+                            <kbd>T</kbd> to create task · <kbd>Cmd+K</kbd> for commands
+                        </div>
                     </div>
                 `;
                 return;
