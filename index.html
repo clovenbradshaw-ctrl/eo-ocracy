@@ -413,6 +413,59 @@
             margin: 0.25rem 0;
         }
 
+        /* Softr User Identity Indicator */
+        .softr-user-indicator {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            background: rgba(255,255,255,0.15);
+            border: 1px solid rgba(255,255,255,0.3);
+            border-radius: 6px;
+            padding: 0.35rem 0.75rem;
+            color: white;
+            font-size: 0.8rem;
+            margin-right: 0.5rem;
+        }
+
+        .softr-user-indicator.no-user {
+            background: rgba(255,255,255,0.08);
+            border-color: rgba(255,255,255,0.15);
+            color: rgba(255,255,255,0.6);
+            font-style: italic;
+        }
+
+        .softr-user-indicator .user-avatar {
+            width: 22px;
+            height: 22px;
+            border-radius: 50%;
+            background: rgba(255,255,255,0.25);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 600;
+            font-size: 0.7rem;
+            text-transform: uppercase;
+        }
+
+        .softr-user-indicator.no-user .user-avatar {
+            background: rgba(255,255,255,0.1);
+        }
+
+        .softr-user-indicator .user-info {
+            display: flex;
+            flex-direction: column;
+            line-height: 1.2;
+        }
+
+        .softr-user-indicator .user-name {
+            font-weight: 500;
+        }
+
+        .softr-user-indicator .user-email {
+            font-size: 0.7rem;
+            opacity: 0.8;
+        }
+
         /* How It Works Modal */
         .how-it-works-overlay {
             position: fixed;
@@ -9283,6 +9336,16 @@
                 <i class="ph ph-spinner" style="animation: spin 1s linear infinite;"></i> Loading...
             </div>
             <div id="filterStatus" style="color: rgba(255,255,255,0.9); font-size: 0.875rem; margin-right: 0.5rem;"></div>
+            <!-- Softr User Identity Indicator -->
+            <div class="softr-user-indicator no-user" id="softrUserIndicator">
+                <div class="user-avatar">
+                    <i class="ph ph-user"></i>
+                </div>
+                <div class="user-info">
+                    <span class="user-name">No user detected</span>
+                    <span class="user-email">Embed on Softr to see user</span>
+                </div>
+            </div>
             <div class="view-toggle">
                 <button class="view-toggle-btn tasks-view-btn active" data-view="tasks" onclick="switchView('tasks')">
                     <i class="ph ph-kanban"></i> Work
@@ -10290,6 +10353,165 @@ John Doe,Engineering,john@example.com"
     </div>
 
     <script>
+        // ==========================================
+        // SOFTR USER IDENTITY
+        // ==========================================
+
+        // Softr Identity Service - detects and tracks user identity when embedded in Softr
+        const SoftrIdentity = {
+            currentUser: null,
+            isInitialized: false,
+
+            init() {
+                if (this.isInitialized) return;
+                this.isInitialized = true;
+
+                console.log('🔐 SoftrIdentity: Initializing...');
+
+                // Method 1: Listen for postMessage from Softr parent
+                window.addEventListener('message', this.handleMessage.bind(this));
+
+                // Method 2: Check URL parameters (fallback)
+                this.checkUrlParams();
+
+                // Method 3: Request user info from Softr parent (if in iframe)
+                if (window.parent !== window) {
+                    console.log('🔐 SoftrIdentity: Running in iframe, requesting user from parent...');
+                    this.requestUserFromParent();
+                }
+
+                // Update UI immediately with current state
+                this.updateUI();
+            },
+
+            handleMessage(event) {
+                // Accept messages from any Softr domain or parent
+                const data = event.data;
+
+                // Handle Softr user data (various formats Softr might use)
+                if (data && (data.type === 'softr:user' || data.type === 'user' || data.softrUser || data.user)) {
+                    console.log('🔐 SoftrIdentity: Received user data via postMessage', data);
+                    const userData = data.user || data.softrUser || data;
+                    this.setUser(userData);
+                }
+
+                // Handle Softr's logged_in_user format
+                if (data && data.logged_in_user) {
+                    console.log('🔐 SoftrIdentity: Received logged_in_user via postMessage', data);
+                    this.setUser(data.logged_in_user);
+                }
+            },
+
+            checkUrlParams() {
+                const params = new URLSearchParams(window.location.search);
+
+                // Check for Softr user params
+                const userId = params.get('softr_user_id') || params.get('user_id');
+                const userEmail = params.get('softr_user_email') || params.get('user_email') || params.get('email');
+                const userName = params.get('softr_user_name') || params.get('user_name') || params.get('name');
+
+                if (userId || userEmail || userName) {
+                    console.log('🔐 SoftrIdentity: Found user in URL params');
+                    this.setUser({
+                        id: userId,
+                        email: userEmail,
+                        name: userName,
+                        source: 'url_params'
+                    });
+                }
+            },
+
+            requestUserFromParent() {
+                // Ask parent frame for user info (Softr should respond)
+                try {
+                    window.parent.postMessage({ type: 'request:user', source: 'taskflow-app' }, '*');
+                    window.parent.postMessage({ type: 'softr:request-user', source: 'taskflow-app' }, '*');
+                } catch (e) {
+                    console.log('🔐 SoftrIdentity: Could not request user from parent', e);
+                }
+            },
+
+            setUser(userData) {
+                if (!userData) return;
+
+                this.currentUser = {
+                    id: userData.id || userData.record_id || userData.user_id || null,
+                    email: userData.email || userData.Email || null,
+                    name: userData.name || userData.Name || userData.full_name || userData.Full_Name || null,
+                    role: userData.role || userData.Role || null,
+                    // Store all original data for potential future use
+                    _raw: userData,
+                    _detectedAt: new Date().toISOString()
+                };
+
+                console.log('🔐 SoftrIdentity: User set:', this.currentUser);
+
+                // Update UI
+                this.updateUI();
+
+                // Dispatch custom event for other parts of app
+                document.dispatchEvent(new CustomEvent('softr:user:ready', {
+                    detail: this.currentUser
+                }));
+            },
+
+            updateUI() {
+                const indicator = document.getElementById('softrUserIndicator');
+                if (!indicator) return;
+
+                if (this.currentUser && (this.currentUser.name || this.currentUser.email)) {
+                    // User detected - show their info
+                    indicator.classList.remove('no-user');
+
+                    const name = this.currentUser.name || 'User';
+                    const email = this.currentUser.email || '';
+                    const initials = this.getInitials(name, email);
+
+                    indicator.innerHTML = `
+                        <div class="user-avatar">${initials}</div>
+                        <div class="user-info">
+                            <span class="user-name">${this.escapeHtml(name)}</span>
+                            ${email ? `<span class="user-email">${this.escapeHtml(email)}</span>` : ''}
+                        </div>
+                    `;
+                } else {
+                    // No user detected
+                    indicator.classList.add('no-user');
+                    indicator.innerHTML = `
+                        <div class="user-avatar"><i class="ph ph-user"></i></div>
+                        <div class="user-info">
+                            <span class="user-name">No user detected</span>
+                            <span class="user-email">Embed on Softr to see user</span>
+                        </div>
+                    `;
+                }
+            },
+
+            getInitials(name, email) {
+                if (name && name !== 'User') {
+                    const parts = name.trim().split(/\s+/);
+                    if (parts.length >= 2) {
+                        return (parts[0][0] + parts[parts.length - 1][0]).toUpperCase();
+                    }
+                    return name.substring(0, 2).toUpperCase();
+                }
+                if (email) {
+                    return email.substring(0, 2).toUpperCase();
+                }
+                return '?';
+            },
+
+            escapeHtml(text) {
+                const div = document.createElement('div');
+                div.textContent = text;
+                return div.innerHTML;
+            },
+
+            getUser() {
+                return this.currentUser;
+            }
+        };
+
         // ==========================================
         // WORKSPACE MANAGEMENT
         // ==========================================
@@ -23674,6 +23896,9 @@ John Doe,Engineering,john@example.com"
             console.log('🔧 Initializing Taskflow...');
             console.log('📍 Loading from:', window.location.protocol);
             console.log('🌐 D3.js loaded:', typeof d3 !== 'undefined');
+
+            // Initialize Softr user identity detection
+            SoftrIdentity.init();
             
             // Check if essential libraries loaded
             if (typeof d3 === 'undefined') {
