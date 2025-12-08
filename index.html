@@ -8439,6 +8439,470 @@
             min-width: 16px;
             text-align: center;
         }
+
+        /* ============================================
+           FLOW VIEW STYLES
+           ============================================ */
+
+        .flow-view {
+            display: none;
+            flex-direction: column;
+            height: 100%;
+            background: #FAF7F5;
+        }
+
+        .flow-view.active {
+            display: flex;
+        }
+
+        .flow-view-header {
+            padding: 1.5rem;
+            background: white;
+            border-bottom: 1px solid #E5DDD1;
+        }
+
+        .flow-view-title {
+            font-size: 1.25rem;
+            font-weight: 600;
+            color: #3D2E1F;
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+        }
+
+        .flow-view-title i {
+            color: #7B95A3;
+        }
+
+        .flow-view-subtitle {
+            font-size: 0.875rem;
+            color: #8B6F47;
+            margin-top: 0.25rem;
+        }
+
+        .flow-view-controls {
+            padding: 1rem 1.5rem;
+            background: white;
+            border-bottom: 1px solid #E5DDD1;
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+        }
+
+        .flow-view-search {
+            flex: 1;
+            max-width: 300px;
+            padding: 0.625rem 1rem;
+            border: 1px solid #E5DDD1;
+            border-radius: 6px;
+            font-size: 0.9rem;
+        }
+
+        .flow-view-search:focus {
+            outline: none;
+            border-color: #7B95A3;
+        }
+
+        .flow-view-content {
+            flex: 1;
+            overflow-y: auto;
+            padding: 1.5rem;
+        }
+
+        .flow-view-empty {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            height: 100%;
+            text-align: center;
+            color: #8B6F47;
+        }
+
+        .flow-view-empty i {
+            font-size: 4rem;
+            margin-bottom: 1rem;
+            color: #7B95A3;
+            opacity: 0.5;
+        }
+
+        .flow-view-empty h3 {
+            font-size: 1.25rem;
+            margin-bottom: 0.5rem;
+            color: #3D2E1F;
+        }
+
+        .flow-view-empty p {
+            font-size: 0.9rem;
+            margin-bottom: 1.5rem;
+            max-width: 400px;
+        }
+
+        .flow-view-list {
+            display: flex;
+            flex-direction: column;
+            gap: 1rem;
+        }
+
+        .workflow-card {
+            background: white;
+            border-radius: 12px;
+            border: 1px solid #E5DDD1;
+            overflow: hidden;
+            transition: all 0.2s;
+        }
+
+        .workflow-card:hover {
+            border-color: #7B95A3;
+            box-shadow: 0 4px 12px rgba(123, 149, 163, 0.15);
+        }
+
+        .workflow-card-header {
+            padding: 1.25rem;
+            border-bottom: 1px solid #E5DDD1;
+            cursor: pointer;
+        }
+
+        .workflow-card-title {
+            font-size: 1.1rem;
+            font-weight: 600;
+            color: #3D2E1F;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .workflow-card-title i {
+            color: #7B95A3;
+        }
+
+        .workflow-card-meta {
+            display: flex;
+            gap: 1rem;
+            margin-top: 0.5rem;
+            font-size: 0.8rem;
+            color: #8B6F47;
+        }
+
+        .workflow-card-body {
+            padding: 1.25rem;
+        }
+
+        .workflow-section {
+            margin-bottom: 1rem;
+        }
+
+        .workflow-section:last-child {
+            margin-bottom: 0;
+        }
+
+        .workflow-section-label {
+            font-size: 0.75rem;
+            color: #8B6F47;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            margin-bottom: 0.5rem;
+        }
+
+        .workflow-chips {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 0.5rem;
+        }
+
+        .workflow-chip {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.375rem;
+            padding: 0.375rem 0.75rem;
+            background: #FAF7F5;
+            border: 1px solid #E5DDD1;
+            border-radius: 16px;
+            font-size: 0.8rem;
+            color: #3D2E1F;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .workflow-chip:hover {
+            background: #F0EBE4;
+            border-color: #C88F4A;
+        }
+
+        .workflow-chip i {
+            font-size: 0.9rem;
+            color: #8B6F47;
+        }
+
+        .workflow-add-chip {
+            border-style: dashed;
+            color: #8B6F47;
+        }
+
+        .workflow-add-chip:hover {
+            background: #F5EFE6;
+            color: #C88F4A;
+        }
+
+        /* Workflow relationship builder */
+        .workflow-relationship-builder {
+            padding: 1rem;
+            background: #FAF7F5;
+            border-radius: 8px;
+            margin-top: 0.75rem;
+        }
+
+        .relationship-search-input {
+            width: 100%;
+            padding: 0.75rem 1rem;
+            border: 2px solid #E5DDD1;
+            border-radius: 8px;
+            font-size: 0.9rem;
+            margin-bottom: 0.75rem;
+        }
+
+        .relationship-search-input:focus {
+            outline: none;
+            border-color: #7B95A3;
+        }
+
+        .relationship-suggestions {
+            display: none;
+            background: white;
+            border: 1px solid #E5DDD1;
+            border-radius: 8px;
+            max-height: 200px;
+            overflow-y: auto;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+        }
+
+        .relationship-suggestions.active {
+            display: block;
+        }
+
+        .relationship-suggestion {
+            padding: 0.75rem 1rem;
+            cursor: pointer;
+            border-bottom: 1px solid #F5F2ED;
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+        }
+
+        .relationship-suggestion:last-child {
+            border-bottom: none;
+        }
+
+        .relationship-suggestion:hover {
+            background: #FAF7F5;
+        }
+
+        .relationship-suggestion-verb {
+            font-weight: 600;
+            color: #7B95A3;
+        }
+
+        .relationship-suggestion-desc {
+            color: #8B6F47;
+            font-size: 0.85rem;
+        }
+
+        /* ============================================
+           SHAPE VIEW STYLES
+           ============================================ */
+
+        .shape-view {
+            display: none;
+            flex-direction: column;
+            height: 100%;
+            background: #FAF7F5;
+        }
+
+        .shape-view.active {
+            display: flex;
+        }
+
+        .shape-view-header {
+            padding: 1.5rem;
+            background: white;
+            border-bottom: 1px solid #E5DDD1;
+        }
+
+        .shape-view-title {
+            font-size: 1.25rem;
+            font-weight: 600;
+            color: #3D2E1F;
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+        }
+
+        .shape-view-title i {
+            color: #C88F4A;
+        }
+
+        .shape-view-subtitle {
+            font-size: 0.875rem;
+            color: #8B6F47;
+            margin-top: 0.25rem;
+        }
+
+        .shape-view-content {
+            flex: 1;
+            overflow-y: auto;
+            padding: 1.5rem;
+        }
+
+        .shape-view-empty {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            height: 100%;
+            text-align: center;
+            color: #8B6F47;
+        }
+
+        .shape-view-empty i {
+            font-size: 4rem;
+            margin-bottom: 1rem;
+            color: #C88F4A;
+            opacity: 0.5;
+        }
+
+        .shape-view-empty h3 {
+            font-size: 1.25rem;
+            margin-bottom: 0.5rem;
+            color: #3D2E1F;
+        }
+
+        .shape-view-empty p {
+            font-size: 0.9rem;
+            margin-bottom: 1.5rem;
+            max-width: 400px;
+        }
+
+        .shape-tree {
+            display: flex;
+            flex-direction: column;
+            gap: 0.5rem;
+        }
+
+        .shape-node {
+            background: white;
+            border-radius: 8px;
+            border: 1px solid #E5DDD1;
+            overflow: hidden;
+        }
+
+        .shape-node-header {
+            padding: 0.75rem 1rem;
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+            cursor: pointer;
+            transition: background 0.2s;
+        }
+
+        .shape-node-header:hover {
+            background: #FAF7F5;
+        }
+
+        .shape-node-toggle {
+            width: 20px;
+            height: 20px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: #8B6F47;
+            transition: transform 0.2s;
+        }
+
+        .shape-node.expanded .shape-node-toggle {
+            transform: rotate(90deg);
+        }
+
+        .shape-node-icon {
+            width: 28px;
+            height: 28px;
+            border-radius: 6px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 0.9rem;
+        }
+
+        .shape-node-icon.unit { background: #FFF9F0; color: #C88F4A; }
+        .shape-node-icon.team { background: #F0F4F7; color: #7B95A3; }
+        .shape-node-icon.role { background: #F5F0E8; color: #8B6F47; }
+
+        .shape-node-name {
+            font-weight: 500;
+            color: #3D2E1F;
+            flex: 1;
+        }
+
+        .shape-node-count {
+            font-size: 0.75rem;
+            color: #8B6F47;
+            background: #F5F2ED;
+            padding: 0.25rem 0.5rem;
+            border-radius: 10px;
+        }
+
+        .shape-node-children {
+            display: none;
+            padding: 0 0.5rem 0.5rem 2.5rem;
+        }
+
+        .shape-node.expanded .shape-node-children {
+            display: block;
+        }
+
+        .shape-insights {
+            background: white;
+            border-radius: 12px;
+            border: 1px solid #E5DDD1;
+            padding: 1.25rem;
+            margin-bottom: 1rem;
+        }
+
+        .shape-insights-title {
+            font-size: 0.9rem;
+            font-weight: 600;
+            color: #3D2E1F;
+            margin-bottom: 0.75rem;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .shape-insights-title i {
+            color: #C88F4A;
+        }
+
+        .shape-insight-item {
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+            padding: 0.5rem 0;
+            border-bottom: 1px solid #F5F2ED;
+            font-size: 0.875rem;
+            color: #6B5642;
+        }
+
+        .shape-insight-item:last-child {
+            border-bottom: none;
+        }
+
+        .shape-insight-item i {
+            color: #8B6F47;
+        }
+
+        .shape-insight-value {
+            font-weight: 600;
+            color: #3D2E1F;
+        }
     </style>
 </head>
 <body>
@@ -8470,28 +8934,15 @@
             <div id="filterStatus" style="color: rgba(255,255,255,0.9); font-size: 0.875rem; margin-right: 0.5rem;"></div>
             <div class="view-toggle">
                 <button class="view-toggle-btn tasks-view-btn active" data-view="tasks" onclick="switchView('tasks')">
-                    <i class="ph ph-kanban"></i> Tasks
+                    <i class="ph ph-kanban"></i> Work
                     <span class="task-count-badge" id="taskCountBadge" style="display: none;">0</span>
                 </button>
-                <button class="view-toggle-btn" data-view="card" onclick="switchView('card')">
-                    <i class="ph ph-squares-four"></i> Cards
+                <button class="view-toggle-btn" data-view="flow" onclick="switchView('flow')">
+                    <i class="ph ph-flow-arrow"></i> Flow
                 </button>
-                <div class="view-toggle-more" id="viewToggleMore">
-                    <button class="view-toggle-btn view-more-btn" onclick="toggleMoreViews(event)">
-                        <i class="ph ph-dots-three"></i> More
-                    </button>
-                    <div class="view-toggle-dropdown" id="viewToggleDropdown">
-                        <button class="view-dropdown-item" data-view="tree" onclick="switchView('tree'); closeMoreViews()">
-                            <i class="ph ph-tree-structure"></i> Tree
-                        </button>
-                        <button class="view-dropdown-item" data-view="orgchart" onclick="switchView('orgchart'); closeMoreViews()">
-                            <i class="ph ph-flow-arrow"></i> Org Chart
-                        </button>
-                        <button class="view-dropdown-item" data-view="venn" onclick="switchView('venn'); closeMoreViews()">
-                            <i class="ph ph-circles-three"></i> Venn
-                        </button>
-                    </div>
-                </div>
+                <button class="view-toggle-btn" data-view="shape" onclick="switchView('shape')">
+                    <i class="ph ph-tree-structure"></i> Shape
+                </button>
             </div>
             <button class="undo-btn" id="undoBtn" onclick="undo()" disabled title="Nothing to undo">
                 <i class="ph ph-arrow-counter-clockwise"></i>
@@ -8795,12 +9246,12 @@
             <!-- Org Chart View -->
             <div id="orgchartView" class="orgchart-view"></div>
 
-            <!-- Task Board View -->
+            <!-- Task Board View (Work) -->
             <div id="taskBoardView" class="task-board-view">
                 <div class="task-board-header">
                     <div class="task-board-title">
                         <i class="ph ph-kanban"></i>
-                        <span>Tasks</span>
+                        <span>Work</span>
                     </div>
                     <div class="task-board-stats">
                         <div class="task-board-stat">
@@ -8824,6 +9275,44 @@
                     </button>
                 </div>
                 <div class="task-board-content" id="taskBoardContent">
+                    <!-- Populated dynamically -->
+                </div>
+            </div>
+
+            <!-- Flow View (Workflows - where relationships emerge) -->
+            <div id="flowView" class="flow-view">
+                <div class="flow-view-header">
+                    <div class="flow-view-title">
+                        <i class="ph ph-flow-arrow"></i>
+                        <span>Flow</span>
+                    </div>
+                    <div class="flow-view-subtitle">How work gets done</div>
+                </div>
+                <div class="flow-view-controls">
+                    <input type="text"
+                           id="flowViewSearch"
+                           class="flow-view-search"
+                           placeholder="Search workflows..."
+                           oninput="filterFlowView()">
+                    <button class="hero-task-btn hero-task-btn-primary" onclick="openCreateWorkflowModal()" style="padding: 0.625rem 1rem;">
+                        <i class="ph ph-plus"></i> New Workflow
+                    </button>
+                </div>
+                <div class="flow-view-content" id="flowViewContent">
+                    <!-- Populated dynamically -->
+                </div>
+            </div>
+
+            <!-- Shape View (Structure - what emerged) -->
+            <div id="shapeView" class="shape-view">
+                <div class="shape-view-header">
+                    <div class="shape-view-title">
+                        <i class="ph ph-tree-structure"></i>
+                        <span>Shape</span>
+                    </div>
+                    <div class="shape-view-subtitle">Structure that emerged from work</div>
+                </div>
+                <div class="shape-view-content" id="shapeViewContent">
                     <!-- Populated dynamically -->
                 </div>
             </div>
@@ -9093,30 +9582,30 @@
 
                 <!-- Modal Tabs -->
                 <div class="modal-tabs" id="modalTabs">
-                    <button class="modal-tab active" data-tab="connections" onclick="switchModalTab('connections')">
-                        <i class="ph ph-arrows-left-right"></i> Connections
-                    </button>
                     <button class="modal-tab" data-tab="structure" onclick="switchModalTab('structure')">
-                        <i class="ph ph-tree-structure"></i> Structure
+                        <i class="ph ph-tree-structure"></i> <span class="tab-label">Structure</span>
+                    </button>
+                    <button class="modal-tab" data-tab="connections" onclick="switchModalTab('connections')">
+                        <i class="ph ph-arrows-left-right"></i> <span class="tab-label">Related</span>
                     </button>
                     <button class="modal-tab" data-tab="connect" onclick="switchModalTab('connect')">
-                        <i class="ph ph-plus-circle"></i> Connect
+                        <i class="ph ph-plus-circle"></i> <span class="tab-label">Add</span>
                     </button>
                 </div>
 
-                <!-- Tab Content: Connections -->
-                <div class="modal-tab-content active" id="tabConnections">
-                    <div class="modal-section" id="modalActivities"></div>
-                </div>
-
-                <!-- Tab Content: Structure -->
+                <!-- Tab Content: Structure (parent/nested - for units/teams/roles) -->
                 <div class="modal-tab-content" id="tabStructure">
                     <div class="modal-section" id="modalNestUnder"></div>
                     <div class="modal-section" id="modalNested"></div>
                     <div class="modal-section" id="modalAddNested"></div>
                 </div>
 
-                <!-- Tab Content: Connect -->
+                <!-- Tab Content: Related (activities/relationships) -->
+                <div class="modal-tab-content" id="tabConnections">
+                    <div class="modal-section" id="modalActivities"></div>
+                </div>
+
+                <!-- Tab Content: Add (create connections) -->
                 <div class="modal-tab-content" id="tabConnect">
                     <div class="modal-section" id="modalAddActivity"></div>
                 </div>
@@ -10260,12 +10749,15 @@ John Doe,Engineering,john@example.com"
                 }
             });
 
+            // Hide all views
             document.getElementById('treeView').classList.remove('active');
             document.getElementById('cardView').classList.remove('active');
             document.getElementById('graphView').classList.remove('active');
             document.getElementById('vennView').classList.remove('active');
             document.getElementById('orgchartView').classList.remove('active');
             document.getElementById('taskBoardView').classList.remove('active');
+            document.getElementById('flowView').classList.remove('active');
+            document.getElementById('shapeView').classList.remove('active');
 
             if (view === 'tree') {
                 document.getElementById('treeView').classList.add('active');
@@ -10282,20 +10774,17 @@ John Doe,Engineering,john@example.com"
             } else if (view === 'tasks') {
                 document.getElementById('taskBoardView').classList.add('active');
                 renderTaskBoardView();
+            } else if (view === 'flow') {
+                document.getElementById('flowView').classList.add('active');
+                renderFlowView();
+            } else if (view === 'shape') {
+                document.getElementById('shapeView').classList.add('active');
+                renderShapeView();
             } else {
                 document.getElementById('graphView').classList.add('active');
                 setTimeout(() => updateGraph(), 100);
             }
 
-            // Also update dropdown items if the selected view is in the dropdown
-            document.querySelectorAll('.view-dropdown-item').forEach(item => {
-                item.classList.remove('active');
-                if (item.dataset.view === view) {
-                    item.classList.add('active');
-                    // Also highlight the "More" button when a dropdown view is active
-                    document.querySelector('.view-more-btn')?.classList.add('active');
-                }
-            });
         }
 
         // More views dropdown toggle
@@ -10796,10 +11285,15 @@ John Doe,Engineering,john@example.com"
             }
         }
 
-        // Update tabs visibility based on entity type
+        // Update tabs visibility and default based on entity type
         function updateModalTabsForEntityType(entityType) {
             const tabsContainer = document.getElementById('modalTabs');
             const isPerson = entityType === 'person';
+
+            // Get tab buttons
+            const structureTab = tabsContainer.querySelector('[data-tab="structure"]');
+            const connectionsTab = tabsContainer.querySelector('[data-tab="connections"]');
+            const connectTab = tabsContainer.querySelector('[data-tab="connect"]');
 
             if (isPerson) {
                 // Hide tabs for persons - they only have role assignment
@@ -10812,14 +11306,48 @@ John Doe,Engineering,john@example.com"
             } else {
                 // Show tabs for other entity types
                 tabsContainer.style.display = 'flex';
-                // Reset to Connections tab
-                switchModalTab('connections');
+
+                // Update tab labels based on entity type
+                const structureLabel = structureTab?.querySelector('.tab-label');
+                const connectionsLabel = connectionsTab?.querySelector('.tab-label');
+
+                // Show/hide tabs and set contextual labels
+                if (entityType === 'unit' || entityType === 'team' || entityType === 'role') {
+                    // Structure entities: show structure tab, call it "Structure"
+                    if (structureTab) structureTab.style.display = '';
+                    if (structureLabel) structureLabel.textContent = 'Structure';
+                    if (connectionsLabel) connectionsLabel.textContent = 'Work';
+                    // Default to structure tab
+                    switchModalTab('structure');
+                } else if (entityType === 'workflow') {
+                    // Workflows: hide structure tab, show related as "Process"
+                    if (structureTab) structureTab.style.display = 'none';
+                    if (connectionsLabel) connectionsLabel.textContent = 'Process';
+                    // Default to connections (process) tab
+                    switchModalTab('connections');
+                } else if (entityType === 'task') {
+                    // Tasks: hide structure tab, show related as "Details"
+                    if (structureTab) structureTab.style.display = 'none';
+                    if (connectionsLabel) connectionsLabel.textContent = 'Details';
+                    // Default to connections (details) tab
+                    switchModalTab('connections');
+                } else if (entityType === 'product') {
+                    // Products: hide structure tab, show related as "Usage"
+                    if (structureTab) structureTab.style.display = 'none';
+                    if (connectionsLabel) connectionsLabel.textContent = 'Usage';
+                    // Default to connections (usage) tab
+                    switchModalTab('connections');
+                } else {
+                    // Default behavior
+                    if (structureTab) structureTab.style.display = '';
+                    switchModalTab('structure');
+                }
             }
         }
 
         // Reset modal tabs to default state
         function resetModalTabs() {
-            switchModalTab('connections');
+            switchModalTab('structure');
         }
 
         // ========================================
@@ -21586,6 +22114,451 @@ John Doe,Engineering,john@example.com"
         function showTaskCardMenu(taskId) {
             // For now, show entity details
             showEntityDetails(taskId);
+        }
+
+        // ============================================
+        // NATURAL LANGUAGE → OPERATOR MAPPING
+        // ============================================
+
+        // Maps natural language verbs to EO operators
+        // Users search for verbs, system maps to operators internally
+        const verbToOperatorMap = {
+            // CON (Link/Connect) - most common for workflows
+            'involves': 'CON',
+            'uses': 'CON',
+            'requires': 'CON',
+            'includes': 'CON',
+            'connects': 'CON',
+            'links': 'CON',
+            'relates': 'CON',
+            'associates': 'CON',
+            'participates': 'CON',
+            'engages': 'CON',
+            'works with': 'CON',
+            'collaborates': 'CON',
+            'produces': 'CON',
+            'creates': 'CON',
+            'generates': 'CON',
+            'outputs': 'CON',
+            'delivers': 'CON',
+
+            // SUP (Balance/Oversee)
+            'oversees': 'SUP',
+            'manages': 'SUP',
+            'supervises': 'SUP',
+            'leads': 'SUP',
+            'directs': 'SUP',
+            'coordinates': 'SUP',
+            'balances': 'SUP',
+            'governs': 'SUP',
+            'controls': 'SUP',
+
+            // SYN (Merge/Combine)
+            'combines': 'SYN',
+            'merges': 'SYN',
+            'integrates': 'SYN',
+            'synthesizes': 'SYN',
+            'unifies': 'SYN',
+            'consolidates': 'SYN',
+            'brings together': 'SYN',
+
+            // SEG (Divide/Segment)
+            'divides': 'SEG',
+            'splits': 'SEG',
+            'breaks down': 'SEG',
+            'segments': 'SEG',
+            'separates': 'SEG',
+            'partitions': 'SEG',
+
+            // ALT (Shift/Alternate)
+            'alternates': 'ALT',
+            'switches': 'ALT',
+            'modifies': 'ALT',
+            'changes': 'ALT',
+            'shifts': 'ALT',
+            'transforms': 'ALT',
+            'adapts': 'ALT',
+
+            // REC (Loop/Reconfigure)
+            'loops': 'REC',
+            'iterates': 'REC',
+            'reconfigures': 'REC',
+            'repeats': 'REC',
+            'cycles': 'REC',
+            'recurses': 'REC',
+            'restructures': 'REC',
+
+            // DES (Define/Designate) - for structure
+            'defines': 'DES',
+            'designates': 'DES',
+            'describes': 'DES',
+            'assigns': 'DES',
+            'contains': 'DES',
+            'nests': 'DES',
+            'belongs to': 'DES',
+
+            // NUL (Notice/Remove)
+            'removes': 'NUL',
+            'deletes': 'NUL',
+            'nullifies': 'NUL',
+            'cancels': 'NUL',
+            'voids': 'NUL'
+        };
+
+        // Search verbs and return matching operators with descriptions
+        function searchRelationshipVerbs(searchTerm) {
+            const term = searchTerm.toLowerCase().trim();
+            if (!term) return [];
+
+            const matches = [];
+            for (const [verb, operatorCode] of Object.entries(verbToOperatorMap)) {
+                if (verb.includes(term)) {
+                    const operator = eoOperators[operatorCode];
+                    if (operator && !operator.deprecated) {
+                        matches.push({
+                            verb: verb,
+                            operator: operatorCode,
+                            label: operator.label,
+                            description: operator.description,
+                            color: operator.color
+                        });
+                    }
+                }
+            }
+
+            // Remove duplicates (same operator, keep first verb match)
+            const seen = new Set();
+            return matches.filter(m => {
+                if (seen.has(m.operator)) return false;
+                seen.add(m.operator);
+                return true;
+            }).slice(0, 6); // Limit results
+        }
+
+        // ============================================
+        // FLOW VIEW FUNCTIONS (Workflows)
+        // ============================================
+
+        function renderFlowView() {
+            const content = document.getElementById('flowViewContent');
+            const workflows = entities.workflow || [];
+            const searchTerm = (document.getElementById('flowViewSearch')?.value || '').toLowerCase();
+
+            // Filter workflows by search
+            const filteredWorkflows = workflows.filter(wf =>
+                !searchTerm || wf.name.toLowerCase().includes(searchTerm)
+            );
+
+            if (filteredWorkflows.length === 0) {
+                content.innerHTML = `
+                    <div class="flow-view-empty">
+                        <i class="ph ph-flow-arrow"></i>
+                        <h3>${workflows.length === 0 ? 'No workflows yet' : 'No matching workflows'}</h3>
+                        <p>${workflows.length === 0
+                            ? 'Workflows emerge when you notice repeatable patterns in your work. Create one to describe how work gets done.'
+                            : 'Try adjusting your search'}</p>
+                        ${workflows.length === 0 ? `
+                            <button class="hero-task-btn hero-task-btn-primary" onclick="openCreateWorkflowModal()">
+                                <i class="ph ph-plus"></i> Create Workflow
+                            </button>
+                        ` : ''}
+                    </div>
+                `;
+                return;
+            }
+
+            let html = '<div class="flow-view-list">';
+
+            filteredWorkflows.forEach(workflow => {
+                // Find connected roles (CON relationships where workflow is subject)
+                const connectedRoles = relationships
+                    .filter(r => r.subject === workflow.id && r.predicate === 'CON')
+                    .map(r => entities.role?.find(role => role.id === r.object))
+                    .filter(Boolean);
+
+                // Also find roles that connect TO the workflow
+                const rolesConnectingTo = relationships
+                    .filter(r => r.object === workflow.id && r.predicate === 'CON')
+                    .map(r => entities.role?.find(role => role.id === r.subject))
+                    .filter(Boolean);
+
+                const allRoles = [...new Set([...connectedRoles, ...rolesConnectingTo])];
+
+                // Find connected products
+                const connectedProducts = relationships
+                    .filter(r => r.subject === workflow.id && r.predicate === 'CON')
+                    .map(r => entities.product?.find(prod => prod.id === r.object))
+                    .filter(Boolean);
+
+                // Find tasks that follow this workflow
+                const workflowTasks = (entities.task || []).filter(t => t.followsWorkflowId === workflow.id);
+
+                html += `
+                    <div class="workflow-card" data-workflow-id="${workflow.id}">
+                        <div class="workflow-card-header" onclick="showEntityDetails('${workflow.id}')">
+                            <div class="workflow-card-title">
+                                <i class="ph ph-flow-arrow"></i>
+                                ${workflow.name}
+                            </div>
+                            <div class="workflow-card-meta">
+                                ${allRoles.length > 0 ? `<span><i class="ph ph-user-circle"></i> ${allRoles.length} role${allRoles.length !== 1 ? 's' : ''}</span>` : ''}
+                                ${connectedProducts.length > 0 ? `<span><i class="ph ph-package"></i> ${connectedProducts.length} output${connectedProducts.length !== 1 ? 's' : ''}</span>` : ''}
+                                ${workflowTasks.length > 0 ? `<span><i class="ph ph-file-text"></i> ${workflowTasks.length} task${workflowTasks.length !== 1 ? 's' : ''}</span>` : ''}
+                            </div>
+                        </div>
+                        <div class="workflow-card-body">
+                            ${allRoles.length > 0 ? `
+                                <div class="workflow-section">
+                                    <div class="workflow-section-label">Who's involved</div>
+                                    <div class="workflow-chips">
+                                        ${allRoles.map(role => `
+                                            <span class="workflow-chip" onclick="event.stopPropagation(); showEntityDetails('${role.id}')">
+                                                <i class="ph ph-user-circle"></i>
+                                                ${role.name}
+                                            </span>
+                                        `).join('')}
+                                        <span class="workflow-chip workflow-add-chip" onclick="event.stopPropagation(); openAddToWorkflow('${workflow.id}', 'role')">
+                                            <i class="ph ph-plus"></i> Add role
+                                        </span>
+                                    </div>
+                                </div>
+                            ` : `
+                                <div class="workflow-section">
+                                    <div class="workflow-section-label">Who's involved</div>
+                                    <div class="workflow-chips">
+                                        <span class="workflow-chip workflow-add-chip" onclick="event.stopPropagation(); openAddToWorkflow('${workflow.id}', 'role')">
+                                            <i class="ph ph-plus"></i> Add role
+                                        </span>
+                                    </div>
+                                </div>
+                            `}
+
+                            ${connectedProducts.length > 0 ? `
+                                <div class="workflow-section">
+                                    <div class="workflow-section-label">What gets produced</div>
+                                    <div class="workflow-chips">
+                                        ${connectedProducts.map(product => `
+                                            <span class="workflow-chip" onclick="event.stopPropagation(); showEntityDetails('${product.id}')">
+                                                <i class="ph ph-package"></i>
+                                                ${product.name}
+                                            </span>
+                                        `).join('')}
+                                        <span class="workflow-chip workflow-add-chip" onclick="event.stopPropagation(); openAddToWorkflow('${workflow.id}', 'product')">
+                                            <i class="ph ph-plus"></i> Add output
+                                        </span>
+                                    </div>
+                                </div>
+                            ` : `
+                                <div class="workflow-section">
+                                    <div class="workflow-section-label">What gets produced</div>
+                                    <div class="workflow-chips">
+                                        <span class="workflow-chip workflow-add-chip" onclick="event.stopPropagation(); openAddToWorkflow('${workflow.id}', 'product')">
+                                            <i class="ph ph-plus"></i> Add output
+                                        </span>
+                                    </div>
+                                </div>
+                            `}
+
+                            ${workflow.description ? `
+                                <div class="workflow-section">
+                                    <div class="workflow-section-label">Description</div>
+                                    <p style="font-size: 0.875rem; color: #6B5642; margin: 0;">${workflow.description}</p>
+                                </div>
+                            ` : ''}
+                        </div>
+                    </div>
+                `;
+            });
+
+            html += '</div>';
+            content.innerHTML = html;
+        }
+
+        function filterFlowView() {
+            renderFlowView();
+        }
+
+        // Open modal to add role/product to workflow
+        function openAddToWorkflow(workflowId, entityType) {
+            // For now, open the workflow entity modal on the connect tab
+            openEntityModal(workflowId, 'workflow');
+            setTimeout(() => {
+                switchModalTab('connect');
+            }, 100);
+        }
+
+        // Open create workflow modal
+        function openCreateWorkflowModal() {
+            // Use the standard entity creation with workflow type
+            selectedEntityType = 'workflow';
+
+            // Open the quick add modal or entity panel
+            const entityNameInput = document.getElementById('entityName');
+            if (entityNameInput) {
+                entityNameInput.value = '';
+                entityNameInput.focus();
+            }
+
+            // For now, open a simple prompt
+            const name = prompt('Workflow name:');
+            if (name && name.trim()) {
+                const workflow = {
+                    id: 'workflow' + Date.now(),
+                    name: name.trim(),
+                    type: 'workflow'
+                };
+                entities.workflow.push(workflow);
+                saveData();
+                renderFlowView();
+                showToast(`Created workflow: ${name.trim()}`);
+            }
+        }
+
+        // ============================================
+        // SHAPE VIEW FUNCTIONS (Structure)
+        // ============================================
+
+        function renderShapeView() {
+            const content = document.getElementById('shapeViewContent');
+
+            // Calculate structure insights
+            const unitCount = (entities.unit || []).length;
+            const teamCount = (entities.team || []).length;
+            const roleCount = (entities.role || []).length;
+            const workflowCount = (entities.workflow || []).length;
+            const taskCount = (entities.task || []).length;
+            const productCount = (entities.product || []).length;
+
+            // Build hierarchy from DES relationships
+            const rootUnits = (entities.unit || []).filter(unit => {
+                // Unit is root if nothing DES-connects to it
+                return !relationships.some(r => r.subject === unit.id && r.predicate === 'DES');
+            });
+
+            const hasStructure = unitCount > 0 || teamCount > 0 || roleCount > 0;
+
+            if (!hasStructure) {
+                content.innerHTML = `
+                    <div class="shape-view-empty">
+                        <i class="ph ph-tree-structure"></i>
+                        <h3>No structure yet</h3>
+                        <p>Structure emerges from work. As you create tasks and workflows, patterns will reveal the natural shape of your organization.</p>
+                        <button class="hero-task-btn hero-task-btn-secondary" onclick="switchView('tasks')">
+                            <i class="ph ph-kanban"></i> Start with Work
+                        </button>
+                    </div>
+                `;
+                return;
+            }
+
+            let html = '';
+
+            // Insights section
+            html += `
+                <div class="shape-insights">
+                    <div class="shape-insights-title">
+                        <i class="ph ph-lightbulb"></i>
+                        What emerged
+                    </div>
+                    <div class="shape-insight-item">
+                        <i class="ph ph-buildings"></i>
+                        <span class="shape-insight-value">${unitCount}</span> unit${unitCount !== 1 ? 's' : ''}
+                    </div>
+                    <div class="shape-insight-item">
+                        <i class="ph ph-users-three"></i>
+                        <span class="shape-insight-value">${teamCount}</span> team${teamCount !== 1 ? 's' : ''}
+                    </div>
+                    <div class="shape-insight-item">
+                        <i class="ph ph-user-circle"></i>
+                        <span class="shape-insight-value">${roleCount}</span> role${roleCount !== 1 ? 's' : ''}
+                    </div>
+                    ${workflowCount > 0 ? `
+                        <div class="shape-insight-item">
+                            <i class="ph ph-flow-arrow"></i>
+                            <span class="shape-insight-value">${workflowCount}</span> workflow${workflowCount !== 1 ? 's' : ''}
+                        </div>
+                    ` : ''}
+                </div>
+            `;
+
+            // Structure tree
+            html += '<div class="shape-tree">';
+
+            // Render units
+            if (unitCount > 0) {
+                (entities.unit || []).forEach(unit => {
+                    html += renderShapeNode(unit, 'unit');
+                });
+            }
+
+            // Orphan teams (not nested under units)
+            const orphanTeams = (entities.team || []).filter(team => {
+                return !relationships.some(r => r.subject === team.id && r.predicate === 'DES');
+            });
+            orphanTeams.forEach(team => {
+                html += renderShapeNode(team, 'team');
+            });
+
+            // Orphan roles (not nested under teams/units)
+            const orphanRoles = (entities.role || []).filter(role => {
+                return !relationships.some(r => r.subject === role.id && r.predicate === 'DES');
+            });
+            orphanRoles.forEach(role => {
+                html += renderShapeNode(role, 'role');
+            });
+
+            html += '</div>';
+
+            content.innerHTML = html;
+        }
+
+        function renderShapeNode(entity, type) {
+            // Find children (entities that DES this entity - meaning this is their parent)
+            const children = relationships
+                .filter(r => r.object === entity.id && r.predicate === 'DES')
+                .map(r => {
+                    // Find the entity
+                    for (const entityType of ['team', 'role', 'unit']) {
+                        const found = entities[entityType]?.find(e => e.id === r.subject);
+                        if (found) return { entity: found, type: entityType };
+                    }
+                    return null;
+                })
+                .filter(Boolean);
+
+            const hasChildren = children.length > 0;
+            const icon = type === 'unit' ? 'ph-buildings' : type === 'team' ? 'ph-users-three' : 'ph-user-circle';
+
+            let html = `
+                <div class="shape-node ${hasChildren ? '' : 'no-children'}" data-entity-id="${entity.id}">
+                    <div class="shape-node-header" onclick="${hasChildren ? `toggleShapeNode('${entity.id}')` : `showEntityDetails('${entity.id}')`}">
+                        ${hasChildren ? `
+                            <div class="shape-node-toggle">
+                                <i class="ph ph-caret-right"></i>
+                            </div>
+                        ` : '<div style="width: 20px;"></div>'}
+                        <div class="shape-node-icon ${type}">
+                            <i class="ph ${icon}"></i>
+                        </div>
+                        <span class="shape-node-name">${entity.name}</span>
+                        ${hasChildren ? `<span class="shape-node-count">${children.length}</span>` : ''}
+                    </div>
+                    ${hasChildren ? `
+                        <div class="shape-node-children">
+                            ${children.map(child => renderShapeNode(child.entity, child.type)).join('')}
+                        </div>
+                    ` : ''}
+                </div>
+            `;
+
+            return html;
+        }
+
+        function toggleShapeNode(entityId) {
+            const node = document.querySelector(`.shape-node[data-entity-id="${entityId}"]`);
+            if (node) {
+                node.classList.toggle('expanded');
+            }
         }
 
         // Keyboard shortcut for hero task modal
