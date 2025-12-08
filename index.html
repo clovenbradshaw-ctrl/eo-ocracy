@@ -22902,7 +22902,8 @@ John Doe,Engineering,john@example.com"
             }, 100);
 
             // Remove pulse animation from FAB after first use
-            document.querySelector('.task-fab').classList.remove('task-fab-pulse');
+            const fab = document.querySelector('.task-fab');
+            if (fab) fab.classList.remove('task-fab-pulse');
         }
 
         // Close the hero task modal
@@ -22965,7 +22966,7 @@ John Doe,Engineering,john@example.com"
             }
 
             // Add roles
-            entities.role.forEach(role => {
+            (entities.role || []).forEach(role => {
                 const option = document.createElement('option');
                 option.value = role.id;
                 option.textContent = role.name;
@@ -22973,7 +22974,7 @@ John Doe,Engineering,john@example.com"
             });
 
             // Add people
-            entities.person.forEach(person => {
+            (entities.person || []).forEach(person => {
                 const option = document.createElement('option');
                 option.value = person.id;
                 option.textContent = person.name;
