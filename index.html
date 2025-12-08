@@ -17076,6 +17076,10 @@ Cmd/Ctrl + K - Command palette
         let xanoActivityUploadCount = 0;
         let xanoLastSuccessfulConnection = null;
 
+        // Agent registry - stores user details once, activities only reference agent_id
+        const declaredAgents = new Map(); // Map<agent_id, {name, email, declaredAt}>
+        let agentDeclarationInProgress = null; // Promise to prevent duplicate declarations
+
         // Update Xano status indicator UI
         function updateXanoStatusIndicator(status, activityCount = null) {
             const indicator = document.getElementById('xanoStatusIndicator');
@@ -17244,6 +17248,67 @@ Cmd/Ctrl + K - Command palette
             }, 60000);
         }
 
+        // Ensure agent is declared in the activity store (user details stored once)
+        async function ensureAgentDeclared(softrUser, agentId, agentName, agentEmail) {
+            // Skip if already declared or anonymous
+            if (declaredAgents.has(agentId) || agentId.startsWith('anon_')) {
+                return;
+            }
+
+            // Prevent duplicate declarations if one is in progress
+            if (agentDeclarationInProgress) {
+                await agentDeclarationInProgress;
+                if (declaredAgents.has(agentId)) return;
+            }
+
+            // Mark declaration in progress
+            agentDeclarationInProgress = (async () => {
+                try {
+                    const payload = {
+                        app_id: APP_ID,
+                        entity_id: agentId,
+                        event_type: 'AGENT_DECLARED',
+                        data: {
+                            event_verb: 'Declare Agent',
+                            eo_operator: 'AGENT_DECLARED',
+                            agent_type: softrUser ? 'softr_user' : 'anonymous',
+                            agent_id: agentId,
+                            agent_name: agentName,
+                            agent_email: agentEmail,
+                            object_type: 'agent',
+                            object_id: agentId,
+                            object_label: agentName
+                        }
+                    };
+
+                    console.log('📝 Declaring agent to Xano:', agentId, agentName);
+
+                    const response = await fetch(`${XANO_BASE_URL}/activity_store`, {
+                        method: 'POST',
+                        mode: 'cors',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify(payload)
+                    });
+
+                    if (response.ok) {
+                        declaredAgents.set(agentId, {
+                            name: agentName,
+                            email: agentEmail,
+                            declaredAt: new Date().toISOString()
+                        });
+                        console.log('✅ Agent declared:', agentId);
+                        xanoActivityUploadCount++;
+                        updateXanoStatusIndicator('connected', xanoActivityUploadCount);
+                    }
+                } catch (error) {
+                    console.error('❌ Error declaring agent:', error);
+                }
+            })();
+
+            await agentDeclarationInProgress;
+            agentDeclarationInProgress = null;
+        }
+
         async function logActivityToXano(activity, showToast = true) {
             const activityLabel = activity.object_label || activity.object_type || 'item';
             const eventType = activity.eo_operator || activity.event_verb || 'action';
@@ -17255,8 +17320,11 @@ Cmd/Ctrl + K - Command palette
             const agentEmail = softrUser?.email || null;
 
             try {
+                // Ensure agent is declared (user details stored once, not repeated in every activity)
+                await ensureAgentDeclared(softrUser, agentId, agentName, agentEmail);
+
                 // New schema: app_id, data (json), entity_id, event_type
-                // Include Softr user data for proper attribution
+                // Only include agent_id - user details are in AGENT_DECLARED activity
                 const payload = {
                     app_id: APP_ID,
                     entity_id: activity.object_id || '',
@@ -17266,9 +17334,6 @@ Cmd/Ctrl + K - Command palette
                         eo_operator: activity.eo_operator,
                         agent_type: softrUser ? 'softr_user' : 'anonymous',
                         agent_id: agentId,
-                        agent_name: agentName,
-                        agent_email: agentEmail,
-                        softr_user_id: softrUser?.id || null,
                         object_type: activity.object_type,
                         object_id: activity.object_id,
                         object_label: activity.object_label,
@@ -17341,8 +17406,8 @@ Cmd/Ctrl + K - Command palette
                 // Update connection status on successful fetch
                 updateXanoStatusIndicator('connected', xanoActivityUploadCount);
 
-                // Filter by app_id and transform to include nested data
-                return activities
+                // Filter by app_id and parse data
+                const parsedActivities = activities
                     .filter(a => a.app_id === APP_ID)
                     .map(a => {
                         // Parse data if it's a string (Xano returns JSON as stringified text)
@@ -17370,6 +17435,35 @@ Cmd/Ctrl + K - Command palette
                             _raw: a
                         };
                     });
+
+                // Build agent registry from AGENT_DECLARED activities
+                for (const activity of parsedActivities) {
+                    if (activity.eo_operator === 'AGENT_DECLARED' || activity.event_type === 'AGENT_DECLARED') {
+                        const agentId = activity.agent_id;
+                        if (agentId && !declaredAgents.has(agentId)) {
+                            declaredAgents.set(agentId, {
+                                name: activity.agent_name,
+                                email: activity.agent_email,
+                                declaredAt: activity.created_at
+                            });
+                        }
+                    }
+                }
+
+                console.log('📋 Loaded', declaredAgents.size, 'agents from activity history');
+
+                // Enrich activities with agent info from registry (for display purposes)
+                return parsedActivities.map(a => {
+                    if (a.agent_id && declaredAgents.has(a.agent_id)) {
+                        const agentInfo = declaredAgents.get(a.agent_id);
+                        return {
+                            ...a,
+                            agent_name: a.agent_name || agentInfo.name,
+                            agent_email: a.agent_email || agentInfo.email
+                        };
+                    }
+                    return a;
+                });
             } catch (error) {
                 console.error('Error fetching activities from Xano:', error);
                 updateXanoStatusIndicator('disconnected');
