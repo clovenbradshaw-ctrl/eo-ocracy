@@ -11014,7 +11014,7 @@ John Doe,Engineering,john@example.com"
 
                 console.log('🔐 SoftrIdentity: Initializing...');
 
-                // Method 1: Check window.logged_in_user (Softr's primary method)
+                // Method 1: Check window.logged_in_user immediately (Softr's primary method)
                 this.checkSoftrGlobalUser();
 
                 // Method 2: Listen for postMessage from Softr parent
@@ -11031,7 +11031,19 @@ John Doe,Engineering,john@example.com"
                     this.checkParentSoftrUser();
                 }
 
-                // Method 5: Poll for Softr user (it may load async)
+                // Method 5: Check again on window load (Softr may inject user data late)
+                window.addEventListener('load', () => {
+                    if (!this.currentUser) {
+                        console.log('🔐 SoftrIdentity: Window loaded, checking for user again...');
+                        if (this.checkSoftrGlobalUser()) {
+                            console.log('🔐 SoftrIdentity: Found user on window load');
+                        } else if (this.checkParentSoftrUser()) {
+                            console.log('🔐 SoftrIdentity: Found user in parent on window load');
+                        }
+                    }
+                });
+
+                // Method 6: Poll for Softr user (it may load async)
                 this.startUserPolling();
 
                 // Update UI immediately with current state
@@ -11078,10 +11090,11 @@ John Doe,Engineering,john@example.com"
 
             startUserPolling() {
                 // Softr user data may load asynchronously, poll for it
+                // Use fast polling (100ms) like Softr's own detection patterns
                 if (this.currentUser) return; // Already have user
 
                 let attempts = 0;
-                const maxAttempts = 10;
+                const maxAttempts = 30; // 30 attempts × 100ms = 3 seconds
                 const pollInterval = setInterval(() => {
                     attempts++;
 
@@ -11092,21 +11105,23 @@ John Doe,Engineering,john@example.com"
 
                     // Check global variables again
                     if (this.checkSoftrGlobalUser()) {
+                        console.log(`🔐 SoftrIdentity: Found user after ${attempts} polling attempt(s)`);
                         clearInterval(pollInterval);
                         return;
                     }
 
-                    // Try parent again
+                    // Try parent again (same-origin only)
                     if (this.checkParentSoftrUser()) {
+                        console.log(`🔐 SoftrIdentity: Found user in parent after ${attempts} polling attempt(s)`);
                         clearInterval(pollInterval);
                         return;
                     }
 
                     if (attempts >= maxAttempts) {
                         clearInterval(pollInterval);
-                        console.log('🔐 SoftrIdentity: User polling complete, no user found');
+                        console.log('🔐 SoftrIdentity: User polling complete, no user found after 3 seconds');
                     }
-                }, 500); // Check every 500ms for 5 seconds total
+                }, 100); // Check every 100ms (fast polling like Softr's patterns)
             },
 
             handleMessage(event) {
