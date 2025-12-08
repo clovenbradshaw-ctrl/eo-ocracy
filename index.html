@@ -4,13 +4,69 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Taskflow - Work Shapes Structure</title>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/d3/7.8.5/d3.min.js"></script>
+    <script>
+        // D3.js loader with fallback CDNs for Softr iframe compatibility
+        (function() {
+            var d3Sources = [
+                'https://cdnjs.cloudflare.com/ajax/libs/d3/7.8.5/d3.min.js',
+                'https://cdn.jsdelivr.net/npm/d3@7.8.5/dist/d3.min.js',
+                'https://unpkg.com/d3@7.8.5/dist/d3.min.js'
+            ];
+            var loaded = false;
+
+            function loadScript(src, callback) {
+                var script = document.createElement('script');
+                script.src = src;
+                script.async = false;
+                script.onload = function() {
+                    if (typeof d3 !== 'undefined') {
+                        loaded = true;
+                        console.log('✅ D3.js loaded from:', src);
+                        callback(true);
+                    } else {
+                        callback(false);
+                    }
+                };
+                script.onerror = function() {
+                    console.warn('⚠️ Failed to load D3.js from:', src);
+                    callback(false);
+                };
+                document.head.appendChild(script);
+            }
+
+            function tryNextSource(index) {
+                if (loaded || index >= d3Sources.length) {
+                    if (!loaded) {
+                        console.error('❌ Failed to load D3.js from all CDN sources');
+                    }
+                    return;
+                }
+                loadScript(d3Sources[index], function(success) {
+                    if (!success) {
+                        tryNextSource(index + 1);
+                    }
+                });
+            }
+
+            // Start loading from first source
+            tryNextSource(0);
+        })();
+    </script>
     <script src="https://unpkg.com/@phosphor-icons/web"></script>
     <style>
-        * {
+        /* CSS Reset - Softr Embed Compatible */
+        *, *::before, *::after {
             margin: 0;
             padding: 0;
             box-sizing: border-box;
+        }
+
+        /* Iframe isolation - prevent Softr parent styles from affecting us */
+        html {
+            font-size: 16px;
+            -webkit-text-size-adjust: 100%;
+            -ms-text-size-adjust: 100%;
+            line-height: 1.15;
         }
 
         body {
@@ -18,6 +74,15 @@
             background: #F5F2ED;
             color: #3D2E1F;
             overflow: hidden;
+            min-height: 100vh;
+            width: 100%;
+            position: relative;
+            /* Prevent inherited styles from Softr */
+            text-align: left;
+            direction: ltr;
+            text-transform: none;
+            letter-spacing: normal;
+            word-spacing: normal;
         }
 
         .header {
@@ -10797,20 +10862,99 @@ John Doe,Engineering,john@example.com"
 
                 console.log('🔐 SoftrIdentity: Initializing...');
 
-                // Method 1: Listen for postMessage from Softr parent
+                // Method 1: Check window.logged_in_user (Softr's primary method)
+                this.checkSoftrGlobalUser();
+
+                // Method 2: Listen for postMessage from Softr parent
                 window.addEventListener('message', this.handleMessage.bind(this));
 
-                // Method 2: Check URL parameters (fallback)
+                // Method 3: Check URL parameters (fallback)
                 this.checkUrlParams();
 
-                // Method 3: Request user info from Softr parent (if in iframe)
+                // Method 4: Request user info from Softr parent (if in iframe)
                 if (window.parent !== window) {
                     console.log('🔐 SoftrIdentity: Running in iframe, requesting user from parent...');
                     this.requestUserFromParent();
+                    // Also try to access parent's logged_in_user after a short delay
+                    this.checkParentSoftrUser();
                 }
+
+                // Method 5: Poll for Softr user (it may load async)
+                this.startUserPolling();
 
                 // Update UI immediately with current state
                 this.updateUI();
+            },
+
+            checkSoftrGlobalUser() {
+                // Softr exposes logged-in user data on window.logged_in_user
+                if (window.logged_in_user) {
+                    console.log('🔐 SoftrIdentity: Found window.logged_in_user', window.logged_in_user);
+                    this.setUser(window.logged_in_user);
+                    return true;
+                }
+                // Also check alternative Softr global variables
+                if (window.softr && window.softr.user) {
+                    console.log('🔐 SoftrIdentity: Found window.softr.user', window.softr.user);
+                    this.setUser(window.softr.user);
+                    return true;
+                }
+                return false;
+            },
+
+            checkParentSoftrUser() {
+                // Try to access parent window's logged_in_user (same-origin only)
+                try {
+                    if (window.parent && window.parent !== window) {
+                        if (window.parent.logged_in_user) {
+                            console.log('🔐 SoftrIdentity: Found parent.logged_in_user', window.parent.logged_in_user);
+                            this.setUser(window.parent.logged_in_user);
+                            return true;
+                        }
+                        if (window.parent.softr && window.parent.softr.user) {
+                            console.log('🔐 SoftrIdentity: Found parent.softr.user', window.parent.softr.user);
+                            this.setUser(window.parent.softr.user);
+                            return true;
+                        }
+                    }
+                } catch (e) {
+                    // Cross-origin access blocked - this is expected for cross-origin iframes
+                    console.log('🔐 SoftrIdentity: Cannot access parent (cross-origin)', e.message);
+                }
+                return false;
+            },
+
+            startUserPolling() {
+                // Softr user data may load asynchronously, poll for it
+                if (this.currentUser) return; // Already have user
+
+                let attempts = 0;
+                const maxAttempts = 10;
+                const pollInterval = setInterval(() => {
+                    attempts++;
+
+                    if (this.currentUser) {
+                        clearInterval(pollInterval);
+                        return;
+                    }
+
+                    // Check global variables again
+                    if (this.checkSoftrGlobalUser()) {
+                        clearInterval(pollInterval);
+                        return;
+                    }
+
+                    // Try parent again
+                    if (this.checkParentSoftrUser()) {
+                        clearInterval(pollInterval);
+                        return;
+                    }
+
+                    if (attempts >= maxAttempts) {
+                        clearInterval(pollInterval);
+                        console.log('🔐 SoftrIdentity: User polling complete, no user found');
+                    }
+                }, 500); // Check every 500ms for 5 seconds total
             },
 
             handleMessage(event) {
