@@ -1,0 +1,330 @@
+<!--
+  Softr Embed Bridge for Taskflow App
+
+  Copy this entire code into a Softr Custom Code block.
+  Replace YOUR_GITHUB_PAGES_URL with your actual GitHub Pages URL.
+
+  This bridge:
+  1. Embeds your Taskflow app in an iframe
+  2. Detects the Softr logged-in user
+  3. Sends user data to your app via postMessage
+  4. Shows connection status (optional debug mode)
+-->
+
+<style>
+  .taskflow-embed-container {
+    position: relative;
+    width: 100%;
+    height: 100%;
+    min-height: 600px;
+    background: #f5f5f5;
+  }
+
+  .taskflow-embed-container iframe {
+    width: 100%;
+    height: 100%;
+    min-height: 600px;
+    border: none;
+    border-radius: 8px;
+    background: white;
+  }
+
+  .taskflow-debug-panel {
+    position: fixed;
+    bottom: 20px;
+    right: 20px;
+    background: rgba(0, 0, 0, 0.85);
+    color: #fff;
+    padding: 12px 16px;
+    border-radius: 8px;
+    font-family: monospace;
+    font-size: 12px;
+    z-index: 10000;
+    max-width: 300px;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.3);
+  }
+
+  .taskflow-debug-panel h4 {
+    margin: 0 0 8px 0;
+    font-size: 13px;
+    color: #4fc3f7;
+  }
+
+  .taskflow-debug-panel .status-row {
+    display: flex;
+    justify-content: space-between;
+    margin: 4px 0;
+    padding: 2px 0;
+    border-bottom: 1px solid rgba(255,255,255,0.1);
+  }
+
+  .taskflow-debug-panel .status-label {
+    color: #aaa;
+  }
+
+  .taskflow-debug-panel .status-value {
+    color: #4caf50;
+  }
+
+  .taskflow-debug-panel .status-value.error {
+    color: #f44336;
+  }
+
+  .taskflow-debug-panel .status-value.pending {
+    color: #ffb74d;
+  }
+</style>
+
+<div class="taskflow-embed-container">
+  <iframe
+    id="taskflow-iframe"
+    src="https://YOUR_GITHUB_PAGES_URL/index.html"
+    allow="clipboard-read; clipboard-write"
+    loading="lazy"
+  ></iframe>
+</div>
+
+<!-- Debug panel (only visible with ?debug=true in URL) -->
+<div class="taskflow-debug-panel" id="taskflow-debug" style="display: none;">
+  <h4>Taskflow Bridge Debug</h4>
+  <div class="status-row">
+    <span class="status-label">User detected:</span>
+    <span class="status-value pending" id="debug-user-status">Checking...</span>
+  </div>
+  <div class="status-row">
+    <span class="status-label">User sent:</span>
+    <span class="status-value pending" id="debug-sent-status">Waiting...</span>
+  </div>
+  <div class="status-row">
+    <span class="status-label">App ready:</span>
+    <span class="status-value pending" id="debug-app-status">Waiting...</span>
+  </div>
+  <div class="status-row">
+    <span class="status-label">Xano:</span>
+    <span class="status-value pending" id="debug-xano-status">Unknown</span>
+  </div>
+</div>
+
+<script>
+(function() {
+  'use strict';
+
+  // Configuration
+  const CONFIG = {
+    retryInterval: 2000,    // How often to retry sending user data (ms)
+    maxRetries: 10,         // Maximum retry attempts
+    pollInterval: 100,      // How often to poll for Softr user (ms)
+    pollTimeout: 5000       // How long to poll for Softr user (ms)
+  };
+
+  // State
+  const state = {
+    softrUser: null,
+    appReady: false,
+    userSent: false,
+    userReceived: false,
+    xanoStatus: 'unknown',
+    retryCount: 0
+  };
+
+  // Debug mode
+  const urlParams = new URLSearchParams(window.location.search);
+  const debugMode = urlParams.get('debug') === 'true';
+
+  if (debugMode) {
+    document.getElementById('taskflow-debug').style.display = 'block';
+  }
+
+  function updateDebug(field, value, status = 'success') {
+    if (!debugMode) return;
+    const el = document.getElementById('debug-' + field + '-status');
+    if (el) {
+      el.textContent = value;
+      el.className = 'status-value ' + status;
+    }
+  }
+
+  // Get iframe reference
+  const iframe = document.getElementById('taskflow-iframe');
+
+  // Detect Softr user
+  function getSoftrUser() {
+    // Method 1: window.logged_in_user (Softr's standard)
+    if (window.logged_in_user) {
+      return window.logged_in_user;
+    }
+
+    // Method 2: window.softr.user
+    if (window.softr && window.softr.user) {
+      return window.softr.user;
+    }
+
+    // Method 3: Check for Softr's user object in different locations
+    if (typeof Softr !== 'undefined' && Softr.user) {
+      return Softr.user;
+    }
+
+    return null;
+  }
+
+  // Send user data to iframe
+  function sendUserToApp(user) {
+    if (!iframe || !iframe.contentWindow) return false;
+
+    try {
+      const message = {
+        type: 'softr-bridge:user',
+        source: 'softr-bridge',
+        user: user,
+        timestamp: Date.now()
+      };
+
+      iframe.contentWindow.postMessage(message, '*');
+      console.log('[Softr Bridge] Sent user to app:', user?.email || user?.id);
+      state.userSent = true;
+      updateDebug('sent', 'Yes', 'success');
+      return true;
+    } catch (e) {
+      console.error('[Softr Bridge] Failed to send user:', e);
+      return false;
+    }
+  }
+
+  // Handle messages from iframe
+  window.addEventListener('message', function(event) {
+    const data = event.data;
+    if (!data || !data.source || data.source !== 'taskflow-app') return;
+
+    console.log('[Softr Bridge] Received from app:', data.type);
+
+    switch (data.type) {
+      case 'taskflow:ready':
+        state.appReady = true;
+        updateDebug('app', 'Ready', 'success');
+        // Send user data when app signals ready
+        if (state.softrUser && !state.userReceived) {
+          sendUserToApp(state.softrUser);
+        }
+        break;
+
+      case 'taskflow:user-received':
+        state.userReceived = true;
+        updateDebug('sent', 'Confirmed', 'success');
+        break;
+
+      case 'taskflow:xano-status':
+        state.xanoStatus = data.status;
+        updateDebug('xano', data.status === 'connected' ? 'Connected' : 'Offline',
+                    data.status === 'connected' ? 'success' : 'error');
+        break;
+
+      case 'taskflow:status':
+        if (data.xanoStatus) {
+          state.xanoStatus = data.xanoStatus;
+          updateDebug('xano', data.xanoStatus === 'connected' ? 'Connected' : 'Offline',
+                      data.xanoStatus === 'connected' ? 'success' : 'error');
+        }
+        break;
+
+      case 'request:user':
+      case 'softr:request-user':
+        // App is requesting user data
+        if (state.softrUser) {
+          sendUserToApp(state.softrUser);
+        }
+        break;
+    }
+  });
+
+  // Poll for Softr user
+  function startUserPolling() {
+    let attempts = 0;
+    const maxAttempts = CONFIG.pollTimeout / CONFIG.pollInterval;
+
+    const pollInterval = setInterval(function() {
+      attempts++;
+
+      const user = getSoftrUser();
+      if (user) {
+        clearInterval(pollInterval);
+        state.softrUser = user;
+        console.log('[Softr Bridge] Found Softr user:', user.email || user.id);
+        updateDebug('user', user.email || user.id || 'Found', 'success');
+
+        // Send to app if ready
+        if (state.appReady || iframe.contentWindow) {
+          sendUserToApp(user);
+        }
+        return;
+      }
+
+      if (attempts >= maxAttempts) {
+        clearInterval(pollInterval);
+        console.log('[Softr Bridge] No Softr user found after polling');
+        updateDebug('user', 'Not found', 'error');
+      }
+    }, CONFIG.pollInterval);
+  }
+
+  // Retry sending user data periodically
+  function startRetryLoop() {
+    const retryInterval = setInterval(function() {
+      state.retryCount++;
+
+      if (state.userReceived || state.retryCount >= CONFIG.maxRetries) {
+        clearInterval(retryInterval);
+        return;
+      }
+
+      // Re-check for user in case it loaded late
+      if (!state.softrUser) {
+        state.softrUser = getSoftrUser();
+        if (state.softrUser) {
+          updateDebug('user', state.softrUser.email || 'Found', 'success');
+        }
+      }
+
+      // Send user if we have one
+      if (state.softrUser && !state.userReceived) {
+        console.log('[Softr Bridge] Retry ' + state.retryCount + '/' + CONFIG.maxRetries);
+        sendUserToApp(state.softrUser);
+      }
+    }, CONFIG.retryInterval);
+  }
+
+  // Initialize
+  function init() {
+    console.log('[Softr Bridge] Initializing...');
+
+    // Immediate check for user
+    state.softrUser = getSoftrUser();
+    if (state.softrUser) {
+      console.log('[Softr Bridge] User found immediately:', state.softrUser.email);
+      updateDebug('user', state.softrUser.email || 'Found', 'success');
+    }
+
+    // Start polling for user
+    startUserPolling();
+
+    // Start retry loop
+    startRetryLoop();
+
+    // When iframe loads, send user if available
+    iframe.addEventListener('load', function() {
+      console.log('[Softr Bridge] Iframe loaded');
+      if (state.softrUser) {
+        setTimeout(function() {
+          sendUserToApp(state.softrUser);
+        }, 500);
+      }
+    });
+  }
+
+  // Start when DOM is ready
+  if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', init);
+  } else {
+    init();
+  }
+})();
+</script>

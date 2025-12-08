@@ -11138,6 +11138,10 @@ John Doe,Engineering,john@example.com"
         const SoftrIdentity = {
             currentUser: null,
             isInitialized: false,
+            isReady: false,
+            readyCallbacks: [],
+            retryCount: 0,
+            maxRetries: 10,
 
             init() {
                 if (this.isInitialized) return;
@@ -11148,7 +11152,7 @@ John Doe,Engineering,john@example.com"
                 // Method 1: Check window.logged_in_user immediately (Softr's primary method)
                 this.checkSoftrGlobalUser();
 
-                // Method 2: Listen for postMessage from Softr parent
+                // Method 2: Listen for postMessage from Softr parent (enhanced bridge)
                 window.addEventListener('message', this.handleMessage.bind(this));
 
                 // Method 3: Check URL parameters (fallback)
@@ -11160,6 +11164,8 @@ John Doe,Engineering,john@example.com"
                     this.requestUserFromParent();
                     // Also try to access parent's logged_in_user after a short delay
                     this.checkParentSoftrUser();
+                    // Start retry loop for requesting user from parent
+                    this.startParentRetryLoop();
                 }
 
                 // Method 5: Check again on window load (Softr may inject user data late)
@@ -11172,6 +11178,8 @@ John Doe,Engineering,john@example.com"
                             console.log('🔐 SoftrIdentity: Found user in parent on window load');
                         }
                     }
+                    // Signal ready to parent regardless of user detection
+                    this.signalReadyToParent();
                 });
 
                 // Method 6: Poll for Softr user (it may load async)
@@ -11179,6 +11187,66 @@ John Doe,Engineering,john@example.com"
 
                 // Update UI immediately with current state
                 this.updateUI();
+
+                // Signal ready after short delay (for faster initial load)
+                setTimeout(() => this.signalReadyToParent(), 500);
+            },
+
+            // Retry loop to request user from parent multiple times
+            startParentRetryLoop() {
+                if (this.currentUser) return;
+
+                const retryInterval = setInterval(() => {
+                    this.retryCount++;
+
+                    if (this.currentUser || this.retryCount >= this.maxRetries) {
+                        clearInterval(retryInterval);
+                        if (!this.currentUser) {
+                            console.log('🔐 SoftrIdentity: Max retries reached, no user from parent');
+                        }
+                        return;
+                    }
+
+                    console.log(`🔐 SoftrIdentity: Retry ${this.retryCount}/${this.maxRetries} - requesting user from parent`);
+                    this.requestUserFromParent();
+                }, 2000); // Retry every 2 seconds
+            },
+
+            // Signal to parent frame that app is ready to receive data
+            signalReadyToParent() {
+                if (this.isReady) return;
+                this.isReady = true;
+
+                if (window.parent !== window) {
+                    try {
+                        const readyMessage = {
+                            type: 'taskflow:ready',
+                            source: 'taskflow-app',
+                            timestamp: Date.now(),
+                            hasUser: !!this.currentUser,
+                            user: this.currentUser
+                        };
+                        window.parent.postMessage(readyMessage, '*');
+                        console.log('🔐 SoftrIdentity: Sent ready signal to parent', readyMessage);
+                    } catch (e) {
+                        console.log('🔐 SoftrIdentity: Could not signal ready to parent', e);
+                    }
+                }
+
+                // Fire ready callbacks
+                this.readyCallbacks.forEach(cb => {
+                    try { cb(this.currentUser); } catch (e) { console.error(e); }
+                });
+                this.readyCallbacks = [];
+            },
+
+            // Register callback for when ready
+            onReady(callback) {
+                if (this.isReady) {
+                    callback(this.currentUser);
+                } else {
+                    this.readyCallbacks.push(callback);
+                }
             },
 
             checkSoftrGlobalUser() {
@@ -11258,18 +11326,59 @@ John Doe,Engineering,john@example.com"
             handleMessage(event) {
                 // Accept messages from any Softr domain or parent
                 const data = event.data;
+                if (!data) return;
+
+                // Log all messages for debugging (in debug mode)
+                const urlParams = new URLSearchParams(window.location.search);
+                if (urlParams.get('debug') === 'true') {
+                    console.log('🔐 SoftrIdentity: Received postMessage:', data);
+                }
+
+                // Handle bridge-specific messages
+                if (data.type === 'softr-bridge:user' || data.type === 'bridge:user') {
+                    console.log('🔐 SoftrIdentity: Received user from Softr bridge', data);
+                    const userData = data.user || data.userData || data;
+                    this.setUser(userData);
+                    // Acknowledge receipt
+                    if (window.parent !== window) {
+                        window.parent.postMessage({
+                            type: 'taskflow:user-received',
+                            source: 'taskflow-app',
+                            userId: this.currentUser?.id
+                        }, '*');
+                    }
+                    return;
+                }
 
                 // Handle Softr user data (various formats Softr might use)
-                if (data && (data.type === 'softr:user' || data.type === 'user' || data.softrUser || data.user)) {
+                if (data.type === 'softr:user' || data.type === 'user' || data.softrUser || data.user) {
                     console.log('🔐 SoftrIdentity: Received user data via postMessage', data);
                     const userData = data.user || data.softrUser || data;
                     this.setUser(userData);
+                    return;
                 }
 
                 // Handle Softr's logged_in_user format
-                if (data && data.logged_in_user) {
+                if (data.logged_in_user) {
                     console.log('🔐 SoftrIdentity: Received logged_in_user via postMessage', data);
                     this.setUser(data.logged_in_user);
+                    return;
+                }
+
+                // Handle request for status from parent
+                if (data.type === 'softr-bridge:request-status' || data.type === 'request:status') {
+                    console.log('🔐 SoftrIdentity: Parent requesting status');
+                    if (window.parent !== window) {
+                        window.parent.postMessage({
+                            type: 'taskflow:status',
+                            source: 'taskflow-app',
+                            isReady: this.isReady,
+                            hasUser: !!this.currentUser,
+                            user: this.currentUser,
+                            xanoStatus: typeof xanoConnectionStatus !== 'undefined' ? xanoConnectionStatus : 'unknown'
+                        }, '*');
+                    }
+                    return;
                 }
             },
 
@@ -16373,23 +16482,59 @@ John Doe,Engineering,john@example.com"
             }, hideDelay);
         }
 
-        // Check Xano connection health
+        // Retry helper with exponential backoff
+        async function fetchWithRetry(url, options = {}, maxRetries = 3, baseDelay = 1000) {
+            let lastError;
+            for (let attempt = 0; attempt < maxRetries; attempt++) {
+                try {
+                    const response = await fetch(url, options);
+                    if (response.ok) {
+                        return response;
+                    }
+                    // If response is not ok but not a network error, don't retry
+                    if (response.status >= 400 && response.status < 500) {
+                        return response;
+                    }
+                    lastError = new Error(`HTTP ${response.status}`);
+                } catch (error) {
+                    lastError = error;
+                }
+
+                if (attempt < maxRetries - 1) {
+                    const delay = baseDelay * Math.pow(2, attempt);
+                    console.log(`⏳ Xano retry ${attempt + 1}/${maxRetries} in ${delay}ms...`);
+                    await new Promise(resolve => setTimeout(resolve, delay));
+                }
+            }
+            throw lastError;
+        }
+
+        // Check Xano connection health with retry
         async function checkXanoConnection() {
             updateXanoStatusIndicator('checking');
 
             try {
-                const response = await fetch(`${XANO_BASE_URL}/activity_store?limit=1`, {
+                const response = await fetchWithRetry(`${XANO_BASE_URL}/activity_store?limit=1`, {
                     method: 'GET',
                     mode: 'cors',
                     headers: {
                         'Content-Type': 'application/json'
                     }
-                });
+                }, 3, 1000);
 
                 if (response.ok) {
                     xanoLastSuccessfulConnection = new Date();
                     updateXanoStatusIndicator('connected', xanoActivityUploadCount);
                     console.log('✅ Xano connection verified');
+                    // Notify parent frame of Xano status
+                    if (window.parent !== window) {
+                        window.parent.postMessage({
+                            type: 'taskflow:xano-status',
+                            source: 'taskflow-app',
+                            status: 'connected',
+                            timestamp: Date.now()
+                        }, '*');
+                    }
                     return true;
                 } else {
                     updateXanoStatusIndicator('disconnected');
@@ -16398,7 +16543,7 @@ John Doe,Engineering,john@example.com"
                 }
             } catch (error) {
                 updateXanoStatusIndicator('disconnected');
-                console.error('❌ Xano connection error:', error.message);
+                console.error('❌ Xano connection error after retries:', error.message);
                 return false;
             }
         }
@@ -16420,8 +16565,15 @@ John Doe,Engineering,john@example.com"
             const activityLabel = activity.object_label || activity.object_type || 'item';
             const eventType = activity.eo_operator || activity.event_verb || 'action';
 
+            // Get Softr user info if available
+            const softrUser = SoftrIdentity.getUser();
+            const agentId = softrUser?.id || softrUser?.email || ('anon_' + Date.now());
+            const agentName = softrUser?.name || softrUser?.email || 'Anonymous User';
+            const agentEmail = softrUser?.email || null;
+
             try {
                 // New schema: app_id, data (json), entity_id, event_type
+                // Include Softr user data for proper attribution
                 const payload = {
                     app_id: APP_ID,
                     entity_id: activity.object_id || '',
@@ -16429,9 +16581,11 @@ John Doe,Engineering,john@example.com"
                     data: {
                         event_verb: activity.event_verb,
                         eo_operator: activity.eo_operator,
-                        agent_type: 'user',
-                        agent_id: 'user_' + Date.now(),
-                        agent_name: 'User',
+                        agent_type: softrUser ? 'softr_user' : 'anonymous',
+                        agent_id: agentId,
+                        agent_name: agentName,
+                        agent_email: agentEmail,
+                        softr_user_id: softrUser?.id || null,
                         object_type: activity.object_type,
                         object_id: activity.object_id,
                         object_label: activity.object_label,
@@ -16484,13 +16638,13 @@ John Doe,Engineering,john@example.com"
         async function getActivitiesFromXano() {
             try {
                 console.log('🔄 Fetching activities from Xano...');
-                const response = await fetch(`${XANO_BASE_URL}/activity_store`, {
+                const response = await fetchWithRetry(`${XANO_BASE_URL}/activity_store`, {
                     method: 'GET',
                     mode: 'cors',
                     headers: {
                         'Content-Type': 'application/json'
                     }
-                });
+                }, 3, 1000);
 
                 if (!response.ok) {
                     console.error('❌ Failed to fetch activities:', response.statusText, response.status);
@@ -16499,7 +16653,7 @@ John Doe,Engineering,john@example.com"
                 }
 
                 const activities = await response.json();
-                console.log('📥 Fetched activities from Xano:', activities);
+                console.log('📥 Fetched activities from Xano:', activities.length, 'records');
 
                 // Update connection status on successful fetch
                 updateXanoStatusIndicator('connected', xanoActivityUploadCount);
