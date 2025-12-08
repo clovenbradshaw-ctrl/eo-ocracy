@@ -531,6 +531,136 @@
             opacity: 0.8;
         }
 
+        /* Xano Connection Status Indicator */
+        .xano-status-indicator {
+            display: flex;
+            align-items: center;
+            gap: 0.4rem;
+            background: rgba(255,255,255,0.1);
+            border: 1px solid rgba(255,255,255,0.2);
+            border-radius: 6px;
+            padding: 0.35rem 0.6rem;
+            color: white;
+            font-size: 0.75rem;
+            margin-right: 0.5rem;
+            transition: all 0.3s ease;
+        }
+
+        .xano-status-indicator.connected {
+            background: rgba(76, 175, 80, 0.25);
+            border-color: rgba(76, 175, 80, 0.5);
+        }
+
+        .xano-status-indicator.disconnected {
+            background: rgba(244, 67, 54, 0.25);
+            border-color: rgba(244, 67, 54, 0.5);
+        }
+
+        .xano-status-indicator.checking {
+            background: rgba(255, 193, 7, 0.25);
+            border-color: rgba(255, 193, 7, 0.5);
+        }
+
+        .xano-status-indicator .status-dot {
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+            background: rgba(255,255,255,0.5);
+            transition: background 0.3s ease;
+        }
+
+        .xano-status-indicator.connected .status-dot {
+            background: #4CAF50;
+            box-shadow: 0 0 6px rgba(76, 175, 80, 0.6);
+        }
+
+        .xano-status-indicator.disconnected .status-dot {
+            background: #F44336;
+            box-shadow: 0 0 6px rgba(244, 67, 54, 0.6);
+        }
+
+        .xano-status-indicator.checking .status-dot {
+            background: #FFC107;
+            animation: pulse 1s ease-in-out infinite;
+        }
+
+        @keyframes pulse {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.4; }
+        }
+
+        .xano-status-indicator .status-text {
+            white-space: nowrap;
+        }
+
+        .xano-status-indicator .activity-count {
+            background: rgba(255,255,255,0.2);
+            padding: 0.1rem 0.4rem;
+            border-radius: 10px;
+            font-size: 0.65rem;
+            font-weight: 600;
+        }
+
+        .xano-status-indicator.connected .activity-count {
+            background: rgba(76, 175, 80, 0.3);
+        }
+
+        /* Activity Upload Toast */
+        .activity-toast {
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+            background: #3D2E1F;
+            color: white;
+            padding: 0.75rem 1rem;
+            border-radius: 8px;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.2);
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            font-size: 0.85rem;
+            z-index: 9999;
+            transform: translateY(100px);
+            opacity: 0;
+            transition: all 0.3s ease;
+        }
+
+        .activity-toast.show {
+            transform: translateY(0);
+            opacity: 1;
+        }
+
+        .activity-toast.success {
+            background: #2E7D32;
+        }
+
+        .activity-toast.error {
+            background: #C62828;
+        }
+
+        .activity-toast.syncing {
+            background: #F57C00;
+        }
+
+        .activity-toast i {
+            font-size: 1.1rem;
+        }
+
+        .activity-toast .toast-content {
+            display: flex;
+            flex-direction: column;
+            gap: 0.1rem;
+        }
+
+        .activity-toast .toast-title {
+            font-weight: 600;
+        }
+
+        .activity-toast .toast-detail {
+            font-size: 0.75rem;
+            opacity: 0.85;
+        }
+
         /* How It Works Modal */
         .how-it-works-overlay {
             position: fixed;
@@ -10102,6 +10232,12 @@
                 <i class="ph ph-spinner" style="animation: spin 1s linear infinite;"></i> Loading...
             </div>
             <div id="filterStatus" style="color: rgba(255,255,255,0.9); font-size: 0.875rem; margin-right: 0.5rem;"></div>
+            <!-- Xano Connection Status Indicator -->
+            <div class="xano-status-indicator checking" id="xanoStatusIndicator" title="Xano database connection status">
+                <span class="status-dot"></span>
+                <span class="status-text">Checking...</span>
+                <span class="activity-count" id="xanoActivityCount" style="display: none;">0</span>
+            </div>
             <!-- Softr User Identity Indicator -->
             <div class="softr-user-indicator no-user" id="softrUserIndicator">
                 <div class="user-avatar">
@@ -16147,13 +16283,154 @@ John Doe,Engineering,john@example.com"
         }
 
         // Xano Activity Store Integration
-        async function logActivityToXano(activity) {
+
+        // Xano connection status tracking
+        let xanoConnectionStatus = 'checking'; // 'connected', 'disconnected', 'checking'
+        let xanoActivityUploadCount = 0;
+        let xanoLastSuccessfulConnection = null;
+
+        // Update Xano status indicator UI
+        function updateXanoStatusIndicator(status, activityCount = null) {
+            const indicator = document.getElementById('xanoStatusIndicator');
+            const statusText = indicator?.querySelector('.status-text');
+            const activityCountEl = document.getElementById('xanoActivityCount');
+
+            if (!indicator) return;
+
+            // Remove all status classes
+            indicator.classList.remove('connected', 'disconnected', 'checking');
+            indicator.classList.add(status);
+
+            xanoConnectionStatus = status;
+
+            // Update status text
+            if (statusText) {
+                switch (status) {
+                    case 'connected':
+                        statusText.textContent = 'Xano Connected';
+                        indicator.title = `Connected to Xano database. Last sync: ${new Date().toLocaleTimeString()}`;
+                        break;
+                    case 'disconnected':
+                        statusText.textContent = 'Xano Offline';
+                        indicator.title = 'Unable to connect to Xano database. Changes saved locally only.';
+                        break;
+                    case 'checking':
+                        statusText.textContent = 'Checking...';
+                        indicator.title = 'Checking Xano database connection...';
+                        break;
+                }
+            }
+
+            // Update activity count if provided
+            if (activityCount !== null && activityCountEl) {
+                xanoActivityUploadCount = activityCount;
+                activityCountEl.textContent = activityCount;
+                activityCountEl.style.display = activityCount > 0 ? 'inline' : 'none';
+            }
+        }
+
+        // Show activity upload toast notification
+        function showActivityToast(type, title, detail = '') {
+            // Remove any existing toast
+            const existingToast = document.getElementById('activityToast');
+            if (existingToast) {
+                existingToast.remove();
+            }
+
+            // Create toast element
+            const toast = document.createElement('div');
+            toast.id = 'activityToast';
+            toast.className = `activity-toast ${type}`;
+
+            let icon = '';
+            switch (type) {
+                case 'success':
+                    icon = '<i class="ph ph-check-circle"></i>';
+                    break;
+                case 'error':
+                    icon = '<i class="ph ph-warning-circle"></i>';
+                    break;
+                case 'syncing':
+                    icon = '<i class="ph ph-cloud-arrow-up" style="animation: pulse 1s ease-in-out infinite;"></i>';
+                    break;
+            }
+
+            toast.innerHTML = `
+                ${icon}
+                <div class="toast-content">
+                    <span class="toast-title">${title}</span>
+                    ${detail ? `<span class="toast-detail">${detail}</span>` : ''}
+                </div>
+            `;
+
+            document.body.appendChild(toast);
+
+            // Trigger show animation
+            requestAnimationFrame(() => {
+                toast.classList.add('show');
+            });
+
+            // Auto-hide after delay (longer for errors)
+            const hideDelay = type === 'error' ? 4000 : 2500;
+            setTimeout(() => {
+                toast.classList.remove('show');
+                setTimeout(() => toast.remove(), 300);
+            }, hideDelay);
+        }
+
+        // Check Xano connection health
+        async function checkXanoConnection() {
+            updateXanoStatusIndicator('checking');
+
+            try {
+                const response = await fetch(`${XANO_BASE_URL}/activity_store?limit=1`, {
+                    method: 'GET',
+                    mode: 'cors',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    }
+                });
+
+                if (response.ok) {
+                    xanoLastSuccessfulConnection = new Date();
+                    updateXanoStatusIndicator('connected', xanoActivityUploadCount);
+                    console.log('✅ Xano connection verified');
+                    return true;
+                } else {
+                    updateXanoStatusIndicator('disconnected');
+                    console.warn('⚠️ Xano connection failed:', response.status);
+                    return false;
+                }
+            } catch (error) {
+                updateXanoStatusIndicator('disconnected');
+                console.error('❌ Xano connection error:', error.message);
+                return false;
+            }
+        }
+
+        // Initialize Xano connection check
+        function initXanoConnectionCheck() {
+            // Initial check
+            checkXanoConnection();
+
+            // Periodic health check every 60 seconds
+            setInterval(() => {
+                if (xanoConnectionStatus !== 'checking') {
+                    checkXanoConnection();
+                }
+            }, 60000);
+        }
+
+        async function logActivityToXano(activity, showToast = true) {
+            const activityLabel = activity.object_label || activity.object_type || 'item';
+            const eventType = activity.eo_operator || activity.event_verb || 'action';
+
             try {
                 // New schema: app_id, data (json), entity_id, event_type
                 const payload = {
                     app_id: APP_ID,
                     entity_id: activity.object_id || '',
-                    event_type: activity.eo_operator || activity.event_verb || 'unknown',
+                    event_type: eventType,
                     data: {
                         event_verb: activity.event_verb,
                         eo_operator: activity.eo_operator,
@@ -16180,14 +16457,31 @@ John Doe,Engineering,john@example.com"
 
                 if (!response.ok) {
                     console.error('❌ Failed to log activity:', response.statusText);
+                    updateXanoStatusIndicator('disconnected');
+                    if (showToast) {
+                        showActivityToast('error', 'Sync Failed', `Could not save "${activityLabel}" to Xano`);
+                    }
                     return null;
                 }
 
                 const result = await response.json();
                 console.log('✅ Activity logged:', result);
+
+                // Update status and count on success
+                xanoActivityUploadCount++;
+                updateXanoStatusIndicator('connected', xanoActivityUploadCount);
+
+                if (showToast) {
+                    showActivityToast('success', 'Saved to Xano', `${eventType}: ${activityLabel}`);
+                }
+
                 return result;
             } catch (error) {
                 console.error('❌ Error logging activity to Xano:', error);
+                updateXanoStatusIndicator('disconnected');
+                if (showToast) {
+                    showActivityToast('error', 'Connection Error', `Failed to sync "${activityLabel}"`);
+                }
                 return null;
             }
         }
@@ -16205,11 +16499,15 @@ John Doe,Engineering,john@example.com"
 
                 if (!response.ok) {
                     console.error('❌ Failed to fetch activities:', response.statusText, response.status);
+                    updateXanoStatusIndicator('disconnected');
                     return [];
                 }
 
                 const activities = await response.json();
                 console.log('📥 Fetched activities from Xano:', activities);
+
+                // Update connection status on successful fetch
+                updateXanoStatusIndicator('connected', xanoActivityUploadCount);
 
                 // Filter by app_id and transform to include nested data
                 return activities
@@ -16242,6 +16540,7 @@ John Doe,Engineering,john@example.com"
                     });
             } catch (error) {
                 console.error('Error fetching activities from Xano:', error);
+                updateXanoStatusIndicator('disconnected');
                 return [];
             }
         }
@@ -16291,14 +16590,17 @@ John Doe,Engineering,john@example.com"
 
                 if (!response.ok) {
                     console.error('Failed to update activity:', response.statusText);
+                    updateXanoStatusIndicator('disconnected');
                     return null;
                 }
 
                 const result = await response.json();
                 console.log('✅ Activity updated:', result);
+                updateXanoStatusIndicator('connected', xanoActivityUploadCount);
                 return result;
             } catch (error) {
                 console.error('Error updating activity in Xano:', error);
+                updateXanoStatusIndicator('disconnected');
                 return null;
             }
         }
@@ -22742,7 +23044,7 @@ John Doe,Engineering,john@example.com"
 
                 entities[entityType].push(entity);
 
-                // Log to Xano
+                // Log to Xano (suppress individual toasts for bulk operations)
                 logActivityToXano({
                     event_verb: 'Start Entity (Bulk Import)',
                     eo_operator: 'INS',
@@ -22754,7 +23056,7 @@ John Doe,Engineering,john@example.com"
                         entity_name: name,
                         import_source: 'bulk_import'
                     }
-                });
+                }, false);
 
                 // Handle relationships
                 fields.forEach(field => {
@@ -22790,7 +23092,7 @@ John Doe,Engineering,john@example.com"
                                 object: objectId
                             });
 
-                            // Log relationship
+                            // Log relationship (suppress individual toasts for bulk operations)
                             logActivityToXano({
                                 event_verb: 'Create Connection (Bulk Import)',
                                 eo_operator: predicate,
@@ -22803,7 +23105,7 @@ John Doe,Engineering,john@example.com"
                                     predicate: predicate,
                                     import_source: 'bulk_import'
                                 }
-                            });
+                            }, false);
                         }
                     }
                 });
@@ -22831,6 +23133,11 @@ John Doe,Engineering,john@example.com"
             document.getElementById('bulkImportSuccessContent').style.display = 'block';
             document.getElementById('bulkImportSuccessMessage').textContent =
                 `Successfully imported ${importedCount} ${bulkImportState.entityType}${importedCount !== 1 ? 's' : ''}.`;
+
+            // Show summary toast for bulk import
+            if (importedCount > 0) {
+                showActivityToast('success', 'Bulk Import Complete', `${importedCount} ${bulkImportState.entityType}${importedCount !== 1 ? 's' : ''} synced to Xano`);
+            }
 
             // Update footer
             document.getElementById('bulkImportImportBtn').style.display = 'none';
@@ -25465,6 +25772,9 @@ John Doe,Engineering,john@example.com"
 
             // Initialize Softr user identity detection
             SoftrIdentity.init();
+
+            // Initialize Xano connection status check
+            initXanoConnectionCheck();
 
             // Check if essential libraries loaded
             if (typeof d3 === 'undefined') {
