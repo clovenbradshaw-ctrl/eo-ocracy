@@ -28692,10 +28692,16 @@ Options:
 
         function renderKanbanBoard() {
             const content = document.getElementById('taskBoardContent');
-            const tasks = entities.task || [];
+            const allTasks = entities.task || [];
+            const tasks = getFilteredTasks();
 
-            // Update total count
-            document.getElementById('taskBoardTotal').textContent = tasks.length;
+            // Update total count (show filtered/total)
+            const totalEl = document.getElementById('taskBoardTotal');
+            if (tasks.length === allTasks.length) {
+                totalEl.textContent = tasks.length;
+            } else {
+                totalEl.textContent = `${tasks.length}/${allTasks.length}`;
+            }
             updateTaskCountBadge();
 
             const fab = document.querySelector('.task-fab');
@@ -28835,9 +28841,16 @@ Options:
 
         function renderTaskTable() {
             const content = document.getElementById('taskBoardContent');
-            const tasks = entities.task || [];
+            const allTasks = entities.task || [];
+            const tasks = getFilteredTasks();
 
-            document.getElementById('taskBoardTotal').textContent = tasks.length;
+            // Update total count (show filtered/total)
+            const totalEl = document.getElementById('taskBoardTotal');
+            if (tasks.length === allTasks.length) {
+                totalEl.textContent = tasks.length;
+            } else {
+                totalEl.textContent = `${tasks.length}/${allTasks.length}`;
+            }
             updateTaskCountBadge();
 
             const fab = document.querySelector('.task-fab');
@@ -28985,9 +28998,16 @@ Options:
 
         function renderTimeline() {
             const content = document.getElementById('taskBoardContent');
-            const tasks = entities.task || [];
+            const allTasks = entities.task || [];
+            const tasks = getFilteredTasks();
 
-            document.getElementById('taskBoardTotal').textContent = tasks.length;
+            // Update total count (show filtered/total)
+            const totalEl = document.getElementById('taskBoardTotal');
+            if (tasks.length === allTasks.length) {
+                totalEl.textContent = tasks.length;
+            } else {
+                totalEl.textContent = `${tasks.length}/${allTasks.length}`;
+            }
             updateTaskCountBadge();
 
             const fab = document.querySelector('.task-fab');
