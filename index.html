@@ -9986,6 +9986,11 @@
                 Undo
                 <span class="undo-count" id="undoCount" style="display: none;">0</span>
             </button>
+            <button class="undo-btn" id="redoBtn" onclick="redo()" disabled title="Nothing to redo">
+                <i class="ph ph-arrow-clockwise"></i>
+                Redo
+                <span class="undo-count" id="redoCount" style="display: none;">0</span>
+            </button>
             <button class="btn btn-small" onclick="exportData()">
                 <i class="ph ph-download"></i> Export
             </button>
@@ -11291,6 +11296,9 @@ John Doe,Engineering,john@example.com"
 
             undoHistory.push(action);
 
+            // Clear redo history - new action invalidates redo stack
+            redoHistory = [];
+
             // Trim history if it exceeds max size
             if (undoHistory.length > MAX_UNDO_HISTORY) {
                 undoHistory = undoHistory.slice(-MAX_UNDO_HISTORY);
@@ -11299,6 +11307,7 @@ John Doe,Engineering,john@example.com"
             // Save history to localStorage
             saveUndoHistory();
             updateUndoButton();
+            updateRedoButton();
         }
 
         function undo() {
@@ -11353,20 +11362,111 @@ John Doe,Engineering,john@example.com"
                         !(item.itemType === 'relationship' && item.item.id === action.data.id)
                     );
                     break;
+
+                case 'update_relationship':
+                    // Undo relationship update - restore old values
+                    const rel = relationships.find(r => r.id === action.data.id);
+                    if (rel) {
+                        rel.subject = action.oldData.subject;
+                        rel.predicate = action.oldData.predicate;
+                        rel.object = action.oldData.object;
+                    }
+                    break;
+            }
+
+            // Push to redo history for redo functionality
+            redoHistory.push(action);
+            if (redoHistory.length > MAX_UNDO_HISTORY) {
+                redoHistory = redoHistory.slice(-MAX_UNDO_HISTORY);
             }
 
             saveToLocalStorage();
             saveUndoHistory();
             updateUndoButton();
+            updateRedoButton();
             refreshAllViews();
 
             showUndoNotification(`Undone: ${action.description}`);
+        }
+
+        function redo() {
+            if (redoHistory.length === 0) {
+                showUndoNotification('Nothing to redo');
+                return;
+            }
+
+            const action = redoHistory.pop();
+
+            switch (action.type) {
+                case 'create_entity':
+                    // Redo entity creation - recreate it
+                    entities[action.entityType].push(action.data);
+                    break;
+
+                case 'delete_entity':
+                    // Redo entity deletion - delete it again
+                    entities[action.entityType] = entities[action.entityType].filter(e => e.id !== action.data.id);
+                    // Remove relationships again
+                    if (action.deletedRelationships) {
+                        const deletedRelIds = action.deletedRelationships.map(r => r.id);
+                        relationships = relationships.filter(r => !deletedRelIds.includes(r.id));
+                    }
+                    // Add back to recycle bin
+                    addToRecycleBin(action.data, 'entity', action.entityType, action.deletedRelationships || []);
+                    break;
+
+                case 'update_entity':
+                    // Redo entity update - apply new values
+                    const entity = findEntity(action.data.id);
+                    if (entity) {
+                        entity.name = action.data.name;
+                        entity.description = action.data.description;
+                    }
+                    break;
+
+                case 'create_relationship':
+                    // Redo relationship creation - recreate it
+                    relationships.push(action.data);
+                    break;
+
+                case 'delete_relationship':
+                    // Redo relationship deletion - delete it again
+                    relationships = relationships.filter(r => r.id !== action.data.id);
+                    // Add back to recycle bin
+                    addToRecycleBin(action.data, 'relationship', null, []);
+                    break;
+
+                case 'update_relationship':
+                    // Redo relationship update - apply new values
+                    const rel = relationships.find(r => r.id === action.data.id);
+                    if (rel) {
+                        rel.subject = action.data.subject;
+                        rel.predicate = action.data.predicate;
+                        rel.object = action.data.object;
+                    }
+                    break;
+            }
+
+            // Push back to undo history
+            undoHistory.push(action);
+            if (undoHistory.length > MAX_UNDO_HISTORY) {
+                undoHistory = undoHistory.slice(-MAX_UNDO_HISTORY);
+            }
+
+            saveToLocalStorage();
+            saveUndoHistory();
+            updateUndoButton();
+            updateRedoButton();
+            refreshAllViews();
+
+            showUndoNotification(`Redone: ${action.description}`);
         }
 
         function saveUndoHistory() {
             try {
                 if (currentWorkspaceId) {
                     localStorage.setItem(`undoHistory_${currentWorkspaceId}`, JSON.stringify(undoHistory));
+                    localStorage.setItem(`redoHistory_${currentWorkspaceId}`, JSON.stringify(redoHistory));
                     localStorage.setItem(`recycleBin_${currentWorkspaceId}`, JSON.stringify(recycleBin));
                 }
             } catch (e) {
@@ -11378,26 +11478,33 @@ John Doe,Engineering,john@example.com"
             try {
                 if (currentWorkspaceId) {
                     const savedHistory = localStorage.getItem(`undoHistory_${currentWorkspaceId}`);
+                    const savedRedoHistory = localStorage.getItem(`redoHistory_${currentWorkspaceId}`);
                     const savedRecycleBin = localStorage.getItem(`recycleBin_${currentWorkspaceId}`);
                     undoHistory = savedHistory ? JSON.parse(savedHistory) : [];
+                    redoHistory = savedRedoHistory ? JSON.parse(savedRedoHistory) : [];
                     recycleBin = savedRecycleBin ? JSON.parse(savedRecycleBin) : [];
                 } else {
                     undoHistory = [];
+                    redoHistory = [];
                     recycleBin = [];
                 }
             } catch (e) {
                 console.error('Failed to load undo history:', e);
                 undoHistory = [];
+                redoHistory = [];
                 recycleBin = [];
             }
             updateUndoButton();
+            updateRedoButton();
             renderRecycleBin();
         }
 
         function clearUndoHistory() {
             undoHistory = [];
+            redoHistory = [];
             saveUndoHistory();
             updateUndoButton();
+            updateRedoButton();
         }
 
         function updateUndoButton() {
@@ -11412,6 +11519,21 @@ John Doe,Engineering,john@example.com"
             if (undoCount) {
                 undoCount.textContent = undoHistory.length;
                 undoCount.style.display = undoHistory.length > 0 ? 'inline' : 'none';
+            }
+        }
+
+        function updateRedoButton() {
+            const redoBtn = document.getElementById('redoBtn');
+            const redoCount = document.getElementById('redoCount');
+            if (redoBtn) {
+                redoBtn.disabled = redoHistory.length === 0;
+                redoBtn.title = redoHistory.length > 0
+                    ? `Redo: ${redoHistory[redoHistory.length - 1]?.description || 'last action'} (Ctrl+Shift+Z)`
+                    : 'Nothing to redo';
+            }
+            if (redoCount) {
+                redoCount.textContent = redoHistory.length;
+                redoCount.style.display = redoHistory.length > 0 ? 'inline' : 'none';
             }
         }
 
@@ -11863,6 +11985,7 @@ John Doe,Engineering,john@example.com"
         // Undo history stack - stores all changes for undo functionality
         // Each entry: { type: 'create'|'update'|'delete', entityType, data, timestamp, description }
         let undoHistory = [];
+        let redoHistory = []; // Redo history stack - stores undone actions for redo
         const MAX_UNDO_HISTORY = 100; // Maximum number of undo steps to keep
 
         // Recycle bin - stores deleted entities and relationships
@@ -15059,7 +15182,7 @@ John Doe,Engineering,john@example.com"
 
         // Handle keyboard shortcuts
         document.addEventListener('keydown', function(e) {
-            // Ctrl+Z or Cmd+Z for undo
+            // Ctrl+Z or Cmd+Z for undo (without Shift)
             if ((e.ctrlKey || e.metaKey) && e.key === 'z' && !e.shiftKey) {
                 // Don't trigger undo if user is typing in an input field
                 const activeElement = document.activeElement;
@@ -15069,6 +15192,20 @@ John Doe,Engineering,john@example.com"
                 if (!isInputField) {
                     e.preventDefault();
                     undo();
+                }
+            }
+
+            // Ctrl+Shift+Z or Cmd+Shift+Z for redo (also Ctrl+Y / Cmd+Y)
+            if (((e.ctrlKey || e.metaKey) && e.key === 'z' && e.shiftKey) ||
+                ((e.ctrlKey || e.metaKey) && e.key === 'y')) {
+                // Don't trigger redo if user is typing in an input field
+                const activeElement = document.activeElement;
+                const isInputField = activeElement.tagName === 'INPUT' ||
+                                   activeElement.tagName === 'TEXTAREA' ||
+                                   activeElement.isContentEditable;
+                if (!isInputField) {
+                    e.preventDefault();
+                    redo();
                 }
             }
 
@@ -15350,17 +15487,34 @@ John Doe,Engineering,john@example.com"
                 return;
             }
 
+            // Track in undo history before making changes
+            const oldSubjectEntity = findEntity(oldSubject);
+            const oldObjectEntity = findEntity(oldObject);
+            const newSubjectEntity = findEntity(newSubject);
+            const newObjectEntity = findEntity(newObject);
+
+            pushToUndoHistory({
+                type: 'update_relationship',
+                data: {
+                    id: currentEditingRelationship.id,
+                    subject: newSubject,
+                    predicate: newPredicate,
+                    object: newObject
+                },
+                oldData: {
+                    subject: oldSubject,
+                    predicate: oldPredicate,
+                    object: oldObject
+                },
+                description: `Update connection: ${oldSubjectEntity?.name || 'Entity'} → ${newSubjectEntity?.name || 'Entity'}`
+            });
+
             // Apply changes
             currentEditingRelationship.subject = newSubject;
             currentEditingRelationship.predicate = newPredicate;
             currentEditingRelationship.object = newObject;
 
             // Log to Xano
-            const oldSubjectEntity = findEntity(oldSubject);
-            const oldObjectEntity = findEntity(oldObject);
-            const newSubjectEntity = findEntity(newSubject);
-            const newObjectEntity = findEntity(newObject);
-
             logActivityToXano({
                 event_verb: 'Shift Connection',
                 eo_operator: 'ALT',
