@@ -478,6 +478,90 @@
             margin: 0.25rem 0;
         }
 
+        /* View Filter Dropdown */
+        .view-filter-dropdown {
+            position: relative;
+        }
+
+        .view-filter-btn {
+            position: relative;
+        }
+
+        .filter-active-badge {
+            position: absolute;
+            top: 2px;
+            right: 2px;
+            width: 8px;
+            height: 8px;
+            background: #C88F4A;
+            border-radius: 50%;
+        }
+
+        .view-filter-menu {
+            position: absolute;
+            top: calc(100% + 0.5rem);
+            right: 0;
+            background: white;
+            border-radius: 8px;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.2);
+            min-width: 180px;
+            z-index: 100;
+            display: none;
+            overflow: hidden;
+            padding: 0.5rem 0;
+        }
+
+        .view-filter-menu.open {
+            display: block;
+        }
+
+        .view-filter-section {
+            padding: 0.5rem 0;
+        }
+
+        .view-filter-section-title {
+            padding: 0.25rem 1rem 0.5rem;
+            font-size: 0.75rem;
+            font-weight: 600;
+            color: #8B6F47;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .view-filter-item {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            padding: 0.5rem 1rem;
+            cursor: pointer;
+            color: #3D2E1F;
+            font-size: 0.875rem;
+            transition: background 0.15s;
+        }
+
+        .view-filter-item:hover {
+            background: #FAF7F5;
+        }
+
+        .view-filter-item input[type="checkbox"] {
+            accent-color: #C88F4A;
+            width: 16px;
+            height: 16px;
+        }
+
+        .view-filter-item i {
+            color: #8B6F47;
+            font-size: 1rem;
+        }
+
+        .view-filter-actions {
+            display: flex;
+            gap: 0.5rem;
+            padding: 0.5rem 1rem;
+            border-top: 1px solid #E5DDD1;
+            margin-top: 0.25rem;
+        }
+
         /* Command Palette Styles */
         .command-palette-overlay {
             position: fixed;
@@ -11423,6 +11507,370 @@
             background: #F5F2ED;
             color: #A89C8C;
         }
+
+        /* ============================================
+           GANTT VIEW STYLES
+           ============================================ */
+
+        .gantt-view {
+            display: none;
+            flex-direction: column;
+            height: 100%;
+            background: #FAF7F5;
+        }
+
+        .gantt-view.active {
+            display: flex;
+        }
+
+        .gantt-view-content {
+            flex: 1;
+            overflow: auto;
+            padding: 1.5rem;
+        }
+
+        .gantt-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 1rem;
+        }
+
+        .gantt-controls {
+            display: flex;
+            gap: 0.5rem;
+            align-items: center;
+        }
+
+        .gantt-container {
+            background: white;
+            border-radius: 8px;
+            border: 1px solid #E5DDD1;
+            overflow: hidden;
+        }
+
+        .gantt-timeline-header {
+            display: flex;
+            border-bottom: 1px solid #E5DDD1;
+            background: #FAF7F5;
+            font-size: 0.75rem;
+            color: #6B5642;
+            font-weight: 600;
+        }
+
+        .gantt-task-column {
+            width: 250px;
+            min-width: 250px;
+            padding: 0.5rem 1rem;
+            border-right: 1px solid #E5DDD1;
+        }
+
+        .gantt-timeline-dates {
+            flex: 1;
+            display: flex;
+            overflow-x: auto;
+        }
+
+        .gantt-date-cell {
+            min-width: 40px;
+            padding: 0.5rem 0.25rem;
+            text-align: center;
+            border-right: 1px solid #E5DDD1;
+        }
+
+        .gantt-date-cell.weekend {
+            background: #F5F2ED;
+        }
+
+        .gantt-date-cell.today {
+            background: rgba(200, 143, 74, 0.15);
+            color: #C88F4A;
+            font-weight: 600;
+        }
+
+        .gantt-row {
+            display: flex;
+            border-bottom: 1px solid #E5DDD1;
+            min-height: 40px;
+        }
+
+        .gantt-row:last-child {
+            border-bottom: none;
+        }
+
+        .gantt-task-cell {
+            width: 250px;
+            min-width: 250px;
+            padding: 0.5rem 1rem;
+            border-right: 1px solid #E5DDD1;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            font-size: 0.875rem;
+        }
+
+        .gantt-task-status {
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+            flex-shrink: 0;
+        }
+
+        .gantt-task-status.pending { background: #F59E0B; }
+        .gantt-task-status.in-progress { background: #3B82F6; }
+        .gantt-task-status.completed { background: #10B981; }
+
+        .gantt-bar-area {
+            flex: 1;
+            position: relative;
+            display: flex;
+            align-items: center;
+            min-height: 40px;
+        }
+
+        .gantt-bar {
+            position: absolute;
+            height: 24px;
+            border-radius: 4px;
+            display: flex;
+            align-items: center;
+            padding: 0 0.5rem;
+            font-size: 0.75rem;
+            color: white;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            cursor: pointer;
+            transition: filter 0.2s;
+        }
+
+        .gantt-bar:hover {
+            filter: brightness(0.9);
+        }
+
+        .gantt-bar.pending { background: #F59E0B; }
+        .gantt-bar.in-progress { background: #3B82F6; }
+        .gantt-bar.completed { background: #10B981; }
+        .gantt-bar.overdue { background: #EF4444; }
+
+        .gantt-empty {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            padding: 4rem 2rem;
+            text-align: center;
+            color: #8B6F47;
+        }
+
+        .gantt-empty i {
+            font-size: 4rem;
+            margin-bottom: 1rem;
+            color: #C88F4A;
+            opacity: 0.5;
+        }
+
+        .gantt-empty h3 {
+            font-size: 1.25rem;
+            margin-bottom: 0.5rem;
+            color: #3D2E1F;
+        }
+
+        /* ============================================
+           CALENDAR VIEW STYLES
+           ============================================ */
+
+        .calendar-view {
+            display: none;
+            flex-direction: column;
+            height: 100%;
+            background: #FAF7F5;
+        }
+
+        .calendar-view.active {
+            display: flex;
+        }
+
+        .calendar-view-content {
+            flex: 1;
+            overflow: auto;
+            padding: 1.5rem;
+        }
+
+        .calendar-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 1rem;
+        }
+
+        .calendar-nav {
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+        }
+
+        .calendar-nav-btn {
+            background: white;
+            border: 1px solid #E5DDD1;
+            border-radius: 6px;
+            padding: 0.5rem;
+            cursor: pointer;
+            color: #3D2E1F;
+            transition: background 0.2s;
+        }
+
+        .calendar-nav-btn:hover {
+            background: #FAF7F5;
+        }
+
+        .calendar-month-title {
+            font-size: 1.25rem;
+            font-weight: 600;
+            color: #3D2E1F;
+            min-width: 180px;
+            text-align: center;
+        }
+
+        .calendar-today-btn {
+            background: #C88F4A;
+            color: white;
+            border: none;
+            border-radius: 6px;
+            padding: 0.5rem 1rem;
+            cursor: pointer;
+            font-size: 0.875rem;
+            font-weight: 500;
+            transition: background 0.2s;
+        }
+
+        .calendar-today-btn:hover {
+            background: #A87339;
+        }
+
+        .calendar-grid {
+            background: white;
+            border-radius: 8px;
+            border: 1px solid #E5DDD1;
+            overflow: hidden;
+        }
+
+        .calendar-weekdays {
+            display: grid;
+            grid-template-columns: repeat(7, 1fr);
+            background: #FAF7F5;
+            border-bottom: 1px solid #E5DDD1;
+        }
+
+        .calendar-weekday {
+            padding: 0.75rem;
+            text-align: center;
+            font-size: 0.75rem;
+            font-weight: 600;
+            color: #6B5642;
+            text-transform: uppercase;
+        }
+
+        .calendar-days {
+            display: grid;
+            grid-template-columns: repeat(7, 1fr);
+        }
+
+        .calendar-day {
+            min-height: 100px;
+            padding: 0.5rem;
+            border-right: 1px solid #E5DDD1;
+            border-bottom: 1px solid #E5DDD1;
+            cursor: pointer;
+            transition: background 0.2s;
+        }
+
+        .calendar-day:nth-child(7n) {
+            border-right: none;
+        }
+
+        .calendar-day:hover {
+            background: #FAF7F5;
+        }
+
+        .calendar-day.other-month {
+            background: #F5F2ED;
+            color: #A89C8C;
+        }
+
+        .calendar-day.today {
+            background: rgba(200, 143, 74, 0.1);
+        }
+
+        .calendar-day-number {
+            font-size: 0.875rem;
+            font-weight: 500;
+            margin-bottom: 0.25rem;
+        }
+
+        .calendar-day.today .calendar-day-number {
+            color: #C88F4A;
+            font-weight: 600;
+        }
+
+        .calendar-day-tasks {
+            display: flex;
+            flex-direction: column;
+            gap: 0.25rem;
+        }
+
+        .calendar-task {
+            font-size: 0.7rem;
+            padding: 0.2rem 0.4rem;
+            border-radius: 4px;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            cursor: pointer;
+        }
+
+        .calendar-task.pending {
+            background: rgba(245, 158, 11, 0.15);
+            color: #B45309;
+        }
+
+        .calendar-task.in-progress {
+            background: rgba(59, 130, 246, 0.15);
+            color: #1D4ED8;
+        }
+
+        .calendar-task.completed {
+            background: rgba(16, 185, 129, 0.15);
+            color: #047857;
+        }
+
+        .calendar-task.overdue {
+            background: rgba(239, 68, 68, 0.15);
+            color: #DC2626;
+        }
+
+        .calendar-empty {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            padding: 4rem 2rem;
+            text-align: center;
+            color: #8B6F47;
+        }
+
+        .calendar-empty i {
+            font-size: 4rem;
+            margin-bottom: 1rem;
+            color: #C88F4A;
+            opacity: 0.5;
+        }
+
+        .calendar-empty h3 {
+            font-size: 1.25rem;
+            margin-bottom: 0.5rem;
+            color: #3D2E1F;
+        }
     </style>
     <div class="header">
         <h1>
@@ -11456,8 +11904,8 @@
                 <span class="status-text">Checking...</span>
                 <span class="activity-count" id="xanoActivityCount" style="display: none;">0</span>
             </div>
-            <!-- Softr User Identity Indicator -->
-            <div class="softr-user-indicator no-user" id="softrUserIndicator">
+            <!-- Softr User Identity Indicator (hidden) -->
+            <div class="softr-user-indicator no-user" id="softrUserIndicator" style="display: none !important;">
                 <div class="user-avatar">
                     <i class="ph ph-user"></i>
                 </div>
@@ -11467,46 +11915,51 @@
                 </div>
             </div>
             <div class="view-toggle">
-                <button class="view-toggle-btn tasks-view-btn active" data-view="tasks" onclick="switchView('tasks')">
-                    <i class="ph ph-kanban"></i> Work
-                    <span class="task-count-badge" id="taskCountBadge" style="display: none;">0</span>
+                <button class="view-toggle-btn active" data-view="kanban" onclick="switchView('kanban')">
+                    <i class="ph ph-columns"></i> Kanban
                 </button>
-                <button class="view-toggle-btn" data-view="flow" onclick="switchView('flow')">
-                    <i class="ph ph-flow-arrow"></i> Flow
+                <button class="view-toggle-btn" data-view="table" onclick="switchView('table')">
+                    <i class="ph ph-table"></i> Table
                 </button>
-                <button class="view-toggle-btn" data-view="shape" onclick="switchView('shape')">
-                    <i class="ph ph-tree-structure"></i> Shape
+                <button class="view-toggle-btn" data-view="gantt" onclick="switchView('gantt')">
+                    <i class="ph ph-chart-bar-horizontal"></i> Gantt
                 </button>
-                <button class="view-toggle-btn" data-view="graph" onclick="switchView('graph')">
-                    <i class="ph ph-graph"></i> Graph
+                <button class="view-toggle-btn" data-view="timeline" onclick="switchView('timeline')">
+                    <i class="ph ph-clock-countdown"></i> Timeline
                 </button>
-                <div class="view-toggle-more">
-                    <button class="view-toggle-btn" onclick="toggleMoreViews(event)">
-                        <i class="ph ph-dots-three"></i> More
+                <button class="view-toggle-btn" data-view="calendar" onclick="switchView('calendar')">
+                    <i class="ph ph-calendar"></i> Calendar
+                </button>
+                <!-- View Filter Dropdown -->
+                <div class="view-filter-dropdown">
+                    <button class="view-toggle-btn view-filter-btn" onclick="toggleViewFilter(event)">
+                        <i class="ph ph-funnel"></i> Filter
+                        <span class="filter-active-badge" id="viewFilterBadge" style="display: none;"></span>
                     </button>
-                    <div class="view-toggle-dropdown" id="viewToggleDropdown">
-                        <button class="view-dropdown-item" onclick="switchView('kanban'); closeMoreViews();">
-                            <i class="ph ph-columns"></i> Kanban
-                        </button>
-                        <button class="view-dropdown-item" onclick="switchView('table'); closeMoreViews();">
-                            <i class="ph ph-table"></i> Table
-                        </button>
-                        <button class="view-dropdown-item" onclick="switchView('timeline'); closeMoreViews();">
-                            <i class="ph ph-calendar-blank"></i> Timeline
-                        </button>
-                        <div class="view-dropdown-divider"></div>
-                        <button class="view-dropdown-item" onclick="switchView('tree'); closeMoreViews();">
-                            <i class="ph ph-list-bullets"></i> Tree
-                        </button>
-                        <button class="view-dropdown-item" onclick="switchView('card'); closeMoreViews();">
-                            <i class="ph ph-squares-four"></i> Cards
-                        </button>
-                        <button class="view-dropdown-item" onclick="switchView('venn'); closeMoreViews();">
-                            <i class="ph ph-circles-three"></i> Venn
-                        </button>
-                        <button class="view-dropdown-item" onclick="switchView('orgchart'); closeMoreViews();">
-                            <i class="ph ph-users-three"></i> Org Chart
-                        </button>
+                    <div class="view-filter-menu" id="viewFilterMenu">
+                        <div class="view-filter-section">
+                            <div class="view-filter-section-title">Filter by</div>
+                            <label class="view-filter-item">
+                                <input type="checkbox" id="viewFilterRole" checked onchange="applyViewFilters()">
+                                <i class="ph ph-briefcase"></i> Roles
+                            </label>
+                            <label class="view-filter-item">
+                                <input type="checkbox" id="viewFilterPerson" checked onchange="applyViewFilters()">
+                                <i class="ph ph-user"></i> People
+                            </label>
+                            <label class="view-filter-item">
+                                <input type="checkbox" id="viewFilterTeam" checked onchange="applyViewFilters()">
+                                <i class="ph ph-users"></i> Teams
+                            </label>
+                            <label class="view-filter-item">
+                                <input type="checkbox" id="viewFilterUnit" checked onchange="applyViewFilters()">
+                                <i class="ph ph-buildings"></i> Units
+                            </label>
+                        </div>
+                        <div class="view-filter-actions">
+                            <button class="btn btn-small" onclick="selectAllViewFilters()">All</button>
+                            <button class="btn btn-small btn-outline" onclick="clearViewFilters()">None</button>
+                        </div>
                     </div>
                 </div>
             </div>
@@ -11902,6 +12355,20 @@
                     <div class="shape-view-subtitle">Structure that emerged from work</div>
                 </div>
                 <div class="shape-view-content" id="shapeViewContent">
+                    <!-- Populated dynamically -->
+                </div>
+            </div>
+
+            <!-- Gantt View -->
+            <div id="ganttView" class="gantt-view">
+                <div class="gantt-view-content" id="ganttViewContent">
+                    <!-- Populated dynamically -->
+                </div>
+            </div>
+
+            <!-- Calendar View -->
+            <div id="calendarView" class="calendar-view">
+                <div class="calendar-view-content" id="calendarViewContent">
                     <!-- Populated dynamically -->
                 </div>
             </div>
@@ -14599,7 +15066,7 @@ John Doe,Engineering,john@example.com"
         let selectedEntityType = 'role';
         let selectedPredicate = 'DES'; // Default to Define operator
         let focusedNode = null;
-        let currentView = 'tasks';
+        let currentView = 'kanban';
 
         // ==========================================
         // UNDO HISTORY & RECYCLE BIN
@@ -14652,6 +15119,8 @@ John Doe,Engineering,john@example.com"
             document.getElementById('taskBoardView').classList.remove('active');
             document.getElementById('flowView').classList.remove('active');
             document.getElementById('shapeView').classList.remove('active');
+            document.getElementById('ganttView').classList.remove('active');
+            document.getElementById('calendarView').classList.remove('active');
 
             if (view === 'tree') {
                 document.getElementById('treeView').classList.add('active');
@@ -14683,6 +15152,12 @@ John Doe,Engineering,john@example.com"
             } else if (view === 'shape') {
                 document.getElementById('shapeView').classList.add('active');
                 renderShapeView();
+            } else if (view === 'gantt') {
+                document.getElementById('ganttView').classList.add('active');
+                renderGanttView();
+            } else if (view === 'calendar') {
+                document.getElementById('calendarView').classList.add('active');
+                renderCalendarView();
             } else {
                 document.getElementById('graphView').classList.add('active');
                 setTimeout(() => updateGraph(), 100);
@@ -14699,7 +15174,106 @@ John Doe,Engineering,john@example.com"
 
         function closeMoreViews() {
             const dropdown = document.getElementById('viewToggleDropdown');
-            dropdown.classList.remove('open');
+            if (dropdown) dropdown.classList.remove('open');
+        }
+
+        // View filter state
+        let viewFilters = {
+            role: true,
+            person: true,
+            team: true,
+            unit: true
+        };
+
+        function toggleViewFilter(event) {
+            event.stopPropagation();
+            const menu = document.getElementById('viewFilterMenu');
+            menu.classList.toggle('open');
+        }
+
+        function closeViewFilter() {
+            const menu = document.getElementById('viewFilterMenu');
+            if (menu) menu.classList.remove('open');
+        }
+
+        function applyViewFilters() {
+            viewFilters.role = document.getElementById('viewFilterRole').checked;
+            viewFilters.person = document.getElementById('viewFilterPerson').checked;
+            viewFilters.team = document.getElementById('viewFilterTeam').checked;
+            viewFilters.unit = document.getElementById('viewFilterUnit').checked;
+
+            // Update badge visibility
+            const badge = document.getElementById('viewFilterBadge');
+            const allChecked = viewFilters.role && viewFilters.person && viewFilters.team && viewFilters.unit;
+            badge.style.display = allChecked ? 'none' : 'block';
+
+            // Re-render current view with filters
+            if (currentView === 'kanban') {
+                renderKanbanBoard();
+            } else if (currentView === 'table') {
+                renderTaskTable();
+            } else if (currentView === 'timeline') {
+                renderTimeline();
+            } else if (currentView === 'gantt') {
+                renderGanttView();
+            } else if (currentView === 'calendar') {
+                renderCalendarView();
+            }
+        }
+
+        function selectAllViewFilters() {
+            document.getElementById('viewFilterRole').checked = true;
+            document.getElementById('viewFilterPerson').checked = true;
+            document.getElementById('viewFilterTeam').checked = true;
+            document.getElementById('viewFilterUnit').checked = true;
+            applyViewFilters();
+        }
+
+        function clearViewFilters() {
+            document.getElementById('viewFilterRole').checked = false;
+            document.getElementById('viewFilterPerson').checked = false;
+            document.getElementById('viewFilterTeam').checked = false;
+            document.getElementById('viewFilterUnit').checked = false;
+            applyViewFilters();
+        }
+
+        function getFilteredTasks() {
+            let filteredTasks = [...tasks];
+
+            // If all filters are enabled, return all tasks
+            if (viewFilters.role && viewFilters.person && viewFilters.team && viewFilters.unit) {
+                return filteredTasks;
+            }
+
+            // Filter tasks based on their assignments
+            return filteredTasks.filter(task => {
+                // Get task's role assignment
+                const taskRoleRel = relationships.find(r => r.object === task.id && r.predicate === 'CON' && r.subject.startsWith('r'));
+                const taskRole = taskRoleRel ? entities.find(e => e.id === taskRoleRel.subject) : null;
+
+                // Get person assigned to role
+                const personRel = taskRole ? relationships.find(r => r.object === taskRole.id && r.predicate === 'CON' && r.subject.startsWith('p')) : null;
+                const person = personRel ? entities.find(e => e.id === personRel.subject) : null;
+
+                // Get team containing role
+                const teamRel = taskRole ? relationships.find(r => r.object === taskRole.id && r.predicate === 'DES' && r.subject.startsWith('t')) : null;
+                const team = teamRel ? entities.find(e => e.id === teamRel.subject) : null;
+
+                // Get unit containing team
+                const unitRel = team ? relationships.find(r => r.object === team.id && r.predicate === 'DES' && r.subject.startsWith('u')) : null;
+                const unit = unitRel ? entities.find(e => e.id === unitRel.subject) : null;
+
+                // Check filter criteria
+                if (viewFilters.role && taskRole) return true;
+                if (viewFilters.person && person) return true;
+                if (viewFilters.team && team) return true;
+                if (viewFilters.unit && unit) return true;
+
+                // If no filters match but task has no assignments, show it
+                if (!taskRole && !person && !team && !unit) return true;
+
+                return false;
+            });
         }
 
         // Close dropdown when clicking outside
@@ -14709,6 +15283,9 @@ John Doe,Engineering,john@example.com"
             }
             if (!e.target.closest('.header-more-menu')) {
                 closeHeaderMenu();
+            }
+            if (!e.target.closest('.view-filter-dropdown')) {
+                closeViewFilter();
             }
         });
 
@@ -29188,6 +29765,264 @@ Options:
             }
         }
 
+        // ============================================
+        // GANTT VIEW
+        // ============================================
+
+        let ganttStartDate = new Date();
+        ganttStartDate.setDate(ganttStartDate.getDate() - 7); // Start a week ago
+
+        function renderGanttView() {
+            const content = document.getElementById('ganttViewContent');
+            const filteredTasks = getFilteredTasks();
+
+            if (filteredTasks.length === 0) {
+                content.innerHTML = `
+                    <div class="gantt-empty">
+                        <i class="ph ph-chart-bar-horizontal"></i>
+                        <h3>No tasks to display</h3>
+                        <p>Create some tasks with due dates to see them on the Gantt chart.</p>
+                    </div>
+                `;
+                return;
+            }
+
+            // Get date range - 4 weeks from start date
+            const daysToShow = 28;
+            const dates = [];
+            for (let i = 0; i < daysToShow; i++) {
+                const date = new Date(ganttStartDate);
+                date.setDate(ganttStartDate.getDate() + i);
+                dates.push(date);
+            }
+
+            const today = new Date();
+            today.setHours(0, 0, 0, 0);
+
+            // Build header
+            let headerHtml = `
+                <div class="gantt-header">
+                    <div style="display: flex; align-items: center; gap: 1rem;">
+                        <h3 style="margin: 0; color: #3D2E1F;"><i class="ph ph-chart-bar-horizontal" style="color: #C88F4A;"></i> Gantt Chart</h3>
+                    </div>
+                    <div class="gantt-controls">
+                        <button class="btn btn-small btn-outline" onclick="ganttNavigate(-7)">
+                            <i class="ph ph-caret-left"></i> Week
+                        </button>
+                        <button class="btn btn-small" onclick="ganttGoToToday()">Today</button>
+                        <button class="btn btn-small btn-outline" onclick="ganttNavigate(7)">
+                            Week <i class="ph ph-caret-right"></i>
+                        </button>
+                    </div>
+                </div>
+                <div class="gantt-container">
+                    <div class="gantt-timeline-header">
+                        <div class="gantt-task-column">Task</div>
+                        <div class="gantt-timeline-dates">
+            `;
+
+            dates.forEach(date => {
+                const isWeekend = date.getDay() === 0 || date.getDay() === 6;
+                const isToday = date.toDateString() === today.toDateString();
+                const dayNames = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];
+                headerHtml += `
+                    <div class="gantt-date-cell ${isWeekend ? 'weekend' : ''} ${isToday ? 'today' : ''}">
+                        <div>${dayNames[date.getDay()]}</div>
+                        <div>${date.getDate()}</div>
+                    </div>
+                `;
+            });
+
+            headerHtml += '</div></div>';
+
+            // Build task rows
+            let rowsHtml = '';
+            filteredTasks.forEach(task => {
+                const statusClass = task.status === 'completed' ? 'completed' :
+                                   task.status === 'in_progress' ? 'in-progress' : 'pending';
+
+                // Calculate bar position
+                let barHtml = '';
+                if (task.dueDate) {
+                    const dueDate = new Date(task.dueDate);
+                    const startOfTask = task.startDate ? new Date(task.startDate) : new Date(dueDate);
+                    startOfTask.setDate(startOfTask.getDate() - 3); // Default 3 days duration if no start
+
+                    const dayWidth = 40; // matches min-width of gantt-date-cell
+                    const startOffset = Math.floor((startOfTask - ganttStartDate) / (1000 * 60 * 60 * 24));
+                    const endOffset = Math.floor((dueDate - ganttStartDate) / (1000 * 60 * 60 * 24));
+                    const duration = Math.max(1, endOffset - startOffset + 1);
+
+                    const left = startOffset * dayWidth;
+                    const width = duration * dayWidth - 4;
+
+                    const isOverdue = dueDate < today && task.status !== 'completed';
+                    const barClass = isOverdue ? 'overdue' : statusClass;
+
+                    if (startOffset < daysToShow && endOffset >= 0) {
+                        barHtml = `
+                            <div class="gantt-bar ${barClass}"
+                                 style="left: ${Math.max(0, left)}px; width: ${Math.min(width, (daysToShow - Math.max(0, startOffset)) * dayWidth)}px;"
+                                 onclick="openTaskModal('${task.id}')"
+                                 title="${task.name}">
+                                ${task.name}
+                            </div>
+                        `;
+                    }
+                }
+
+                rowsHtml += `
+                    <div class="gantt-row">
+                        <div class="gantt-task-cell" onclick="openTaskModal('${task.id}')" style="cursor: pointer;">
+                            <div class="gantt-task-status ${statusClass}"></div>
+                            <span style="overflow: hidden; text-overflow: ellipsis; white-space: nowrap;">${task.name}</span>
+                        </div>
+                        <div class="gantt-bar-area">
+                            ${barHtml}
+                        </div>
+                    </div>
+                `;
+            });
+
+            content.innerHTML = headerHtml + rowsHtml + '</div>';
+        }
+
+        function ganttNavigate(days) {
+            ganttStartDate.setDate(ganttStartDate.getDate() + days);
+            renderGanttView();
+        }
+
+        function ganttGoToToday() {
+            ganttStartDate = new Date();
+            ganttStartDate.setDate(ganttStartDate.getDate() - 7);
+            renderGanttView();
+        }
+
+        // ============================================
+        // CALENDAR VIEW
+        // ============================================
+
+        let calendarCurrentMonth = new Date();
+
+        function renderCalendarView() {
+            const content = document.getElementById('calendarViewContent');
+            const filteredTasks = getFilteredTasks();
+
+            const year = calendarCurrentMonth.getFullYear();
+            const month = calendarCurrentMonth.getMonth();
+            const monthNames = ['January', 'February', 'March', 'April', 'May', 'June',
+                              'July', 'August', 'September', 'October', 'November', 'December'];
+
+            const today = new Date();
+            today.setHours(0, 0, 0, 0);
+
+            // Get first day of month and number of days
+            const firstDay = new Date(year, month, 1);
+            const lastDay = new Date(year, month + 1, 0);
+            const daysInMonth = lastDay.getDate();
+            const startDayOfWeek = firstDay.getDay();
+
+            // Group tasks by due date
+            const tasksByDate = {};
+            filteredTasks.forEach(task => {
+                if (task.dueDate) {
+                    const dateKey = task.dueDate.split('T')[0];
+                    if (!tasksByDate[dateKey]) tasksByDate[dateKey] = [];
+                    tasksByDate[dateKey].push(task);
+                }
+            });
+
+            let html = `
+                <div class="calendar-header">
+                    <div class="calendar-nav">
+                        <button class="calendar-nav-btn" onclick="calendarNavigate(-1)">
+                            <i class="ph ph-caret-left"></i>
+                        </button>
+                        <div class="calendar-month-title">${monthNames[month]} ${year}</div>
+                        <button class="calendar-nav-btn" onclick="calendarNavigate(1)">
+                            <i class="ph ph-caret-right"></i>
+                        </button>
+                    </div>
+                    <button class="calendar-today-btn" onclick="calendarGoToToday()">Today</button>
+                </div>
+                <div class="calendar-grid">
+                    <div class="calendar-weekdays">
+                        <div class="calendar-weekday">Sun</div>
+                        <div class="calendar-weekday">Mon</div>
+                        <div class="calendar-weekday">Tue</div>
+                        <div class="calendar-weekday">Wed</div>
+                        <div class="calendar-weekday">Thu</div>
+                        <div class="calendar-weekday">Fri</div>
+                        <div class="calendar-weekday">Sat</div>
+                    </div>
+                    <div class="calendar-days">
+            `;
+
+            // Add empty cells for days before first of month
+            for (let i = 0; i < startDayOfWeek; i++) {
+                const prevMonthDay = new Date(year, month, -startDayOfWeek + i + 1);
+                html += `<div class="calendar-day other-month"><div class="calendar-day-number">${prevMonthDay.getDate()}</div></div>`;
+            }
+
+            // Add days of the month
+            for (let day = 1; day <= daysInMonth; day++) {
+                const currentDate = new Date(year, month, day);
+                const dateKey = currentDate.toISOString().split('T')[0];
+                const isToday = currentDate.toDateString() === today.toDateString();
+                const dayTasks = tasksByDate[dateKey] || [];
+
+                let tasksHtml = '';
+                dayTasks.slice(0, 3).forEach(task => {
+                    const isOverdue = new Date(task.dueDate) < today && task.status !== 'completed';
+                    const statusClass = isOverdue ? 'overdue' :
+                                       task.status === 'completed' ? 'completed' :
+                                       task.status === 'in_progress' ? 'in-progress' : 'pending';
+                    tasksHtml += `
+                        <div class="calendar-task ${statusClass}" onclick="event.stopPropagation(); openTaskModal('${task.id}')" title="${task.name}">
+                            ${task.name}
+                        </div>
+                    `;
+                });
+
+                if (dayTasks.length > 3) {
+                    tasksHtml += `<div class="calendar-task" style="background: #F5F2ED; color: #6B5642;">+${dayTasks.length - 3} more</div>`;
+                }
+
+                html += `
+                    <div class="calendar-day ${isToday ? 'today' : ''}" onclick="showDayTasks('${dateKey}')">
+                        <div class="calendar-day-number">${day}</div>
+                        <div class="calendar-day-tasks">${tasksHtml}</div>
+                    </div>
+                `;
+            }
+
+            // Add empty cells for days after last of month
+            const cellsUsed = startDayOfWeek + daysInMonth;
+            const cellsNeeded = Math.ceil(cellsUsed / 7) * 7;
+            for (let i = cellsUsed; i < cellsNeeded; i++) {
+                const nextMonthDay = i - cellsUsed + 1;
+                html += `<div class="calendar-day other-month"><div class="calendar-day-number">${nextMonthDay}</div></div>`;
+            }
+
+            html += '</div></div>';
+            content.innerHTML = html;
+        }
+
+        function calendarNavigate(direction) {
+            calendarCurrentMonth.setMonth(calendarCurrentMonth.getMonth() + direction);
+            renderCalendarView();
+        }
+
+        function calendarGoToToday() {
+            calendarCurrentMonth = new Date();
+            renderCalendarView();
+        }
+
+        function showDayTasks(dateKey) {
+            // Could open a modal showing all tasks for that day
+            console.log('Show tasks for:', dateKey);
+        }
+
         // Keyboard shortcut for hero task modal
         document.addEventListener('keydown', function(event) {
             const overlay = document.getElementById('heroTaskOverlay');
@@ -29490,12 +30325,12 @@ Options:
                     });
                 }
 
-                // Show tasks view by default - work shapes structure
+                // Show kanban view by default
                 try {
-                    switchView('tasks');
-                    console.log('✅ Tasks view activated');
+                    switchView('kanban');
+                    console.log('✅ Kanban view activated');
                 } catch (e) {
-                    console.error('❌ Error switching to card view:', e);
+                    console.error('❌ Error switching to kanban view:', e);
                     updateStatus('Error loading view', false);
                 }
 
