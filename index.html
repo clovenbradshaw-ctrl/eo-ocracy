@@ -15275,105 +15275,9 @@ John Doe,Engineering,john@example.com"
         function renderEntityList() {
             const list = document.getElementById('entityList');
             if (!list) return; // Safety check
-            
+
             const searchTerm = document.getElementById('entitySearch')?.value.toLowerCase() || '';
             list.innerHTML = '';
-
-            // Helper function to recursively render entity tree
-            // Use visited set to prevent infinite recursion from bidirectional relationships
-            function renderEntityNode(entity, depth = 0, searchTerm = '', visited = new Set()) {
-                // Prevent infinite recursion - skip if already rendered in this branch
-                if (visited.has(entity.id)) {
-                    return null;
-                }
-                visited.add(entity.id);
-
-                const marginLeft = depth * 1;
-                
-                // Skip if doesn't match search
-                if (searchTerm && !entity.name.toLowerCase().includes(searchTerm)) {
-                    const hasMatchingChildren = findMatchingChildren(entity.id, searchTerm);
-                    if (!hasMatchingChildren) return null;
-                }
-
-                const container = document.createElement('div');
-                const node = document.createElement('div');
-                node.className = `tree-node-item ${entity.type}`;
-                node.style.marginLeft = `${marginLeft}rem`;
-                node.style.cursor = 'pointer';
-                node.onclick = (e) => {
-                    if (!e.target.closest('.btn-icon') && !e.target.closest('.tree-expand-icon')) {
-                        openEntityModal(entity.id, entity.type);
-                    }
-                };
-
-                const icon = getIcon(entity.type);
-                
-                // Get all potential children (units, teams, roles - NOT objects)
-                let children = [];
-                if (entity.type === 'unit') {
-                    children = [
-                        ...getConnectedEntities(entity.id, 'unit'),
-                        ...getConnectedEntities(entity.id, 'team'),
-                        ...getConnectedEntities(entity.id, 'role')
-                    ];
-                } else if (entity.type === 'team') {
-                    children = [
-                        ...getConnectedEntities(entity.id, 'team'),
-                        ...getConnectedEntities(entity.id, 'role')
-                    ];
-                }
-                // Roles don't show objects as children - objects shown separately
-
-                const hasChildren = children.length > 0;
-
-                node.innerHTML = `
-                    <span class="tree-expand-icon ${hasChildren ? 'expanded' : ''}" style="${hasChildren ? '' : 'visibility: hidden;'}">▶</span>
-                    <span class="tree-node-icon" style="font-size: ${depth === 0 ? '1.1rem' : '0.95rem'};">${icon}</span>
-                    <div class="tree-node-content">
-                        <div class="tree-node-name">${entity.name}</div>
-                    </div>
-                    <div class="tree-node-actions">
-                        ${(entity.type === 'unit' || entity.type === 'team') ? `<button class="btn-icon add" onclick="event.stopPropagation(); quickAddChild('${entity.id}', '${entity.type}')" title="Add sub-entity"><i class="ph ph-plus"></i></button>` : ''}
-                        <button class="btn-icon" onclick="event.stopPropagation(); deleteEntity('${entity.id}', '${entity.type}')" title="Delete"><i class="ph ph-x"></i></button>
-                    </div>
-                `;
-
-                container.appendChild(node);
-
-                if (hasChildren) {
-                    const childrenContainer = document.createElement('div');
-                    childrenContainer.className = 'tree-children expanded';
-
-                    children.forEach(child => {
-                        if (searchTerm && !child.name.toLowerCase().includes(searchTerm)) {
-                            const hasMatchingGrandchildren = findMatchingChildren(child.id, searchTerm);
-                            if (!hasMatchingGrandchildren) return;
-                        }
-                        
-                        const childNode = renderEntityNode(child, depth + 1, searchTerm, visited);
-                        if (childNode) {
-                            childrenContainer.appendChild(childNode);
-                        }
-                    });
-
-                    if (childrenContainer.children.length > 0) {
-                        container.appendChild(childrenContainer);
-
-                        // Add expand/collapse
-                        const expandIcon = node.querySelector('.tree-expand-icon');
-                        if (expandIcon) {
-                            expandIcon.onclick = (e) => {
-                                e.stopPropagation();
-                                childrenContainer.classList.toggle('expanded');
-                                expandIcon.classList.toggle('expanded');
-                            };
-                        }
-                    }
-                }
-
-                return container;
-            }
 
             // Helper to get people assigned to a role (via INS relationship)
             function getPeopleInRole(roleId) {
@@ -15383,54 +15287,337 @@ John Doe,Engineering,john@example.com"
                     .filter(e => e !== null && e.type === 'person');
             }
 
-            // 1. ROLES - The primary entry point (with people tagged)
-            if (entities.role.length > 0 && (!searchTerm || entities.role.some(r => r.name.toLowerCase().includes(searchTerm)))) {
+            // Helper to render people badges for a role
+            function renderPeopleBadges(roleId) {
+                const peopleInRole = getPeopleInRole(roleId);
+                if (peopleInRole.length === 0) return '';
+                return `<div style="display: flex; gap: 0.25rem; flex-wrap: wrap; margin-top: 0.25rem; margin-left: 1.5rem;">
+                    ${peopleInRole.map(person =>
+                        `<span style="font-size: 0.65rem; padding: 0.125rem 0.375rem; background: rgba(139, 111, 71, 0.1); color: #8B6F47; border-radius: 10px; cursor: pointer;" onclick="event.stopPropagation(); openEntityModal('${person.id}', 'person')"><i class="ph ph-user"></i> ${person.name}</span>`
+                    ).join('')}
+                   </div>`;
+            }
+
+            // Helper to render a role node with people badges
+            function renderRoleNode(role, depth = 0) {
+                const container = document.createElement('div');
+                const node = document.createElement('div');
+                node.className = 'tree-node-item role';
+                node.style.marginLeft = `${depth}rem`;
+                node.style.cursor = 'pointer';
+                node.onclick = (e) => {
+                    if (!e.target.closest('.btn-icon')) {
+                        openEntityModal(role.id, 'role');
+                    }
+                };
+
+                const peopleBadges = renderPeopleBadges(role.id);
+                node.innerHTML = `
+                    <span class="tree-expand-icon" style="visibility: hidden;">▶</span>
+                    <span class="tree-node-icon"><i class="ph ph-briefcase"></i></span>
+                    <div class="tree-node-content">
+                        <div class="tree-node-name">${role.name}</div>
+                    </div>
+                    <div class="tree-node-actions">
+                        <button class="btn-icon" onclick="event.stopPropagation(); deleteEntity('${role.id}', 'role')" title="Delete"><i class="ph ph-x"></i></button>
+                    </div>
+                `;
+                container.appendChild(node);
+
+                // Add people badges below the role
+                if (peopleBadges) {
+                    const badgesDiv = document.createElement('div');
+                    badgesDiv.innerHTML = peopleBadges;
+                    badgesDiv.style.marginLeft = `${depth}rem`;
+                    container.appendChild(badgesDiv);
+                }
+
+                return container;
+            }
+
+            // Helper to render a team node with its roles
+            function renderTeamNode(team, depth = 0, searchTerm = '') {
+                const rolesInTeam = getConnectedEntities(team.id, 'role');
+
+                // Filter roles if searching
+                const filteredRoles = searchTerm
+                    ? rolesInTeam.filter(r => r.name.toLowerCase().includes(searchTerm) || team.name.toLowerCase().includes(searchTerm))
+                    : rolesInTeam;
+
+                const container = document.createElement('div');
+                const node = document.createElement('div');
+                node.className = 'tree-node-item team';
+                node.style.marginLeft = `${depth}rem`;
+                node.style.cursor = 'pointer';
+                node.onclick = (e) => {
+                    if (!e.target.closest('.btn-icon') && !e.target.closest('.tree-expand-icon')) {
+                        openEntityModal(team.id, 'team');
+                    }
+                };
+
+                const hasRoles = filteredRoles.length > 0;
+                node.innerHTML = `
+                    <span class="tree-expand-icon ${hasRoles ? 'expanded' : ''}" style="${hasRoles ? '' : 'visibility: hidden;'}">▶</span>
+                    <span class="tree-node-icon"><i class="ph ph-users-three"></i></span>
+                    <div class="tree-node-content">
+                        <div class="tree-node-name">${team.name}</div>
+                    </div>
+                    <div class="tree-node-actions">
+                        <button class="btn-icon add" onclick="event.stopPropagation(); quickAddChild('${team.id}', 'team')" title="Add role"><i class="ph ph-plus"></i></button>
+                        <button class="btn-icon" onclick="event.stopPropagation(); deleteEntity('${team.id}', 'team')" title="Delete"><i class="ph ph-x"></i></button>
+                    </div>
+                `;
+                container.appendChild(node);
+
+                if (hasRoles) {
+                    const childrenContainer = document.createElement('div');
+                    childrenContainer.className = 'tree-children expanded';
+
+                    filteredRoles.forEach(role => {
+                        const roleNode = renderRoleNode(role, depth + 1);
+                        childrenContainer.appendChild(roleNode);
+                    });
+
+                    container.appendChild(childrenContainer);
+
+                    const expandIcon = node.querySelector('.tree-expand-icon');
+                    if (expandIcon) {
+                        expandIcon.onclick = (e) => {
+                            e.stopPropagation();
+                            childrenContainer.classList.toggle('expanded');
+                            expandIcon.classList.toggle('expanded');
+                        };
+                    }
+                }
+
+                return container;
+            }
+
+            // Helper to render a unit node with its teams and roles
+            function renderUnitNode(unit, depth = 0, searchTerm = '', visited = new Set()) {
+                if (visited.has(unit.id)) return null;
+                visited.add(unit.id);
+
+                const teamsInUnit = getConnectedEntities(unit.id, 'team');
+                const rolesInUnit = getConnectedEntities(unit.id, 'role');
+                const subUnits = getConnectedEntities(unit.id, 'unit');
+
+                // Filter based on search
+                const matchesSearch = (entity) => entity.name.toLowerCase().includes(searchTerm);
+                const filteredTeams = searchTerm
+                    ? teamsInUnit.filter(t => matchesSearch(t) || getConnectedEntities(t.id, 'role').some(matchesSearch) || matchesSearch(unit))
+                    : teamsInUnit;
+                const filteredRoles = searchTerm
+                    ? rolesInUnit.filter(r => matchesSearch(r) || matchesSearch(unit))
+                    : rolesInUnit;
+                const filteredSubUnits = searchTerm
+                    ? subUnits.filter(u => matchesSearch(u) || findMatchingChildren(u.id, searchTerm))
+                    : subUnits;
+
+                const container = document.createElement('div');
+                const node = document.createElement('div');
+                node.className = 'tree-node-item unit';
+                node.style.marginLeft = `${depth}rem`;
+                node.style.cursor = 'pointer';
+                node.onclick = (e) => {
+                    if (!e.target.closest('.btn-icon') && !e.target.closest('.tree-expand-icon')) {
+                        openEntityModal(unit.id, 'unit');
+                    }
+                };
+
+                const hasChildren = filteredTeams.length > 0 || filteredRoles.length > 0 || filteredSubUnits.length > 0;
+                node.innerHTML = `
+                    <span class="tree-expand-icon ${hasChildren ? 'expanded' : ''}" style="${hasChildren ? '' : 'visibility: hidden;'}">▶</span>
+                    <span class="tree-node-icon"><i class="ph ph-buildings"></i></span>
+                    <div class="tree-node-content">
+                        <div class="tree-node-name">${unit.name}</div>
+                    </div>
+                    <div class="tree-node-actions">
+                        <button class="btn-icon add" onclick="event.stopPropagation(); quickAddChild('${unit.id}', 'unit')" title="Add team/role"><i class="ph ph-plus"></i></button>
+                        <button class="btn-icon" onclick="event.stopPropagation(); deleteEntity('${unit.id}', 'unit')" title="Delete"><i class="ph ph-x"></i></button>
+                    </div>
+                `;
+                container.appendChild(node);
+
+                if (hasChildren) {
+                    const childrenContainer = document.createElement('div');
+                    childrenContainer.className = 'tree-children expanded';
+
+                    // Render sub-units first
+                    filteredSubUnits.forEach(subUnit => {
+                        const subUnitNode = renderUnitNode(subUnit, depth + 1, searchTerm, visited);
+                        if (subUnitNode) childrenContainer.appendChild(subUnitNode);
+                    });
+
+                    // Then teams
+                    filteredTeams.forEach(team => {
+                        const teamNode = renderTeamNode(team, depth + 1, searchTerm);
+                        childrenContainer.appendChild(teamNode);
+                    });
+
+                    // Then direct roles (roles not in a team)
+                    filteredRoles.forEach(role => {
+                        const roleNode = renderRoleNode(role, depth + 1);
+                        childrenContainer.appendChild(roleNode);
+                    });
+
+                    container.appendChild(childrenContainer);
+
+                    const expandIcon = node.querySelector('.tree-expand-icon');
+                    if (expandIcon) {
+                        expandIcon.onclick = (e) => {
+                            e.stopPropagation();
+                            childrenContainer.classList.toggle('expanded');
+                            expandIcon.classList.toggle('expanded');
+                        };
+                    }
+                }
+
+                return container;
+            }
+
+            // Track which entities are rendered in the hierarchy
+            const renderedTeamIds = new Set();
+            const renderedRoleIds = new Set();
+
+            // 1. UNITS - The organizational hierarchy: Units > Teams > Roles (with people tagged)
+            if (entities.unit.length > 0) {
+                // Find top-level units (not contained by any other unit)
+                const topLevelUnits = entities.unit.filter(unit => {
+                    return !relationships.some(r =>
+                        r.object === unit.id && entities.unit.some(u => u.id === r.subject)
+                    );
+                });
+
+                // Filter for search
+                const filteredUnits = searchTerm
+                    ? topLevelUnits.filter(u => u.name.toLowerCase().includes(searchTerm) || findMatchingChildren(u.id, searchTerm))
+                    : topLevelUnits;
+
+                if (filteredUnits.length > 0) {
+                    const section = document.createElement('div');
+                    section.className = 'entity-section';
+                    const header = document.createElement('div');
+                    header.className = 'entity-section-header';
+                    header.innerHTML = '<i class="ph ph-buildings" style="margin-right: 0.25rem;"></i> Units';
+                    section.appendChild(header);
+
+                    filteredUnits.forEach(unit => {
+                        const unitNode = renderUnitNode(unit, 0, searchTerm);
+                        if (unitNode) {
+                            section.appendChild(unitNode);
+                            // Track teams and roles rendered under this unit
+                            getConnectedEntities(unit.id, 'team').forEach(t => {
+                                renderedTeamIds.add(t.id);
+                                getConnectedEntities(t.id, 'role').forEach(r => renderedRoleIds.add(r.id));
+                            });
+                            getConnectedEntities(unit.id, 'role').forEach(r => renderedRoleIds.add(r.id));
+                        }
+                    });
+
+                    if (section.children.length > 1) {
+                        list.appendChild(section);
+                    }
+                }
+            }
+
+            // 2. ORPHANED TEAMS - Teams not under any unit
+            const orphanedTeams = entities.team.filter(team => !renderedTeamIds.has(team.id));
+            if (orphanedTeams.length > 0) {
+                const filteredTeams = searchTerm
+                    ? orphanedTeams.filter(t => t.name.toLowerCase().includes(searchTerm) ||
+                        getConnectedEntities(t.id, 'role').some(r => r.name.toLowerCase().includes(searchTerm)))
+                    : orphanedTeams;
+
+                if (filteredTeams.length > 0) {
+                    const section = document.createElement('div');
+                    section.className = 'entity-section';
+                    const header = document.createElement('div');
+                    header.className = 'entity-section-header';
+                    header.innerHTML = '<i class="ph ph-users-three" style="margin-right: 0.25rem;"></i> Teams';
+                    section.appendChild(header);
+
+                    filteredTeams.forEach(team => {
+                        const teamNode = renderTeamNode(team, 0, searchTerm);
+                        section.appendChild(teamNode);
+                        // Track roles rendered under this team
+                        getConnectedEntities(team.id, 'role').forEach(r => renderedRoleIds.add(r.id));
+                    });
+
+                    if (section.children.length > 1) {
+                        list.appendChild(section);
+                    }
+                }
+            }
+
+            // 3. ORPHANED ROLES - Roles not under any team or unit
+            const orphanedRoles = entities.role.filter(role => !renderedRoleIds.has(role.id));
+            if (orphanedRoles.length > 0) {
+                const filteredRoles = searchTerm
+                    ? orphanedRoles.filter(r => r.name.toLowerCase().includes(searchTerm))
+                    : orphanedRoles;
+
+                if (filteredRoles.length > 0) {
+                    const section = document.createElement('div');
+                    section.className = 'entity-section';
+                    const header = document.createElement('div');
+                    header.className = 'entity-section-header';
+                    header.innerHTML = '<i class="ph ph-briefcase" style="margin-right: 0.25rem;"></i> Roles';
+                    section.appendChild(header);
+
+                    filteredRoles.forEach(role => {
+                        const roleNode = renderRoleNode(role, 0);
+                        section.appendChild(roleNode);
+                    });
+
+                    if (section.children.length > 1) {
+                        list.appendChild(section);
+                    }
+                }
+            }
+
+            // 4. WORK PRODUCTS
+            if (entities.product.length > 0 && (!searchTerm || entities.product.some(o => o.name.toLowerCase().includes(searchTerm)))) {
                 const section = document.createElement('div');
                 section.className = 'entity-section';
                 const header = document.createElement('div');
                 header.className = 'entity-section-header';
-                header.textContent = 'Roles';
+                header.innerHTML = '<i class="ph ph-package" style="margin-right: 0.25rem;"></i> Work Products';
                 section.appendChild(header);
 
-                entities.role.forEach(role => {
-                    if (searchTerm && !role.name.toLowerCase().includes(searchTerm)) return;
-
-                    const peopleInRole = getPeopleInRole(role.id);
-                    const peopleBadges = peopleInRole.length > 0
-                        ? `<div style="display: flex; gap: 0.25rem; flex-wrap: wrap; margin-top: 0.25rem;">
-                            ${peopleInRole.map(person =>
-                                `<span style="font-size: 0.65rem; padding: 0.125rem 0.375rem; background: rgba(139, 111, 71, 0.1); color: #8B6F47; border-radius: 10px;"><i class="ph ph-user"></i> ${person.name}</span>`
-                            ).join('')}
-                           </div>`
-                        : '';
+                entities.product.forEach(obj => {
+                    if (searchTerm && !obj.name.toLowerCase().includes(searchTerm)) return;
 
                     const node = document.createElement('div');
-                    node.className = 'entity-item role';
+                    node.className = 'entity-item product';
                     node.style.cursor = 'pointer';
                     node.onclick = (e) => {
                         if (!e.target.closest('.btn-icon')) {
-                            openEntityModal(role.id, 'role');
+                            openEntityModal(obj.id, 'product');
                         }
                     };
+
                     node.innerHTML = `
                         <div style="flex: 1;">
-                            <div class="entity-name"><i class="ph ph-briefcase"></i> ${role.name}</div>
-                            ${peopleBadges}
+                            <div class="entity-name"><i class="ph ph-package"></i> ${obj.name}</div>
                         </div>
-                        <button class="btn-icon" onclick="event.stopPropagation(); deleteEntity('${role.id}', 'role')"><i class="ph ph-x"></i></button>
+                        <button class="btn-icon" onclick="event.stopPropagation(); deleteEntity('${obj.id}', 'product')"><i class="ph ph-x"></i></button>
                     `;
                     section.appendChild(node);
                 });
-                list.appendChild(section);
+
+                if (section.children.length > 1) {
+                    list.appendChild(section);
+                }
             }
 
-            // 2. PEOPLE - Individuals (shown separately)
+            // 5. PEOPLE - Separate section at the bottom
             if (entities.person.length > 0 && (!searchTerm || entities.person.some(p => p.name.toLowerCase().includes(searchTerm)))) {
                 const section = document.createElement('div');
                 section.className = 'entity-section';
                 const header = document.createElement('div');
                 header.className = 'entity-section-header';
-                header.textContent = 'People';
+                header.innerHTML = '<i class="ph ph-user" style="margin-right: 0.25rem;"></i> People';
                 section.appendChild(header);
 
                 entities.person.forEach(person => {
@@ -15445,7 +15632,7 @@ John Doe,Engineering,john@example.com"
                     const roleBadges = assignedRoles.length > 0
                         ? `<div style="display: flex; gap: 0.25rem; flex-wrap: wrap; margin-top: 0.25rem;">
                             ${assignedRoles.map(role =>
-                                `<span style="font-size: 0.65rem; padding: 0.125rem 0.375rem; background: rgba(139, 111, 71, 0.1); color: #8B6F47; border-radius: 10px;"><i class="ph ph-briefcase"></i> ${role.name}</span>`
+                                `<span style="font-size: 0.65rem; padding: 0.125rem 0.375rem; background: rgba(139, 111, 71, 0.1); color: #8B6F47; border-radius: 10px; cursor: pointer;" onclick="event.stopPropagation(); openEntityModal('${role.id}', 'role')"><i class="ph ph-briefcase"></i> ${role.name}</span>`
                             ).join('')}
                            </div>`
                         : '';
@@ -15467,308 +15654,9 @@ John Doe,Engineering,john@example.com"
                     `;
                     section.appendChild(node);
                 });
-                list.appendChild(section);
-            }
-
-            // 3. WORK PRODUCTS
-            if (entities.product.length > 0 && (!searchTerm || entities.product.some(o => o.name.toLowerCase().includes(searchTerm)))) {
-                const section = document.createElement('div');
-                section.className = 'entity-section';
-                const header = document.createElement('div');
-                header.className = 'entity-section-header';
-                header.textContent = 'Work Products';
-                section.appendChild(header);
-
-                entities.product.forEach(obj => {
-                    if (searchTerm && !obj.name.toLowerCase().includes(searchTerm)) return;
-
-                    // Find roles connected to this product
-                    const connectedRoles = relationships
-                        .filter(r => r.object === obj.id || r.subject === obj.id)
-                        .map(r => {
-                            const entityId = r.object === obj.id ? r.subject : r.object;
-                            return findEntity(entityId);
-                        })
-                        .filter(e => e && e.type === 'role');
-
-                    const node = document.createElement('div');
-                    node.className = 'entity-item product';
-                    node.style.cursor = 'pointer';
-                    node.onclick = (e) => {
-                        if (!e.target.closest('.btn-icon')) {
-                            openEntityModal(obj.id, 'product');
-                        }
-                    };
-
-                    const connectionBadges = connectedRoles.length > 0
-                        ? `<div style="display: flex; gap: 0.25rem; flex-wrap: wrap; margin-top: 0.25rem;">
-                            ${connectedRoles.map(role =>
-                                `<span style="font-size: 0.65rem; padding: 0.125rem 0.375rem; background: rgba(139, 111, 71, 0.1); color: #8B6F47; border-radius: 10px;"><i class="ph ph-briefcase"></i> ${role.name}</span>`
-                            ).join('')}
-                           </div>`
-                        : '';
-
-                    node.innerHTML = `
-                        <div style="flex: 1;">
-                            <div class="entity-name"><i class="ph ph-package"></i> ${obj.name}</div>
-                            ${connectionBadges}
-                        </div>
-                        <button class="btn-icon" onclick="event.stopPropagation(); deleteEntity('${obj.id}', 'object')"><i class="ph ph-x"></i></button>
-                    `;
-                    section.appendChild(node);
-                });
-                list.appendChild(section);
-            }
-
-            // 4. TEAMS - Teams with their roles
-            if (entities.team.length > 0 && (!searchTerm || entities.team.some(t => t.name.toLowerCase().includes(searchTerm)) ||
-                entities.team.some(t => getConnectedEntities(t.id, 'role').some(r => r.name.toLowerCase().includes(searchTerm))))) {
-                const section = document.createElement('div');
-                section.className = 'entity-section';
-                const header = document.createElement('div');
-                header.className = 'entity-section-header';
-                header.innerHTML = '<i class="ph ph-users-three" style="margin-right: 0.25rem;"></i> Teams';
-                section.appendChild(header);
-
-                entities.team.forEach(team => {
-                    const rolesInTeam = getConnectedEntities(team.id, 'role');
-
-                    // Skip if doesn't match search (check team name and role names)
-                    if (searchTerm) {
-                        const teamMatches = team.name.toLowerCase().includes(searchTerm);
-                        const rolesMatch = rolesInTeam.some(r => r.name.toLowerCase().includes(searchTerm));
-                        if (!teamMatches && !rolesMatch) return;
-                    }
-
-                    const container = document.createElement('div');
-                    const node = document.createElement('div');
-                    node.className = 'tree-node-item team';
-                    node.style.cursor = 'pointer';
-                    node.onclick = (e) => {
-                        if (!e.target.closest('.btn-icon') && !e.target.closest('.tree-expand-icon')) {
-                            openEntityModal(team.id, 'team');
-                        }
-                    };
-
-                    const hasRoles = rolesInTeam.length > 0;
-                    node.innerHTML = `
-                        <span class="tree-expand-icon ${hasRoles ? 'expanded' : ''}" style="${hasRoles ? '' : 'visibility: hidden;'}">▶</span>
-                        <span class="tree-node-icon"><i class="ph ph-users-three"></i></span>
-                        <div class="tree-node-content">
-                            <div class="tree-node-name">${team.name}</div>
-                        </div>
-                        <div class="tree-node-actions">
-                            <button class="btn-icon" onclick="event.stopPropagation(); deleteEntity('${team.id}', 'team')" title="Delete"><i class="ph ph-x"></i></button>
-                        </div>
-                    `;
-                    container.appendChild(node);
-
-                    if (hasRoles) {
-                        const childrenContainer = document.createElement('div');
-                        childrenContainer.className = 'tree-children expanded';
-
-                        rolesInTeam.forEach(role => {
-                            if (searchTerm && !role.name.toLowerCase().includes(searchTerm) && !team.name.toLowerCase().includes(searchTerm)) return;
-
-                            const roleNode = document.createElement('div');
-                            roleNode.className = 'tree-node-item role';
-                            roleNode.style.marginLeft = '1rem';
-                            roleNode.style.cursor = 'pointer';
-                            roleNode.onclick = (e) => {
-                                if (!e.target.closest('.btn-icon')) {
-                                    openEntityModal(role.id, 'role');
-                                }
-                            };
-                            roleNode.innerHTML = `
-                                <span class="tree-expand-icon" style="visibility: hidden;">▶</span>
-                                <span class="tree-node-icon"><i class="ph ph-briefcase"></i></span>
-                                <div class="tree-node-content">
-                                    <div class="tree-node-name">${role.name}</div>
-                                </div>
-                                <div class="tree-node-actions">
-                                    <button class="btn-icon" onclick="event.stopPropagation(); deleteEntity('${role.id}', 'role')" title="Delete"><i class="ph ph-x"></i></button>
-                                </div>
-                            `;
-                            childrenContainer.appendChild(roleNode);
-                        });
-
-                        if (childrenContainer.children.length > 0) {
-                            container.appendChild(childrenContainer);
-
-                            const expandIcon = node.querySelector('.tree-expand-icon');
-                            if (expandIcon) {
-                                expandIcon.onclick = (e) => {
-                                    e.stopPropagation();
-                                    childrenContainer.classList.toggle('expanded');
-                                    expandIcon.classList.toggle('expanded');
-                                };
-                            }
-                        }
-                    }
-
-                    section.appendChild(container);
-                });
 
                 if (section.children.length > 1) {
                     list.appendChild(section);
-                }
-            }
-
-            // 5. UNITS - Units with their roles
-            if (entities.unit.length > 0 && (!searchTerm || entities.unit.some(u => u.name.toLowerCase().includes(searchTerm)) ||
-                entities.unit.some(u => getConnectedEntities(u.id, 'role').some(r => r.name.toLowerCase().includes(searchTerm))))) {
-                const section = document.createElement('div');
-                section.className = 'entity-section';
-                const header = document.createElement('div');
-                header.className = 'entity-section-header';
-                header.innerHTML = '<i class="ph ph-buildings" style="margin-right: 0.25rem;"></i> Units';
-                section.appendChild(header);
-
-                entities.unit.forEach(unit => {
-                    const rolesInUnit = getConnectedEntities(unit.id, 'role');
-
-                    // Skip if doesn't match search (check unit name and role names)
-                    if (searchTerm) {
-                        const unitMatches = unit.name.toLowerCase().includes(searchTerm);
-                        const rolesMatch = rolesInUnit.some(r => r.name.toLowerCase().includes(searchTerm));
-                        if (!unitMatches && !rolesMatch) return;
-                    }
-
-                    const container = document.createElement('div');
-                    const node = document.createElement('div');
-                    node.className = 'tree-node-item unit';
-                    node.style.cursor = 'pointer';
-                    node.onclick = (e) => {
-                        if (!e.target.closest('.btn-icon') && !e.target.closest('.tree-expand-icon')) {
-                            openEntityModal(unit.id, 'unit');
-                        }
-                    };
-
-                    const hasRoles = rolesInUnit.length > 0;
-                    node.innerHTML = `
-                        <span class="tree-expand-icon ${hasRoles ? 'expanded' : ''}" style="${hasRoles ? '' : 'visibility: hidden;'}">▶</span>
-                        <span class="tree-node-icon"><i class="ph ph-buildings"></i></span>
-                        <div class="tree-node-content">
-                            <div class="tree-node-name">${unit.name}</div>
-                        </div>
-                        <div class="tree-node-actions">
-                            <button class="btn-icon" onclick="event.stopPropagation(); deleteEntity('${unit.id}', 'unit')" title="Delete"><i class="ph ph-x"></i></button>
-                        </div>
-                    `;
-                    container.appendChild(node);
-
-                    if (hasRoles) {
-                        const childrenContainer = document.createElement('div');
-                        childrenContainer.className = 'tree-children expanded';
-
-                        rolesInUnit.forEach(role => {
-                            if (searchTerm && !role.name.toLowerCase().includes(searchTerm) && !unit.name.toLowerCase().includes(searchTerm)) return;
-
-                            const roleNode = document.createElement('div');
-                            roleNode.className = 'tree-node-item role';
-                            roleNode.style.marginLeft = '1rem';
-                            roleNode.style.cursor = 'pointer';
-                            roleNode.onclick = (e) => {
-                                if (!e.target.closest('.btn-icon')) {
-                                    openEntityModal(role.id, 'role');
-                                }
-                            };
-                            roleNode.innerHTML = `
-                                <span class="tree-expand-icon" style="visibility: hidden;">▶</span>
-                                <span class="tree-node-icon"><i class="ph ph-briefcase"></i></span>
-                                <div class="tree-node-content">
-                                    <div class="tree-node-name">${role.name}</div>
-                                </div>
-                                <div class="tree-node-actions">
-                                    <button class="btn-icon" onclick="event.stopPropagation(); deleteEntity('${role.id}', 'role')" title="Delete"><i class="ph ph-x"></i></button>
-                                </div>
-                            `;
-                            childrenContainer.appendChild(roleNode);
-                        });
-
-                        if (childrenContainer.children.length > 0) {
-                            container.appendChild(childrenContainer);
-
-                            const expandIcon = node.querySelector('.tree-expand-icon');
-                            if (expandIcon) {
-                                expandIcon.onclick = (e) => {
-                                    e.stopPropagation();
-                                    childrenContainer.classList.toggle('expanded');
-                                    expandIcon.classList.toggle('expanded');
-                                };
-                            }
-                        }
-                    }
-
-                    section.appendChild(container);
-                });
-
-                if (section.children.length > 1) {
-                    list.appendChild(section);
-                }
-            }
-
-            // 6. STRUCTURE - Units and Teams (emergent organization)
-            const hasStructure = entities.unit.length > 0 || entities.team.length > 0;
-            if (hasStructure) {
-                const structureSection = document.createElement('div');
-                structureSection.className = 'entity-section';
-                structureSection.style.marginTop = '1rem';
-
-                const header = document.createElement('div');
-                header.className = 'entity-section-header';
-                header.innerHTML = '<i class="ph ph-tree-structure" style="margin-right: 0.25rem;"></i> Structure';
-                structureSection.appendChild(header);
-
-                // Find top-level units (not contained by any other unit)
-                const topLevelUnits = entities.unit.filter(unit => {
-                    return !relationships.some(r =>
-                        r.object === unit.id && entities.unit.some(u => u.id === r.subject)
-                    );
-                });
-
-                topLevelUnits.forEach(unit => {
-                    if (searchTerm && !unit.name.toLowerCase().includes(searchTerm)) {
-                        const hasMatchingChildren = findMatchingChildren(unit.id, searchTerm);
-                        if (!hasMatchingChildren) return;
-                    }
-                    const unitNode = renderEntityNode(unit, 0, searchTerm);
-                    if (unitNode) {
-                        structureSection.appendChild(unitNode);
-                    }
-                });
-
-                // Orphaned teams (not connected to any unit or team)
-                const orphanedTeams = entities.team.filter(team => {
-                    const isConnected = relationships.some(r =>
-                        (r.subject === team.id || r.object === team.id) &&
-                        (entities.unit.some(u => u.id === r.subject || u.id === r.object) ||
-                         entities.team.some(t => t.id === r.subject || t.id === r.object))
-                    );
-                    return !isConnected;
-                });
-
-                if (orphanedTeams.length > 0 && (!searchTerm || orphanedTeams.some(t => t.name.toLowerCase().includes(searchTerm)))) {
-                    orphanedTeams.forEach(team => {
-                        if (searchTerm && !team.name.toLowerCase().includes(searchTerm)) return;
-                        const node = document.createElement('div');
-                        node.className = 'entity-item team';
-                        node.style.cursor = 'pointer';
-                        node.onclick = (e) => {
-                            if (!e.target.closest('.btn-icon')) {
-                                openEntityModal(team.id, 'team');
-                            }
-                        };
-                        node.innerHTML = `
-                            <div class="entity-name"><i class="ph ph-users-three"></i> ${team.name}</div>
-                            <button class="btn-icon" onclick="event.stopPropagation(); deleteEntity('${team.id}', 'team')"><i class="ph ph-x"></i></button>
-                        `;
-                        structureSection.appendChild(node);
-                    });
-                }
-
-                if (structureSection.children.length > 1) { // More than just the header
-                    list.appendChild(structureSection);
                 }
             }
 
