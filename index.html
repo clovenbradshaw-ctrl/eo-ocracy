@@ -28668,6 +28668,8 @@ Options:
         // Update task count badge
         function updateTaskCountBadge() {
             const badge = document.getElementById('taskCountBadge');
+            if (!badge) return; // Badge element may not exist
+
             const count = (entities.task || []).length;
 
             if (count > 0) {
