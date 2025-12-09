@@ -9802,6 +9802,108 @@
             color: #F57F17;
         }
 
+        /* Parent-Subtask Kanban Styling */
+        .kanban-card.has-subtasks {
+            border-left: 3px solid #7B95A3;
+        }
+
+        .kanban-card.is-subtask {
+            margin-left: 0.5rem;
+            border-left: 3px solid #C88F4A;
+        }
+
+        .kanban-card.subtask-related {
+            border: 2px solid #C88F4A;
+            box-shadow: 0 0 12px rgba(200, 143, 74, 0.4);
+            z-index: 10;
+            position: relative;
+        }
+
+        .kanban-card.subtask-faded {
+            opacity: 0.15;
+            pointer-events: none;
+            filter: grayscale(50%);
+            transition: opacity 0.2s, filter 0.2s;
+        }
+
+        .kanban-card.parent-blocked {
+            cursor: not-allowed !important;
+        }
+
+        .kanban-card.parent-blocked::after {
+            content: '';
+            position: absolute;
+            inset: 0;
+            background: repeating-linear-gradient(
+                45deg,
+                transparent,
+                transparent 5px,
+                rgba(198, 40, 40, 0.1) 5px,
+                rgba(198, 40, 40, 0.1) 10px
+            );
+            border-radius: 8px;
+            pointer-events: none;
+        }
+
+        /* Subtask badge */
+        .kanban-card-subtask-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.25rem;
+            background: #7B95A3;
+            color: white;
+            font-size: 0.7rem;
+            padding: 0.15rem 0.4rem;
+            border-radius: 4px;
+            margin-left: auto;
+        }
+
+        /* Connection lines between parent and subtasks */
+        .kanban-subtask-connector {
+            position: fixed;
+            pointer-events: none;
+            z-index: 1000;
+        }
+
+        .kanban-subtask-connector line {
+            stroke: #C88F4A;
+            stroke-width: 2;
+            stroke-dasharray: 6 4;
+            animation: dash-flow 0.5s linear infinite;
+        }
+
+        @keyframes dash-flow {
+            to {
+                stroke-dashoffset: -10;
+            }
+        }
+
+        /* Drop zone blocked indicator */
+        .kanban-column-content.drop-blocked {
+            background: rgba(198, 40, 40, 0.1) !important;
+            border: 2px dashed #C62828;
+        }
+
+        .kanban-column-content.drop-blocked::before {
+            content: 'Move subtasks first';
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            background: #C62828;
+            color: white;
+            padding: 0.5rem 1rem;
+            border-radius: 6px;
+            font-size: 0.85rem;
+            font-weight: 500;
+            white-space: nowrap;
+            z-index: 100;
+        }
+
+        .kanban-column-content {
+            position: relative;
+        }
+
         /* ============================================
            TABLE VIEW STYLES
            ============================================ */
@@ -28528,6 +28630,48 @@ Options:
 
         let draggedTaskId = null;
 
+        // Get all subtasks (children) of a parent task
+        function getSubtasks(parentTaskId) {
+            return (entities.task || []).filter(t => t.predecessorId === parentTaskId);
+        }
+
+        // Get the status order for comparison
+        function getStatusOrder(status) {
+            const order = { 'pending': 0, 'in_progress': 1, 'completed': 2 };
+            return order[status] ?? 0;
+        }
+
+        // Check if parent can move to target status (all subtasks must be at or beyond target)
+        function canParentMoveToStatus(parentTaskId, targetStatus) {
+            const subtasks = getSubtasks(parentTaskId);
+            if (subtasks.length === 0) return true; // No subtasks, can move freely
+
+            const targetOrder = getStatusOrder(targetStatus);
+            return subtasks.every(subtask => getStatusOrder(subtask.status) >= targetOrder);
+        }
+
+        // Get all related task IDs (parent and all its subtasks)
+        function getRelatedTaskIds(taskId) {
+            const task = entities.task.find(t => t.id === taskId);
+            if (!task) return [taskId];
+
+            // Get subtasks of this task
+            const subtasks = getSubtasks(taskId);
+
+            // If this task has a predecessor, include sibling subtasks
+            if (task.predecessorId) {
+                const siblings = getSubtasks(task.predecessorId);
+                return [task.predecessorId, taskId, ...siblings.map(s => s.id)];
+            }
+
+            // This is a parent task with subtasks
+            if (subtasks.length > 0) {
+                return [taskId, ...subtasks.map(s => s.id)];
+            }
+
+            return [taskId];
+        }
+
         function renderKanbanBoard() {
             const content = document.getElementById('taskBoardContent');
             const tasks = entities.task || [];
@@ -28590,15 +28734,31 @@ Options:
 
                     const dueDateStatus = getTaskDueDateStatus(task);
 
+                    // Check if this is a parent (has subtasks) or a subtask
+                    const subtasks = getSubtasks(task.id);
+                    const hasSubtasks = subtasks.length > 0;
+                    const isSubtask = !!task.predecessorId;
+                    const parentTask = isSubtask ? entities.task.find(t => t.id === task.predecessorId) : null;
+
+                    // Build card classes
+                    let cardClasses = `kanban-card ${dueDateStatus}`;
+                    if (hasSubtasks) cardClasses += ' has-subtasks';
+                    if (isSubtask) cardClasses += ' is-subtask';
+
                     html += `
-                        <div class="kanban-card ${dueDateStatus}"
+                        <div class="${cardClasses}"
                              draggable="true"
                              data-id="${task.id}"
+                             data-predecessor-id="${task.predecessorId || ''}"
                              ondragstart="handleKanbanDragStart(event)"
                              ondragend="handleKanbanDragEnd(event)"
                              onclick="showEntityDetails('${task.id}')">
-                            <div class="kanban-card-title">${task.name}</div>
+                            <div class="kanban-card-title" style="display: flex; align-items: center; gap: 0.5rem;">
+                                ${task.name}
+                                ${hasSubtasks ? `<span class="kanban-card-subtask-badge"><i class="ph ph-git-branch"></i> ${subtasks.length}</span>` : ''}
+                            </div>
                             <div class="kanban-card-meta">
+                                ${isSubtask && parentTask ? `<span class="kanban-card-role" style="color: #7B95A3;"><i class="ph ph-arrow-bend-left-up"></i> ${parentTask.name}</span>` : ''}
                                 ${role ? `<span class="kanban-card-role"><i class="ph ph-briefcase"></i> ${role.name}</span>` : ''}
                                 ${person ? `<span class="kanban-card-person"><i class="ph ph-user"></i> ${person.name}</span>` : ''}
                                 ${task.dueDate ? `<span class="kanban-card-due ${dueDateStatus}"><i class="ph ph-calendar"></i> ${formatDateShort(task.dueDate)}</span>` : ''}
@@ -28623,20 +28783,71 @@ Options:
             event.currentTarget.classList.add('dragging');
             event.dataTransfer.effectAllowed = 'move';
             event.dataTransfer.setData('text/plain', draggedTaskId);
+
+            // Get related tasks (parent, siblings, or subtasks)
+            const relatedIds = getRelatedTaskIds(draggedTaskId);
+            const hasSubtasks = getSubtasks(draggedTaskId).length > 0;
+
+            // Highlight related tasks and fade unrelated ones
+            document.querySelectorAll('.kanban-card').forEach(card => {
+                const cardId = card.dataset.id;
+                if (relatedIds.includes(cardId)) {
+                    if (cardId !== draggedTaskId) {
+                        card.classList.add('subtask-related');
+                    }
+                } else {
+                    card.classList.add('subtask-faded');
+                }
+            });
+
+            // Draw connection lines if there are related tasks
+            if (relatedIds.length > 1) {
+                drawSubtaskConnections(draggedTaskId, relatedIds);
+            }
+
+            // Mark columns that are blocked for parent tasks with subtasks
+            if (hasSubtasks) {
+                document.querySelectorAll('.kanban-column').forEach(column => {
+                    const targetStatus = column.dataset.status;
+                    if (!canParentMoveToStatus(draggedTaskId, targetStatus)) {
+                        column.querySelector('.kanban-column-content').classList.add('drop-blocked');
+                    }
+                });
+            }
         }
 
         function handleKanbanDragEnd(event) {
             event.currentTarget.classList.remove('dragging');
             draggedTaskId = null;
-            // Remove all drag-over states
+
+            // Remove all visual states
             document.querySelectorAll('.kanban-column-content').forEach(col => {
                 col.classList.remove('drag-over');
+                col.classList.remove('drop-blocked');
             });
+
+            // Remove highlight/fade from all cards
+            document.querySelectorAll('.kanban-card').forEach(card => {
+                card.classList.remove('subtask-related');
+                card.classList.remove('subtask-faded');
+            });
+
+            // Remove connection lines
+            removeSubtaskConnections();
         }
 
         function handleKanbanDragOver(event) {
             event.preventDefault();
-            event.currentTarget.classList.add('drag-over');
+
+            const columnContent = event.currentTarget;
+
+            // If this column is blocked, don't show drag-over effect
+            if (columnContent.classList.contains('drop-blocked')) {
+                event.dataTransfer.dropEffect = 'none';
+                return;
+            }
+
+            columnContent.classList.add('drag-over');
         }
 
         function handleKanbanDragLeave(event) {
@@ -28652,17 +28863,81 @@ Options:
             const newStatus = event.currentTarget.parentElement.dataset.status;
             const task = entities.task.find(t => t.id === draggedTaskId);
 
-            if (task && task.status !== newStatus) {
-                task.status = newStatus;
-                saveToLocalStorage();
+            if (!task || task.status === newStatus) return;
 
-                logActivityToXano({
-                    event_verb: 'Update Status',
-                    object_type: 'task',
-                    object_label: `${task.name} → ${newStatus}`
-                });
+            // Check if this is a parent task with subtasks
+            const subtasks = getSubtasks(draggedTaskId);
+            if (subtasks.length > 0) {
+                // Check if all subtasks are at or beyond the target status
+                if (!canParentMoveToStatus(draggedTaskId, newStatus)) {
+                    showToast('Move all subtasks to this stage first', 'warning');
+                    return;
+                }
+            }
 
-                renderKanbanBoard();
+            task.status = newStatus;
+            saveToLocalStorage();
+
+            logActivityToXano({
+                event_verb: 'Update Status',
+                object_type: 'task',
+                object_label: `${task.name} → ${newStatus}`
+            });
+
+            renderKanbanBoard();
+        }
+
+        // Draw SVG lines connecting parent to subtasks
+        function drawSubtaskConnections(draggedId, relatedIds) {
+            // Remove any existing connector
+            removeSubtaskConnections();
+
+            const draggedCard = document.querySelector(`.kanban-card[data-id="${draggedId}"]`);
+            if (!draggedCard) return;
+
+            // Create SVG overlay
+            const svg = document.createElementNS('http://www.w3.org/2000/svg', 'svg');
+            svg.classList.add('kanban-subtask-connector');
+            svg.style.position = 'fixed';
+            svg.style.top = '0';
+            svg.style.left = '0';
+            svg.style.width = '100%';
+            svg.style.height = '100%';
+            svg.style.pointerEvents = 'none';
+            svg.style.zIndex = '1000';
+
+            const draggedRect = draggedCard.getBoundingClientRect();
+            const draggedCenterX = draggedRect.left + draggedRect.width / 2;
+            const draggedCenterY = draggedRect.top + draggedRect.height / 2;
+
+            // Draw lines to each related card (except the dragged one)
+            relatedIds.forEach(id => {
+                if (id === draggedId) return;
+
+                const relatedCard = document.querySelector(`.kanban-card[data-id="${id}"]`);
+                if (!relatedCard) return;
+
+                const relatedRect = relatedCard.getBoundingClientRect();
+                const relatedCenterX = relatedRect.left + relatedRect.width / 2;
+                const relatedCenterY = relatedRect.top + relatedRect.height / 2;
+
+                const line = document.createElementNS('http://www.w3.org/2000/svg', 'line');
+                line.setAttribute('x1', draggedCenterX);
+                line.setAttribute('y1', draggedCenterY);
+                line.setAttribute('x2', relatedCenterX);
+                line.setAttribute('y2', relatedCenterY);
+
+                svg.appendChild(line);
+            });
+
+            document.body.appendChild(svg);
+        }
+
+        // Remove connection lines
+        function removeSubtaskConnections() {
+            const existing = document.querySelector('.kanban-subtask-connector');
+            if (existing) {
+                existing.remove();
             }
         }
 
