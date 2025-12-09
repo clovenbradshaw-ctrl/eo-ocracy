@@ -15535,6 +15535,11 @@ Cmd/Ctrl + K - Command palette
             return new Date(timestamp).toLocaleDateString();
         }
 
+        // Open task modal - wrapper for Gantt and Calendar views
+        function openTaskModal(taskId) {
+            showEntityDetails(taskId);
+        }
+
         // Show entity details - helper function to open entity modal without knowing the type
         function showEntityDetails(entityId) {
             // Determine entity type from ID prefix or by searching
