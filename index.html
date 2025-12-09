@@ -13869,6 +13869,7 @@ John Doe,Engineering,john@example.com"
             renderActivityList();
             renderRecycleBin();
 
+            // Refresh the current view
             if (currentView === 'graph') {
                 updateGraph();
             } else if (currentView === 'tree') {
@@ -13877,6 +13878,24 @@ John Doe,Engineering,john@example.com"
                 renderCardView();
             } else if (currentView === 'venn') {
                 renderVennView();
+            } else if (currentView === 'kanban') {
+                renderKanbanBoard();
+            } else if (currentView === 'table') {
+                renderTaskTable();
+            } else if (currentView === 'timeline') {
+                renderTimeline();
+            } else if (currentView === 'gantt') {
+                renderGanttView();
+            } else if (currentView === 'calendar') {
+                renderCalendarView();
+            } else if (currentView === 'tasks') {
+                renderTaskBoardView();
+            } else if (currentView === 'orgchart') {
+                renderOrgChartView();
+            } else if (currentView === 'flow') {
+                renderFlowView();
+            } else if (currentView === 'shape') {
+                renderShapeView();
             }
         }
 
@@ -20550,18 +20569,9 @@ Cmd/Ctrl + K - Command palette
             document.getElementById('parentEntitySelect').value = '';
 
             saveToLocalStorage();
-            renderEntityList();
-            updateSelects();
-            updateParentOptions();
+            refreshAllViews();
             updateStructureSectionVisibility();
-
-            if (currentView === 'graph') {
-                updateGraph();
-            } else if (currentView === 'tree') {
-                renderTreeView();
-            } else if (currentView === 'card') {
-                renderCardView();
-            }
+            updateTaskCountBadge();
         }
 
         // Add structure entity (team/unit) - separate from regular entity creation
@@ -20617,19 +20627,8 @@ Cmd/Ctrl + K - Command palette
             document.getElementById('parentEntitySelect').value = '';
 
             saveToLocalStorage();
-            renderEntityList();
-            updateSelects();
-            updateParentOptions();
-
-            if (currentView === 'graph') {
-                updateGraph();
-            } else if (currentView === 'tree') {
-                renderTreeView();
-            } else if (currentView === 'card') {
-                renderCardView();
-            } else if (currentView === 'shape') {
-                renderShapeView();
-            }
+            refreshAllViews();
+            updateTaskCountBadge();
         }
 
         // Show/hide structure section based on whether roles exist
@@ -27536,10 +27535,9 @@ Options:
             // Re-render the modal to update the UI
             openEntityModal(taskId, 'task');
 
-            // Update task board if visible
-            if (document.getElementById('taskBoardView')?.classList.contains('active')) {
-                renderTaskBoard();
-            }
+            // Update all views
+            refreshAllViews();
+            updateTaskCountBadge();
         }
 
         // Render role work dashboard content - shows people, tasks, and workflows
@@ -28307,11 +28305,8 @@ Options:
 
             // Refresh UI in a try-catch to prevent errors from blocking
             try {
-                renderEntityList();
-                renderActivityList();
-                populateSelects();
+                refreshAllViews();
                 updateTaskCountBadge();
-                renderTaskBoardView();
             } catch (renderError) {
                 console.error('Error refreshing UI after task creation:', renderError);
             }
