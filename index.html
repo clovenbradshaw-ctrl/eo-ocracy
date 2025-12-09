@@ -20053,7 +20053,7 @@ Cmd/Ctrl + K - Command palette
         }
 
         function initSampleData() {
-            // WORK-FIRST SAMPLE DATA
+            // WORK-FIRST SAMPLE DATA - Marketing Agency Example
             // This example shows how work drives structure:
             // 1. First, we have work (tasks) that need to get done
             // 2. Roles emerge to handle that work
@@ -20062,24 +20062,25 @@ Cmd/Ctrl + K - Command palette
 
             const today = new Date();
             const tomorrow = new Date(today.getTime() + 1 * 24 * 60 * 60 * 1000);
+            const in3Days = new Date(today.getTime() + 3 * 24 * 60 * 60 * 1000);
             const nextWeek = new Date(today.getTime() + 7 * 24 * 60 * 60 * 1000);
             const in2Weeks = new Date(today.getTime() + 14 * 24 * 60 * 60 * 1000);
 
-            // STEP 1: THE WORK - What needs to get done?
+            // STEP 1: THE WORK - What needs to get done for a client campaign?
             entities.task.push({
                 id: 'task1',
-                name: 'Interview new client (Garcia family)',
+                name: 'Create client brand guidelines document',
                 type: 'task',
-                description: 'Initial consultation to understand their asylum case.',
+                description: 'Define brand colors, typography, voice, and visual standards for Acme Corp campaign.',
                 dueDate: today.toISOString().split('T')[0],
                 status: 'pending',
                 createdAt: new Date().toISOString()
             });
             entities.task.push({
                 id: 'task2',
-                name: 'Gather country conditions evidence',
+                name: 'Design social media campaign assets',
                 type: 'task',
-                description: 'Research and compile documentation about conditions in home country.',
+                description: 'Create graphics for Instagram, LinkedIn, and Twitter posts based on brand guidelines.',
                 dueDate: tomorrow.toISOString().split('T')[0],
                 predecessorId: 'task1',
                 status: 'pending',
@@ -20087,65 +20088,66 @@ Cmd/Ctrl + K - Command palette
             });
             entities.task.push({
                 id: 'task3',
-                name: 'Draft asylum application',
+                name: 'Write blog post series',
                 type: 'task',
-                description: 'Prepare I-589 form and supporting declaration.',
+                description: 'Draft 4 SEO-optimized blog posts for the Q1 content calendar.',
+                dueDate: in3Days.toISOString().split('T')[0],
+                status: 'pending',
+                createdAt: new Date().toISOString()
+            });
+            entities.task.push({
+                id: 'task4',
+                name: 'Schedule and publish content',
+                type: 'task',
+                description: 'Use scheduling tools to queue all social posts and blog articles.',
                 dueDate: nextWeek.toISOString().split('T')[0],
                 predecessorId: 'task2',
                 status: 'pending',
                 createdAt: new Date().toISOString()
             });
             entities.task.push({
-                id: 'task4',
-                name: 'Review and file application',
-                type: 'task',
-                description: 'Final review by senior attorney, then submit to USCIS.',
-                dueDate: in2Weeks.toISOString().split('T')[0],
-                predecessorId: 'task3',
-                status: 'pending',
-                createdAt: new Date().toISOString()
-            });
-            entities.task.push({
                 id: 'task5',
-                name: 'Update case calendar',
+                name: 'Analyze campaign performance metrics',
                 type: 'task',
-                description: 'Track all deadlines and hearing dates.',
-                dueDate: today.toISOString().split('T')[0],
+                description: 'Pull data from analytics platforms and compile engagement and conversion metrics.',
+                dueDate: in2Weeks.toISOString().split('T')[0],
+                predecessorId: 'task4',
                 status: 'pending',
                 createdAt: new Date().toISOString()
             });
             entities.task.push({
                 id: 'task6',
-                name: 'Prepare court filing package',
+                name: 'Prepare monthly client report',
                 type: 'task',
-                description: 'Compile all documents for upcoming court date.',
-                dueDate: nextWeek.toISOString().split('T')[0],
+                description: 'Create presentation summarizing campaign results, insights, and recommendations.',
+                dueDate: in2Weeks.toISOString().split('T')[0],
+                predecessorId: 'task5',
                 status: 'pending',
                 createdAt: new Date().toISOString()
             });
 
             // STEP 2: WHO DOES THE WORK - Roles emerge from task needs
-            entities.role.push({ id: 'r1', name: 'Attorney', type: 'role', description: 'Handles legal strategy and court appearances.' });
-            entities.role.push({ id: 'r2', name: 'Paralegal', type: 'role', description: 'Researches, drafts documents, and supports case preparation.' });
-            entities.role.push({ id: 'r3', name: 'Case Coordinator', type: 'role', description: 'Manages schedules, deadlines, and client communication.' });
+            entities.role.push({ id: 'r1', name: 'Creative Director', type: 'role', description: 'Leads visual direction and brand strategy for client campaigns.' });
+            entities.role.push({ id: 'r2', name: 'Content Strategist', type: 'role', description: 'Plans and creates written content, manages editorial calendar.' });
+            entities.role.push({ id: 'r3', name: 'Account Manager', type: 'role', description: 'Coordinates with clients, manages timelines, and delivers reports.' });
 
             // STEP 3: CONNECT WORK TO ROLES - Who handles what?
-            relationships.push({ subject: 'r1', predicate: 'CON', object: 'task1', id: 'rel1' }); // Attorney does interviews
-            relationships.push({ subject: 'r2', predicate: 'CON', object: 'task2', id: 'rel2' }); // Paralegal does research
-            relationships.push({ subject: 'r2', predicate: 'CON', object: 'task3', id: 'rel3' }); // Paralegal drafts applications
-            relationships.push({ subject: 'r1', predicate: 'CON', object: 'task4', id: 'rel4' }); // Attorney reviews and files
-            relationships.push({ subject: 'r3', predicate: 'CON', object: 'task5', id: 'rel5' }); // Coordinator manages calendar
-            relationships.push({ subject: 'r1', predicate: 'CON', object: 'task6', id: 'rel6' }); // Attorney prepares filings
+            relationships.push({ subject: 'r1', predicate: 'CON', object: 'task1', id: 'rel1' }); // Creative Director creates brand guidelines
+            relationships.push({ subject: 'r1', predicate: 'CON', object: 'task2', id: 'rel2' }); // Creative Director designs assets
+            relationships.push({ subject: 'r2', predicate: 'CON', object: 'task3', id: 'rel3' }); // Content Strategist writes blog posts
+            relationships.push({ subject: 'r2', predicate: 'CON', object: 'task4', id: 'rel4' }); // Content Strategist schedules content
+            relationships.push({ subject: 'r3', predicate: 'CON', object: 'task5', id: 'rel5' }); // Account Manager analyzes metrics
+            relationships.push({ subject: 'r3', predicate: 'CON', object: 'task6', id: 'rel6' }); // Account Manager prepares reports
 
             // STEP 4: PEOPLE - Real humans fill roles
-            entities.person.push({ id: 'p1', name: 'Maria Santos', type: 'person', description: 'Immigration attorney, 15 years experience.' });
-            entities.person.push({ id: 'p2', name: 'James Chen', type: 'person', description: 'Paralegal specializing in asylum cases.' });
-            entities.person.push({ id: 'p3', name: 'Ana Rodriguez', type: 'person', description: 'Case coordinator, bilingual Spanish/English.' });
+            entities.person.push({ id: 'p1', name: 'Sarah Mitchell', type: 'person', description: 'Creative Director with 10 years in branding and design.' });
+            entities.person.push({ id: 'p2', name: 'David Park', type: 'person', description: 'Content Strategist specializing in B2B marketing.' });
+            entities.person.push({ id: 'p3', name: 'Emma Thompson', type: 'person', description: 'Account Manager, expert in client relations and analytics.' });
 
             // Assign people to roles
-            relationships.push({ subject: 'p1', predicate: 'INS', object: 'r1', id: 'rel_p1' }); // Maria is the Attorney
-            relationships.push({ subject: 'p2', predicate: 'INS', object: 'r2', id: 'rel_p2' }); // James is the Paralegal
-            relationships.push({ subject: 'p3', predicate: 'INS', object: 'r3', id: 'rel_p3' }); // Ana is the Coordinator
+            relationships.push({ subject: 'p1', predicate: 'INS', object: 'r1', id: 'rel_p1' }); // Sarah is the Creative Director
+            relationships.push({ subject: 'p2', predicate: 'INS', object: 'r2', id: 'rel_p2' }); // David is the Content Strategist
+            relationships.push({ subject: 'p3', predicate: 'INS', object: 'r3', id: 'rel_p3' }); // Emma is the Account Manager
 
             // NOTE: No teams or units created!
             // In the Shape view, users will see roles have emerged.
@@ -29847,7 +29849,7 @@ Options:
                     const wsId = generateWorkspaceId();
                     workspaces[wsId] = {
                         id: wsId,
-                        name: 'My Organization',
+                        name: 'Acme Marketing Agency',
                         entities: { unit: [], team: [], role: [], person: [], task: [], product: [], workflow: [] },
                         relationships: [],
                         hasSampleData: true,
