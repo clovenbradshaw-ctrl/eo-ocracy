@@ -27961,116 +27961,132 @@ Options:
                 return;
             }
 
-            const role = entities.role.find(r => r.id === roleId);
-            const person = personId ? entities.person.find(p => p.id === personId) : null;
-            const workflow = workflowId ? entities.workflow.find(w => w.id === workflowId) : null;
+            let taskId = null;
 
-            // 1. Create task entity (tasks can optionally be instances of workflows)
-            const taskId = 'task' + Date.now();
-            const taskObject = {
-                id: taskId,
-                name: taskName,
-                type: 'task',
-                dueDate: dueDate || null,
-                predecessorId: predecessorId || null,
-                status: 'pending',
-                producesProductId: null,
-                followsWorkflowId: workflowId || null,
-                createdAt: new Date().toISOString()
-            };
-            entities.task.push(taskObject);
+            try {
+                const role = entities.role.find(r => r.id === roleId);
+                const person = personId ? entities.person.find(p => p.id === personId) : null;
+                const workflow = workflowId ? entities.workflow.find(w => w.id === workflowId) : null;
 
-            logActivityToXano({
-                event_verb: 'Add Entity',
-                object_type: 'task',
-                object_label: taskName
-            });
-
-            // 2. Connect workflow to task (Workflow CON Task) - only if workflow is selected
-            if (workflow) {
-                const workflowTaskRel = {
-                    id: 'rel' + Date.now(),
-                    subject: workflowId,
-                    predicate: 'CON',
-                    object: taskId,
-                    description: ''
+                // 1. Create task entity (tasks can optionally be instances of workflows)
+                taskId = 'task' + Date.now();
+                const taskObject = {
+                    id: taskId,
+                    name: taskName,
+                    type: 'task',
+                    dueDate: dueDate || null,
+                    predecessorId: predecessorId || null,
+                    status: 'pending',
+                    producesProductId: null,
+                    followsWorkflowId: workflowId || null,
+                    createdAt: new Date().toISOString()
                 };
-                relationships.push(workflowTaskRel);
+                entities.task.push(taskObject);
 
                 logActivityToXano({
-                    event_verb: 'Link Connection',
-                    eo_operator: 'CON',
-                    object_type: 'relationship',
-                    object_label: `${workflow.name} → ${taskName}`
+                    event_verb: 'Add Entity',
+                    object_type: 'task',
+                    object_label: taskName
                 });
-            }
 
-            // 3. Connect role to task (Role CON Task) - only if role is selected
-            if (role) {
-                const roleTaskRel = {
-                    id: 'rel' + (Date.now() + 1),
-                    subject: role.id,
-                    predicate: 'CON',
-                    object: taskId,
-                    description: ''
-                };
-                relationships.push(roleTaskRel);
-
-                logActivityToXano({
-                    event_verb: 'Link Connection',
-                    eo_operator: 'CON',
-                    object_type: 'relationship',
-                    object_label: `${role.name} → ${taskName}`
-                });
-            }
-
-            // 4. If person selected and role selected, assign person to role (Person INS Role)
-            if (person && role) {
-                const existingAssignment = relationships.find(r =>
-                    r.subject === person.id &&
-                    r.predicate === 'INS' &&
-                    r.object === role.id
-                );
-
-                if (!existingAssignment) {
-                    const personRoleRel = {
-                        id: 'rel' + (Date.now() + 1),
-                        subject: person.id,
-                        predicate: 'INS',
-                        object: role.id,
+                // 2. Connect workflow to task (Workflow CON Task) - only if workflow is selected
+                if (workflow) {
+                    const workflowTaskRel = {
+                        id: 'rel' + Date.now(),
+                        subject: workflowId,
+                        predicate: 'CON',
+                        object: taskId,
                         description: ''
                     };
-                    relationships.push(personRoleRel);
+                    relationships.push(workflowTaskRel);
 
                     logActivityToXano({
-                        event_verb: 'Start Assignment',
-                        eo_operator: 'INS',
+                        event_verb: 'Link Connection',
+                        eo_operator: 'CON',
                         object_type: 'relationship',
-                        object_label: `${person.name} → ${role.name}`
+                        object_label: `${workflow.name} → ${taskName}`
                     });
                 }
+
+                // 3. Connect role to task (Role CON Task) - only if role is selected
+                if (role) {
+                    const roleTaskRel = {
+                        id: 'rel' + (Date.now() + 1),
+                        subject: role.id,
+                        predicate: 'CON',
+                        object: taskId,
+                        description: ''
+                    };
+                    relationships.push(roleTaskRel);
+
+                    logActivityToXano({
+                        event_verb: 'Link Connection',
+                        eo_operator: 'CON',
+                        object_type: 'relationship',
+                        object_label: `${role.name} → ${taskName}`
+                    });
+                }
+
+                // 4. If person selected and role selected, assign person to role (Person INS Role)
+                if (person && role) {
+                    const existingAssignment = relationships.find(r =>
+                        r.subject === person.id &&
+                        r.predicate === 'INS' &&
+                        r.object === role.id
+                    );
+
+                    if (!existingAssignment) {
+                        const personRoleRel = {
+                            id: 'rel' + (Date.now() + 1),
+                            subject: person.id,
+                            predicate: 'INS',
+                            object: role.id,
+                            description: ''
+                        };
+                        relationships.push(personRoleRel);
+
+                        logActivityToXano({
+                            event_verb: 'Start Assignment',
+                            eo_operator: 'INS',
+                            object_type: 'relationship',
+                            object_label: `${person.name} → ${role.name}`
+                        });
+                    }
+                }
+
+                // Save to local storage first (most important)
+                saveToLocalStorage();
+
+                console.log('Task created via hero modal:', taskName);
+            } catch (error) {
+                console.error('Error creating task:', error);
             }
 
-            // Save and refresh
-            saveToLocalStorage();
-            renderEntityList();
-            renderActivityList();
-            populateSelects();
-            updateTaskCountBadge();
-
-            // Refresh task board view
-            renderTaskBoardView();
-
-            // Close modal
+            // Always close modal, even if there was an error
             closeHeroTaskModal();
+
+            // Refresh UI in a try-catch to prevent errors from blocking
+            try {
+                renderEntityList();
+                renderActivityList();
+                populateSelects();
+                updateTaskCountBadge();
+                renderTaskBoardView();
+            } catch (renderError) {
+                console.error('Error refreshing UI after task creation:', renderError);
+            }
 
             // Check for pattern emergence (similar tasks or linked chains)
             // Use setTimeout to allow UI to update first
-            setTimeout(() => {
-                checkForPatternEmergence(taskId);
-            }, 500);
-
-            console.log('Task created via hero modal:', taskName);
+            if (taskId) {
+                setTimeout(() => {
+                    try {
+                        checkForPatternEmergence(taskId);
+                    } catch (patternError) {
+                        console.error('Error checking pattern emergence:', patternError);
+                    }
+                }, 500);
+            }
         }
 
         // ============================================
