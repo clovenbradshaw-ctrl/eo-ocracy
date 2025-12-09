@@ -12010,122 +12010,6 @@
             <button class="panel-collapse-btn" onclick="togglePanel('left')" title="Collapse sidebar">
                 <i class="ph ph-caret-left"></i>
             </button>
-            <!-- Task Wizard -->
-            <div id="taskWizard" class="task-wizard">
-                <!-- Initial CTA -->
-                <div id="wizardCTA" class="task-wizard-cta">
-                    <h3>What needs to get done?</h3>
-                    <button class="btn-create-task" onclick="startTaskWizard()">
-                        <i class="ph ph-plus-circle"></i> Create a Task
-                    </button>
-                    <div class="helper-links">
-                        <a onclick="loadSampleData()">See example</a> · <a onclick="showHowItWorks()">How it works</a>
-                    </div>
-                </div>
-
-                <!-- Wizard Steps -->
-                <div id="wizardSteps" class="task-wizard-steps">
-                    <div class="wizard-progress">
-                        <div class="wizard-progress-dot active" data-step="1"></div>
-                        <div class="wizard-progress-dot" data-step="2"></div>
-                        <div class="wizard-progress-dot" data-step="3"></div>
-                    </div>
-
-                    <!-- Step 1: Task Name -->
-                    <div id="wizardStep1" class="wizard-step active">
-                        <div class="wizard-step-header">
-                            <span class="wizard-step-number">1</span>
-                            <span class="wizard-step-title">What's the task?</span>
-                        </div>
-                        <input type="text"
-                               id="wizardTaskName"
-                               class="wizard-input"
-                               placeholder="e.g., Review contracts, Prepare report..."
-                               onkeypress="if(event.key==='Enter') wizardNextStep(2)">
-                        <div class="wizard-actions">
-                            <button class="btn btn-back" onclick="cancelTaskWizard()">Cancel</button>
-                            <button class="btn" onclick="wizardNextStep(2)">Next</button>
-                        </div>
-                    </div>
-
-                    <!-- Step 2: Assign to Role -->
-                    <div id="wizardStep2" class="wizard-step">
-                        <div class="wizard-step-header">
-                            <span class="wizard-step-number">2</span>
-                            <span class="wizard-step-title">Who handles this?</span>
-                            <span class="wizard-step-subtitle">Select or create a role</span>
-                        </div>
-                        <div id="wizardRoleList" class="wizard-select-grid">
-                            <!-- Populated dynamically -->
-                        </div>
-                        <div id="wizardCreateRole" class="wizard-inline-create">
-                            <input type="text"
-                                   id="wizardNewRoleName"
-                                   class="wizard-input"
-                                   placeholder="Role name..."
-                                   onkeypress="if(event.key==='Enter') createWizardRole()">
-                            <div class="wizard-actions" style="margin-top: 0.75rem;">
-                                <button class="btn btn-small btn-back" onclick="hideWizardCreateRole()">Cancel</button>
-                                <button class="btn btn-small" onclick="createWizardRole()">Create Role</button>
-                            </div>
-                        </div>
-                        <div class="wizard-actions">
-                            <button class="btn btn-back" onclick="wizardPrevStep(1)">Back</button>
-                            <button class="btn" onclick="wizardNextStep(3)" id="wizardStep2Next" disabled>Next</button>
-                        </div>
-                    </div>
-
-                    <!-- Step 3: Assign Person (optional) -->
-                    <div id="wizardStep3" class="wizard-step">
-                        <div class="wizard-step-header">
-                            <span class="wizard-step-number">3</span>
-                            <span class="wizard-step-title">Assign someone?</span>
-                            <span class="wizard-step-subtitle">Optional</span>
-                        </div>
-                        <div id="wizardPersonList" class="wizard-select-grid">
-                            <!-- Populated dynamically -->
-                        </div>
-                        <div id="wizardCreatePerson" class="wizard-inline-create">
-                            <input type="text"
-                                   id="wizardNewPersonName"
-                                   class="wizard-input"
-                                   placeholder="Person's name..."
-                                   onkeypress="if(event.key==='Enter') createWizardPerson()">
-                            <div class="wizard-actions" style="margin-top: 0.75rem;">
-                                <button class="btn btn-small btn-back" onclick="hideWizardCreatePerson()">Cancel</button>
-                                <button class="btn btn-small" onclick="createWizardPerson()">Add Person</button>
-                            </div>
-                        </div>
-                        <div class="wizard-summary" id="wizardSummary">
-                            <div class="wizard-summary-item">
-                                <span class="wizard-summary-label">Task:</span>
-                                <span class="wizard-summary-value" id="summaryTask"></span>
-                            </div>
-                            <div class="wizard-summary-item">
-                                <span class="wizard-summary-label">Role:</span>
-                                <span class="wizard-summary-value" id="summaryRole"></span>
-                            </div>
-                        </div>
-                        <div class="wizard-actions">
-                            <button class="btn btn-back" onclick="wizardPrevStep(2)">Back</button>
-                            <button class="btn" onclick="completeTaskWizard()">
-                                <i class="ph ph-check"></i> Create Task
-                            </button>
-                        </div>
-                        <div class="wizard-skip-hint">
-                            <a onclick="completeTaskWizard()">Skip - assign later</a>
-                        </div>
-                    </div>
-                </div>
-            </div>
-
-            <!-- Compact Task CTA - Shows when wizard is dismissed -->
-            <div id="taskQuickCTA" class="task-quick-cta" style="display: none;">
-                <button class="btn-create-task" onclick="startTaskWizard(); showFullWizard();">
-                    <i class="ph ph-plus-circle"></i> Create a Task
-                </button>
-            </div>
-
             <!-- Search at top -->
             <div class="input-group" style="margin-bottom: 1rem;">
                 <input type="text" id="entitySearch" placeholder="Search..." oninput="filterEntities()">
@@ -20654,6 +20538,7 @@ Cmd/Ctrl + K - Command palette
                         <div class="tree-node-name">${role.name}</div>
                     </div>
                     <div class="tree-node-actions">
+                        <button class="btn-icon add" onclick="event.stopPropagation(); openHeroTaskModal('${role.id}')" title="Create task for this role"><i class="ph ph-plus"></i></button>
                         <button class="btn-icon" onclick="event.stopPropagation(); deleteEntity('${role.id}', 'role')" title="Delete"><i class="ph ph-x"></i></button>
                     </div>
                 `;
@@ -26943,357 +26828,44 @@ Cmd/Ctrl + K - Command palette
             }
         }
 
-        // Start the wizard flow
+        // Start the wizard flow (deprecated - wizard removed, use openHeroTaskModal instead)
         function startTaskWizard() {
-            wizardState = {
-                taskName: '',
-                selectedRole: null,
-                selectedPerson: null,
-                newRoleName: '',
-                newPersonName: ''
-            };
-
-            document.getElementById('wizardCTA').style.display = 'none';
-            document.getElementById('wizardSteps').classList.add('active');
-            document.getElementById('wizardTaskName').value = '';
-            document.getElementById('wizardTaskName').focus();
-
-            updateWizardProgress(1);
+            // Wizard has been removed, open hero task modal instead
+            openHeroTaskModal();
         }
 
-        // Cancel wizard and go back to CTA (compact or full based on state)
+        // Cancel wizard (deprecated - wizard removed)
         function cancelTaskWizard() {
-            document.getElementById('wizardSteps').classList.remove('active');
-            resetWizardSteps();
-
-            // Show compact CTA if there are entities, otherwise show full wizard CTA
-            const hasEntities = Object.values(entities).some(arr => arr.length > 0);
-            const wizard = document.getElementById('taskWizard');
-            const quickCTA = document.getElementById('taskQuickCTA');
-
-            if (hasEntities) {
-                // Show compact CTA
-                if (wizard) wizard.style.display = 'none';
-                if (quickCTA) quickCTA.style.display = 'block';
-            } else {
-                // Show full wizard CTA
-                document.getElementById('wizardCTA').style.display = 'block';
-            }
+            // Wizard has been removed, no-op
         }
 
         function resetWizardSteps() {
-            document.querySelectorAll('.wizard-step').forEach(step => step.classList.remove('active'));
-            document.getElementById('wizardStep1').classList.add('active');
-            document.getElementById('wizardCreateRole').classList.remove('active');
-            document.getElementById('wizardCreatePerson').classList.remove('active');
+            // Wizard has been removed, no-op
         }
 
-        // Update progress dots
-        function updateWizardProgress(currentStep) {
-            document.querySelectorAll('.wizard-progress-dot').forEach(dot => {
-                const step = parseInt(dot.dataset.step);
-                dot.classList.remove('active', 'completed');
-                if (step === currentStep) {
-                    dot.classList.add('active');
-                } else if (step < currentStep) {
-                    dot.classList.add('completed');
-                }
-            });
-        }
+        // Deprecated wizard functions - wizard has been removed, use openHeroTaskModal instead
+        function updateWizardProgress(currentStep) { }
+        function wizardNextStep(step) { }
+        function wizardPrevStep(step) { }
+        function populateWizardRoles() { }
+        function selectWizardRole(roleId) { }
+        function showWizardCreateRole() { }
+        function hideWizardCreateRole() { }
+        function createWizardRole() { }
+        function populateWizardPersons() { }
+        function selectWizardPerson(personId) { }
+        function showWizardCreatePerson() { }
+        function hideWizardCreatePerson() { }
+        function createWizardPerson() { }
+        function updateWizardSummary() { }
 
-        // Navigate between steps
-        function wizardNextStep(step) {
-            // Validate current step
-            if (step === 2) {
-                const taskName = document.getElementById('wizardTaskName').value.trim();
-                if (!taskName) {
-                    document.getElementById('wizardTaskName').focus();
-                    return;
-                }
-                wizardState.taskName = taskName;
-                populateWizardRoles();
-            }
+        // Deprecated - wizard removed, use submitHeroTask instead
+        function completeTaskWizard() { }
 
-            if (step === 3) {
-                if (!wizardState.selectedRole) return;
-                populateWizardPersons();
-                updateWizardSummary();
-            }
+        // Legacy compatibility (deprecated)
+        function dismissWelcomeBanner() { }
 
-            // Show the step
-            document.querySelectorAll('.wizard-step').forEach(s => s.classList.remove('active'));
-            document.getElementById(`wizardStep${step}`).classList.add('active');
-            updateWizardProgress(step);
-        }
-
-        function wizardPrevStep(step) {
-            document.querySelectorAll('.wizard-step').forEach(s => s.classList.remove('active'));
-            document.getElementById(`wizardStep${step}`).classList.add('active');
-            updateWizardProgress(step);
-        }
-
-        // Populate role options in step 2
-        function populateWizardRoles() {
-            const container = document.getElementById('wizardRoleList');
-            const roles = entities.role || [];
-
-            let html = '';
-
-            // Show existing roles
-            roles.forEach(role => {
-                const isSelected = wizardState.selectedRole && wizardState.selectedRole.id === role.id;
-                html += `
-                    <div class="wizard-select-option ${isSelected ? 'selected' : ''}"
-                         onclick="selectWizardRole('${role.id}')">
-                        <i class="ph ph-briefcase"></i>
-                        <span>${role.name}</span>
-                    </div>
-                `;
-            });
-
-            // Always show "create new" option
-            html += `
-                <div class="wizard-select-option wizard-create-new" onclick="showWizardCreateRole()">
-                    <i class="ph ph-plus-circle"></i>
-                    <span>Create new role...</span>
-                </div>
-            `;
-
-            container.innerHTML = html;
-        }
-
-        function selectWizardRole(roleId) {
-            const role = entities.role.find(r => r.id === roleId);
-            if (role) {
-                wizardState.selectedRole = role;
-                document.getElementById('wizardStep2Next').disabled = false;
-                populateWizardRoles(); // Re-render to show selection
-            }
-        }
-
-        function showWizardCreateRole() {
-            document.getElementById('wizardCreateRole').classList.add('active');
-            document.getElementById('wizardNewRoleName').focus();
-        }
-
-        function hideWizardCreateRole() {
-            document.getElementById('wizardCreateRole').classList.remove('active');
-            document.getElementById('wizardNewRoleName').value = '';
-        }
-
-        function createWizardRole() {
-            const name = document.getElementById('wizardNewRoleName').value.trim();
-            if (!name) return;
-
-            // Create the role entity
-            const roleId = 'role' + Date.now();
-            const newRole = {
-                id: roleId,
-                name: name,
-                type: 'role'
-            };
-            entities.role.push(newRole);
-
-            // Log to Xano
-            logActivityToXano({
-                event_verb: 'Add Entity',
-                object_type: 'role',
-                object_label: name
-            });
-
-            // Select it
-            wizardState.selectedRole = newRole;
-            document.getElementById('wizardStep2Next').disabled = false;
-
-            // Hide create form and refresh
-            hideWizardCreateRole();
-            populateWizardRoles();
-        }
-
-        // Populate person options in step 3
-        function populateWizardPersons() {
-            const container = document.getElementById('wizardPersonList');
-            const persons = entities.person || [];
-
-            let html = '';
-
-            // Show existing persons
-            persons.forEach(person => {
-                const isSelected = wizardState.selectedPerson && wizardState.selectedPerson.id === person.id;
-                html += `
-                    <div class="wizard-select-option ${isSelected ? 'selected' : ''}"
-                         onclick="selectWizardPerson('${person.id}')">
-                        <i class="ph ph-user"></i>
-                        <span>${person.name}</span>
-                    </div>
-                `;
-            });
-
-            // Always show "create new" option
-            html += `
-                <div class="wizard-select-option wizard-create-new" onclick="showWizardCreatePerson()">
-                    <i class="ph ph-user-plus"></i>
-                    <span>Add someone new...</span>
-                </div>
-            `;
-
-            container.innerHTML = html;
-        }
-
-        function selectWizardPerson(personId) {
-            const person = entities.person.find(p => p.id === personId);
-            if (person) {
-                wizardState.selectedPerson = person;
-                populateWizardPersons(); // Re-render to show selection
-            }
-        }
-
-        function showWizardCreatePerson() {
-            document.getElementById('wizardCreatePerson').classList.add('active');
-            document.getElementById('wizardNewPersonName').focus();
-        }
-
-        function hideWizardCreatePerson() {
-            document.getElementById('wizardCreatePerson').classList.remove('active');
-            document.getElementById('wizardNewPersonName').value = '';
-        }
-
-        function createWizardPerson() {
-            const name = document.getElementById('wizardNewPersonName').value.trim();
-            if (!name) return;
-
-            // Create the person entity
-            const personId = 'person' + Date.now();
-            const newPerson = {
-                id: personId,
-                name: name,
-                type: 'person'
-            };
-            entities.person.push(newPerson);
-
-            // Log to Xano
-            logActivityToXano({
-                event_verb: 'Add Entity',
-                object_type: 'person',
-                object_label: name
-            });
-
-            // Select it
-            wizardState.selectedPerson = newPerson;
-
-            // Hide create form and refresh
-            hideWizardCreatePerson();
-            populateWizardPersons();
-        }
-
-        // Update summary in step 3
-        function updateWizardSummary() {
-            document.getElementById('summaryTask').textContent = wizardState.taskName;
-            document.getElementById('summaryRole').textContent = wizardState.selectedRole?.name || '';
-        }
-
-        // Complete the wizard - create task and connections
-        function completeTaskWizard() {
-            const taskName = wizardState.taskName;
-            const role = wizardState.selectedRole;
-            const person = wizardState.selectedPerson;
-
-            if (!taskName || !role) {
-                console.error('Missing required data');
-                return;
-            }
-
-            // 1. Create task entity (tasks are activities that produce work products)
-            const taskId = 'task' + Date.now();
-            const taskObject = {
-                id: taskId,
-                name: taskName,
-                type: 'task',
-                dueDate: null,
-                predecessorId: null,
-                status: 'pending',
-                producesProductId: null,
-                followsWorkflowId: null,
-                createdAt: new Date().toISOString()
-            };
-            entities.task.push(taskObject);
-
-            logActivityToXano({
-                event_verb: 'Add Entity',
-                object_type: 'task',
-                object_label: taskName
-            });
-
-            // 2. Connect role to task (Role CON Task)
-            const roleTaskRel = {
-                id: 'rel' + Date.now(),
-                subject: role.id,
-                predicate: 'CON',
-                object: taskId,
-                description: ''
-            };
-            relationships.push(roleTaskRel);
-
-            logActivityToXano({
-                event_verb: 'Link Connection',
-                eo_operator: 'CON',
-                object_type: 'relationship',
-                object_label: `${role.name} → ${taskName}`
-            });
-
-            // 3. If person selected, assign to role (Person INS Role)
-            if (person) {
-                // Check if this assignment already exists
-                const existingAssignment = relationships.find(r =>
-                    r.subject === person.id &&
-                    r.predicate === 'INS' &&
-                    r.object === role.id
-                );
-
-                if (!existingAssignment) {
-                    const personRoleRel = {
-                        id: 'rel' + (Date.now() + 1),
-                        subject: person.id,
-                        predicate: 'INS',
-                        object: role.id,
-                        description: ''
-                    };
-                    relationships.push(personRoleRel);
-
-                    logActivityToXano({
-                        event_verb: 'Start Assignment',
-                        eo_operator: 'INS',
-                        object_type: 'relationship',
-                        object_label: `${person.name} → ${role.name}`
-                    });
-                }
-            }
-
-            // Save and refresh
-            saveToLocalStorage();
-            renderEntityList();
-            renderActivityList();
-            populateSelects();
-            updateTaskCountBadge();
-
-            // Refresh task board view
-            renderTaskBoardView();
-
-            // Hide wizard
-            dismissTaskWizard();
-
-            // Show a brief success indicator (optional)
-            console.log('Task created:', taskName);
-        }
-
-        // Legacy compatibility
-        function dismissWelcomeBanner() {
-            dismissTaskWizard();
-        }
-
-        function checkWelcomeBanner() {
-            checkTaskWizard();
-        }
+        function checkWelcomeBanner() { }
 
         // ============================================
         // HERO TASK MODAL FUNCTIONS
@@ -27303,12 +26875,22 @@ Cmd/Ctrl + K - Command palette
         let heroDatePicker = null;
 
         // Open the hero task modal
-        function openHeroTaskModal() {
+        function openHeroTaskModal(preselectedRoleId = null) {
             const overlay = document.getElementById('heroTaskOverlay');
             overlay.classList.add('active');
 
             // Populate role and person selects
             populateHeroSelects();
+
+            // Pre-select role if provided
+            if (preselectedRoleId) {
+                const roleSelect = document.getElementById('heroTaskRole');
+                if (roleSelect) {
+                    roleSelect.value = preselectedRoleId;
+                    // Trigger change event to update person dropdown and preview
+                    roleSelect.dispatchEvent(new Event('change'));
+                }
+            }
 
             // Initialize Flatpickr for better cross-browser date picking
             if (typeof flatpickr !== 'undefined' && !heroDatePicker) {
@@ -30638,7 +30220,7 @@ Options:
                 <strong>The insight:</strong> Traditional org charts start with structure. Taskflow starts with work, and structure follows naturally.
             </div>
 
-            <button class="btn" onclick="closeHowItWorks(); startTaskWizard();">
+            <button class="btn" onclick="closeHowItWorks(); openHeroTaskModal();">
                 <i class="ph ph-rocket"></i> Get Started
             </button>
         </div>
