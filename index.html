@@ -831,6 +831,61 @@
             background: rgba(76, 175, 80, 0.3);
         }
 
+        /* Auto-Refresh Toggle */
+        .auto-refresh-toggle {
+            display: flex;
+            align-items: center;
+            gap: 0.4rem;
+            background: rgba(255,255,255,0.1);
+            border: 1px solid rgba(255,255,255,0.2);
+            border-radius: 6px;
+            padding: 0.35rem 0.6rem;
+            color: white;
+            font-size: 0.75rem;
+            margin-right: 0.5rem;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            user-select: none;
+        }
+
+        .auto-refresh-toggle:hover {
+            background: rgba(255,255,255,0.15);
+            border-color: rgba(255,255,255,0.3);
+        }
+
+        .auto-refresh-toggle.active {
+            background: rgba(76, 175, 80, 0.25);
+            border-color: rgba(76, 175, 80, 0.5);
+        }
+
+        .auto-refresh-toggle .refresh-icon {
+            width: 14px;
+            height: 14px;
+            transition: transform 0.3s ease;
+        }
+
+        .auto-refresh-toggle.active .refresh-icon {
+            animation: spin-slow 2s linear infinite;
+        }
+
+        .auto-refresh-toggle.refreshing .refresh-icon {
+            animation: spin 0.5s linear infinite;
+        }
+
+        @keyframes spin-slow {
+            from { transform: rotate(0deg); }
+            to { transform: rotate(360deg); }
+        }
+
+        .auto-refresh-toggle .refresh-status {
+            font-size: 0.65rem;
+            opacity: 0.8;
+        }
+
+        .auto-refresh-toggle.active .refresh-status {
+            color: #81C784;
+        }
+
         /* Activity Upload Toast */
         .activity-toast {
             position: fixed;
@@ -11902,6 +11957,12 @@
                 <span class="status-text">Checking...</span>
                 <span class="activity-count" id="xanoActivityCount" style="display: none;">0</span>
             </div>
+            <!-- Auto-Refresh Toggle -->
+            <div class="auto-refresh-toggle" id="autoRefreshToggle" onclick="toggleAutoRefresh()" title="Auto-refresh: Click to enable automatic syncing of new data">
+                <i class="ph ph-arrows-clockwise refresh-icon"></i>
+                <span class="refresh-label">Auto</span>
+                <span class="refresh-status" id="autoRefreshStatus">Off</span>
+            </div>
             <!-- Softr User Identity Indicator (hidden) -->
             <div class="softr-user-indicator no-user" id="softrUserIndicator" style="display: none !important;">
                 <div class="user-avatar">
@@ -19535,6 +19596,170 @@ Cmd/Ctrl + K - Command palette
                 }
             }, 60000);
         }
+
+        // ============================================
+        // AUTO-REFRESH FUNCTIONALITY
+        // ============================================
+        let autoRefreshEnabled = false;
+        let autoRefreshInterval = null;
+        let autoRefreshIntervalMs = 10000; // 10 seconds
+        let lastActivityCount = 0;
+        let isTabVisible = true;
+        let autoRefreshInProgress = false;
+
+        // Toggle auto-refresh on/off
+        function toggleAutoRefresh() {
+            autoRefreshEnabled = !autoRefreshEnabled;
+            const toggle = document.getElementById('autoRefreshToggle');
+            const status = document.getElementById('autoRefreshStatus');
+
+            if (autoRefreshEnabled) {
+                toggle.classList.add('active');
+                status.textContent = 'On';
+                toggle.title = 'Auto-refresh: ON - Syncing every 10 seconds';
+                startAutoRefresh();
+                console.log('🔄 Auto-refresh enabled');
+            } else {
+                toggle.classList.remove('active');
+                status.textContent = 'Off';
+                toggle.title = 'Auto-refresh: Click to enable automatic syncing of new data';
+                stopAutoRefresh();
+                console.log('⏹️ Auto-refresh disabled');
+            }
+
+            // Save preference to localStorage
+            try {
+                localStorage.setItem('autoRefreshEnabled', autoRefreshEnabled);
+            } catch (e) {
+                console.warn('Could not save auto-refresh preference');
+            }
+        }
+
+        // Start the auto-refresh polling
+        function startAutoRefresh() {
+            if (autoRefreshInterval) {
+                clearInterval(autoRefreshInterval);
+            }
+
+            // Do an immediate refresh
+            performAutoRefresh();
+
+            // Set up interval
+            autoRefreshInterval = setInterval(() => {
+                if (isTabVisible && !autoRefreshInProgress) {
+                    performAutoRefresh();
+                }
+            }, autoRefreshIntervalMs);
+        }
+
+        // Stop auto-refresh polling
+        function stopAutoRefresh() {
+            if (autoRefreshInterval) {
+                clearInterval(autoRefreshInterval);
+                autoRefreshInterval = null;
+            }
+        }
+
+        // Perform the actual refresh - fetch from Xano and update if changed
+        async function performAutoRefresh() {
+            if (autoRefreshInProgress) return;
+            autoRefreshInProgress = true;
+
+            const toggle = document.getElementById('autoRefreshToggle');
+            toggle.classList.add('refreshing');
+
+            try {
+                const activities = await getActivitiesFromXano();
+
+                if (activities && activities.length > 0) {
+                    // Check if there are new activities
+                    if (activities.length !== lastActivityCount) {
+                        console.log('🔄 Auto-refresh: Detected change (' + lastActivityCount + ' -> ' + activities.length + ' activities)');
+                        lastActivityCount = activities.length;
+
+                        // Reconstruct entities from activities
+                        const reconstructed = reconstructEntitiesFromActivities(activities);
+                        const totalEntities = Object.values(reconstructed.entities).reduce(
+                            (sum, arr) => sum + arr.length, 0
+                        );
+
+                        if (totalEntities > 0) {
+                            // Update current workspace with new data
+                            entities = normalizeEntities(JSON.parse(JSON.stringify(reconstructed.entities)));
+                            relationships = JSON.parse(JSON.stringify(reconstructed.relationships));
+
+                            // Update workspace
+                            if (currentWorkspaceId && workspaces[currentWorkspaceId]) {
+                                workspaces[currentWorkspaceId].entities = JSON.parse(JSON.stringify(entities));
+                                workspaces[currentWorkspaceId].relationships = JSON.parse(JSON.stringify(relationships));
+                                workspaces[currentWorkspaceId].updatedAt = Date.now();
+                            }
+
+                            // Save to localStorage
+                            saveWorkspaces();
+
+                            // Refresh all views
+                            refreshAllViews();
+                            updateFilterStatus();
+                            updateTaskCountBadge();
+
+                            console.log('✅ Auto-refresh: Updated with ' + totalEntities + ' entities');
+                        }
+                    }
+                }
+            } catch (error) {
+                console.error('❌ Auto-refresh error:', error);
+            } finally {
+                autoRefreshInProgress = false;
+                toggle.classList.remove('refreshing');
+            }
+        }
+
+        // Handle tab visibility changes - pause refresh when tab is not visible
+        function initVisibilityDetection() {
+            document.addEventListener('visibilitychange', () => {
+                isTabVisible = !document.hidden;
+
+                if (isTabVisible && autoRefreshEnabled) {
+                    console.log('👁️ Tab visible - resuming auto-refresh');
+                    // Immediate refresh when tab becomes visible
+                    performAutoRefresh();
+                } else if (!isTabVisible) {
+                    console.log('👁️ Tab hidden - pausing auto-refresh');
+                }
+            });
+        }
+
+        // Restore auto-refresh preference from localStorage
+        function restoreAutoRefreshPreference() {
+            try {
+                const savedPref = localStorage.getItem('autoRefreshEnabled');
+                if (savedPref === 'true') {
+                    // Restore the enabled state
+                    autoRefreshEnabled = true;
+                    const toggle = document.getElementById('autoRefreshToggle');
+                    const status = document.getElementById('autoRefreshStatus');
+                    if (toggle && status) {
+                        toggle.classList.add('active');
+                        status.textContent = 'On';
+                        toggle.title = 'Auto-refresh: ON - Syncing every 10 seconds';
+                        startAutoRefresh();
+                        console.log('🔄 Auto-refresh restored from preferences');
+                    }
+                }
+            } catch (e) {
+                console.warn('Could not restore auto-refresh preference');
+            }
+        }
+
+        // Initialize auto-refresh system
+        function initAutoRefresh() {
+            initVisibilityDetection();
+            restoreAutoRefreshPreference();
+        }
+        // ============================================
+        // END AUTO-REFRESH FUNCTIONALITY
+        // ============================================
 
         // Ensure agent is declared in the activity store (user details stored once)
         async function ensureAgentDeclared(softrUser, agentId, agentName, agentEmail) {
@@ -29950,6 +30175,10 @@ Options:
                     console.error('❌ Error switching to kanban view:', e);
                     updateStatus('Error loading view', false);
                 }
+
+                // Initialize auto-refresh system
+                initAutoRefresh();
+                console.log('🔄 Auto-refresh system initialized');
 
                 console.log('🎉 Initialization complete!');
                 console.log('📊 Current state:', {
