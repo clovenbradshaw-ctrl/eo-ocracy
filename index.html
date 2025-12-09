@@ -9724,6 +9724,7 @@
             overflow-y: auto;
             min-height: 200px;
             transition: background 0.2s;
+            position: relative;
         }
 
         .kanban-column-content.drag-over {
@@ -9775,19 +9776,50 @@
             font-size: 0.8rem;
         }
 
-        .kanban-card-role,
-        .kanban-card-person,
+        .kanban-card-assignee,
         .kanban-card-due {
             display: inline-flex;
             align-items: center;
             gap: 0.25rem;
-            color: #8B6F47;
+            color: #3D2E1F;
+            font-weight: 500;
         }
 
-        .kanban-card-role i,
-        .kanban-card-person i,
+        .kanban-card-assignee i,
         .kanban-card-due i {
             font-size: 0.9rem;
+            color: #7B95A3;
+        }
+
+        .kanban-card-role-only {
+            color: #8B6F47;
+            font-style: italic;
+        }
+
+        .kanban-card-role-only i {
+            color: #C88F4A;
+        }
+
+        .kanban-card-blocked {
+            display: flex;
+            align-items: center;
+            gap: 0.25rem;
+            color: #D97706;
+            background: #FEF3C7;
+            padding: 0.25rem 0.5rem;
+            border-radius: 4px;
+            font-size: 0.75rem;
+            width: 100%;
+            margin-bottom: 0.25rem;
+        }
+
+        .kanban-card-blocked i {
+            color: #D97706;
+        }
+
+        .kanban-card-blocked em {
+            font-style: normal;
+            font-weight: 600;
         }
 
         .kanban-card-due.overdue {
@@ -9845,17 +9877,24 @@
             pointer-events: none;
         }
 
-        /* Subtask badge */
+        /* Subtask progress badge */
         .kanban-card-subtask-badge {
             display: inline-flex;
             align-items: center;
             gap: 0.25rem;
-            background: #7B95A3;
-            color: white;
+            background: linear-gradient(135deg, #E8F4F8, #D4E9F0);
+            border: 1px solid #7B95A3;
+            color: #4A6D7C;
             font-size: 0.7rem;
-            padding: 0.15rem 0.4rem;
-            border-radius: 4px;
+            font-weight: 600;
+            padding: 0.2rem 0.5rem;
+            border-radius: 10px;
             margin-left: auto;
+            cursor: help;
+        }
+
+        .kanban-card-subtask-badge i {
+            color: #7B95A3;
         }
 
         /* Connection lines between parent and subtasks */
@@ -9880,28 +9919,47 @@
 
         /* Drop zone blocked indicator */
         .kanban-column-content.drop-blocked {
-            background: rgba(198, 40, 40, 0.1) !important;
+            background: repeating-linear-gradient(
+                -45deg,
+                rgba(198, 40, 40, 0.05),
+                rgba(198, 40, 40, 0.05) 10px,
+                rgba(198, 40, 40, 0.1) 10px,
+                rgba(198, 40, 40, 0.1) 20px
+            ) !important;
             border: 2px dashed #C62828;
+            position: relative;
         }
 
         .kanban-column-content.drop-blocked::before {
-            content: 'Move subtasks first';
+            content: '\2717  Complete subtasks first to move parent task';
             position: absolute;
             top: 50%;
             left: 50%;
             transform: translate(-50%, -50%);
-            background: #C62828;
+            background: linear-gradient(135deg, #DC2626, #B91C1C);
             color: white;
-            padding: 0.5rem 1rem;
-            border-radius: 6px;
+            padding: 0.75rem 1.25rem;
+            border-radius: 8px;
             font-size: 0.85rem;
-            font-weight: 500;
+            font-weight: 600;
             white-space: nowrap;
             z-index: 100;
+            box-shadow: 0 4px 12px rgba(185, 28, 28, 0.3);
+            animation: shake-blocked 0.5s ease-in-out;
         }
 
-        .kanban-column-content {
-            position: relative;
+        @keyframes shake-blocked {
+            0%, 100% { transform: translate(-50%, -50%) rotate(0deg); }
+            25% { transform: translate(-50%, -50%) rotate(-2deg); }
+            75% { transform: translate(-50%, -50%) rotate(2deg); }
+        }
+
+        .kanban-column-content.drop-blocked::after {
+            content: '';
+            position: absolute;
+            inset: 0;
+            background: rgba(198, 40, 40, 0.05);
+            pointer-events: none;
         }
 
         /* ============================================
@@ -10207,47 +10265,52 @@
 
         .task-status-toggle {
             display: flex;
-            gap: 0.25rem;
-            background: #E5DDD1;
-            border-radius: 8px;
-            padding: 0.25rem;
+            gap: 0.375rem;
+            background: #F5F0EB;
+            border-radius: 10px;
+            padding: 0.375rem;
+            border: 1px solid #E5DDD1;
         }
 
         .task-status-btn {
-            padding: 0.5rem 1rem;
+            padding: 0.625rem 1.25rem;
             border: none;
             background: transparent;
-            border-radius: 6px;
-            font-size: 0.875rem;
-            font-weight: 500;
-            color: #6B5642;
+            border-radius: 8px;
+            font-size: 0.9rem;
+            font-weight: 600;
+            color: #8B6F47;
             cursor: pointer;
             transition: all 0.2s;
             display: flex;
             align-items: center;
-            gap: 0.375rem;
+            gap: 0.5rem;
         }
 
         .task-status-btn:hover {
-            background: rgba(255, 255, 255, 0.5);
+            background: rgba(255, 255, 255, 0.7);
         }
 
         .task-status-btn.active {
-            background: white;
-            color: #3D2E1F;
-            box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+            box-shadow: 0 2px 6px rgba(0,0,0,0.12);
         }
 
         .task-status-btn.active.pending {
-            color: #8B6F47;
+            background: linear-gradient(135deg, #FEF3C7, #FDE68A);
+            color: #92400E;
+            border: 1px solid #F59E0B;
         }
 
         .task-status-btn.active.in-progress {
-            color: #1565C0;
+            background: linear-gradient(135deg, #DBEAFE, #BFDBFE);
+            color: #1E40AF;
+            border: 1px solid #3B82F6;
         }
 
         .task-status-btn.active.completed {
-            color: #2E7D32;
+            background: linear-gradient(135deg, #D1FAE5, #A7F3D0);
+            color: #065F46;
+            border: 1px solid #10B981;
         }
 
         .task-meta-grid {
@@ -12038,32 +12101,47 @@
         .task-priority {
             display: inline-flex;
             align-items: center;
-            gap: 0.25rem;
-            padding: 0.2rem 0.5rem;
-            border-radius: 4px;
-            font-size: 0.75rem;
-            font-weight: 600;
+            gap: 0.375rem;
+            padding: 0.375rem 0.75rem;
+            border-radius: 6px;
+            font-size: 0.8rem;
+            font-weight: 700;
             text-transform: uppercase;
+            letter-spacing: 0.03em;
+        }
+
+        .task-priority i {
+            font-size: 0.9rem;
         }
 
         .task-priority.urgent {
-            background: #FEE2E2;
+            background: linear-gradient(135deg, #FEE2E2, #FECACA);
             color: #DC2626;
+            border: 1px solid #F87171;
+            animation: pulse-urgent 2s infinite;
+        }
+
+        @keyframes pulse-urgent {
+            0%, 100% { box-shadow: 0 0 0 0 rgba(220, 38, 38, 0.3); }
+            50% { box-shadow: 0 0 0 4px rgba(220, 38, 38, 0); }
         }
 
         .task-priority.high {
-            background: #FEF3C7;
-            color: #D97706;
+            background: linear-gradient(135deg, #FEF3C7, #FDE68A);
+            color: #B45309;
+            border: 1px solid #F59E0B;
         }
 
         .task-priority.medium {
-            background: #DBEAFE;
-            color: #2563EB;
+            background: linear-gradient(135deg, #DBEAFE, #BFDBFE);
+            color: #1D4ED8;
+            border: 1px solid #60A5FA;
         }
 
         .task-priority.low {
-            background: #F3F4F6;
-            color: #6B7280;
+            background: linear-gradient(135deg, #F3F4F6, #E5E7EB);
+            color: #4B5563;
+            border: 1px solid #D1D5DB;
         }
 
         /* Tags System */
@@ -12523,6 +12601,30 @@
             display: flex;
             align-items: center;
             gap: 0.5rem;
+        }
+
+        /* Help tooltip for section explanations */
+        .section-help-tooltip {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            width: 16px;
+            height: 16px;
+            background: #E5DDD1;
+            border-radius: 50%;
+            cursor: help;
+            font-size: 0.65rem;
+            color: #8B6F47;
+            transition: all 0.15s;
+        }
+
+        .section-help-tooltip:hover {
+            background: #C88F4A;
+            color: white;
+        }
+
+        .section-help-tooltip i {
+            font-size: 0.6rem;
         }
 
         .subtask-progress {
@@ -28807,10 +28909,13 @@ Cmd/Ctrl + K - Command palette
                     <div class="task-links-section" style="margin-top: 1rem; padding-top: 1rem; border-top: 1px solid #E5DDD1;">
                         <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 0.75rem;">
                             <div style="font-size: 0.875rem; font-weight: 600; color: #6B5642; display: flex; align-items: center; gap: 0.5rem;">
-                                <i class="ph ph-link"></i> Linked Tasks
+                                <i class="ph ph-link"></i> Related Tasks
+                                <span class="section-help-tooltip" title="Related tasks are cross-references to other tasks. Unlike subtasks, they don't block completion—they're just for tracking connections between work items.">
+                                    <i class="ph ph-question"></i>
+                                </span>
                             </div>
                             <button onclick="openTaskLinkModal('${task.id}')" style="background: #7B95A3; color: white; border: none; padding: 0.375rem 0.75rem; border-radius: 6px; font-size: 0.8rem; cursor: pointer; display: flex; align-items: center; gap: 0.375rem;">
-                                <i class="ph ph-plus"></i> Link Task
+                                <i class="ph ph-plus"></i> Link
                             </button>
                         </div>
                         ${linkedTasksData.length > 0 ? `
@@ -30077,6 +30182,9 @@ Options:
                     <div class="subtasks-header">
                         <span class="subtasks-title">
                             <i class="ph ph-list-checks"></i> Subtasks
+                            <span class="section-help-tooltip" title="Subtasks are smaller steps that must be completed as part of this task. All subtasks must be done before this task can be marked complete.">
+                                <i class="ph ph-question"></i>
+                            </span>
                         </span>
                         ${totalCount > 0 ? `
                         <div class="subtask-progress">
@@ -30908,12 +31016,12 @@ Options:
                              onclick="showEntityDetails('${task.id}')">
                             <div class="kanban-card-title" style="display: flex; align-items: center; gap: 0.5rem;">
                                 ${task.name}
-                                ${hasSubtasks ? `<span class="kanban-card-subtask-badge"><i class="ph ph-git-branch"></i> ${subtasks.length}</span>` : ''}
+                                ${hasSubtasks ? `<span class="kanban-card-subtask-badge" title="${subtasks.filter(s => s.status === 'completed').length} of ${subtasks.length} subtasks complete"><i class="ph ph-list-checks"></i> ${subtasks.filter(s => s.status === 'completed').length}/${subtasks.length}</span>` : ''}
                             </div>
                             <div class="kanban-card-meta">
-                                ${isSubtask && parentTask ? `<span class="kanban-card-role" style="color: #7B95A3;"><i class="ph ph-arrow-bend-left-up"></i> ${parentTask.name}</span>` : ''}
-                                ${role ? `<span class="kanban-card-role"><i class="ph ph-briefcase"></i> ${role.name}</span>` : ''}
-                                ${person ? `<span class="kanban-card-person"><i class="ph ph-user"></i> ${person.name}</span>` : ''}
+                                ${isSubtask && parentTask ? `<span class="kanban-card-blocked"><i class="ph ph-arrow-elbow-left-up"></i> <em>Blocked by:</em> ${parentTask.name}</span>` : ''}
+                                ${person ? `<span class="kanban-card-assignee" ${role ? `title="Role: ${role.name}"` : ''}><i class="ph ph-user-circle"></i> ${person.name}</span>` :
+                                  (role ? `<span class="kanban-card-assignee kanban-card-role-only" title="No person assigned to this role"><i class="ph ph-briefcase"></i> ${role.name}</span>` : '')}
                                 ${task.dueDate ? `<span class="kanban-card-due ${dueDateStatus}"><i class="ph ph-calendar"></i> ${formatDateShort(task.dueDate)}</span>` : ''}
                             </div>
                         </div>
@@ -31023,7 +31131,13 @@ Options:
             if (subtasks.length > 0) {
                 // Check if all subtasks are at or beyond the target status
                 if (!canParentMoveToStatus(draggedTaskId, newStatus)) {
-                    showToast('Move all subtasks to this stage first', 'warning');
+                    const pendingSubtasks = subtasks.filter(s => {
+                        if (newStatus === 'completed') return s.status !== 'completed';
+                        if (newStatus === 'in_progress') return s.status === 'pending';
+                        return false;
+                    });
+                    const count = pendingSubtasks.length;
+                    showToast(`${count} subtask${count > 1 ? 's' : ''} must be moved to "${newStatus === 'completed' ? 'Done' : 'In Progress'}" first`, 'warning');
                     return;
                 }
             }
