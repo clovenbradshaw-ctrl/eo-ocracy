@@ -14309,9 +14309,13 @@ John Doe,Engineering,john@example.com"
                 const linkedTask = entities.task.find(t => t.id === linkedId);
 
                 if (linkedTask && linkedTask.dueDate) {
-                    const linkedDate = new Date(linkedTask.dueDate);
+                    const linkedDate = parseLocalDate(linkedTask.dueDate);
                     linkedDate.setDate(linkedDate.getDate() + daysDelta);
-                    linkedTask.dueDate = linkedDate.toISOString().split('T')[0];
+                    // Format back to YYYY-MM-DD
+                    const year = linkedDate.getFullYear();
+                    const month = String(linkedDate.getMonth() + 1).padStart(2, '0');
+                    const day = String(linkedDate.getDate()).padStart(2, '0');
+                    linkedTask.dueDate = `${year}-${month}-${day}`;
 
                     // Log the cascading change
                     logActivityToXano({
@@ -15120,7 +15124,7 @@ John Doe,Engineering,john@example.com"
         }
 
         function getFilteredTasks() {
-            let filteredTasks = [...tasks];
+            let filteredTasks = [...(entities.task || [])];
 
             // If all filters are enabled, return all tasks
             if (viewFilters.role && viewFilters.person && viewFilters.team && viewFilters.unit) {
@@ -15131,19 +15135,19 @@ John Doe,Engineering,john@example.com"
             return filteredTasks.filter(task => {
                 // Get task's role assignment
                 const taskRoleRel = relationships.find(r => r.object === task.id && r.predicate === 'CON' && r.subject.startsWith('r'));
-                const taskRole = taskRoleRel ? entities.find(e => e.id === taskRoleRel.subject) : null;
+                const taskRole = taskRoleRel ? (entities.role || []).find(e => e.id === taskRoleRel.subject) : null;
 
                 // Get person assigned to role
-                const personRel = taskRole ? relationships.find(r => r.object === taskRole.id && r.predicate === 'CON' && r.subject.startsWith('p')) : null;
-                const person = personRel ? entities.find(e => e.id === personRel.subject) : null;
+                const personRel = taskRole ? relationships.find(r => r.object === taskRole.id && r.predicate === 'INS' && r.subject.startsWith('p')) : null;
+                const person = personRel ? (entities.person || []).find(e => e.id === personRel.subject) : null;
 
                 // Get team containing role
                 const teamRel = taskRole ? relationships.find(r => r.object === taskRole.id && r.predicate === 'DES' && r.subject.startsWith('t')) : null;
-                const team = teamRel ? entities.find(e => e.id === teamRel.subject) : null;
+                const team = teamRel ? (entities.team || []).find(e => e.id === teamRel.subject) : null;
 
                 // Get unit containing team
                 const unitRel = team ? relationships.find(r => r.object === team.id && r.predicate === 'DES' && r.subject.startsWith('u')) : null;
-                const unit = unitRel ? entities.find(e => e.id === unitRel.subject) : null;
+                const unit = unitRel ? (entities.unit || []).find(e => e.id === unitRel.subject) : null;
 
                 // Check filter criteria
                 if (viewFilters.role && taskRole) return true;
@@ -27026,10 +27030,21 @@ Cmd/Ctrl + K - Command palette
             });
         }
 
+        // Parse date string to local Date object (avoids timezone issues)
+        // dateStr is expected in YYYY-MM-DD format
+        function parseLocalDate(dateStr) {
+            if (!dateStr) return null;
+            const parts = dateStr.split('T')[0].split('-');
+            const year = parseInt(parts[0], 10);
+            const month = parseInt(parts[1], 10) - 1; // JS months are 0-indexed
+            const day = parseInt(parts[2], 10);
+            return new Date(year, month, day);
+        }
+
         // Format date for display
         function formatDateShort(dateStr) {
             if (!dateStr) return '';
-            const date = new Date(dateStr);
+            const date = parseLocalDate(dateStr);
             return date.toLocaleDateString('en-US', { month: 'short', day: 'numeric' });
         }
 
@@ -27040,9 +27055,8 @@ Cmd/Ctrl + K - Command palette
 
             const today = new Date();
             today.setHours(0, 0, 0, 0);
-            const dueDate = new Date(task.dueDate);
-            dueDate.setHours(0, 0, 0, 0);
 
+            const dueDate = parseLocalDate(task.dueDate);
             const diffDays = Math.ceil((dueDate - today) / (1000 * 60 * 60 * 24));
 
             if (diffDays < 0) return 'overdue';
@@ -27087,10 +27101,9 @@ Cmd/Ctrl + K - Command palette
             let dueDateDisplay = 'Not set';
             let dueDateClass = 'empty';
             if (task.dueDate) {
-                const date = new Date(task.dueDate);
+                const date = parseLocalDate(task.dueDate);
                 const today = new Date();
                 today.setHours(0, 0, 0, 0);
-                date.setHours(0, 0, 0, 0);
                 const diffDays = Math.ceil((date - today) / (1000 * 60 * 60 * 24));
 
                 dueDateDisplay = formatDateShort(task.dueDate);
@@ -27720,8 +27733,8 @@ Options:
                 return;
             }
 
-            const predDate = new Date(predecessor.dueDate);
-            const taskDate = new Date(dueDate);
+            const predDate = parseLocalDate(predecessor.dueDate);
+            const taskDate = parseLocalDate(dueDate);
 
             if (taskDate <= predDate) {
                 warningEl.style.display = 'flex';
@@ -28200,7 +28213,7 @@ Options:
                 // Check date status
                 const dueDateStatus = getTaskDueDateStatus(task);
                 const hasDateConflict = predecessor && task.dueDate && predecessor.dueDate &&
-                    new Date(task.dueDate) <= new Date(predecessor.dueDate);
+                    parseLocalDate(task.dueDate) <= parseLocalDate(predecessor.dueDate);
 
                 html += `
                     <div class="task-board-card ${dueDateStatus}" onclick="showEntityDetails('${task.id}')">
@@ -28380,13 +28393,15 @@ Options:
         }
 
         function handleKanbanDragStart(event) {
-            draggedTaskId = event.target.dataset.id;
-            event.target.classList.add('dragging');
+            // Use currentTarget to get the card element even if drag started from a child
+            draggedTaskId = event.currentTarget.dataset.id;
+            event.currentTarget.classList.add('dragging');
             event.dataTransfer.effectAllowed = 'move';
+            event.dataTransfer.setData('text/plain', draggedTaskId);
         }
 
         function handleKanbanDragEnd(event) {
-            event.target.classList.remove('dragging');
+            event.currentTarget.classList.remove('dragging');
             draggedTaskId = null;
             // Remove all drag-over states
             document.querySelectorAll('.kanban-column-content').forEach(col => {
@@ -28630,7 +28645,7 @@ Options:
             const today = new Date();
             today.setHours(0, 0, 0, 0);
 
-            const dates = tasksWithDates.map(t => new Date(t.dueDate));
+            const dates = tasksWithDates.map(t => parseLocalDate(t.dueDate));
             const minDate = new Date(Math.min(today.getTime(), ...dates.map(d => d.getTime())));
             const maxDate = new Date(Math.max(...dates.map(d => d.getTime())));
 
@@ -29444,9 +29459,11 @@ Options:
                 // Calculate bar position
                 let barHtml = '';
                 if (task.dueDate) {
-                    const dueDate = new Date(task.dueDate);
-                    const startOfTask = task.startDate ? new Date(task.startDate) : new Date(dueDate);
-                    startOfTask.setDate(startOfTask.getDate() - 3); // Default 3 days duration if no start
+                    const dueDate = parseLocalDate(task.dueDate);
+                    const startOfTask = task.startDate ? parseLocalDate(task.startDate) : new Date(dueDate);
+                    if (!task.startDate) {
+                        startOfTask.setDate(startOfTask.getDate() - 3); // Default 3 days duration if no start
+                    }
 
                     const dayWidth = 40; // matches min-width of gantt-date-cell
                     const startOffset = Math.floor((startOfTask - ganttStartDate) / (1000 * 60 * 60 * 24));
@@ -29573,7 +29590,7 @@ Options:
 
                 let tasksHtml = '';
                 dayTasks.slice(0, 3).forEach(task => {
-                    const isOverdue = new Date(task.dueDate) < today && task.status !== 'completed';
+                    const isOverdue = parseLocalDate(task.dueDate) < today && task.status !== 'completed';
                     const statusClass = isOverdue ? 'overdue' :
                                        task.status === 'completed' ? 'completed' :
                                        task.status === 'in_progress' ? 'in-progress' : 'pending';
