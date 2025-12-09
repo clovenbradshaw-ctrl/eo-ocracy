@@ -12028,6 +12028,1029 @@
             margin-bottom: 0.5rem;
             color: #3D2E1F;
         }
+
+        /* ============================================
+           ENHANCED TASK MANAGEMENT STYLES
+           Asana-style features with EO holonic integration
+           ============================================ */
+
+        /* Priority Badges */
+        .task-priority {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.25rem;
+            padding: 0.2rem 0.5rem;
+            border-radius: 4px;
+            font-size: 0.75rem;
+            font-weight: 600;
+            text-transform: uppercase;
+        }
+
+        .task-priority.urgent {
+            background: #FEE2E2;
+            color: #DC2626;
+        }
+
+        .task-priority.high {
+            background: #FEF3C7;
+            color: #D97706;
+        }
+
+        .task-priority.medium {
+            background: #DBEAFE;
+            color: #2563EB;
+        }
+
+        .task-priority.low {
+            background: #F3F4F6;
+            color: #6B7280;
+        }
+
+        /* Tags System */
+        .task-tags {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 0.375rem;
+            margin-top: 0.5rem;
+        }
+
+        .task-tag {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.25rem;
+            padding: 0.2rem 0.5rem;
+            background: #F3F4F6;
+            border-radius: 12px;
+            font-size: 0.75rem;
+            color: #4B5563;
+            cursor: pointer;
+            transition: all 0.15s;
+        }
+
+        .task-tag:hover {
+            background: #E5E7EB;
+        }
+
+        .task-tag .tag-remove {
+            font-size: 0.65rem;
+            opacity: 0.6;
+        }
+
+        .task-tag .tag-remove:hover {
+            opacity: 1;
+        }
+
+        /* Custom tag colors */
+        .task-tag[data-color="blue"] { background: #DBEAFE; color: #1E40AF; }
+        .task-tag[data-color="green"] { background: #D1FAE5; color: #065F46; }
+        .task-tag[data-color="yellow"] { background: #FEF3C7; color: #92400E; }
+        .task-tag[data-color="red"] { background: #FEE2E2; color: #991B1B; }
+        .task-tag[data-color="purple"] { background: #EDE9FE; color: #5B21B6; }
+        .task-tag[data-color="pink"] { background: #FCE7F3; color: #9D174D; }
+        .task-tag[data-color="orange"] { background: #FFEDD5; color: #9A3412; }
+
+        /* Tags Input */
+        .tags-input-container {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 0.375rem;
+            padding: 0.5rem;
+            border: 2px solid #E5DDD1;
+            border-radius: 8px;
+            background: #FAF7F5;
+            min-height: 42px;
+            cursor: text;
+        }
+
+        .tags-input-container:focus-within {
+            border-color: #C88F4A;
+            background: white;
+        }
+
+        .tags-input-container input {
+            flex: 1;
+            min-width: 100px;
+            border: none;
+            background: transparent;
+            outline: none;
+            font-size: 0.9rem;
+            padding: 0.25rem;
+        }
+
+        /* Collaborators/Followers */
+        .task-collaborators {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .collaborator-avatars {
+            display: flex;
+        }
+
+        .collaborator-avatar {
+            width: 28px;
+            height: 28px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, #C88F4A 0%, #B87B5B 100%);
+            color: white;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 0.7rem;
+            font-weight: 600;
+            border: 2px solid white;
+            margin-left: -8px;
+            cursor: pointer;
+            transition: transform 0.15s;
+        }
+
+        .collaborator-avatar:first-child {
+            margin-left: 0;
+        }
+
+        .collaborator-avatar:hover {
+            transform: scale(1.1);
+            z-index: 1;
+        }
+
+        .collaborator-add {
+            width: 28px;
+            height: 28px;
+            border-radius: 50%;
+            background: #F3F4F6;
+            border: 2px dashed #D1D5DB;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            color: #9CA3AF;
+            transition: all 0.15s;
+        }
+
+        .collaborator-add:hover {
+            background: #E5E7EB;
+            border-color: #9CA3AF;
+            color: #6B7280;
+        }
+
+        /* Comments Section */
+        .task-comments {
+            margin-top: 1rem;
+            border-top: 1px solid #E5DDD1;
+            padding-top: 1rem;
+        }
+
+        .task-comments-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-bottom: 0.75rem;
+        }
+
+        .task-comments-title {
+            font-size: 0.875rem;
+            font-weight: 600;
+            color: #6B5642;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .task-comments-count {
+            background: #E5DDD1;
+            color: #6B5642;
+            padding: 0.125rem 0.5rem;
+            border-radius: 10px;
+            font-size: 0.75rem;
+        }
+
+        .comment-item {
+            display: flex;
+            gap: 0.75rem;
+            padding: 0.75rem;
+            background: #FAF7F5;
+            border-radius: 8px;
+            margin-bottom: 0.5rem;
+        }
+
+        .comment-avatar {
+            width: 32px;
+            height: 32px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, #7B95A3 0%, #5B7585 100%);
+            color: white;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 0.75rem;
+            font-weight: 600;
+            flex-shrink: 0;
+        }
+
+        .comment-content {
+            flex: 1;
+        }
+
+        .comment-header {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            margin-bottom: 0.25rem;
+        }
+
+        .comment-author {
+            font-weight: 600;
+            font-size: 0.875rem;
+            color: #3D2E1F;
+        }
+
+        .comment-time {
+            font-size: 0.75rem;
+            color: #8B6F47;
+        }
+
+        .comment-text {
+            font-size: 0.875rem;
+            color: #4B5563;
+            line-height: 1.5;
+        }
+
+        .comment-text .mention {
+            color: #C88F4A;
+            font-weight: 500;
+            cursor: pointer;
+        }
+
+        .comment-text .mention:hover {
+            text-decoration: underline;
+        }
+
+        .comment-input-container {
+            display: flex;
+            gap: 0.75rem;
+            padding: 0.75rem;
+            background: #FAF7F5;
+            border-radius: 8px;
+            border: 2px solid transparent;
+            transition: all 0.2s;
+        }
+
+        .comment-input-container:focus-within {
+            border-color: #C88F4A;
+            background: white;
+        }
+
+        .comment-input {
+            flex: 1;
+            border: none;
+            background: transparent;
+            outline: none;
+            font-size: 0.875rem;
+            resize: none;
+            min-height: 24px;
+            max-height: 120px;
+        }
+
+        .comment-submit-btn {
+            background: #C88F4A;
+            color: white;
+            border: none;
+            padding: 0.5rem 0.75rem;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 0.8rem;
+            font-weight: 500;
+            display: flex;
+            align-items: center;
+            gap: 0.25rem;
+            transition: all 0.15s;
+        }
+
+        .comment-submit-btn:hover {
+            background: #B07D3A;
+        }
+
+        .comment-submit-btn:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+        }
+
+        /* @Mention Autocomplete */
+        .mention-autocomplete {
+            position: absolute;
+            background: white;
+            border-radius: 8px;
+            box-shadow: 0 4px 16px rgba(0,0,0,0.15);
+            max-height: 200px;
+            overflow-y: auto;
+            z-index: 1000;
+            min-width: 200px;
+            display: none;
+        }
+
+        .mention-autocomplete.active {
+            display: block;
+        }
+
+        .mention-option {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            padding: 0.5rem 0.75rem;
+            cursor: pointer;
+            transition: background 0.15s;
+        }
+
+        .mention-option:hover,
+        .mention-option.highlighted {
+            background: #FAF7F5;
+        }
+
+        .mention-option-icon {
+            width: 24px;
+            height: 24px;
+            border-radius: 50%;
+            background: #E5DDD1;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 0.7rem;
+            color: #6B5642;
+        }
+
+        .mention-option-icon.role {
+            background: #DBEAFE;
+            color: #1E40AF;
+        }
+
+        .mention-option-icon.person {
+            background: linear-gradient(135deg, #C88F4A 0%, #B87B5B 100%);
+            color: white;
+        }
+
+        .mention-option-name {
+            font-size: 0.875rem;
+            color: #3D2E1F;
+        }
+
+        .mention-option-type {
+            font-size: 0.7rem;
+            color: #8B6F47;
+            margin-left: auto;
+        }
+
+        /* Description Field */
+        .task-description-field {
+            width: 100%;
+            min-height: 80px;
+            padding: 0.875rem 1rem;
+            font-size: 0.9rem;
+            border: 2px solid #E5DDD1;
+            border-radius: 8px;
+            background: #FAF7F5;
+            color: #3D2E1F;
+            resize: vertical;
+            font-family: inherit;
+            line-height: 1.5;
+            transition: all 0.2s;
+        }
+
+        .task-description-field:focus {
+            outline: none;
+            border-color: #C88F4A;
+            background: white;
+        }
+
+        .task-description-field::placeholder {
+            color: #A99D8F;
+        }
+
+        /* Role Context Display */
+        .role-context-display {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            padding: 0.75rem;
+            background: linear-gradient(135deg, #FAF7F5 0%, #F5EFE6 100%);
+            border-radius: 8px;
+            border: 1px solid #E5DDD1;
+            margin-bottom: 1rem;
+        }
+
+        .role-context-breadcrumb {
+            display: flex;
+            align-items: center;
+            gap: 0.25rem;
+            font-size: 0.8rem;
+            color: #6B5642;
+        }
+
+        .role-context-breadcrumb i {
+            font-size: 0.7rem;
+            color: #A99D8F;
+        }
+
+        .role-context-item {
+            display: flex;
+            align-items: center;
+            gap: 0.25rem;
+            cursor: pointer;
+            padding: 0.25rem 0.5rem;
+            border-radius: 4px;
+            transition: background 0.15s;
+        }
+
+        .role-context-item:hover {
+            background: rgba(200, 143, 74, 0.1);
+        }
+
+        .role-context-item.unit {
+            color: #7B95A3;
+        }
+
+        .role-context-item.team {
+            color: #B87B5B;
+        }
+
+        .role-context-item.role {
+            color: #C88F4A;
+            font-weight: 600;
+        }
+
+        /* Required Role Indicator */
+        .required-indicator {
+            color: #DC2626;
+            font-weight: 500;
+            margin-left: 0.25rem;
+        }
+
+        .role-required-notice {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            padding: 0.625rem 0.875rem;
+            background: #FEF3C7;
+            border: 1px solid #FCD34D;
+            border-radius: 6px;
+            font-size: 0.8rem;
+            color: #92400E;
+            margin-top: 0.5rem;
+        }
+
+        .role-required-notice i {
+            font-size: 1rem;
+        }
+
+        /* Subtasks Section */
+        .subtasks-section {
+            margin-top: 1rem;
+            padding-top: 1rem;
+            border-top: 1px solid #E5DDD1;
+        }
+
+        .subtasks-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-bottom: 0.75rem;
+        }
+
+        .subtasks-title {
+            font-size: 0.875rem;
+            font-weight: 600;
+            color: #6B5642;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .subtask-progress {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .subtask-progress-bar {
+            width: 60px;
+            height: 6px;
+            background: #E5DDD1;
+            border-radius: 3px;
+            overflow: hidden;
+        }
+
+        .subtask-progress-fill {
+            height: 100%;
+            background: #10B981;
+            border-radius: 3px;
+            transition: width 0.3s;
+        }
+
+        .subtask-progress-text {
+            font-size: 0.75rem;
+            color: #6B5642;
+        }
+
+        .subtask-item {
+            display: flex;
+            align-items: flex-start;
+            gap: 0.5rem;
+            padding: 0.625rem;
+            background: #FAF7F5;
+            border-radius: 6px;
+            margin-bottom: 0.375rem;
+            transition: all 0.15s;
+        }
+
+        .subtask-item:hover {
+            background: #F5EFE6;
+        }
+
+        .subtask-checkbox {
+            width: 18px;
+            height: 18px;
+            border: 2px solid #D1D5DB;
+            border-radius: 4px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            flex-shrink: 0;
+            margin-top: 2px;
+            transition: all 0.15s;
+        }
+
+        .subtask-checkbox:hover {
+            border-color: #C88F4A;
+        }
+
+        .subtask-checkbox.checked {
+            background: #10B981;
+            border-color: #10B981;
+            color: white;
+        }
+
+        .subtask-content {
+            flex: 1;
+        }
+
+        .subtask-name {
+            font-size: 0.875rem;
+            color: #3D2E1F;
+        }
+
+        .subtask-item.completed .subtask-name {
+            text-decoration: line-through;
+            color: #9CA3AF;
+        }
+
+        .subtask-meta {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            margin-top: 0.25rem;
+        }
+
+        .subtask-role {
+            display: flex;
+            align-items: center;
+            gap: 0.25rem;
+            font-size: 0.75rem;
+            color: #6B5642;
+            background: #E5DDD1;
+            padding: 0.125rem 0.375rem;
+            border-radius: 4px;
+        }
+
+        .subtask-due {
+            font-size: 0.75rem;
+            color: #8B6F47;
+        }
+
+        .add-subtask-btn {
+            display: flex;
+            align-items: center;
+            gap: 0.375rem;
+            padding: 0.5rem 0.75rem;
+            background: transparent;
+            border: 1px dashed #D1D5DB;
+            border-radius: 6px;
+            color: #6B5642;
+            font-size: 0.8rem;
+            cursor: pointer;
+            width: 100%;
+            justify-content: center;
+            transition: all 0.15s;
+        }
+
+        .add-subtask-btn:hover {
+            background: #FAF7F5;
+            border-color: #C88F4A;
+            color: #C88F4A;
+        }
+
+        /* Automation Rules */
+        .automation-rules-section {
+            margin-top: 1.5rem;
+            padding: 1rem;
+            background: #F9FAFB;
+            border-radius: 8px;
+            border: 1px solid #E5E7EB;
+        }
+
+        .automation-rule {
+            display: flex;
+            align-items: flex-start;
+            gap: 0.75rem;
+            padding: 0.75rem;
+            background: white;
+            border-radius: 6px;
+            border: 1px solid #E5E7EB;
+            margin-bottom: 0.5rem;
+        }
+
+        .automation-rule-icon {
+            width: 32px;
+            height: 32px;
+            border-radius: 6px;
+            background: #EDE9FE;
+            color: #7C3AED;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            flex-shrink: 0;
+        }
+
+        .automation-rule-content {
+            flex: 1;
+        }
+
+        .automation-rule-name {
+            font-weight: 600;
+            font-size: 0.875rem;
+            color: #3D2E1F;
+        }
+
+        .automation-rule-description {
+            font-size: 0.8rem;
+            color: #6B7280;
+            margin-top: 0.125rem;
+        }
+
+        .automation-rule-toggle {
+            width: 40px;
+            height: 22px;
+            background: #D1D5DB;
+            border-radius: 11px;
+            position: relative;
+            cursor: pointer;
+            transition: background 0.2s;
+        }
+
+        .automation-rule-toggle.active {
+            background: #10B981;
+        }
+
+        .automation-rule-toggle::after {
+            content: '';
+            position: absolute;
+            width: 18px;
+            height: 18px;
+            background: white;
+            border-radius: 50%;
+            top: 2px;
+            left: 2px;
+            transition: transform 0.2s;
+        }
+
+        .automation-rule-toggle.active::after {
+            transform: translateX(18px);
+        }
+
+        /* Notifications Panel */
+        .notifications-panel {
+            position: fixed;
+            top: 60px;
+            right: 20px;
+            width: 380px;
+            max-height: calc(100vh - 100px);
+            background: white;
+            border-radius: 12px;
+            box-shadow: 0 8px 32px rgba(0,0,0,0.15);
+            z-index: 1001;
+            display: none;
+            overflow: hidden;
+        }
+
+        .notifications-panel.open {
+            display: block;
+        }
+
+        .notifications-header {
+            padding: 1rem 1.25rem;
+            border-bottom: 1px solid #E5E7EB;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+
+        .notifications-title {
+            font-weight: 600;
+            font-size: 1rem;
+            color: #3D2E1F;
+        }
+
+        .notifications-actions {
+            display: flex;
+            gap: 0.5rem;
+        }
+
+        .notifications-action-btn {
+            background: none;
+            border: none;
+            color: #6B5642;
+            cursor: pointer;
+            padding: 0.25rem;
+            border-radius: 4px;
+        }
+
+        .notifications-action-btn:hover {
+            background: #F3F4F6;
+        }
+
+        .notifications-list {
+            max-height: 400px;
+            overflow-y: auto;
+        }
+
+        .notification-item {
+            display: flex;
+            gap: 0.75rem;
+            padding: 1rem 1.25rem;
+            border-bottom: 1px solid #F3F4F6;
+            cursor: pointer;
+            transition: background 0.15s;
+        }
+
+        .notification-item:hover {
+            background: #FAF7F5;
+        }
+
+        .notification-item.unread {
+            background: #FEF3C7;
+        }
+
+        .notification-icon {
+            width: 36px;
+            height: 36px;
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            flex-shrink: 0;
+        }
+
+        .notification-icon.task {
+            background: #DBEAFE;
+            color: #2563EB;
+        }
+
+        .notification-icon.comment {
+            background: #D1FAE5;
+            color: #059669;
+        }
+
+        .notification-icon.mention {
+            background: #FCE7F3;
+            color: #DB2777;
+        }
+
+        .notification-icon.assignment {
+            background: #EDE9FE;
+            color: #7C3AED;
+        }
+
+        .notification-content {
+            flex: 1;
+        }
+
+        .notification-text {
+            font-size: 0.875rem;
+            color: #3D2E1F;
+            line-height: 1.4;
+        }
+
+        .notification-text strong {
+            font-weight: 600;
+        }
+
+        .notification-time {
+            font-size: 0.75rem;
+            color: #8B6F47;
+            margin-top: 0.25rem;
+        }
+
+        .notification-badge {
+            position: absolute;
+            top: -4px;
+            right: -4px;
+            width: 18px;
+            height: 18px;
+            background: #DC2626;
+            color: white;
+            border-radius: 50%;
+            font-size: 0.7rem;
+            font-weight: 600;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        /* Dashboard Cards */
+        .dashboard-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 1.5rem;
+            padding: 1.5rem;
+        }
+
+        .dashboard-card {
+            background: white;
+            border-radius: 12px;
+            padding: 1.25rem;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+        }
+
+        .dashboard-card-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-bottom: 1rem;
+        }
+
+        .dashboard-card-title {
+            font-weight: 600;
+            font-size: 0.9rem;
+            color: #3D2E1F;
+        }
+
+        .dashboard-stat {
+            display: flex;
+            align-items: baseline;
+            gap: 0.5rem;
+        }
+
+        .dashboard-stat-value {
+            font-size: 2rem;
+            font-weight: 700;
+            color: #C88F4A;
+        }
+
+        .dashboard-stat-label {
+            font-size: 0.8rem;
+            color: #6B5642;
+        }
+
+        .dashboard-chart {
+            height: 120px;
+            margin-top: 1rem;
+        }
+
+        /* Workload Distribution */
+        .workload-item {
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+            padding: 0.5rem 0;
+            border-bottom: 1px solid #F3F4F6;
+        }
+
+        .workload-item:last-child {
+            border-bottom: none;
+        }
+
+        .workload-role {
+            flex: 1;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .workload-role-name {
+            font-size: 0.875rem;
+            color: #3D2E1F;
+        }
+
+        .workload-bar {
+            width: 100px;
+            height: 8px;
+            background: #E5DDD1;
+            border-radius: 4px;
+            overflow: hidden;
+        }
+
+        .workload-bar-fill {
+            height: 100%;
+            border-radius: 4px;
+            transition: width 0.3s;
+        }
+
+        .workload-bar-fill.low { background: #10B981; }
+        .workload-bar-fill.medium { background: #F59E0B; }
+        .workload-bar-fill.high { background: #EF4444; }
+
+        .workload-count {
+            font-size: 0.8rem;
+            color: #6B5642;
+            min-width: 50px;
+            text-align: right;
+        }
+
+        /* Recurring Task Indicator */
+        .recurring-indicator {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.25rem;
+            padding: 0.2rem 0.5rem;
+            background: #EDE9FE;
+            color: #7C3AED;
+            border-radius: 4px;
+            font-size: 0.75rem;
+        }
+
+        /* Custom Fields Section */
+        .custom-fields-section {
+            margin-top: 1rem;
+        }
+
+        .custom-field-item {
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+            padding: 0.5rem 0;
+        }
+
+        .custom-field-label {
+            font-size: 0.8rem;
+            color: #6B5642;
+            min-width: 100px;
+        }
+
+        .custom-field-value {
+            flex: 1;
+            font-size: 0.875rem;
+            color: #3D2E1F;
+        }
+
+        /* Hero Task Modal Enhancements */
+        .hero-task-description-group {
+            margin-top: 1rem;
+        }
+
+        .hero-task-priority-group {
+            margin-top: 1rem;
+        }
+
+        .priority-select {
+            display: flex;
+            gap: 0.5rem;
+        }
+
+        .priority-option {
+            flex: 1;
+            padding: 0.625rem 0.75rem;
+            border: 2px solid #E5DDD1;
+            border-radius: 8px;
+            background: #FAF7F5;
+            cursor: pointer;
+            text-align: center;
+            font-size: 0.8rem;
+            font-weight: 500;
+            transition: all 0.15s;
+        }
+
+        .priority-option:hover {
+            border-color: #C88F4A;
+        }
+
+        .priority-option.selected {
+            border-color: currentColor;
+            background: currentColor;
+        }
+
+        .priority-option.selected span {
+            color: white;
+        }
+
+        .priority-option.urgent { color: #DC2626; }
+        .priority-option.high { color: #D97706; }
+        .priority-option.medium { color: #2563EB; }
+        .priority-option.low { color: #6B7280; }
+
+        .priority-option.urgent.selected { background: #DC2626; border-color: #DC2626; }
+        .priority-option.high.selected { background: #D97706; border-color: #D97706; }
+        .priority-option.medium.selected { background: #2563EB; border-color: #2563EB; }
+        .priority-option.low.selected { background: #6B7280; border-color: #6B7280; }
     </style>
     <div class="header">
         <h1>
@@ -12134,6 +13157,11 @@
                 Redo
                 <span class="undo-count" id="redoCount" style="display: none;">0</span>
             </button>
+            <!-- Notifications Bell -->
+            <button class="btn btn-small" onclick="toggleNotificationsPanel()" style="position: relative;" title="Notifications">
+                <i class="ph ph-bell"></i>
+                <span class="notification-badge" id="notificationBadge" style="display: none;"></span>
+            </button>
             <button class="btn btn-small" onclick="exportData()">
                 <i class="ph ph-download"></i> Export
             </button>
@@ -12164,6 +13192,24 @@
                     </button>
                 </div>
             </div>
+        </div>
+    </div>
+
+    <!-- Notifications Panel -->
+    <div class="notifications-panel" id="notificationsPanel">
+        <div class="notifications-header">
+            <span class="notifications-title">Notifications</span>
+            <div class="notifications-actions">
+                <button class="notifications-action-btn" onclick="markAllNotificationsRead()" title="Mark all as read">
+                    <i class="ph ph-checks"></i>
+                </button>
+                <button class="notifications-action-btn" onclick="toggleNotificationsPanel()" title="Close">
+                    <i class="ph ph-x"></i>
+                </button>
+            </div>
+        </div>
+        <div class="notifications-list" id="notificationsList">
+            <!-- Populated dynamically -->
         </div>
     </div>
 
@@ -27257,10 +28303,11 @@ Cmd/Ctrl + K - Command palette
             const overlay = document.getElementById('heroTaskOverlay');
             overlay.classList.remove('active');
 
-            // Reset form
+            // Reset form - basic fields
             document.getElementById('heroTaskName').value = '';
             document.getElementById('heroTaskWorkflow').value = '';
-            document.getElementById('heroTaskRole').value = '';
+            if (document.getElementById('heroTaskRole')) document.getElementById('heroTaskRole').value = '';
+            if (document.getElementById('heroTaskRoleMain')) document.getElementById('heroTaskRoleMain').value = '';
             document.getElementById('heroTaskPerson').value = '';
             document.getElementById('heroTaskDueDate').value = '';
             if (heroDatePicker) {
@@ -27271,9 +28318,47 @@ Cmd/Ctrl + K - Command palette
             document.getElementById('heroTaskSubmitBtn').disabled = true;
             document.getElementById('heroDependencyWarning').style.display = 'none';
 
+            // Reset new fields
+            if (document.getElementById('heroTaskDescription')) {
+                document.getElementById('heroTaskDescription').value = '';
+            }
+            if (document.getElementById('heroTaskRecurring')) {
+                document.getElementById('heroTaskRecurring').value = '';
+            }
+
+            // Reset priority to medium
+            selectedPriority = 'medium';
+            const priorityOptions = document.querySelectorAll('#heroPrioritySelect .priority-option');
+            priorityOptions.forEach(opt => {
+                opt.classList.remove('selected');
+                if (opt.dataset.priority === 'medium') {
+                    opt.classList.add('selected');
+                }
+            });
+
+            // Reset tags
+            heroTaskTags = [];
+            const tagsContainer = document.getElementById('heroTagsContainer');
+            if (tagsContainer) {
+                tagsContainer.querySelectorAll('.task-tag').forEach(el => el.remove());
+            }
+
+            // Reset collaborators
+            heroCollaborators = [];
+            renderCollaboratorAvatars();
+
+            // Hide role context display and required notice
+            if (document.getElementById('roleContextDisplay')) {
+                document.getElementById('roleContextDisplay').style.display = 'none';
+            }
+            if (document.getElementById('roleRequiredNotice')) {
+                document.getElementById('roleRequiredNotice').style.display = 'none';
+            }
+
             // Hide inline create forms
             document.getElementById('heroWorkflowCreate').classList.remove('active');
-            document.getElementById('heroRoleCreate').classList.remove('active');
+            if (document.getElementById('heroRoleCreate')) document.getElementById('heroRoleCreate').classList.remove('active');
+            if (document.getElementById('heroRoleCreateMain')) document.getElementById('heroRoleCreateMain').classList.remove('active');
             document.getElementById('heroPersonCreate').classList.remove('active');
 
             // Reset advanced options to collapsed state
@@ -27309,13 +28394,15 @@ Cmd/Ctrl + K - Command palette
         // Populate role and person selects in hero modal
         function populateHeroSelects() {
             const roleSelect = document.getElementById('heroTaskRole');
+            const roleSelectMain = document.getElementById('heroTaskRoleMain'); // Main required role selector
             const personSelect = document.getElementById('heroTaskPerson');
             const predecessorSelect = document.getElementById('heroTaskPredecessor');
             const workflowSelect = document.getElementById('heroTaskWorkflow');
             const workflowPrompt = document.getElementById('heroWorkflowPrompt');
 
             // Clear existing options (except first)
-            roleSelect.innerHTML = '<option value="">Select a role...</option>';
+            if (roleSelect) roleSelect.innerHTML = '<option value="">Select a role...</option>';
+            if (roleSelectMain) roleSelectMain.innerHTML = '<option value="">Select a role...</option>';
             personSelect.innerHTML = '<option value="">Select a person...</option>';
             predecessorSelect.innerHTML = '<option value="">No dependency...</option>';
             workflowSelect.innerHTML = '<option value="">Select a workflow...</option>';
@@ -27336,12 +28423,26 @@ Cmd/Ctrl + K - Command palette
                 workflowPrompt.style.display = 'none';
             }
 
-            // Add roles
+            // Add roles to both selectors
             (entities.role || []).forEach(role => {
-                const option = document.createElement('option');
-                option.value = role.id;
-                option.textContent = role.name;
-                roleSelect.appendChild(option);
+                // Get role hierarchy context for display
+                const hierarchy = getRoleHierarchy ? getRoleHierarchy(role.id) : [];
+                const contextText = hierarchy.length > 1 ?
+                    ` (${hierarchy.slice(0, -1).map(h => h.name).join(' > ')})` : '';
+
+                if (roleSelect) {
+                    const option = document.createElement('option');
+                    option.value = role.id;
+                    option.textContent = role.name;
+                    roleSelect.appendChild(option);
+                }
+
+                if (roleSelectMain) {
+                    const option = document.createElement('option');
+                    option.value = role.id;
+                    option.textContent = role.name + contextText;
+                    roleSelectMain.appendChild(option);
+                }
             });
 
             // Add people
@@ -27502,6 +28603,14 @@ Cmd/Ctrl + K - Command palette
                             </div>
                         </div>
                         <div class="task-meta-item">
+                            <div class="task-meta-label">Priority</div>
+                            <div class="task-meta-value">
+                                <span class="task-priority ${task.priority || 'medium'}">
+                                    <i class="ph ph-flag"></i> ${(task.priority || 'medium').charAt(0).toUpperCase() + (task.priority || 'medium').slice(1)}
+                                </span>
+                            </div>
+                        </div>
+                        <div class="task-meta-item">
                             <div class="task-meta-label">Assigned Role</div>
                             <div class="task-meta-value ${connectedRoles.length ? 'clickable' : 'empty'}"
                                  ${connectedRoles.length ? `onclick="openEntityModal('${connectedRoles[0].id}', 'role')"` : ''}>
@@ -27511,6 +28620,16 @@ Cmd/Ctrl + K - Command palette
                                 ` : '<i class="ph ph-user-circle"></i> Unassigned'}
                             </div>
                         </div>
+                        ${task.recurring ? `
+                        <div class="task-meta-item">
+                            <div class="task-meta-label">Recurring</div>
+                            <div class="task-meta-value">
+                                <span class="recurring-indicator">
+                                    <i class="ph ph-repeat"></i> ${task.recurring.charAt(0).toUpperCase() + task.recurring.slice(1)}
+                                </span>
+                            </div>
+                        </div>
+                        ` : ''}
                         ${workflow ? `
                         <div class="task-meta-item" style="grid-column: span 2;">
                             <div class="task-meta-label">Workflow</div>
@@ -27520,6 +28639,72 @@ Cmd/Ctrl + K - Command palette
                         </div>
                         ` : ''}
                     </div>
+
+                    <!-- Role Hierarchy Context -->
+                    ${connectedRoles.length > 0 ? (() => {
+                        const roleHierarchy = typeof getRoleHierarchy === 'function' ? getRoleHierarchy(connectedRoles[0].id) : [];
+                        if (roleHierarchy.length > 1) {
+                            return `
+                            <div class="role-context-display" style="margin-top: 1rem;">
+                                <div class="role-context-breadcrumb">
+                                    ${roleHierarchy.map((item, index) => {
+                                        const icon = item.type === 'unit' ? 'ph-buildings' :
+                                                     item.type === 'team' ? 'ph-users-three' : 'ph-briefcase';
+                                        return `${index > 0 ? '<i class="ph ph-caret-right"></i>' : ''}
+                                            <span class="role-context-item ${item.type}" onclick="openEntityModal('${item.id}', '${item.type}')">
+                                                <i class="ph ${icon}"></i>
+                                                ${item.name}
+                                            </span>`;
+                                    }).join('')}
+                                </div>
+                            </div>`;
+                        }
+                        return '';
+                    })() : ''}
+
+                    <!-- Tags -->
+                    ${(task.tags && task.tags.length > 0) ? `
+                    <div class="task-tags" style="margin-top: 1rem;">
+                        ${task.tags.map((tag, index) => {
+                            const colors = ['blue', 'green', 'yellow', 'red', 'purple', 'pink', 'orange'];
+                            return `<span class="task-tag" data-color="${colors[index % colors.length]}">${tag}</span>`;
+                        }).join('')}
+                    </div>
+                    ` : ''}
+
+                    <!-- Description -->
+                    ${task.description ? `
+                    <div style="margin-top: 1rem; padding: 1rem; background: #FAF7F5; border-radius: 8px; border-left: 3px solid #C88F4A;">
+                        <div style="font-size: 0.8rem; font-weight: 600; color: #6B5642; margin-bottom: 0.5rem;">
+                            <i class="ph ph-text-aa"></i> Description
+                        </div>
+                        <div style="font-size: 0.9rem; color: #3D2E1F; line-height: 1.5; white-space: pre-wrap;">${task.description}</div>
+                    </div>
+                    ` : ''}
+
+                    <!-- Collaborators -->
+                    ${(task.collaborators && task.collaborators.length > 0) ? `
+                    <div style="margin-top: 1rem;">
+                        <div style="font-size: 0.8rem; font-weight: 600; color: #6B5642; margin-bottom: 0.5rem;">
+                            <i class="ph ph-users"></i> Collaborators
+                        </div>
+                        <div class="task-collaborators">
+                            <div class="collaborator-avatars">
+                                ${task.collaborators.map(personId => {
+                                    const person = entities.person?.find(p => p.id === personId);
+                                    if (person) {
+                                        const initials = person.name.split(' ').map(n => n[0]).join('').substring(0, 2).toUpperCase();
+                                        return `<div class="collaborator-avatar" title="${person.name}" onclick="openEntityModal('${person.id}', 'person')">${initials}</div>`;
+                                    }
+                                    return '';
+                                }).join('')}
+                            </div>
+                        </div>
+                    </div>
+                    ` : ''}
+
+                    <!-- Subtasks Section -->
+                    ${renderSubtasksSection(task.id)}
 
                     <!-- Linked Tasks Section -->
                     <div class="task-links-section" style="margin-top: 1rem; padding-top: 1rem; border-top: 1px solid #E5DDD1;">
@@ -27594,6 +28779,9 @@ Cmd/Ctrl + K - Command palette
                         ` : ''}
                     </div>
                     ` : ''}
+
+                    <!-- Comments Section -->
+                    ${renderTaskComments(task.id)}
                 </div>
             `;
         }
@@ -28076,12 +29264,781 @@ Options:
             }
         }
 
-        // Toggle role inline create
+        // Toggle role inline create (legacy - kept for compatibility)
         function toggleHeroRoleCreate() {
             const createDiv = document.getElementById('heroRoleCreate');
+            if (createDiv) {
+                createDiv.classList.toggle('active');
+                if (createDiv.classList.contains('active')) {
+                    document.getElementById('heroNewRoleName')?.focus();
+                }
+            }
+        }
+
+        // Toggle main role inline create
+        function toggleHeroRoleCreateMain() {
+            const createDiv = document.getElementById('heroRoleCreateMain');
             createDiv.classList.toggle('active');
             if (createDiv.classList.contains('active')) {
-                document.getElementById('heroNewRoleName').focus();
+                document.getElementById('heroNewRoleNameMain').focus();
+            }
+        }
+
+        // Create new role from main section of hero modal
+        function createHeroRoleMain() {
+            const nameInput = document.getElementById('heroNewRoleNameMain');
+            const name = nameInput.value.trim();
+
+            if (!name) return;
+
+            // Create role entity
+            const roleId = 'role' + Date.now();
+            const role = { id: roleId, name: name, type: 'role', description: '' };
+            entities.role.push(role);
+
+            logActivityToXano({
+                event_verb: 'Add Entity',
+                object_type: 'role',
+                object_label: name
+            });
+
+            saveToLocalStorage();
+            renderEntityList();
+
+            // Refresh selects and select the new role
+            populateHeroSelects();
+            document.getElementById('heroTaskRoleMain').value = roleId;
+
+            // Clear and hide inline create
+            nameInput.value = '';
+            document.getElementById('heroRoleCreateMain').classList.remove('active');
+
+            updateHeroTaskPreview();
+            updateRoleContext();
+        }
+
+        // ============================================
+        // PRIORITY SELECTION
+        // ============================================
+        let selectedPriority = 'medium';
+
+        function selectPriority(priority) {
+            selectedPriority = priority;
+            const options = document.querySelectorAll('#heroPrioritySelect .priority-option');
+            options.forEach(opt => {
+                opt.classList.remove('selected');
+                if (opt.dataset.priority === priority) {
+                    opt.classList.add('selected');
+                }
+            });
+            updateHeroTaskPreview();
+        }
+
+        // ============================================
+        // TAGS SYSTEM
+        // ============================================
+        let heroTaskTags = [];
+        const tagColors = ['blue', 'green', 'yellow', 'red', 'purple', 'pink', 'orange'];
+
+        function handleTagInput(event) {
+            if (event.key === 'Enter' || event.key === ',') {
+                event.preventDefault();
+                const input = event.target;
+                const tag = input.value.trim().replace(',', '');
+
+                if (tag && !heroTaskTags.includes(tag)) {
+                    heroTaskTags.push(tag);
+                    renderHeroTags();
+                }
+                input.value = '';
+            } else if (event.key === 'Backspace' && event.target.value === '' && heroTaskTags.length > 0) {
+                heroTaskTags.pop();
+                renderHeroTags();
+            }
+        }
+
+        function renderHeroTags() {
+            const container = document.getElementById('heroTagsContainer');
+            const input = document.getElementById('heroTagsInput');
+
+            // Remove existing tags
+            container.querySelectorAll('.task-tag').forEach(el => el.remove());
+
+            // Add tags before the input
+            heroTaskTags.forEach((tag, index) => {
+                const tagEl = document.createElement('span');
+                tagEl.className = 'task-tag';
+                tagEl.dataset.color = tagColors[index % tagColors.length];
+                tagEl.innerHTML = `${tag} <i class="ph ph-x tag-remove" onclick="removeHeroTag('${tag}')"></i>`;
+                container.insertBefore(tagEl, input);
+            });
+        }
+
+        function removeHeroTag(tag) {
+            heroTaskTags = heroTaskTags.filter(t => t !== tag);
+            renderHeroTags();
+        }
+
+        // ============================================
+        // ROLE CONTEXT (Holonic Hierarchy Display)
+        // ============================================
+        function updateRoleContext() {
+            const roleSelect = document.getElementById('heroTaskRoleMain');
+            const contextDisplay = document.getElementById('roleContextDisplay');
+            const breadcrumb = document.getElementById('roleContextBreadcrumb');
+            const roleRequiredNotice = document.getElementById('roleRequiredNotice');
+
+            const roleId = roleSelect?.value;
+
+            if (!roleId) {
+                if (contextDisplay) contextDisplay.style.display = 'none';
+                if (roleRequiredNotice) roleRequiredNotice.style.display = 'flex';
+                return;
+            }
+
+            if (roleRequiredNotice) roleRequiredNotice.style.display = 'none';
+
+            // Build hierarchy: Unit > Team > Role
+            const hierarchy = getRoleHierarchy(roleId);
+
+            if (hierarchy.length > 0 && contextDisplay) {
+                contextDisplay.style.display = 'flex';
+
+                let html = '';
+                hierarchy.forEach((item, index) => {
+                    if (index > 0) {
+                        html += '<i class="ph ph-caret-right"></i>';
+                    }
+                    const icon = item.type === 'unit' ? 'ph-buildings' :
+                                 item.type === 'team' ? 'ph-users-three' : 'ph-briefcase';
+                    html += `<span class="role-context-item ${item.type}" onclick="openEntityModal('${item.id}', '${item.type}')">
+                        <i class="ph ${icon}"></i>
+                        ${item.name}
+                    </span>`;
+                });
+                breadcrumb.innerHTML = html;
+            } else if (contextDisplay) {
+                contextDisplay.style.display = 'none';
+            }
+        }
+
+        function getRoleHierarchy(roleId) {
+            const hierarchy = [];
+            let currentId = roleId;
+
+            // Start with the role
+            const role = entities.role?.find(r => r.id === roleId);
+            if (role) {
+                hierarchy.unshift({ id: role.id, name: role.name, type: 'role' });
+            }
+
+            // Find parent team/unit
+            while (currentId) {
+                const parentRel = relationships.find(r =>
+                    r.predicate === 'DES' && r.object === currentId
+                );
+
+                if (parentRel) {
+                    const parent = findEntity(parentRel.subject);
+                    if (parent && (parent.type === 'team' || parent.type === 'unit')) {
+                        hierarchy.unshift({ id: parent.id, name: parent.name, type: parent.type });
+                        currentId = parent.id;
+                    } else {
+                        break;
+                    }
+                } else {
+                    break;
+                }
+            }
+
+            return hierarchy;
+        }
+
+        // ============================================
+        // COLLABORATORS SYSTEM
+        // ============================================
+        let heroCollaborators = [];
+
+        function openCollaboratorPicker() {
+            // Get all people not already added as collaborators
+            const available = (entities.person || []).filter(p => !heroCollaborators.includes(p.id));
+
+            if (available.length === 0) {
+                showToast('All people have been added as collaborators', 'info');
+                return;
+            }
+
+            // Simple prompt-based picker for now (can be enhanced with modal)
+            const names = available.map(p => p.name).join(', ');
+            const selected = prompt(`Available collaborators: ${names}\n\nEnter name to add:`);
+
+            if (selected) {
+                const person = available.find(p => p.name.toLowerCase() === selected.toLowerCase());
+                if (person) {
+                    heroCollaborators.push(person.id);
+                    renderCollaboratorAvatars();
+                } else {
+                    showToast('Person not found', 'error');
+                }
+            }
+        }
+
+        function renderCollaboratorAvatars() {
+            const container = document.getElementById('heroCollaboratorAvatars');
+            if (!container) return;
+
+            container.innerHTML = '';
+
+            heroCollaborators.forEach(personId => {
+                const person = entities.person?.find(p => p.id === personId);
+                if (person) {
+                    const initials = person.name.split(' ').map(n => n[0]).join('').substring(0, 2).toUpperCase();
+                    const avatar = document.createElement('div');
+                    avatar.className = 'collaborator-avatar';
+                    avatar.title = person.name;
+                    avatar.textContent = initials;
+                    avatar.onclick = () => removeCollaborator(personId);
+                    container.appendChild(avatar);
+                }
+            });
+        }
+
+        function removeCollaborator(personId) {
+            heroCollaborators = heroCollaborators.filter(id => id !== personId);
+            renderCollaboratorAvatars();
+        }
+
+        // ============================================
+        // TASK COMMENTS SYSTEM
+        // ============================================
+        let taskComments = {}; // { taskId: [{ id, author, authorType, text, createdAt, mentions }] }
+
+        function addTaskComment(taskId, text, authorName = 'You') {
+            if (!taskComments[taskId]) {
+                taskComments[taskId] = [];
+            }
+
+            // Parse mentions from text
+            const mentionRegex = /@(\w+(?:\s+\w+)?)/g;
+            const mentions = [];
+            let match;
+            while ((match = mentionRegex.exec(text)) !== null) {
+                mentions.push(match[1]);
+            }
+
+            const comment = {
+                id: 'comment' + Date.now(),
+                author: authorName,
+                authorType: 'person',
+                text: text,
+                createdAt: new Date().toISOString(),
+                mentions: mentions
+            };
+
+            taskComments[taskId].push(comment);
+            saveTaskComments();
+
+            // Trigger notifications for mentions
+            if (mentions.length > 0) {
+                addMentionNotifications(taskId, comment, mentions);
+            }
+
+            return comment;
+        }
+
+        function getTaskComments(taskId) {
+            return taskComments[taskId] || [];
+        }
+
+        function renderTaskComments(taskId) {
+            const comments = getTaskComments(taskId);
+
+            if (comments.length === 0) {
+                return `
+                    <div class="task-comments">
+                        <div class="task-comments-header">
+                            <span class="task-comments-title">
+                                <i class="ph ph-chat-circle"></i> Comments
+                            </span>
+                        </div>
+                        <div style="padding: 0.75rem; background: #FAF7F5; border-radius: 6px; text-align: center; color: #8B6F47; font-size: 0.875rem;">
+                            <em>No comments yet</em>
+                        </div>
+                        <div class="comment-input-container" style="margin-top: 0.75rem;">
+                            <textarea class="comment-input"
+                                      id="commentInput_${taskId}"
+                                      placeholder="Add a comment... (use @name to mention)"
+                                      onkeydown="handleCommentKeydown(event, '${taskId}')"></textarea>
+                            <button class="comment-submit-btn" onclick="submitComment('${taskId}')">
+                                <i class="ph ph-paper-plane-tilt"></i>
+                            </button>
+                        </div>
+                    </div>
+                `;
+            }
+
+            const commentsHtml = comments.map(comment => {
+                const initials = comment.author.split(' ').map(n => n[0]).join('').substring(0, 2).toUpperCase();
+                const formattedText = comment.text.replace(/@(\w+(?:\s+\w+)?)/g, '<span class="mention">@$1</span>');
+                const timeAgo = formatTimeAgo(new Date(comment.createdAt).getTime());
+
+                return `
+                    <div class="comment-item">
+                        <div class="comment-avatar">${initials}</div>
+                        <div class="comment-content">
+                            <div class="comment-header">
+                                <span class="comment-author">${comment.author}</span>
+                                <span class="comment-time">${timeAgo}</span>
+                            </div>
+                            <div class="comment-text">${formattedText}</div>
+                        </div>
+                    </div>
+                `;
+            }).join('');
+
+            return `
+                <div class="task-comments">
+                    <div class="task-comments-header">
+                        <span class="task-comments-title">
+                            <i class="ph ph-chat-circle"></i> Comments
+                            <span class="task-comments-count">${comments.length}</span>
+                        </span>
+                    </div>
+                    ${commentsHtml}
+                    <div class="comment-input-container" style="margin-top: 0.75rem;">
+                        <textarea class="comment-input"
+                                  id="commentInput_${taskId}"
+                                  placeholder="Add a comment... (use @name to mention)"
+                                  onkeydown="handleCommentKeydown(event, '${taskId}')"></textarea>
+                        <button class="comment-submit-btn" onclick="submitComment('${taskId}')">
+                            <i class="ph ph-paper-plane-tilt"></i>
+                        </button>
+                    </div>
+                </div>
+            `;
+        }
+
+        function handleCommentKeydown(event, taskId) {
+            if (event.key === 'Enter' && !event.shiftKey) {
+                event.preventDefault();
+                submitComment(taskId);
+            }
+        }
+
+        function submitComment(taskId) {
+            const input = document.getElementById(`commentInput_${taskId}`);
+            const text = input?.value.trim();
+
+            if (!text) return;
+
+            addTaskComment(taskId, text);
+            input.value = '';
+
+            // Re-render the task modal to show new comment
+            openEntityModal(taskId, 'task');
+            showToast('Comment added', 'success');
+        }
+
+        function saveTaskComments() {
+            if (currentWorkspaceId) {
+                localStorage.setItem(`taskComments_${currentWorkspaceId}`, JSON.stringify(taskComments));
+            }
+        }
+
+        function loadTaskComments() {
+            if (currentWorkspaceId) {
+                const saved = localStorage.getItem(`taskComments_${currentWorkspaceId}`);
+                if (saved) {
+                    taskComments = JSON.parse(saved);
+                }
+            }
+        }
+
+        // ============================================
+        // NOTIFICATION SYSTEM
+        // ============================================
+        let notifications = []; // [{ id, type, text, taskId, read, createdAt }]
+        let notificationSettings = {
+            taskAssignment: true,
+            taskUpdate: true,
+            mentions: true,
+            comments: true,
+            dueDateReminder: true
+        };
+
+        function addNotification(type, text, taskId = null) {
+            const notification = {
+                id: 'notif' + Date.now(),
+                type: type,
+                text: text,
+                taskId: taskId,
+                read: false,
+                createdAt: new Date().toISOString()
+            };
+
+            notifications.unshift(notification);
+
+            // Keep only last 50 notifications
+            if (notifications.length > 50) {
+                notifications = notifications.slice(0, 50);
+            }
+
+            saveNotifications();
+            updateNotificationBadge();
+
+            return notification;
+        }
+
+        function addMentionNotifications(taskId, comment, mentions) {
+            const task = entities.task?.find(t => t.id === taskId);
+            if (!task) return;
+
+            mentions.forEach(mention => {
+                // Check if mention matches a person or role
+                const person = entities.person?.find(p => p.name.toLowerCase().includes(mention.toLowerCase()));
+                const role = entities.role?.find(r => r.name.toLowerCase().includes(mention.toLowerCase()));
+
+                if (person || role) {
+                    addNotification(
+                        'mention',
+                        `${comment.author} mentioned ${mention} in "${task.name}"`,
+                        taskId
+                    );
+                }
+            });
+        }
+
+        function markNotificationRead(notificationId) {
+            const notification = notifications.find(n => n.id === notificationId);
+            if (notification) {
+                notification.read = true;
+                saveNotifications();
+                updateNotificationBadge();
+            }
+        }
+
+        function markAllNotificationsRead() {
+            notifications.forEach(n => n.read = true);
+            saveNotifications();
+            updateNotificationBadge();
+        }
+
+        function getUnreadCount() {
+            return notifications.filter(n => !n.read).length;
+        }
+
+        function updateNotificationBadge() {
+            const badge = document.getElementById('notificationBadge');
+            const count = getUnreadCount();
+
+            if (badge) {
+                if (count > 0) {
+                    badge.textContent = count > 9 ? '9+' : count;
+                    badge.style.display = 'flex';
+                } else {
+                    badge.style.display = 'none';
+                }
+            }
+        }
+
+        function saveNotifications() {
+            if (currentWorkspaceId) {
+                localStorage.setItem(`notifications_${currentWorkspaceId}`, JSON.stringify(notifications));
+            }
+        }
+
+        function loadNotifications() {
+            if (currentWorkspaceId) {
+                const saved = localStorage.getItem(`notifications_${currentWorkspaceId}`);
+                if (saved) {
+                    notifications = JSON.parse(saved);
+                }
+            }
+        }
+
+        function toggleNotificationsPanel() {
+            const panel = document.getElementById('notificationsPanel');
+            if (panel) {
+                panel.classList.toggle('open');
+                if (panel.classList.contains('open')) {
+                    renderNotificationsPanel();
+                }
+            }
+        }
+
+        function renderNotificationsPanel() {
+            const list = document.getElementById('notificationsList');
+            if (!list) return;
+
+            if (notifications.length === 0) {
+                list.innerHTML = `
+                    <div style="padding: 2rem; text-align: center; color: #8B6F47;">
+                        <i class="ph ph-bell-slash" style="font-size: 2rem; margin-bottom: 0.5rem; display: block;"></i>
+                        No notifications yet
+                    </div>
+                `;
+                return;
+            }
+
+            list.innerHTML = notifications.map(notif => {
+                const iconClass = notif.type === 'task' ? 'task' :
+                                  notif.type === 'comment' ? 'comment' :
+                                  notif.type === 'mention' ? 'mention' : 'assignment';
+                const icon = notif.type === 'task' ? 'ph-check-square' :
+                             notif.type === 'comment' ? 'ph-chat-circle' :
+                             notif.type === 'mention' ? 'ph-at' : 'ph-user-plus';
+                const timeAgo = formatTimeAgo(new Date(notif.createdAt).getTime());
+
+                return `
+                    <div class="notification-item ${notif.read ? '' : 'unread'}"
+                         onclick="handleNotificationClick('${notif.id}', '${notif.taskId || ''}')">
+                        <div class="notification-icon ${iconClass}">
+                            <i class="ph ${icon}"></i>
+                        </div>
+                        <div class="notification-content">
+                            <div class="notification-text">${notif.text}</div>
+                            <div class="notification-time">${timeAgo}</div>
+                        </div>
+                    </div>
+                `;
+            }).join('');
+        }
+
+        function handleNotificationClick(notificationId, taskId) {
+            markNotificationRead(notificationId);
+            renderNotificationsPanel();
+
+            if (taskId) {
+                toggleNotificationsPanel();
+                openEntityModal(taskId, 'task');
+            }
+        }
+
+        // ============================================
+        // AUTOMATION RULES ENGINE
+        // ============================================
+        let automationRules = [
+            {
+                id: 'rule_auto_complete_parent',
+                name: 'Auto-complete parent tasks',
+                description: 'When all subtasks are completed, mark parent task as complete',
+                trigger: 'subtask_completed',
+                action: 'complete_parent_if_all_done',
+                enabled: true
+            },
+            {
+                id: 'rule_notify_role',
+                name: 'Notify on assignment',
+                description: 'Send notification when a task is assigned to a role',
+                trigger: 'task_assigned',
+                action: 'notify_role_members',
+                enabled: true
+            },
+            {
+                id: 'rule_due_date_reminder',
+                name: 'Due date reminders',
+                description: 'Notify when tasks are due soon or overdue',
+                trigger: 'due_date_approaching',
+                action: 'send_reminder',
+                enabled: true
+            },
+            {
+                id: 'rule_cascade_dates',
+                name: 'Cascade date changes',
+                description: 'When a predecessor task date changes, adjust dependent task dates',
+                trigger: 'due_date_changed',
+                action: 'cascade_to_dependents',
+                enabled: false
+            }
+        ];
+
+        function toggleAutomationRule(ruleId) {
+            const rule = automationRules.find(r => r.id === ruleId);
+            if (rule) {
+                rule.enabled = !rule.enabled;
+                saveAutomationRules();
+                showToast(`Rule "${rule.name}" ${rule.enabled ? 'enabled' : 'disabled'}`, 'info');
+            }
+        }
+
+        function executeAutomationRules(trigger, context) {
+            const activeRules = automationRules.filter(r => r.enabled && r.trigger === trigger);
+
+            activeRules.forEach(rule => {
+                switch (rule.action) {
+                    case 'complete_parent_if_all_done':
+                        if (context.parentTaskId) {
+                            checkAndCompleteParent(context.parentTaskId);
+                        }
+                        break;
+                    case 'notify_role_members':
+                        if (context.roleId && context.taskId) {
+                            notifyRoleMembers(context.roleId, context.taskId);
+                        }
+                        break;
+                    case 'send_reminder':
+                        // Handled by periodic check
+                        break;
+                    case 'cascade_to_dependents':
+                        if (context.taskId && context.daysDelta) {
+                            propagateDateChange(context.taskId, context.newDate, context.daysDelta);
+                        }
+                        break;
+                }
+            });
+        }
+
+        function checkAndCompleteParent(parentTaskId) {
+            const subtasks = getSubtasks(parentTaskId);
+            if (subtasks.length > 0 && subtasks.every(t => t.status === 'completed')) {
+                const parent = entities.task?.find(t => t.id === parentTaskId);
+                if (parent && parent.status !== 'completed') {
+                    parent.status = 'completed';
+                    saveToLocalStorage();
+                    showToast('Parent task auto-completed', 'success');
+                    addNotification('task', `"${parent.name}" was automatically completed`, parentTaskId);
+                }
+            }
+        }
+
+        function notifyRoleMembers(roleId, taskId) {
+            const role = entities.role?.find(r => r.id === roleId);
+            const task = entities.task?.find(t => t.id === taskId);
+            if (role && task) {
+                addNotification('assignment', `Task "${task.name}" assigned to ${role.name}`, taskId);
+            }
+        }
+
+        function saveAutomationRules() {
+            if (currentWorkspaceId) {
+                localStorage.setItem(`automationRules_${currentWorkspaceId}`, JSON.stringify(automationRules));
+            }
+        }
+
+        function loadAutomationRules() {
+            if (currentWorkspaceId) {
+                const saved = localStorage.getItem(`automationRules_${currentWorkspaceId}`);
+                if (saved) {
+                    automationRules = JSON.parse(saved);
+                }
+            }
+        }
+
+        // ============================================
+        // SUBTASKS WITH ROLE ASSIGNMENTS
+        // ============================================
+        function addSubtask(parentTaskId, subtaskName, roleId = null, dueDate = null) {
+            const subtaskId = 'task' + Date.now();
+            const subtask = {
+                id: subtaskId,
+                name: subtaskName,
+                type: 'task',
+                status: 'pending',
+                dueDate: dueDate,
+                predecessorId: parentTaskId, // Using predecessorId to link to parent
+                parentTaskId: parentTaskId,
+                priority: 'medium',
+                tags: [],
+                description: '',
+                createdAt: new Date().toISOString()
+            };
+
+            entities.task.push(subtask);
+
+            // Connect to role if provided
+            if (roleId) {
+                const roleTaskRel = {
+                    id: 'rel' + Date.now(),
+                    subject: roleId,
+                    predicate: 'CON',
+                    object: subtaskId,
+                    description: ''
+                };
+                relationships.push(roleTaskRel);
+            }
+
+            saveToLocalStorage();
+
+            logActivityToXano({
+                event_verb: 'Add Subtask',
+                object_type: 'task',
+                object_label: subtaskName,
+                details: `Parent: ${parentTaskId}`
+            });
+
+            return subtask;
+        }
+
+        function renderSubtasksSection(taskId) {
+            const subtasks = getSubtasks(taskId);
+            const completedCount = subtasks.filter(t => t.status === 'completed').length;
+            const totalCount = subtasks.length;
+            const progress = totalCount > 0 ? (completedCount / totalCount) * 100 : 0;
+
+            return `
+                <div class="subtasks-section">
+                    <div class="subtasks-header">
+                        <span class="subtasks-title">
+                            <i class="ph ph-list-checks"></i> Subtasks
+                        </span>
+                        ${totalCount > 0 ? `
+                        <div class="subtask-progress">
+                            <div class="subtask-progress-bar">
+                                <div class="subtask-progress-fill" style="width: ${progress}%"></div>
+                            </div>
+                            <span class="subtask-progress-text">${completedCount}/${totalCount}</span>
+                        </div>
+                        ` : ''}
+                    </div>
+                    ${subtasks.map(subtask => {
+                        const roleRel = relationships.find(r => r.object === subtask.id && r.predicate === 'CON');
+                        const role = roleRel ? entities.role?.find(r => r.id === roleRel.subject) : null;
+
+                        return `
+                            <div class="subtask-item ${subtask.status === 'completed' ? 'completed' : ''}" onclick="openEntityModal('${subtask.id}', 'task')">
+                                <div class="subtask-checkbox ${subtask.status === 'completed' ? 'checked' : ''}"
+                                     onclick="event.stopPropagation(); toggleSubtaskStatus('${subtask.id}', '${taskId}')">
+                                    ${subtask.status === 'completed' ? '<i class="ph ph-check" style="font-size: 12px;"></i>' : ''}
+                                </div>
+                                <div class="subtask-content">
+                                    <div class="subtask-name">${subtask.name}</div>
+                                    <div class="subtask-meta">
+                                        ${role ? `<span class="subtask-role"><i class="ph ph-briefcase"></i> ${role.name}</span>` : ''}
+                                        ${subtask.dueDate ? `<span class="subtask-due"><i class="ph ph-calendar"></i> ${formatDateShort(subtask.dueDate)}</span>` : ''}
+                                    </div>
+                                </div>
+                            </div>
+                        `;
+                    }).join('')}
+                    <button class="add-subtask-btn" onclick="openAddSubtaskModal('${taskId}')">
+                        <i class="ph ph-plus"></i> Add subtask
+                    </button>
+                </div>
+            `;
+        }
+
+        function toggleSubtaskStatus(subtaskId, parentTaskId) {
+            const subtask = entities.task?.find(t => t.id === subtaskId);
+            if (subtask) {
+                subtask.status = subtask.status === 'completed' ? 'pending' : 'completed';
+                saveToLocalStorage();
+
+                // Execute automation rules
+                if (subtask.status === 'completed') {
+                    executeAutomationRules('subtask_completed', { parentTaskId: parentTaskId });
+                }
+
+                // Refresh the task modal
+                openEntityModal(parentTaskId, 'task');
+            }
+        }
+
+        function openAddSubtaskModal(parentTaskId) {
+            const name = prompt('Enter subtask name:');
+            if (name && name.trim()) {
+                addSubtask(parentTaskId, name.trim());
+                openEntityModal(parentTaskId, 'task');
+                showToast('Subtask added', 'success');
             }
         }
 
@@ -28297,14 +30254,27 @@ Options:
         // Submit hero task
         function submitHeroTask() {
             const taskName = document.getElementById('heroTaskName').value.trim();
-            const roleId = document.getElementById('heroTaskRole').value;
-            const personId = document.getElementById('heroTaskPerson').value;
-            const dueDate = document.getElementById('heroTaskDueDate').value;
-            const predecessorId = document.getElementById('heroTaskPredecessor').value;
-            const workflowId = document.getElementById('heroTaskWorkflow').value;
+            const description = document.getElementById('heroTaskDescription')?.value.trim() || '';
+            // Use main role selector (required), fall back to legacy selector
+            const roleIdMain = document.getElementById('heroTaskRoleMain')?.value;
+            const roleIdLegacy = document.getElementById('heroTaskRole')?.value;
+            const roleId = roleIdMain || roleIdLegacy;
+            const personId = document.getElementById('heroTaskPerson')?.value;
+            const dueDate = document.getElementById('heroTaskDueDate')?.value;
+            const predecessorId = document.getElementById('heroTaskPredecessor')?.value;
+            const workflowId = document.getElementById('heroTaskWorkflow')?.value;
+            const recurringValue = document.getElementById('heroTaskRecurring')?.value || '';
 
-            // Task name is required, but workflow is optional
+            // Task name is required
             if (!taskName) {
+                showToast('Task name is required', 'error');
+                return;
+            }
+
+            // Role is required (EO holonic model - tasks must be assigned to roles)
+            if (!roleId) {
+                showToast('Please assign this task to a role', 'error');
+                document.getElementById('roleRequiredNotice').style.display = 'flex';
                 return;
             }
 
@@ -28315,15 +30285,20 @@ Options:
                 const person = personId ? entities.person.find(p => p.id === personId) : null;
                 const workflow = workflowId ? entities.workflow.find(w => w.id === workflowId) : null;
 
-                // 1. Create task entity (tasks can optionally be instances of workflows)
+                // 1. Create task entity with enhanced fields
                 taskId = 'task' + Date.now();
                 const taskObject = {
                     id: taskId,
                     name: taskName,
                     type: 'task',
+                    description: description,
                     dueDate: dueDate || null,
                     predecessorId: predecessorId || null,
                     status: 'pending',
+                    priority: selectedPriority || 'medium',
+                    tags: [...heroTaskTags], // Copy tags array
+                    collaborators: [...heroCollaborators], // Copy collaborators array
+                    recurring: recurringValue || null,
                     producesProductId: null,
                     followsWorkflowId: workflowId || null,
                     createdAt: new Date().toISOString()
@@ -28403,6 +30378,11 @@ Options:
 
                 // Save to local storage first (most important)
                 saveToLocalStorage();
+
+                // Trigger automation rules for task assignment
+                if (role) {
+                    executeAutomationRules('task_assigned', { roleId: roleId, taskId: taskId });
+                }
 
                 console.log('Task created via hero modal:', taskName);
             } catch (error) {
@@ -30415,6 +32395,11 @@ Options:
                 // Load undo history and recycle bin for current workspace
                 loadUndoHistory();
 
+                // Load enhanced task management data
+                loadTaskComments();
+                loadNotifications();
+                loadAutomationRules();
+
                 // Render everything
                 try {
                     updateStatus('Rendering interface...');
@@ -30425,6 +32410,7 @@ Options:
                     renderActivityList();
                     updateFilterStatus();
                     updateTaskCountBadge();
+                    updateNotificationBadge();
                     console.log('✅ UI rendered');
                     updateStatus('Ready');
 
@@ -30589,6 +32575,15 @@ Options:
                            oninput="updateHeroTaskPreview()">
                 </div>
 
+                <!-- Description Field -->
+                <div class="hero-task-input-group hero-task-description-group">
+                    <label class="hero-task-label"><i class="ph ph-text-aa"></i> Description (Optional)</label>
+                    <textarea id="heroTaskDescription"
+                              class="task-description-field"
+                              placeholder="Add more details about this task..."
+                              oninput="updateHeroTaskPreview()"></textarea>
+                </div>
+
                 <div class="hero-task-row hero-task-essential-options">
                     <div class="hero-task-input-group" style="flex: 1;">
                         <label class="hero-task-label"><i class="ph ph-calendar"></i> Due Date</label>
@@ -30596,6 +32591,71 @@ Options:
                                id="heroTaskDueDate"
                                class="hero-task-date-input"
                                onchange="updateHeroTaskPreview()">
+                    </div>
+                    <div class="hero-task-input-group" style="flex: 1;">
+                        <label class="hero-task-label"><i class="ph ph-flag"></i> Priority</label>
+                        <div class="priority-select" id="heroPrioritySelect">
+                            <div class="priority-option low" onclick="selectPriority('low')" data-priority="low">
+                                <span>Low</span>
+                            </div>
+                            <div class="priority-option medium selected" onclick="selectPriority('medium')" data-priority="medium">
+                                <span>Medium</span>
+                            </div>
+                            <div class="priority-option high" onclick="selectPriority('high')" data-priority="high">
+                                <span>High</span>
+                            </div>
+                            <div class="priority-option urgent" onclick="selectPriority('urgent')" data-priority="urgent">
+                                <span>Urgent</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Tags Input -->
+                <div class="hero-task-input-group" style="margin-top: 1rem;">
+                    <label class="hero-task-label"><i class="ph ph-tag"></i> Tags (Optional)</label>
+                    <div class="tags-input-container" id="heroTagsContainer" onclick="document.getElementById('heroTagsInput').focus()">
+                        <input type="text"
+                               id="heroTagsInput"
+                               placeholder="Type and press Enter to add tags..."
+                               onkeydown="handleTagInput(event)">
+                    </div>
+                </div>
+
+                <!-- Role Assignment (Required for EO integration) -->
+                <div class="hero-task-input-group" style="margin-top: 1rem;">
+                    <label class="hero-task-label">
+                        <i class="ph ph-briefcase"></i> Assign to Role<span class="required-indicator">*</span>
+                    </label>
+                    <div class="hero-task-select-wrapper">
+                        <select id="heroTaskRoleMain" class="hero-task-select" onchange="updateHeroTaskPreview(); updateRoleContext()">
+                            <option value="">Select a role...</option>
+                        </select>
+                    </div>
+                    <div class="hero-task-or-create">
+                        or <a onclick="toggleHeroRoleCreateMain()">create new role</a>
+                    </div>
+                    <div class="hero-task-inline-create" id="heroRoleCreateMain">
+                        <div class="hero-task-inline-row">
+                            <input type="text"
+                                   id="heroNewRoleNameMain"
+                                   class="hero-task-inline-input"
+                                   placeholder="Role name..."
+                                   onkeypress="if(event.key==='Enter') createHeroRoleMain()">
+                            <button class="hero-task-inline-btn" onclick="createHeroRoleMain()">
+                                <i class="ph ph-plus"></i>
+                            </button>
+                        </div>
+                    </div>
+                    <div class="role-required-notice" id="roleRequiredNotice" style="display: none;">
+                        <i class="ph ph-info"></i>
+                        <span>In EO, tasks must be assigned to roles. This ensures work is tied to organizational structure.</span>
+                    </div>
+                    <!-- Role Context Display -->
+                    <div class="role-context-display" id="roleContextDisplay" style="display: none; margin-top: 0.75rem;">
+                        <div class="role-context-breadcrumb" id="roleContextBreadcrumb">
+                            <!-- Populated dynamically -->
+                        </div>
                     </div>
                 </div>
 
@@ -30605,6 +32665,23 @@ Options:
                 </button>
 
                 <div class="hero-task-advanced-options" id="heroAdvancedOptions" style="display: none;">
+                    <!-- Collaborators/Followers -->
+                    <div class="hero-task-input-group">
+                        <label class="hero-task-label"><i class="ph ph-users"></i> Collaborators (Optional)</label>
+                        <div class="task-collaborators" id="heroCollaboratorsContainer">
+                            <div class="collaborator-avatars" id="heroCollaboratorAvatars">
+                                <!-- Populated dynamically -->
+                            </div>
+                            <div class="collaborator-add" onclick="openCollaboratorPicker()" title="Add collaborator">
+                                <i class="ph ph-plus" style="font-size: 0.8rem;"></i>
+                            </div>
+                        </div>
+                        <div class="hero-task-or-create" style="margin-top: 0.5rem;">
+                            <small style="color: #8B6F47;">Collaborators will be notified of task updates</small>
+                        </div>
+                    </div>
+
+                    <!-- Workflow -->
                     <div class="hero-task-input-group">
                         <label class="hero-task-label"><i class="ph ph-flow-arrow"></i> Part of Workflow (Optional)</label>
                         <div class="hero-task-select-wrapper">
@@ -30633,56 +32710,32 @@ Options:
                         </div>
                     </div>
 
-                    <div class="hero-task-row">
-                        <div class="hero-task-input-group">
-                            <label class="hero-task-label">Assign to Role (Optional)</label>
-                            <div class="hero-task-select-wrapper">
-                                <select id="heroTaskRole" class="hero-task-select" onchange="updateHeroTaskPreview()">
-                                    <option value="">Select a role...</option>
-                                </select>
-                            </div>
-                            <div class="hero-task-or-create">
-                                or <a onclick="toggleHeroRoleCreate()">create new role</a>
-                            </div>
-                            <div class="hero-task-inline-create" id="heroRoleCreate">
-                                <div class="hero-task-inline-row">
-                                    <input type="text"
-                                           id="heroNewRoleName"
-                                           class="hero-task-inline-input"
-                                           placeholder="Role name..."
-                                           onkeypress="if(event.key==='Enter') createHeroRole()">
-                                    <button class="hero-task-inline-btn" onclick="createHeroRole()">
-                                        <i class="ph ph-plus"></i>
-                                    </button>
-                                </div>
-                            </div>
+                    <!-- Person Assignment (within selected role) -->
+                    <div class="hero-task-input-group">
+                        <label class="hero-task-label"><i class="ph ph-user"></i> Assign to Person (Optional)</label>
+                        <div class="hero-task-select-wrapper">
+                            <select id="heroTaskPerson" class="hero-task-select" onchange="updateHeroTaskPreview()">
+                                <option value="">Select a person...</option>
+                            </select>
                         </div>
-
-                        <div class="hero-task-input-group">
-                            <label class="hero-task-label">Assign to Person (Optional)</label>
-                            <div class="hero-task-select-wrapper">
-                                <select id="heroTaskPerson" class="hero-task-select" onchange="updateHeroTaskPreview()">
-                                    <option value="">Select a person...</option>
-                                </select>
-                            </div>
-                            <div class="hero-task-or-create">
-                                or <a onclick="toggleHeroPersonCreate()">add new person</a>
-                            </div>
-                            <div class="hero-task-inline-create" id="heroPersonCreate">
-                                <div class="hero-task-inline-row">
-                                    <input type="text"
-                                           id="heroNewPersonName"
-                                           class="hero-task-inline-input"
-                                           placeholder="Person's name..."
-                                           onkeypress="if(event.key==='Enter') createHeroPerson()">
-                                    <button class="hero-task-inline-btn" onclick="createHeroPerson()">
-                                        <i class="ph ph-plus"></i>
-                                    </button>
-                                </div>
+                        <div class="hero-task-or-create">
+                            or <a onclick="toggleHeroPersonCreate()">add new person</a>
+                        </div>
+                        <div class="hero-task-inline-create" id="heroPersonCreate">
+                            <div class="hero-task-inline-row">
+                                <input type="text"
+                                       id="heroNewPersonName"
+                                       class="hero-task-inline-input"
+                                       placeholder="Person's name..."
+                                       onkeypress="if(event.key==='Enter') createHeroPerson()">
+                                <button class="hero-task-inline-btn" onclick="createHeroPerson()">
+                                    <i class="ph ph-plus"></i>
+                                </button>
                             </div>
                         </div>
                     </div>
 
+                    <!-- Dependencies -->
                     <div class="hero-task-input-group">
                         <label class="hero-task-label"><i class="ph ph-link-simple"></i> Depends On (Optional)</label>
                         <div class="hero-task-select-wrapper">
@@ -30693,6 +32746,21 @@ Options:
                         <div class="hero-task-dependency-warning" id="heroDependencyWarning" style="display: none;">
                             <i class="ph ph-warning"></i>
                             <span id="heroDependencyWarningText"></span>
+                        </div>
+                    </div>
+
+                    <!-- Recurring Task -->
+                    <div class="hero-task-input-group">
+                        <label class="hero-task-label"><i class="ph ph-repeat"></i> Recurring (Optional)</label>
+                        <div class="hero-task-select-wrapper">
+                            <select id="heroTaskRecurring" class="hero-task-select">
+                                <option value="">Does not repeat</option>
+                                <option value="daily">Daily</option>
+                                <option value="weekly">Weekly</option>
+                                <option value="biweekly">Every 2 weeks</option>
+                                <option value="monthly">Monthly</option>
+                                <option value="quarterly">Quarterly</option>
+                            </select>
                         </div>
                     </div>
                 </div>
