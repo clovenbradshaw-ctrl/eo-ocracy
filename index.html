@@ -12649,6 +12649,103 @@
             color: #C88F4A;
         }
 
+        /* Inline Subtask Input Row */
+        .subtask-input-row {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            padding: 0.5rem 0.625rem;
+            background: transparent;
+            border: 1px dashed #D1D5DB;
+            border-radius: 6px;
+            cursor: text;
+            transition: all 0.15s;
+        }
+
+        .subtask-input-row:hover {
+            background: #FAF7F5;
+            border-color: #C88F4A;
+        }
+
+        .subtask-input-row:focus-within {
+            background: #FAF7F5;
+            border: 1px solid #C88F4A;
+            box-shadow: 0 0 0 3px rgba(200, 143, 74, 0.1);
+        }
+
+        .subtask-input-row .input-icon {
+            color: #9CA3AF;
+            font-size: 0.875rem;
+            flex-shrink: 0;
+            transition: color 0.15s;
+        }
+
+        .subtask-input-row:focus-within .input-icon {
+            color: #C88F4A;
+        }
+
+        .subtask-input-row input {
+            flex: 1;
+            border: none;
+            background: transparent;
+            font-size: 0.8rem;
+            color: #3D2E1F;
+            outline: none;
+            font-family: inherit;
+        }
+
+        .subtask-input-row input::placeholder {
+            color: #9CA3AF;
+        }
+
+        .subtask-input-row input:focus::placeholder {
+            color: #C88F4A;
+            opacity: 0.6;
+        }
+
+        .subtask-input-actions {
+            display: none;
+            align-items: center;
+            gap: 0.25rem;
+        }
+
+        .subtask-input-row:focus-within .subtask-input-actions {
+            display: flex;
+        }
+
+        .subtask-input-btn {
+            padding: 0.25rem 0.5rem;
+            border: none;
+            border-radius: 4px;
+            font-size: 0.7rem;
+            cursor: pointer;
+            transition: all 0.15s;
+        }
+
+        .subtask-input-btn.submit {
+            background: #C88F4A;
+            color: white;
+        }
+
+        .subtask-input-btn.submit:hover {
+            background: #B07D3A;
+        }
+
+        .subtask-input-btn.submit:disabled {
+            background: #D1D5DB;
+            cursor: not-allowed;
+        }
+
+        .subtask-input-hint {
+            font-size: 0.65rem;
+            color: #9CA3AF;
+            margin-left: auto;
+        }
+
+        .subtask-input-row:focus-within .subtask-input-hint {
+            color: #8B6F47;
+        }
+
         /* Automation Rules */
         .automation-rules-section {
             margin-top: 1.5rem;
@@ -30010,9 +30107,21 @@ Options:
                             </div>
                         `;
                     }).join('')}
-                    <button class="add-subtask-btn" onclick="openAddSubtaskModal('${taskId}')">
-                        <i class="ph ph-plus"></i> Add subtask
-                    </button>
+                    <div class="subtask-input-row" onclick="this.querySelector('input').focus()">
+                        <i class="ph ph-plus input-icon"></i>
+                        <input type="text"
+                               id="subtask-input-${taskId}"
+                               placeholder="Add a subtask…"
+                               onkeydown="handleSubtaskInputKeydown(event, '${taskId}')"
+                               onblur="handleSubtaskInputBlur(event, '${taskId}')" />
+                        <span class="subtask-input-hint">Press Enter</span>
+                        <div class="subtask-input-actions">
+                            <button type="button" class="subtask-input-btn submit"
+                                    onclick="event.stopPropagation(); submitSubtaskInput('${taskId}')">
+                                Add
+                            </button>
+                        </div>
+                    </div>
                 </div>
             `;
         }
@@ -30033,13 +30142,72 @@ Options:
             }
         }
 
-        function openAddSubtaskModal(parentTaskId) {
-            const name = prompt('Enter subtask name:');
-            if (name && name.trim()) {
-                addSubtask(parentTaskId, name.trim());
-                openEntityModal(parentTaskId, 'task');
-                showToast('Subtask added', 'success');
+        // Inline subtask input handlers
+        function handleSubtaskInputKeydown(event, parentTaskId) {
+            if (event.key === 'Enter') {
+                event.preventDefault();
+                submitSubtaskInput(parentTaskId);
+            } else if (event.key === 'Escape') {
+                event.target.value = '';
+                event.target.blur();
             }
+        }
+
+        function handleSubtaskInputBlur(event, parentTaskId) {
+            // Small delay to allow click on Add button to register
+            setTimeout(() => {
+                const input = event.target;
+                const value = input.value.trim();
+                // Only submit if there's content and focus moved outside the input row
+                if (value && !input.closest('.subtask-input-row').contains(document.activeElement)) {
+                    submitSubtaskInput(parentTaskId);
+                }
+            }, 150);
+        }
+
+        function submitSubtaskInput(parentTaskId) {
+            const input = document.getElementById(`subtask-input-${parentTaskId}`);
+            if (!input) return;
+
+            const name = input.value.trim();
+            if (!name) return;
+
+            // Create the subtask
+            const subtask = addSubtask(parentTaskId, name);
+
+            // Clear input for next entry
+            input.value = '';
+
+            // Re-render the subtasks section to show the new subtask
+            const subtasksContainer = input.closest('.subtasks-section');
+            if (subtasksContainer) {
+                const newHtml = renderSubtasksSection(parentTaskId);
+                subtasksContainer.outerHTML = newHtml;
+
+                // Focus the new input for quick consecutive additions
+                setTimeout(() => {
+                    const newInput = document.getElementById(`subtask-input-${parentTaskId}`);
+                    if (newInput) newInput.focus();
+                }, 50);
+            }
+
+            showToast('Subtask added', 'success');
+        }
+
+        // Legacy function kept for compatibility (e.g., Kanban board calls)
+        function openAddSubtaskModal(parentTaskId) {
+            // Try to find and focus the inline input first
+            const input = document.getElementById(`subtask-input-${parentTaskId}`);
+            if (input) {
+                input.focus();
+                return;
+            }
+            // Fallback: open modal if inline input not available
+            openEntityModal(parentTaskId, 'task');
+            setTimeout(() => {
+                const modalInput = document.getElementById(`subtask-input-${parentTaskId}`);
+                if (modalInput) modalInput.focus();
+            }, 100);
         }
 
         // Toggle person inline create
