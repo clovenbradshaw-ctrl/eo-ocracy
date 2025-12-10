@@ -10702,6 +10702,119 @@
         }
 
         /* ============================================
+           WORKFLOW-BASED KANBAN STYLES
+           ============================================ */
+
+        /* Blocked/Waiting column - spans full width */
+        .kanban-column.waiting-column {
+            flex: none;
+            width: 100%;
+            max-width: 100%;
+            background: #FAFAFA;
+            border: 2px dashed #E5E5E5;
+            border-radius: 12px;
+        }
+
+        .kanban-column.waiting-column .kanban-column-header {
+            color: #8B8B8B;
+        }
+
+        .kanban-column.waiting-column .kanban-column-content {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 0.75rem;
+            padding: 1rem;
+        }
+
+        .kanban-column.waiting-column .kanban-card {
+            flex: 0 1 calc(33.333% - 0.5rem);
+            min-width: 280px;
+            max-width: 350px;
+            margin-bottom: 0;
+            background: #FAFAFA;
+            opacity: 0.85;
+        }
+
+        .kanban-column.waiting-column .kanban-card:hover {
+            opacity: 1;
+        }
+
+        /* Ready to work column header style */
+        .kanban-column.ready-column .kanban-column-header {
+            background: linear-gradient(135deg, rgba(16, 185, 129, 0.1), rgba(16, 185, 129, 0.05));
+            border-bottom-color: #10B981;
+        }
+
+        .kanban-column.ready-column .kanban-column-count {
+            background: #10B981;
+            color: white;
+        }
+
+        /* Column subtitle for context */
+        .kanban-column-subtitle {
+            font-size: 0.75rem;
+            font-weight: normal;
+            color: #999;
+            margin-top: 0.25rem;
+            display: block;
+        }
+
+        /* Unblocks banner - shown on tasks that will unblock others */
+        .kanban-unblocks-banner {
+            background: linear-gradient(135deg, #D1FAE5, #A7F3D0);
+            border-left: 3px solid #10B981;
+            padding: 0.5rem 0.75rem;
+            margin: -0.875rem -0.875rem 0.75rem -0.875rem;
+            border-radius: 8px 8px 0 0;
+            font-size: 0.75rem;
+            color: #065F46;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .kanban-unblocks-banner strong {
+            font-weight: 600;
+        }
+
+        /* Blocked by banner - shown on blocked tasks */
+        .kanban-blocker-banner {
+            background: linear-gradient(135deg, #FEF3C7, #FDE68A);
+            border-left: 3px solid #F59E0B;
+            padding: 0.5rem 0.75rem;
+            margin: -0.875rem -0.875rem 0.75rem -0.875rem;
+            border-radius: 8px 8px 0 0;
+            font-size: 0.75rem;
+            color: #92400E;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .kanban-blocker-banner strong {
+            font-weight: 600;
+        }
+
+        /* Blocked task card styling */
+        .kanban-card.blocked-task {
+            background: #FAFAFA;
+            border-color: #E5E5E5;
+        }
+
+        /* Grid layout for workflow board */
+        .kanban-board.workflow-board {
+            display: grid;
+            grid-template-columns: 1fr 1fr 1fr;
+            grid-template-rows: auto auto;
+            gap: 1rem;
+            padding: 1rem;
+        }
+
+        .kanban-board.workflow-board .waiting-column {
+            grid-column: 1 / -1;
+        }
+
+        /* ============================================
            TABLE VIEW STYLES
            ============================================ */
 
@@ -11321,6 +11434,136 @@
 
         .task-connected-item i {
             color: #C88F4A;
+        }
+
+        /* ============================================
+           STREAMLINED TASK MODAL STYLES
+           ============================================ */
+
+        /* Compact meta bar with chips */
+        .task-compact-meta {
+            display: flex;
+            gap: 0.625rem;
+            flex-wrap: wrap;
+            padding: 1rem 1.25rem;
+            background: #FAF7F5;
+            border-bottom: 1px solid #E5DDD1;
+        }
+
+        .task-meta-chip {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.375rem;
+            padding: 0.5rem 0.875rem;
+            background: white;
+            border: 1px solid #E5DDD1;
+            border-radius: 6px;
+            font-size: 0.8125rem;
+            color: #6B5642;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .task-meta-chip:hover {
+            border-color: #C88F4A;
+            color: #3D2E1F;
+        }
+
+        .task-meta-chip.active {
+            background: #C88F4A;
+            color: white;
+            border-color: #C88F4A;
+        }
+
+        .task-meta-chip.status-pending {
+            background: linear-gradient(135deg, #FEF3C7, #FDE68A);
+            color: #92400E;
+            border-color: #F59E0B;
+        }
+
+        .task-meta-chip.status-in-progress {
+            background: linear-gradient(135deg, #DBEAFE, #BFDBFE);
+            color: #1E40AF;
+            border-color: #3B82F6;
+        }
+
+        .task-meta-chip.status-completed {
+            background: linear-gradient(135deg, #D1FAE5, #A7F3D0);
+            color: #065F46;
+            border-color: #10B981;
+        }
+
+        .task-meta-chip i {
+            font-size: 0.875rem;
+        }
+
+        /* Streamlined description area */
+        .task-description-area {
+            padding: 1.25rem;
+        }
+
+        .task-description-text {
+            font-size: 0.9375rem;
+            color: #3D2E1F;
+            line-height: 1.6;
+            white-space: pre-wrap;
+        }
+
+        .task-description-empty {
+            font-size: 0.875rem;
+            color: #A89984;
+            font-style: italic;
+        }
+
+        /* Action link sections */
+        .task-action-sections {
+            padding: 0.75rem 1.25rem 1.25rem;
+        }
+
+        .task-action-link {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 0.875rem 0;
+            color: #6B5642;
+            font-size: 0.9375rem;
+            cursor: pointer;
+            border-bottom: 1px solid #F0EBE5;
+            transition: all 0.2s;
+        }
+
+        .task-action-link:hover {
+            color: #3D2E1F;
+            padding-left: 0.5rem;
+        }
+
+        .task-action-link:last-child {
+            border-bottom: none;
+        }
+
+        .task-action-text {
+            display: flex;
+            align-items: center;
+            gap: 0.625rem;
+        }
+
+        .task-action-text i {
+            font-size: 1rem;
+            color: #C88F4A;
+        }
+
+        .task-action-count {
+            background: #F0EBE5;
+            color: #6B5642;
+            font-size: 0.6875rem;
+            padding: 0.125rem 0.5rem;
+            border-radius: 4px;
+            font-weight: 600;
+        }
+
+        .task-action-arrow {
+            color: #D4C4B0;
+            font-size: 0.875rem;
         }
 
         /* Role Work Dashboard Styles */
@@ -29709,6 +29952,20 @@ Cmd/Ctrl + K - Command palette
                 dueDateClass = dueDateStatus || 'pending';
             }
 
+            // Get status display info
+            const statusInfo = {
+                pending: { label: 'To Do', icon: 'ph-circle-dashed', class: 'status-pending' },
+                in_progress: { label: 'In Progress', icon: 'ph-spinner', class: 'status-in-progress' },
+                completed: { label: 'Done', icon: 'ph-check-circle', class: 'status-completed' }
+            };
+            const currentStatus = statusInfo[task.status] || statusInfo.pending;
+
+            // Get subtasks count
+            const subtasks = (entities.task || []).filter(t => t.parentId === task.id);
+
+            // Get comments count
+            const comments = task.comments || [];
+
             return `
                 <div class="task-modal-info">
                     <!-- Violations Alert -->
@@ -29729,27 +29986,12 @@ Cmd/Ctrl + K - Command palette
                     </div>
                     ` : ''}
 
-                    <!-- Status Toggle -->
-                    <div class="task-status-section">
-                        <div class="task-status-toggle">
-                            <button class="task-status-btn ${task.status === 'pending' ? 'active pending' : ''}"
-                                    onclick="updateTaskStatus('${task.id}', 'pending')">
-                                <i class="ph ph-circle-dashed"></i> To Do
-                            </button>
-                            <button class="task-status-btn ${task.status === 'in_progress' ? 'active in-progress' : ''}"
-                                    onclick="updateTaskStatus('${task.id}', 'in_progress')">
-                                <i class="ph ph-spinner"></i> In Progress
-                            </button>
-                            <button class="task-status-btn ${task.status === 'completed' ? 'active completed' : ''}"
-                                    onclick="updateTaskStatus('${task.id}', 'completed')">
-                                <i class="ph ph-check-circle"></i> Done
-                            </button>
+                    <!-- Compact Meta Chips Bar -->
+                    <div class="task-compact-meta">
+                        <div class="task-meta-chip ${currentStatus.class}" onclick="cycleTaskStatus('${task.id}')" title="Click to change status">
+                            <i class="ph ${currentStatus.icon}"></i> ${currentStatus.label}
                         </div>
-                    </div>
-
-                    <!-- Quick Actions Row -->
-                    <div class="task-quick-actions">
-                        <button class="quick-action-btn ${task.dueDate ? 'active' : ''}" onclick="toggleTaskDatePicker('${task.id}')" style="position: relative;" id="taskDateBtn_${task.id}">
+                        <div class="task-meta-chip" onclick="toggleTaskDatePicker('${task.id}')" style="position: relative;" id="taskDateBtn_${task.id}">
                             <i class="ph ph-calendar"></i> ${task.dueDate ? dueDateDisplay : 'Set date'}
                             <div class="date-picker-popup" id="taskDatePicker_${task.id}">
                                 <div class="date-quick-options">
@@ -29761,71 +30003,18 @@ Cmd/Ctrl + K - Command palette
                                     <div class="date-option" onclick="event.stopPropagation(); setTaskDueDate('${task.id}', 'none')">No Date</div>
                                 </div>
                             </div>
-                        </button>
-                        <button class="quick-action-btn priority-${task.priority || 'medium'}" onclick="cycleTaskPriority('${task.id}')" title="Click to change priority">
+                        </div>
+                        <div class="task-meta-chip" onclick="cycleTaskPriority('${task.id}')" title="Click to change priority">
                             <i class="ph ph-flag"></i> ${(task.priority || 'medium').charAt(0).toUpperCase() + (task.priority || 'medium').slice(1)}
-                        </button>
-                        <button class="quick-action-btn ${connectedRoles.length ? 'active' : ''}" ${connectedRoles.length ? `onclick="openEntityModal('${connectedRoles[0].id}', 'role')"` : `onclick="showToast('Use full modal to assign role', 'info')"`}>
-                            <i class="ph ph-briefcase"></i> ${connectedRoles.length ? connectedRoles[0].name : 'Assign role'}
-                        </button>
-                        ${task.recurring ? `
-                        <button class="quick-action-btn active">
-                            <i class="ph ph-repeat"></i> ${task.recurring.charAt(0).toUpperCase() + task.recurring.slice(1)}
-                        </button>
+                        </div>
+                        ${connectedRoles.length ? `
+                        <div class="task-meta-chip active" onclick="openEntityModal('${connectedRoles[0].id}', 'role')">
+                            <i class="ph ph-briefcase"></i> ${connectedRoles[0].name}
+                        </div>
                         ` : ''}
                         ${workflow ? `
-                        <button class="quick-action-btn active" onclick="openEntityModal('${workflow.id}', 'workflow')">
+                        <div class="task-meta-chip" onclick="openEntityModal('${workflow.id}', 'workflow')">
                             <i class="ph ph-flow-arrow"></i> ${workflow.name}
-                        </button>
-                        ` : ''}
-                    </div>
-
-                    <!-- Legacy Meta Grid - hidden but kept for compatibility -->
-                    <div class="task-meta-grid" style="display: none;">
-                        <div class="task-meta-item">
-                            <div class="task-meta-label">Due Date</div>
-                            <div class="task-meta-value ${task.dueDate ? '' : 'empty'}">
-                                ${task.dueDate ? `
-                                    <span class="task-due-date ${dueDateClass}">
-                                        <i class="ph ph-calendar"></i> ${dueDateDisplay}
-                                    </span>
-                                ` : '<i class="ph ph-calendar-blank"></i> Not set'}
-                            </div>
-                        </div>
-                        <div class="task-meta-item">
-                            <div class="task-meta-label">Priority</div>
-                            <div class="task-meta-value">
-                                <span class="task-priority ${task.priority || 'medium'}">
-                                    <i class="ph ph-flag"></i> ${(task.priority || 'medium').charAt(0).toUpperCase() + (task.priority || 'medium').slice(1)}
-                                </span>
-                            </div>
-                        </div>
-                        <div class="task-meta-item">
-                            <div class="task-meta-label">Assigned Role</div>
-                            <div class="task-meta-value ${connectedRoles.length ? 'clickable' : 'empty'}"
-                                 ${connectedRoles.length ? `onclick="openEntityModal('${connectedRoles[0].id}', 'role')"` : ''}>
-                                ${connectedRoles.length ? `
-                                    <i class="ph ph-briefcase"></i> ${connectedRoles[0].name}
-                                    ${connectedRoles.length > 1 ? `<span style="color:#8B6F47;font-size:0.8rem;">+${connectedRoles.length - 1}</span>` : ''}
-                                ` : '<i class="ph ph-user-circle"></i> Unassigned'}
-                            </div>
-                        </div>
-                        ${task.recurring ? `
-                        <div class="task-meta-item">
-                            <div class="task-meta-label">Recurring</div>
-                            <div class="task-meta-value">
-                                <span class="recurring-indicator">
-                                    <i class="ph ph-repeat"></i> ${task.recurring.charAt(0).toUpperCase() + task.recurring.slice(1)}
-                                </span>
-                            </div>
-                        </div>
-                        ` : ''}
-                        ${workflow ? `
-                        <div class="task-meta-item" style="grid-column: span 2;">
-                            <div class="task-meta-label">Workflow</div>
-                            <div class="task-meta-value clickable" onclick="openEntityModal('${workflow.id}', 'workflow')">
-                                <i class="ph ph-git-branch"></i> ${workflow.name}
-                            </div>
                         </div>
                         ` : ''}
                     </div>
@@ -30045,6 +30234,19 @@ Options:
             if (document.getElementById('taskBoardView')?.classList.contains('active')) {
                 renderTaskBoard();
             }
+        }
+
+        // Cycle through task statuses (for compact chip click)
+        function cycleTaskStatus(taskId) {
+            const task = entities.task.find(t => t.id === taskId);
+            if (!task) return;
+
+            const statusOrder = ['pending', 'in_progress', 'completed'];
+            const currentIndex = statusOrder.indexOf(task.status);
+            const nextIndex = (currentIndex + 1) % statusOrder.length;
+            const newStatus = statusOrder[nextIndex];
+
+            updateTaskStatus(taskId, newStatus);
         }
 
         // Render role work dashboard content - shows people, tasks, and workflows
@@ -32669,6 +32871,32 @@ Options:
             return [taskId];
         }
 
+        // Helper: Check if a task is blocked by incomplete predecessor
+        function isTaskBlocked(task) {
+            if (!task.predecessorId) return false;
+            const predecessor = entities.task.find(t => t.id === task.predecessorId);
+            return predecessor && predecessor.status !== 'completed';
+        }
+
+        // Helper: Get tasks that depend on this task (will be unblocked when this completes)
+        function getBlockedByTask(taskId) {
+            return (entities.task || []).filter(t =>
+                t.predecessorId === taskId && t.status !== 'completed'
+            );
+        }
+
+        // Helper: Get blocker task name(s) for a blocked task
+        function getBlockerNames(task) {
+            const blockers = [];
+            if (task.predecessorId) {
+                const predecessor = entities.task.find(t => t.id === task.predecessorId);
+                if (predecessor && predecessor.status !== 'completed') {
+                    blockers.push(predecessor.name);
+                }
+            }
+            return blockers;
+        }
+
         function renderKanbanBoard() {
             const content = document.getElementById('taskBoardContent');
             const tasks = entities.task || [];
@@ -32696,66 +32924,39 @@ Options:
 
             if (fab) fab.style.display = 'flex';
 
-            const statuses = [
-                { key: 'pending', label: 'To Do', icon: 'ph-circle-dashed' },
-                { key: 'in_progress', label: 'In Progress', icon: 'ph-spinner' },
-                { key: 'completed', label: 'Done', icon: 'ph-check-circle' }
-            ];
+            // Workflow-based column definitions
+            // Separate pending tasks into "ready" (unblocked) and "blocked" (waiting on dependencies)
+            const readyTasks = tasks.filter(t => t.status === 'pending' && !isTaskBlocked(t));
+            const inProgressTasks = tasks.filter(t => t.status === 'in_progress');
+            const completedTasks = tasks.filter(t => t.status === 'completed');
+            const blockedTasks = tasks.filter(t => t.status === 'pending' && isTaskBlocked(t));
 
-            // Check if there are any parent/subtask relationships
-            const hasParentTasks = tasks.some(t => tasks.some(st => st.predecessorId === t.id));
-            const hasSubtasks = tasks.some(t => t.predecessorId);
+            const columns = [
+                { key: 'ready', label: 'Ready to Work', subtitle: 'No blockers · Start here', icon: 'ph-circle-dashed', tasks: readyTasks, isReady: true },
+                { key: 'in_progress', label: 'In Progress', subtitle: 'Currently working on', icon: 'ph-spinner', tasks: inProgressTasks },
+                { key: 'completed', label: 'Done', subtitle: 'Completed work', icon: 'ph-check-circle', tasks: completedTasks }
+            ];
 
             let html = '';
 
-            // Add hierarchy legend if there are parent/subtask relationships
-            if (hasParentTasks || hasSubtasks) {
-                html += `
-                    <div class="kanban-hierarchy-legend">
-                        <div class="kanban-legend-title">
-                            <i class="ph ph-info"></i> Task Hierarchy Guide
-                        </div>
-                        <div class="kanban-legend-items">
-                            <div class="kanban-legend-item">
-                                <div class="kanban-legend-indicator parent-indicator"></div>
-                                <div class="kanban-legend-text">
-                                    <strong>Parent Task</strong>
-                                    <span>Has subtasks that must be completed first. Cannot be moved to "Done" until all subtasks are done.</span>
-                                </div>
-                            </div>
-                            <div class="kanban-legend-item">
-                                <div class="kanban-legend-indicator subtask-indicator"></div>
-                                <div class="kanban-legend-text">
-                                    <strong>Subtask</strong>
-                                    <span>Part of a parent task. Must be completed before the parent can advance.</span>
-                                </div>
-                            </div>
-                            <div class="kanban-legend-item">
-                                <div class="kanban-legend-indicator regular-indicator"></div>
-                                <div class="kanban-legend-text">
-                                    <strong>Regular Task</strong>
-                                    <span>Standalone task with no hierarchy. Can be moved freely between columns.</span>
-                                </div>
-                            </div>
-                        </div>
-                        <div class="kanban-legend-tip">
-                            <i class="ph ph-lightbulb"></i>
-                            <span>Drag a parent task to see connections to its subtasks and restricted columns.</span>
-                        </div>
-                    </div>
-                `;
-            }
+            // Use workflow board grid layout if there are blocked tasks
+            const hasBlockedTasks = blockedTasks.length > 0;
+            html += `<div class="kanban-board${hasBlockedTasks ? ' workflow-board' : ''}">`;
 
-            html += '<div class="kanban-board">';
+            columns.forEach(column => {
+                const columnClass = column.isReady ? 'kanban-column ready-column' : 'kanban-column';
+                // Map status for drag/drop - "ready" tasks are still "pending" status
+                const statusKey = column.key === 'ready' ? 'pending' : column.key;
 
-            statuses.forEach(status => {
-                const columnTasks = tasks.filter(t => t.status === status.key);
                 html += `
-                    <div class="kanban-column" data-status="${status.key}">
+                    <div class="${columnClass}" data-status="${statusKey}">
                         <div class="kanban-column-header">
-                            <i class="ph ${status.icon}"></i>
-                            <span>${status.label}</span>
-                            <span class="kanban-column-count">${columnTasks.length}</span>
+                            <div>
+                                <i class="ph ${column.icon}"></i>
+                                <span>${column.label}</span>
+                                <span class="kanban-column-subtitle">${column.subtitle}</span>
+                            </div>
+                            <span class="kanban-column-count">${column.tasks.length}</span>
                         </div>
                         <div class="kanban-column-content"
                              ondrop="handleKanbanDrop(event)"
@@ -32763,79 +32964,8 @@ Options:
                              ondragleave="handleKanbanDragLeave(event)">
                 `;
 
-                columnTasks.forEach(task => {
-                    // Get role and person info
-                    const roleRel = relationships.find(r => r.object === task.id && r.predicate === 'CON');
-                    const role = roleRel ? entities.role.find(r => r.id === roleRel.subject) : null;
-                    let person = null;
-                    if (role) {
-                        const personRel = relationships.find(r => r.object === role.id && r.predicate === 'INS');
-                        person = personRel ? entities.person.find(p => p.id === personRel.subject) : null;
-                    }
-
-                    const dueDateStatus = getTaskDueDateStatus(task);
-
-                    // Check if this is a parent (has subtasks) or a subtask
-                    const subtasks = getSubtasks(task.id);
-                    const hasSubtasks = subtasks.length > 0;
-                    const isSubtask = !!task.predecessorId;
-                    const parentTask = isSubtask ? entities.task.find(t => t.id === task.predecessorId) : null;
-
-                    // Build card classes
-                    let cardClasses = `kanban-card ${dueDateStatus}`;
-                    if (hasSubtasks) cardClasses += ' has-subtasks';
-                    if (isSubtask) cardClasses += ' is-subtask';
-
-                    // Build subtask progress info for parent tasks
-                    const completedSubtasks = subtasks.filter(s => s.status === 'completed').length;
-                    const pendingSubtasks = subtasks.filter(s => s.status === 'pending').length;
-                    const inProgressSubtasks = subtasks.filter(s => s.status === 'in_progress').length;
-
-                    // Determine movement restrictions for parent tasks
-                    let movementNote = '';
-                    if (hasSubtasks) {
-                        if (completedSubtasks < subtasks.length) {
-                            movementNote = `Cannot move to "Done" until all ${subtasks.length} subtasks are complete`;
-                        }
-                        if (pendingSubtasks > 0) {
-                            movementNote = `Cannot move to "In Progress" or "Done" - ${pendingSubtasks} subtask(s) still in "To Do"`;
-                        }
-                    }
-
-                    html += `
-                        <div class="${cardClasses}"
-                             draggable="true"
-                             data-id="${task.id}"
-                             data-predecessor-id="${task.predecessorId || ''}"
-                             ondragstart="handleKanbanDragStart(event)"
-                             ondragend="handleKanbanDragEnd(event)"
-                             onclick="showEntityDetails('${task.id}')">
-                            ${hasSubtasks ? `
-                                <div class="kanban-card-hierarchy-badge parent-badge" title="${movementNote}">
-                                    <i class="ph ph-folder-notch-open"></i> PARENT TASK
-                                    <span class="hierarchy-badge-info">
-                                        <i class="ph ph-info"></i>
-                                        <span class="hierarchy-badge-tooltip">${movementNote || 'This task has subtasks that must be completed before this task can be moved to "Done"'}</span>
-                                    </span>
-                                </div>
-                            ` : ''}
-                            ${isSubtask ? `
-                                <div class="kanban-card-hierarchy-badge subtask-badge">
-                                    <i class="ph ph-arrow-elbow-down-right"></i> SUBTASK
-                                </div>
-                            ` : ''}
-                            <div class="kanban-card-title" style="display: flex; align-items: center; gap: 0.5rem;">
-                                ${task.name}
-                                ${hasSubtasks ? `<span class="kanban-card-subtask-badge" title="${completedSubtasks} of ${subtasks.length} subtasks complete"><i class="ph ph-list-checks"></i> ${completedSubtasks}/${subtasks.length}</span>` : ''}
-                            </div>
-                            <div class="kanban-card-meta">
-                                ${isSubtask && parentTask ? `<span class="kanban-card-parent-link"><i class="ph ph-git-branch"></i> <em>Subtask of:</em> ${parentTask.name}</span>` : ''}
-                                ${person ? `<span class="kanban-card-assignee" ${role ? `title="Role: ${role.name}"` : ''}><i class="ph ph-user-circle"></i> ${person.name}</span>` :
-                                  (role ? `<span class="kanban-card-assignee kanban-card-role-only" title="No person assigned to this role"><i class="ph ph-briefcase"></i> ${role.name}</span>` : '')}
-                                ${task.dueDate ? `<span class="kanban-card-due ${dueDateStatus}"><i class="ph ph-calendar"></i> ${formatDateShort(task.dueDate)}</span>` : ''}
-                            </div>
-                        </div>
-                    `;
+                column.tasks.forEach(task => {
+                    html += renderKanbanCard(task, false);
                 });
 
                 html += `
@@ -32844,8 +32974,133 @@ Options:
                 `;
             });
 
+            // Add "Waiting On" column if there are blocked tasks
+            if (hasBlockedTasks) {
+                html += `
+                    <div class="kanban-column waiting-column" data-status="pending">
+                        <div class="kanban-column-header">
+                            <div>
+                                <i class="ph ph-hourglass"></i>
+                                <span>Waiting On</span>
+                                <span class="kanban-column-subtitle">Can't start until blockers are resolved</span>
+                            </div>
+                            <span class="kanban-column-count">${blockedTasks.length}</span>
+                        </div>
+                        <div class="kanban-column-content"
+                             ondrop="handleKanbanDrop(event)"
+                             ondragover="handleKanbanDragOver(event)"
+                             ondragleave="handleKanbanDragLeave(event)">
+                `;
+
+                blockedTasks.forEach(task => {
+                    html += renderKanbanCard(task, true);
+                });
+
+                html += `
+                        </div>
+                    </div>
+                `;
+            }
+
             html += '</div>';
             content.innerHTML = html;
+        }
+
+        // Helper function to render a kanban card with dependency banners
+        function renderKanbanCard(task, isBlocked) {
+            // Get role and person info
+            const roleRel = relationships.find(r => r.object === task.id && r.predicate === 'CON');
+            const role = roleRel ? entities.role.find(r => r.id === roleRel.subject) : null;
+            let person = null;
+            if (role) {
+                const personRel = relationships.find(r => r.object === role.id && r.predicate === 'INS');
+                person = personRel ? entities.person.find(p => p.id === personRel.subject) : null;
+            }
+
+            const dueDateStatus = getTaskDueDateStatus(task);
+
+            // Check if this is a parent (has subtasks) or a subtask
+            const subtasks = getSubtasks(task.id);
+            const hasSubtasks = subtasks.length > 0;
+            const isSubtask = !!task.predecessorId;
+            const parentTask = isSubtask ? entities.task.find(t => t.id === task.predecessorId) : null;
+
+            // Get tasks that will be unblocked when this task is completed
+            const willUnblock = getBlockedByTask(task.id);
+
+            // Get blocker names if this task is blocked
+            const blockerNames = isBlocked ? getBlockerNames(task) : [];
+
+            // Build card classes
+            let cardClasses = `kanban-card ${dueDateStatus}`;
+            if (hasSubtasks) cardClasses += ' has-subtasks';
+            if (isSubtask) cardClasses += ' is-subtask';
+            if (isBlocked) cardClasses += ' blocked-task';
+
+            // Build subtask progress info for parent tasks
+            const completedSubtasks = subtasks.filter(s => s.status === 'completed').length;
+
+            let html = `
+                <div class="${cardClasses}"
+                     draggable="true"
+                     data-id="${task.id}"
+                     data-predecessor-id="${task.predecessorId || ''}"
+                     ondragstart="handleKanbanDragStart(event)"
+                     ondragend="handleKanbanDragEnd(event)"
+                     onclick="showEntityDetails('${task.id}')">
+            `;
+
+            // Add blocker banner for blocked tasks
+            if (isBlocked && blockerNames.length > 0) {
+                html += `
+                    <div class="kanban-blocker-banner">
+                        <span>🔒</span>
+                        <span>Blocked by: <strong>${blockerNames.join(', ')}</strong></span>
+                    </div>
+                `;
+            }
+
+            // Add unblocks banner for tasks that will unblock others (only show in Ready/In Progress)
+            if (!isBlocked && willUnblock.length > 0 && task.status !== 'completed') {
+                html += `
+                    <div class="kanban-unblocks-banner">
+                        <span>🔓</span>
+                        <span>Unblocks <strong>${willUnblock.length} task${willUnblock.length > 1 ? 's' : ''}</strong> when complete</span>
+                    </div>
+                `;
+            }
+
+            // Parent/subtask badges
+            if (hasSubtasks) {
+                html += `
+                    <div class="kanban-card-hierarchy-badge parent-badge">
+                        <i class="ph ph-folder-notch-open"></i> PARENT TASK
+                    </div>
+                `;
+            }
+            if (isSubtask && !isBlocked) {
+                html += `
+                    <div class="kanban-card-hierarchy-badge subtask-badge">
+                        <i class="ph ph-arrow-elbow-down-right"></i> SUBTASK
+                    </div>
+                `;
+            }
+
+            html += `
+                <div class="kanban-card-title" style="display: flex; align-items: center; gap: 0.5rem;">
+                    ${task.name}
+                    ${hasSubtasks ? `<span class="kanban-card-subtask-badge" title="${completedSubtasks} of ${subtasks.length} subtasks complete"><i class="ph ph-list-checks"></i> ${completedSubtasks}/${subtasks.length}</span>` : ''}
+                </div>
+                <div class="kanban-card-meta">
+                    ${isSubtask && parentTask && !isBlocked ? `<span class="kanban-card-parent-link"><i class="ph ph-git-branch"></i> <em>Subtask of:</em> ${parentTask.name}</span>` : ''}
+                    ${person ? `<span class="kanban-card-assignee" ${role ? `title="Role: ${role.name}"` : ''}><i class="ph ph-user-circle"></i> ${person.name}</span>` :
+                      (role ? `<span class="kanban-card-assignee kanban-card-role-only" title="No person assigned to this role"><i class="ph ph-briefcase"></i> ${role.name}</span>` : '')}
+                    ${task.dueDate ? `<span class="kanban-card-due ${dueDateStatus}"><i class="ph ph-calendar"></i> ${formatDateShort(task.dueDate)}</span>` : ''}
+                </div>
+            </div>
+            `;
+
+            return html;
         }
 
         function handleKanbanDragStart(event) {
