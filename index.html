@@ -32710,6 +32710,14 @@ Options:
         // ============================================
         function addSubtask(parentTaskId, subtaskName, roleId = null, dueDate = null) {
             const subtaskId = 'task' + Date.now();
+
+            // Calculate orderIndex - new subtasks go to the end (last to complete)
+            const existingSubtasks = getSubtasks(parentTaskId);
+            const maxOrderIndex = existingSubtasks.reduce((max, s) => {
+                const idx = s.orderIndex ?? 0;
+                return idx > max ? idx : max;
+            }, 0);
+
             const subtask = {
                 id: subtaskId,
                 name: subtaskName,
@@ -32721,7 +32729,8 @@ Options:
                 priority: 'medium',
                 tags: [],
                 description: '',
-                createdAt: new Date().toISOString()
+                createdAt: new Date().toISOString(),
+                orderIndex: maxOrderIndex + 1 // Lower orderIndex = first to complete (top of list)
             };
 
             entities.task.push(subtask);
@@ -33481,9 +33490,17 @@ Options:
 
         let draggedTaskId = null;
 
-        // Get all subtasks (children) of a parent task
+        // Get all subtasks (children) of a parent task, sorted by orderIndex (first to complete at top)
         function getSubtasks(parentTaskId) {
-            return (entities.task || []).filter(t => t.predecessorId === parentTaskId);
+            return (entities.task || [])
+                .filter(t => t.predecessorId === parentTaskId)
+                .sort((a, b) => {
+                    // Sort by orderIndex (lower = first to do = top of list)
+                    // Fallback to createdAt for backward compatibility
+                    const orderA = a.orderIndex ?? new Date(a.createdAt).getTime();
+                    const orderB = b.orderIndex ?? new Date(b.createdAt).getTime();
+                    return orderA - orderB;
+                });
         }
 
         // Get the status order for comparison
@@ -33603,7 +33620,46 @@ Options:
             html += '<div class="kanban-board">';
 
             statuses.forEach(status => {
-                const columnTasks = tasks.filter(t => t.status === status.key);
+                // Get tasks for this column and sort them:
+                // 1. Parent tasks first (or standalone tasks), followed by their subtasks in orderIndex order
+                // 2. This makes subtasks "fan out" below their parent when viewed
+                const columnTasks = tasks
+                    .filter(t => t.status === status.key)
+                    .sort((a, b) => {
+                        // Get parent IDs (null if standalone/parent task)
+                        const aParentId = a.predecessorId || null;
+                        const bParentId = b.predecessorId || null;
+
+                        // If both have same parent (or both are standalone), sort by orderIndex
+                        if (aParentId === bParentId) {
+                            const orderA = a.orderIndex ?? new Date(a.createdAt).getTime();
+                            const orderB = b.orderIndex ?? new Date(b.createdAt).getTime();
+                            return orderA - orderB;
+                        }
+
+                        // If a is b's parent, a comes first
+                        if (a.id === bParentId) return -1;
+                        // If b is a's parent, b comes first
+                        if (b.id === aParentId) return 1;
+
+                        // If a is a subtask of a task that appears before b, a stays grouped
+                        // Group subtasks under their parent
+                        const aGroupKey = aParentId || a.id;
+                        const bGroupKey = bParentId || b.id;
+
+                        if (aGroupKey !== bGroupKey) {
+                            // Sort by group (parent task id)
+                            return aGroupKey.localeCompare(bGroupKey);
+                        }
+
+                        // Within same group: parent first, then subtasks by orderIndex
+                        if (!aParentId && bParentId) return -1; // a is parent
+                        if (aParentId && !bParentId) return 1;  // b is parent
+
+                        const orderA = a.orderIndex ?? new Date(a.createdAt).getTime();
+                        const orderB = b.orderIndex ?? new Date(b.createdAt).getTime();
+                        return orderA - orderB;
+                    });
                 html += `
                     <div class="kanban-column" data-status="${status.key}">
                         <div class="kanban-column-header">
