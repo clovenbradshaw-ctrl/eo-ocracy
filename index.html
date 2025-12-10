@@ -29052,11 +29052,68 @@ Cmd/Ctrl + K - Command palette
                     switchWorkspace(wsId);
                     renderWorkspaceList();
 
-                    // Log activity
+                    // Calculate totals for reporting
                     const totalEntities = Object.values(data.entities).reduce((sum, arr) => sum + arr.length, 0);
-                    logActivity('INS', 'system', null, `Imported workspace with ${totalEntities} entities and ${data.relationships.length} relationships`);
+                    const totalRelationships = data.relationships.length;
 
-                    alert(`Successfully imported "${data.workspaceName}" as a new workspace with ${totalEntities} entities and ${data.relationships.length} relationships.`);
+                    // Log workspace import to Xano API
+                    logActivityToXano({
+                        event_verb: 'Start Workspace (JSON Import)',
+                        eo_operator: 'INS',
+                        object_type: 'workspace',
+                        object_id: wsId,
+                        object_label: importedName,
+                        data_json: {
+                            original_name: data.workspaceName,
+                            entity_count: totalEntities,
+                            relationship_count: totalRelationships,
+                            import_source: 'json_import'
+                        }
+                    }, false);
+
+                    // Log each entity to Xano API (suppress individual toasts for bulk operations)
+                    for (const entityType of Object.keys(data.entities)) {
+                        for (const entity of data.entities[entityType]) {
+                            logActivityToXano({
+                                event_verb: 'Start Entity (JSON Import)',
+                                eo_operator: 'INS',
+                                object_type: entityType,
+                                object_id: entity.id,
+                                object_label: entity.name,
+                                data_json: {
+                                    entity_type: entityType,
+                                    entity_name: entity.name,
+                                    workspace_id: wsId,
+                                    import_source: 'json_import'
+                                }
+                            }, false);
+                        }
+                    }
+
+                    // Log each relationship to Xano API (suppress individual toasts for bulk operations)
+                    for (const rel of data.relationships) {
+                        const subjectEntity = findEntity(rel.subject);
+                        const objectEntity = findEntity(rel.object);
+                        logActivityToXano({
+                            event_verb: 'Create Connection (JSON Import)',
+                            eo_operator: rel.predicate || 'DES',
+                            object_type: 'relationship',
+                            object_id: rel.id,
+                            object_label: `${subjectEntity?.name || rel.subject} ${rel.predicate || 'DES'} ${objectEntity?.name || rel.object}`,
+                            data_json: {
+                                subject_id: rel.subject,
+                                object_id: rel.object,
+                                predicate: rel.predicate || 'DES',
+                                workspace_id: wsId,
+                                import_source: 'json_import'
+                            }
+                        }, false);
+                    }
+
+                    // Show summary toast for the import
+                    showActivityToast('success', 'JSON Import Complete', `${totalEntities} entities and ${totalRelationships} relationships synced to Xano`);
+
+                    alert(`Successfully imported "${data.workspaceName}" as a new workspace with ${totalEntities} entities and ${totalRelationships} relationships.`);
 
                 } catch (err) {
                     console.error('Import error:', err);
