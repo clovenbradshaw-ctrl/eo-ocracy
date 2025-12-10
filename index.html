@@ -10878,6 +10878,238 @@
         }
 
         /* ============================================
+           COLLAPSIBLE TASK SEQUENCE STYLES
+           ============================================ */
+
+        .task-sequence {
+            margin-bottom: 0.5rem;
+        }
+
+        .task-sequence-header {
+            display: flex;
+            align-items: center;
+            gap: 0.25rem;
+            cursor: pointer;
+            padding: 0;
+        }
+
+        .task-sequence-toggle {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            width: 20px;
+            height: 20px;
+            border-radius: 4px;
+            background: #f0f0f0;
+            color: #666;
+            font-size: 0.7rem;
+            flex-shrink: 0;
+            transition: all 0.15s ease;
+        }
+
+        .task-sequence-toggle:hover {
+            background: #e0e0e0;
+            color: #333;
+        }
+
+        .task-sequence-toggle i {
+            transition: transform 0.2s ease;
+        }
+
+        .task-sequence.collapsed .task-sequence-toggle i {
+            transform: rotate(-90deg);
+        }
+
+        .task-sequence-content {
+            overflow: hidden;
+            transition: max-height 0.2s ease-out, opacity 0.2s ease-out;
+            max-height: 2000px;
+            opacity: 1;
+        }
+
+        .task-sequence.collapsed .task-sequence-content {
+            max-height: 0;
+            opacity: 0;
+        }
+
+        .task-sequence-count {
+            font-size: 0.65rem;
+            color: #888;
+            background: #f5f5f5;
+            padding: 0.15rem 0.35rem;
+            border-radius: 3px;
+            margin-left: 0.25rem;
+        }
+
+        /* Kanban view specific sequence styling */
+        .kanban-task-sequence {
+            margin-bottom: 0.5rem;
+        }
+
+        .kanban-sequence-header {
+            display: flex;
+            align-items: stretch;
+            gap: 0;
+        }
+
+        .kanban-sequence-toggle {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            width: 24px;
+            background: #f5f5f5;
+            border: 1px solid #e0e0e0;
+            border-right: none;
+            border-radius: 8px 0 0 8px;
+            color: #888;
+            font-size: 0.7rem;
+            cursor: pointer;
+            transition: all 0.15s ease;
+            flex-shrink: 0;
+        }
+
+        .kanban-sequence-toggle:hover {
+            background: #e8e8e8;
+            color: #555;
+        }
+
+        .kanban-sequence-toggle i {
+            transition: transform 0.2s ease;
+        }
+
+        .kanban-task-sequence.collapsed .kanban-sequence-toggle i {
+            transform: rotate(-90deg);
+        }
+
+        .kanban-task-sequence.collapsed .kanban-sequence-toggle {
+            border-radius: 8px 0 0 8px;
+        }
+
+        .kanban-sequence-header .kanban-card {
+            border-radius: 0 8px 8px 0;
+            flex: 1;
+            margin-bottom: 0;
+        }
+
+        .kanban-sequence-content {
+            margin-left: 24px;
+            overflow: hidden;
+            transition: max-height 0.2s ease-out, opacity 0.2s ease-out;
+            max-height: 2000px;
+            opacity: 1;
+        }
+
+        .kanban-task-sequence.collapsed .kanban-sequence-content {
+            max-height: 0;
+            opacity: 0;
+            margin-top: 0;
+        }
+
+        .kanban-sequence-content .kanban-card {
+            border-left: 2px solid #ddd;
+            border-radius: 0 8px 8px 0;
+            margin-left: 0;
+            margin-top: 2px;
+        }
+
+        .kanban-sequence-content .kanban-card::before {
+            display: none;
+        }
+
+        .kanban-sequence-content .kanban-card:last-child {
+            border-radius: 0 8px 8px 8px;
+        }
+
+        /* Board view specific sequence styling */
+        .board-task-sequence {
+            margin-bottom: 0.5rem;
+        }
+
+        .board-sequence-header {
+            display: flex;
+            align-items: stretch;
+            gap: 0;
+        }
+
+        .board-sequence-toggle {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            width: 28px;
+            background: #f8f6f4;
+            border: 1px solid #e5ddd1;
+            border-right: none;
+            border-radius: 8px 0 0 8px;
+            color: #8b7355;
+            font-size: 0.75rem;
+            cursor: pointer;
+            transition: all 0.15s ease;
+            flex-shrink: 0;
+        }
+
+        .board-sequence-toggle:hover {
+            background: #f0ebe5;
+            color: #6b5642;
+        }
+
+        .board-sequence-toggle i {
+            transition: transform 0.2s ease;
+        }
+
+        .board-task-sequence.collapsed .board-sequence-toggle i {
+            transform: rotate(-90deg);
+        }
+
+        .board-sequence-header .task-board-card {
+            border-radius: 0 8px 8px 0;
+            flex: 1;
+            margin-bottom: 0;
+        }
+
+        .board-sequence-content {
+            margin-left: 28px;
+            overflow: hidden;
+            transition: max-height 0.2s ease-out, opacity 0.2s ease-out;
+            max-height: 2000px;
+            opacity: 1;
+        }
+
+        .board-task-sequence.collapsed .board-sequence-content {
+            max-height: 0;
+            opacity: 0;
+        }
+
+        .board-sequence-content .task-board-card {
+            border-left: 2px solid #e5ddd1;
+            border-radius: 0 8px 8px 0;
+            margin-left: 0;
+            margin-top: 2px;
+        }
+
+        .board-sequence-content .task-board-card:last-child {
+            border-radius: 0 8px 8px 8px;
+        }
+
+        /* Sequence badge showing count of linked tasks */
+        .sequence-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.25rem;
+            background: #f0f0f0;
+            color: #666;
+            font-size: 0.65rem;
+            font-weight: 500;
+            padding: 0.15rem 0.4rem;
+            border-radius: 3px;
+            margin-left: auto;
+        }
+
+        .sequence-badge i {
+            font-size: 0.7rem;
+            color: #888;
+        }
+
+        /* ============================================
            TABLE VIEW STYLES
            ============================================ */
 
@@ -33162,8 +33394,176 @@ Options:
         }
 
         // ============================================
+        // TASK SEQUENCE (COLLAPSIBLE LINKED TASKS) FUNCTIONS
+        // ============================================
+
+        // Track collapsed state of task sequences (persisted in session)
+        const collapsedSequences = new Set();
+
+        // Toggle a task sequence collapsed/expanded state
+        function toggleTaskSequence(rootTaskId, event) {
+            if (event) {
+                event.stopPropagation();
+            }
+
+            if (collapsedSequences.has(rootTaskId)) {
+                collapsedSequences.delete(rootTaskId);
+            } else {
+                collapsedSequences.add(rootTaskId);
+            }
+
+            // Re-render the current view
+            const currentView = document.querySelector('.view-toggle-btn.active')?.dataset?.view;
+            if (currentView === 'kanban') {
+                renderKanbanBoard();
+            } else if (currentView === 'table') {
+                renderTaskTable();
+            } else {
+                renderTaskBoardView();
+            }
+        }
+
+        // Get all tasks in a sequence starting from a root task
+        // Returns array of tasks in order: [root, child1, child2, ...]
+        function getTaskSequence(rootTaskId) {
+            const sequence = [];
+            const root = (entities.task || []).find(t => t.id === rootTaskId);
+            if (!root) return sequence;
+
+            sequence.push(root);
+
+            // Recursively get all descendants
+            function addDescendants(parentId) {
+                const children = (entities.task || [])
+                    .filter(t => t.predecessorId === parentId)
+                    .sort((a, b) => {
+                        const orderA = a.orderIndex ?? new Date(a.createdAt).getTime();
+                        const orderB = b.orderIndex ?? new Date(b.createdAt).getTime();
+                        return orderA - orderB;
+                    });
+
+                children.forEach(child => {
+                    sequence.push(child);
+                    addDescendants(child.id);
+                });
+            }
+
+            addDescendants(rootTaskId);
+            return sequence;
+        }
+
+        // Find the root task of a sequence (the task with no predecessor, or the top-level ancestor)
+        function findSequenceRoot(taskId) {
+            const task = (entities.task || []).find(t => t.id === taskId);
+            if (!task) return null;
+
+            if (!task.predecessorId) return task;
+
+            // Walk up the chain to find the root
+            let current = task;
+            while (current.predecessorId) {
+                const parent = (entities.task || []).find(t => t.id === current.predecessorId);
+                if (!parent) break;
+                current = parent;
+            }
+            return current;
+        }
+
+        // Get all root tasks (tasks that have dependents but no predecessor themselves)
+        function getRootTasks() {
+            const tasks = entities.task || [];
+            const tasksWithDependents = new Set();
+
+            tasks.forEach(t => {
+                if (t.predecessorId) {
+                    tasksWithDependents.add(t.predecessorId);
+                }
+            });
+
+            // Root tasks are those that have dependents but no predecessor
+            return tasks.filter(t => !t.predecessorId && tasksWithDependents.has(t.id));
+        }
+
+        // Check if a task is part of a sequence (has predecessor or has dependents)
+        function isPartOfSequence(taskId) {
+            const task = (entities.task || []).find(t => t.id === taskId);
+            if (!task) return false;
+
+            // Has a predecessor?
+            if (task.predecessorId) return true;
+
+            // Has dependents?
+            const hasDependents = (entities.task || []).some(t => t.predecessorId === taskId);
+            return hasDependents;
+        }
+
+        // ============================================
         // TASK BOARD VIEW FUNCTIONS
         // ============================================
+
+        // Render a single task card for board view
+        function renderBoardTaskCard(task, isInSequence = false) {
+            // Find connected role
+            const roleRel = relationships.find(r =>
+                r.object === task.id && r.predicate === 'CON'
+            );
+            const role = roleRel ? entities.role.find(r => r.id === roleRel.subject) : null;
+
+            // Find person assigned to role
+            let person = null;
+            let roleParent = null;
+            if (role) {
+                const personRel = relationships.find(r =>
+                    r.object === role.id && r.predicate === 'INS'
+                );
+                person = personRel ? entities.person.find(p => p.id === personRel.subject) : null;
+
+                // Find role's parent team/unit for structural context
+                const parentRel = relationships.find(r =>
+                    r.predicate === 'DES' && r.object === role.id
+                );
+                if (parentRel) {
+                    roleParent = findEntity(parentRel.subject);
+                }
+            }
+
+            // Check date status
+            const dueDateStatus = getTaskDueDateStatus(task);
+
+            return `
+                <div class="task-board-card ${dueDateStatus}" onclick="showEntityDetails('${task.id}')">
+                    <div class="task-board-card-header">
+                        <div class="task-board-card-title">
+                            <i class="ph ph-file-text"></i>
+                            ${task.name}
+                        </div>
+                        <button class="task-board-card-menu" onclick="event.stopPropagation(); showTaskCardMenu('${task.id}')">
+                            <i class="ph ph-dots-three-vertical"></i>
+                        </button>
+                    </div>
+                    <div class="task-board-card-meta">
+                        ${role ? `
+                            <span class="task-board-card-tag role">
+                                <i class="ph ph-briefcase"></i>
+                                ${role.name}${person ? ` <i class="ph ph-arrow-right" style="font-size: 0.7rem; opacity: 0.5; margin: 0 0.15rem;"></i> ${person.name}` : ''}
+                            </span>
+                        ` : ''}
+                        ${task.dueDate ? `
+                            <span class="task-board-card-tag due-date ${dueDateStatus}">
+                                <i class="ph ph-calendar"></i>
+                                ${formatDateShort(task.dueDate)}
+                            </span>
+                        ` : ''}
+                    </div>
+                    ${roleParent ? `
+                        <div class="task-board-card-structure">
+                            <i class="ph ph-${roleParent.type === 'unit' ? 'buildings' : 'users-three'}"></i>
+                            ${roleParent.name}
+                        </div>
+                    ` : ''}
+                </div>
+            `;
+        }
 
         // Render the task board view
         function renderTaskBoardView() {
@@ -33233,94 +33633,106 @@ Options:
                 return;
             }
 
-            // Build task cards
+            // Build task cards - group linked tasks into collapsible sequences
             let html = '<div class="task-board-list">';
 
-            filteredTasks.forEach(task => {
-                // Find connected role
-                const roleRel = relationships.find(r =>
-                    r.object === task.id && r.predicate === 'CON'
+            // Track which tasks have been rendered (to avoid duplicates)
+            const renderedTasks = new Set();
+
+            // First, identify root tasks (tasks with dependents but no predecessor)
+            const rootTasks = filteredTasks.filter(t => {
+                const hasDependents = filteredTasks.some(d => d.predecessorId === t.id);
+                return !t.predecessorId && hasDependents;
+            });
+
+            // Render root tasks with their sequences
+            rootTasks.forEach(rootTask => {
+                const sequence = getTaskSequence(rootTask.id).filter(t =>
+                    filteredTasks.some(ft => ft.id === t.id)
                 );
-                const role = roleRel ? entities.role.find(r => r.id === roleRel.subject) : null;
 
-                // Find person assigned to role
-                let person = null;
-                let roleParent = null;
-                if (role) {
-                    const personRel = relationships.find(r =>
-                        r.object === role.id && r.predicate === 'INS'
-                    );
-                    person = personRel ? entities.person.find(p => p.id === personRel.subject) : null;
+                if (sequence.length === 0) return;
 
-                    // Find role's parent team/unit for structural context
-                    const parentRel = relationships.find(r =>
-                        r.predicate === 'DES' && r.object === role.id
-                    );
-                    if (parentRel) {
-                        roleParent = findEntity(parentRel.subject);
+                // Mark all tasks in this sequence as rendered
+                sequence.forEach(t => renderedTasks.add(t.id));
+
+                const isCollapsed = collapsedSequences.has(rootTask.id);
+                const dependentCount = sequence.length - 1;
+
+                html += `
+                    <div class="board-task-sequence ${isCollapsed ? 'collapsed' : ''}" data-root-id="${rootTask.id}">
+                        <div class="board-sequence-header">
+                            <div class="board-sequence-toggle" onclick="toggleTaskSequence('${rootTask.id}', event)" title="${isCollapsed ? 'Expand' : 'Collapse'} sequence">
+                                <i class="ph ph-caret-down"></i>
+                            </div>
+                            ${renderBoardTaskCard(rootTask, true)}
+                        </div>
+                        <div class="board-sequence-content">
+                `;
+
+                // Render dependent tasks in the sequence (skip the root)
+                sequence.slice(1).forEach(task => {
+                    html += renderBoardTaskCard(task, true);
+                });
+
+                html += `
+                        </div>
+                    </div>
+                `;
+            });
+
+            // Render standalone tasks (no predecessor and no dependents in filtered set)
+            filteredTasks.forEach(task => {
+                if (renderedTasks.has(task.id)) return;
+
+                // Check if this task is part of a sequence that wasn't fully in the filtered set
+                if (task.predecessorId) {
+                    // This is a dependent task whose root wasn't in the filtered set
+                    // Find its root or the highest ancestor in filtered set
+                    let rootId = task.predecessorId;
+                    let root = filteredTasks.find(t => t.id === rootId);
+
+                    // If root is in filtered and not rendered, render it as a sequence
+                    if (root && !renderedTasks.has(root.id)) {
+                        const sequence = getTaskSequence(root.id).filter(t =>
+                            filteredTasks.some(ft => ft.id === t.id)
+                        );
+
+                        if (sequence.length > 1) {
+                            sequence.forEach(t => renderedTasks.add(t.id));
+
+                            const isCollapsed = collapsedSequences.has(root.id);
+
+                            html += `
+                                <div class="board-task-sequence ${isCollapsed ? 'collapsed' : ''}" data-root-id="${root.id}">
+                                    <div class="board-sequence-header">
+                                        <div class="board-sequence-toggle" onclick="toggleTaskSequence('${root.id}', event)" title="${isCollapsed ? 'Expand' : 'Collapse'} sequence">
+                                            <i class="ph ph-caret-down"></i>
+                                        </div>
+                                        ${renderBoardTaskCard(root, true)}
+                                    </div>
+                                    <div class="board-sequence-content">
+                            `;
+
+                            sequence.slice(1).forEach(seqTask => {
+                                html += renderBoardTaskCard(seqTask, true);
+                            });
+
+                            html += `
+                                    </div>
+                                </div>
+                            `;
+                            return;
+                        }
                     }
                 }
 
-                // Find predecessor task
-                const predecessor = task.predecessorId ? entities.task.find(t => t.id === task.predecessorId) : null;
+                // Skip if already rendered
+                if (renderedTasks.has(task.id)) return;
 
-                // Find dependent tasks (tasks that depend on this one)
-                const dependentTasks = entities.task.filter(t => t.predecessorId === task.id);
-
-                // Check date status
-                const dueDateStatus = getTaskDueDateStatus(task);
-                const hasDateConflict = predecessor && task.dueDate && predecessor.dueDate &&
-                    parseLocalDate(task.dueDate) <= parseLocalDate(predecessor.dueDate);
-
-                html += `
-                    <div class="task-board-card ${dueDateStatus}" onclick="showEntityDetails('${task.id}')">
-                        <div class="task-board-card-header">
-                            <div class="task-board-card-title">
-                                <i class="ph ph-file-text"></i>
-                                ${task.name}
-                            </div>
-                            <button class="task-board-card-menu" onclick="event.stopPropagation(); showTaskCardMenu('${task.id}')">
-                                <i class="ph ph-dots-three-vertical"></i>
-                            </button>
-                        </div>
-                        <div class="task-board-card-meta">
-                            ${role ? `
-                                <span class="task-board-card-tag role">
-                                    <i class="ph ph-briefcase"></i>
-                                    ${role.name}${person ? ` <i class="ph ph-arrow-right" style="font-size: 0.7rem; opacity: 0.5; margin: 0 0.15rem;"></i> ${person.name}` : ''}
-                                </span>
-                            ` : ''}
-                            ${task.dueDate ? `
-                                <span class="task-board-card-tag due-date ${dueDateStatus}">
-                                    <i class="ph ph-calendar"></i>
-                                    ${formatDateShort(task.dueDate)}
-                                </span>
-                            ` : ''}
-                        </div>
-                        ${roleParent ? `
-                            <div class="task-board-card-structure">
-                                <i class="ph ph-${roleParent.type === 'unit' ? 'buildings' : 'users-three'}"></i>
-                                ${roleParent.name}
-                            </div>
-                        ` : ''}
-                        ${predecessor || dependentTasks.length > 0 ? `
-                            <div class="task-board-card-deps">
-                                ${predecessor ? `
-                                    <span class="task-dep-tag predecessor ${hasDateConflict ? 'conflict' : ''}">
-                                        ↳ Waiting on: ${predecessor.name}
-                                        ${hasDateConflict ? '<i class="ph ph-warning" title="Due date conflict"></i>' : ''}
-                                    </span>
-                                ` : ''}
-                                ${dependentTasks.length > 0 ? `
-                                    <span class="task-dep-tag dependents">
-                                        <i class="ph ph-arrow-right"></i>
-                                        ${dependentTasks.length} waiting
-                                    </span>
-                                ` : ''}
-                            </div>
-                        ` : ''}
-                    </div>
-                `;
+                // Render as standalone task
+                renderedTasks.add(task.id);
+                html += renderBoardTaskCard(task, false);
             });
 
             html += '</div>';
@@ -33409,6 +33821,62 @@ Options:
             return [taskId];
         }
 
+        // Render a single kanban card
+        function renderKanbanCard(task) {
+            // Get role and person info
+            const roleRel = relationships.find(r => r.object === task.id && r.predicate === 'CON');
+            const role = roleRel ? entities.role.find(r => r.id === roleRel.subject) : null;
+            let person = null;
+            if (role) {
+                const personRel = relationships.find(r => r.object === role.id && r.predicate === 'INS');
+                person = personRel ? entities.person.find(p => p.id === personRel.subject) : null;
+            }
+
+            const dueDateStatus = getTaskDueDateStatus(task);
+
+            // Check if this is a parent (has subtasks) or a subtask
+            const subtasks = getSubtasks(task.id);
+            const hasSubtasks = subtasks.length > 0;
+
+            // Build card classes (no subtask-specific classes since we're grouping them)
+            let cardClasses = `kanban-card ${dueDateStatus}`;
+
+            // Build subtask progress info for parent tasks
+            const completedSubtasks = subtasks.filter(s => s.status === 'completed').length;
+
+            // Determine movement restrictions for parent tasks
+            let movementNote = '';
+            if (hasSubtasks) {
+                const pendingSubtasks = subtasks.filter(s => s.status === 'pending').length;
+                if (completedSubtasks < subtasks.length) {
+                    movementNote = `Cannot move to "Done" until all ${subtasks.length} subtasks are complete`;
+                }
+                if (pendingSubtasks > 0) {
+                    movementNote = `Cannot move to "In Progress" or "Done" - ${pendingSubtasks} subtask(s) still in "To Do"`;
+                }
+            }
+
+            return `
+                <div class="${cardClasses}"
+                     draggable="true"
+                     data-id="${task.id}"
+                     data-predecessor-id="${task.predecessorId || ''}"
+                     ondragstart="handleKanbanDragStart(event)"
+                     ondragend="handleKanbanDragEnd(event)"
+                     onclick="showEntityDetails('${task.id}')">
+                    <div class="kanban-card-title" style="display: flex; align-items: center; gap: 0.5rem;">
+                        ${task.name}
+                        ${hasSubtasks ? `<span class="kanban-card-subtask-badge" title="${completedSubtasks} of ${subtasks.length} subtasks complete${movementNote ? ' - ' + movementNote : ''}"><i class="ph ph-list-checks"></i> ${completedSubtasks}/${subtasks.length}</span>` : ''}
+                    </div>
+                    <div class="kanban-card-meta">
+                        ${person ? `<span class="kanban-card-assignee" ${role ? `title="Role: ${role.name}"` : ''}><i class="ph ph-user-circle"></i> ${person.name}</span>` :
+                          (role ? `<span class="kanban-card-assignee kanban-card-role-only" title="No person assigned to this role"><i class="ph ph-briefcase"></i> ${role.name}</span>` : '')}
+                        ${task.dueDate ? `<span class="kanban-card-due ${dueDateStatus}"><i class="ph ph-calendar"></i> ${formatDateShort(task.dueDate)}</span>` : ''}
+                    </div>
+                </div>
+            `;
+        }
+
         function renderKanbanBoard() {
             const content = document.getElementById('taskBoardContent');
             const tasks = entities.task || [];
@@ -33445,46 +33913,40 @@ Options:
             let html = '<div class="kanban-board">';
 
             statuses.forEach(status => {
-                // Get tasks for this column and sort them:
-                // 1. Parent tasks first (or standalone tasks), followed by their subtasks in orderIndex order
-                // 2. This makes subtasks "fan out" below their parent when viewed
-                const columnTasks = tasks
-                    .filter(t => t.status === status.key)
-                    .sort((a, b) => {
-                        // Get parent IDs (null if standalone/parent task)
-                        const aParentId = a.predecessorId || null;
-                        const bParentId = b.predecessorId || null;
+                // Get tasks for this column
+                const columnTasks = tasks.filter(t => t.status === status.key);
 
-                        // If both have same parent (or both are standalone), sort by orderIndex
-                        if (aParentId === bParentId) {
-                            const orderA = a.orderIndex ?? new Date(a.createdAt).getTime();
-                            const orderB = b.orderIndex ?? new Date(b.createdAt).getTime();
-                            return orderA - orderB;
+                // Group tasks by their sequence root
+                const tasksByRoot = new Map(); // rootId -> [tasks in sequence in this column]
+                const standaloneTasks = [];
+                const processedTasks = new Set();
+
+                columnTasks.forEach(task => {
+                    if (processedTasks.has(task.id)) return;
+
+                    // Find the root of this task's sequence
+                    const root = findSequenceRoot(task.id);
+
+                    if (root) {
+                        // Get all tasks in this sequence that are in this column
+                        const fullSequence = getTaskSequence(root.id);
+                        const sequenceInColumn = fullSequence.filter(t => t.status === status.key);
+
+                        if (sequenceInColumn.length > 1) {
+                            // This is a multi-task sequence in this column
+                            tasksByRoot.set(root.id, sequenceInColumn);
+                            sequenceInColumn.forEach(t => processedTasks.add(t.id));
+                        } else if (sequenceInColumn.length === 1) {
+                            // Only one task from this sequence in this column
+                            standaloneTasks.push(task);
+                            processedTasks.add(task.id);
                         }
+                    } else {
+                        standaloneTasks.push(task);
+                        processedTasks.add(task.id);
+                    }
+                });
 
-                        // If a is b's parent, a comes first
-                        if (a.id === bParentId) return -1;
-                        // If b is a's parent, b comes first
-                        if (b.id === aParentId) return 1;
-
-                        // If a is a subtask of a task that appears before b, a stays grouped
-                        // Group subtasks under their parent
-                        const aGroupKey = aParentId || a.id;
-                        const bGroupKey = bParentId || b.id;
-
-                        if (aGroupKey !== bGroupKey) {
-                            // Sort by group (parent task id)
-                            return aGroupKey.localeCompare(bGroupKey);
-                        }
-
-                        // Within same group: parent first, then subtasks by orderIndex
-                        if (!aParentId && bParentId) return -1; // a is parent
-                        if (aParentId && !bParentId) return 1;  // b is parent
-
-                        const orderA = a.orderIndex ?? new Date(a.createdAt).getTime();
-                        const orderB = b.orderIndex ?? new Date(b.createdAt).getTime();
-                        return orderA - orderB;
-                    });
                 html += `
                     <div class="kanban-column" data-status="${status.key}">
                         <div class="kanban-column-header">
@@ -33498,65 +33960,36 @@ Options:
                              ondragleave="handleKanbanDragLeave(event)">
                 `;
 
-                columnTasks.forEach(task => {
-                    // Get role and person info
-                    const roleRel = relationships.find(r => r.object === task.id && r.predicate === 'CON');
-                    const role = roleRel ? entities.role.find(r => r.id === roleRel.subject) : null;
-                    let person = null;
-                    if (role) {
-                        const personRel = relationships.find(r => r.object === role.id && r.predicate === 'INS');
-                        person = personRel ? entities.person.find(p => p.id === personRel.subject) : null;
-                    }
-
-                    const dueDateStatus = getTaskDueDateStatus(task);
-
-                    // Check if this is a parent (has subtasks) or a subtask
-                    const subtasks = getSubtasks(task.id);
-                    const hasSubtasks = subtasks.length > 0;
-                    const isSubtask = !!task.predecessorId;
-                    const parentTask = isSubtask ? entities.task.find(t => t.id === task.predecessorId) : null;
-
-                    // Build card classes
-                    let cardClasses = `kanban-card ${dueDateStatus}`;
-                    if (hasSubtasks) cardClasses += ' has-subtasks';
-                    if (isSubtask) cardClasses += ' is-subtask';
-
-                    // Build subtask progress info for parent tasks
-                    const completedSubtasks = subtasks.filter(s => s.status === 'completed').length;
-                    const pendingSubtasks = subtasks.filter(s => s.status === 'pending').length;
-                    const inProgressSubtasks = subtasks.filter(s => s.status === 'in_progress').length;
-
-                    // Determine movement restrictions for parent tasks
-                    let movementNote = '';
-                    if (hasSubtasks) {
-                        if (completedSubtasks < subtasks.length) {
-                            movementNote = `Cannot move to "Done" until all ${subtasks.length} subtasks are complete`;
-                        }
-                        if (pendingSubtasks > 0) {
-                            movementNote = `Cannot move to "In Progress" or "Done" - ${pendingSubtasks} subtask(s) still in "To Do"`;
-                        }
-                    }
+                // Render sequences first
+                tasksByRoot.forEach((sequenceTasks, rootId) => {
+                    const isCollapsed = collapsedSequences.has(rootId);
+                    const firstTask = sequenceTasks[0];
+                    const restTasks = sequenceTasks.slice(1);
 
                     html += `
-                        <div class="${cardClasses}"
-                             draggable="true"
-                             data-id="${task.id}"
-                             data-predecessor-id="${task.predecessorId || ''}"
-                             ondragstart="handleKanbanDragStart(event)"
-                             ondragend="handleKanbanDragEnd(event)"
-                             onclick="showEntityDetails('${task.id}')">
-                            <div class="kanban-card-title" style="display: flex; align-items: center; gap: 0.5rem;">
-                                ${task.name}
-                                ${hasSubtasks ? `<span class="kanban-card-subtask-badge" title="${completedSubtasks} of ${subtasks.length} subtasks complete${movementNote ? ' - ' + movementNote : ''}"><i class="ph ph-list-checks"></i> ${completedSubtasks}/${subtasks.length}</span>` : ''}
+                        <div class="kanban-task-sequence ${isCollapsed ? 'collapsed' : ''}" data-root-id="${rootId}">
+                            <div class="kanban-sequence-header">
+                                <div class="kanban-sequence-toggle" onclick="toggleTaskSequence('${rootId}', event)" title="${isCollapsed ? 'Expand' : 'Collapse'} sequence (${sequenceTasks.length} tasks)">
+                                    <i class="ph ph-caret-down"></i>
+                                </div>
+                                ${renderKanbanCard(firstTask)}
                             </div>
-                            <div class="kanban-card-meta">
-                                ${isSubtask && parentTask ? `<span class="kanban-card-parent-link" onclick="event.stopPropagation(); showEntityDetails('${parentTask.id}')">↳ Part of: <em>${parentTask.name}</em></span>` : ''}
-                                ${person ? `<span class="kanban-card-assignee" ${role ? `title="Role: ${role.name}"` : ''}><i class="ph ph-user-circle"></i> ${person.name}</span>` :
-                                  (role ? `<span class="kanban-card-assignee kanban-card-role-only" title="No person assigned to this role"><i class="ph ph-briefcase"></i> ${role.name}</span>` : '')}
-                                ${task.dueDate ? `<span class="kanban-card-due ${dueDateStatus}"><i class="ph ph-calendar"></i> ${formatDateShort(task.dueDate)}</span>` : ''}
+                            <div class="kanban-sequence-content">
+                    `;
+
+                    restTasks.forEach(task => {
+                        html += renderKanbanCard(task);
+                    });
+
+                    html += `
                             </div>
                         </div>
                     `;
+                });
+
+                // Render standalone tasks
+                standaloneTasks.forEach(task => {
+                    html += renderKanbanCard(task);
                 });
 
                 html += `
