@@ -9130,6 +9130,115 @@
             font-weight: 500;
         }
 
+        /* Hierarchical Role Selector Styles */
+        .role-hierarchy-section {
+            border-bottom: 1px solid #eee;
+        }
+
+        .role-hierarchy-section:last-child {
+            border-bottom: none;
+        }
+
+        .role-hierarchy-header {
+            padding: 10px 16px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            color: #666;
+            font-size: 12px;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            background: #fafafa;
+            transition: background 0.15s;
+        }
+
+        .role-hierarchy-header:hover {
+            background: #f0f0f0;
+        }
+
+        .role-hierarchy-header i {
+            font-size: 14px;
+            transition: transform 0.2s;
+        }
+
+        .role-hierarchy-header.expanded i.toggle-icon {
+            transform: rotate(90deg);
+        }
+
+        .role-hierarchy-header .header-icon {
+            color: #C88F4A;
+        }
+
+        .role-hierarchy-content {
+            display: none;
+        }
+
+        .role-hierarchy-content.expanded {
+            display: block;
+        }
+
+        .role-hierarchy-team {
+            border-left: 2px solid #e0e0e0;
+            margin-left: 16px;
+        }
+
+        .role-hierarchy-team-header {
+            padding: 8px 12px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            color: #555;
+            font-size: 13px;
+            font-weight: 500;
+            background: #f8f8f8;
+            transition: background 0.15s;
+        }
+
+        .role-hierarchy-team-header:hover {
+            background: #f0f0f0;
+        }
+
+        .role-hierarchy-team-header i {
+            font-size: 13px;
+        }
+
+        .role-hierarchy-team-header i.toggle-icon {
+            transition: transform 0.2s;
+        }
+
+        .role-hierarchy-team-header.expanded i.toggle-icon {
+            transform: rotate(90deg);
+        }
+
+        .role-hierarchy-team-header .header-icon {
+            color: #6B5642;
+        }
+
+        .role-hierarchy-team-content {
+            display: none;
+        }
+
+        .role-hierarchy-team-content.expanded {
+            display: block;
+        }
+
+        .role-hierarchy-roles {
+            padding-left: 8px;
+        }
+
+        .role-hierarchy-orphan-header {
+            padding: 10px 16px;
+            color: #888;
+            font-size: 11px;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            background: #f5f5f5;
+        }
+
         .quick-add-modal-description {
             padding: 20px 24px;
         }
@@ -30206,27 +30315,93 @@ Cmd/Ctrl + K - Command palette
                 workflowPrompt.style.display = 'none';
             }
 
-            // Add roles to both selectors
-            (entities.role || []).forEach(role => {
-                // Get role hierarchy context for display
-                const hierarchy = getRoleHierarchy ? getRoleHierarchy(role.id) : [];
-                const contextText = hierarchy.length > 1 ?
-                    ` (${hierarchy.slice(0, -1).map(h => h.name).join(' > ')})` : '';
+            // Add roles to both selectors using hierarchical structure
+            const roleHierarchy = buildRoleHierarchyStructure();
 
-                if (roleSelect) {
-                    const option = document.createElement('option');
-                    option.value = role.id;
-                    option.textContent = role.name;
-                    roleSelect.appendChild(option);
-                }
+            // Helper to add role options
+            const addRoleOption = (selectEl, role, indent = '') => {
+                const option = document.createElement('option');
+                option.value = role.id;
+                option.textContent = indent + role.name;
+                selectEl.appendChild(option);
+            };
 
-                if (roleSelectMain) {
-                    const option = document.createElement('option');
-                    option.value = role.id;
-                    option.textContent = role.name + contextText;
-                    roleSelectMain.appendChild(option);
+            // Populate hierarchical role options
+            const populateRoleSelect = (selectEl, showHierarchy = false) => {
+                if (!selectEl) return;
+
+                // Add units with their teams and roles
+                roleHierarchy.units.forEach(unit => {
+                    const unitGroup = document.createElement('optgroup');
+                    unitGroup.label = `📦 ${unit.name}`;
+
+                    unit.teams.forEach(team => {
+                        // Add team as a disabled option header within unit
+                        const teamOption = document.createElement('option');
+                        teamOption.disabled = true;
+                        teamOption.textContent = `  👥 ${team.name}`;
+                        teamOption.style.fontWeight = '600';
+                        teamOption.style.color = '#666';
+                        unitGroup.appendChild(teamOption);
+
+                        // Add roles under team
+                        team.roles.forEach(role => {
+                            const option = document.createElement('option');
+                            option.value = role.id;
+                            option.textContent = `      ${role.name}`;
+                            unitGroup.appendChild(option);
+                        });
+                    });
+
+                    if (unitGroup.children.length > 0) {
+                        selectEl.appendChild(unitGroup);
+                    }
+                });
+
+                // Add orphan teams (teams not in any unit)
+                roleHierarchy.orphanTeams.forEach(team => {
+                    const teamGroup = document.createElement('optgroup');
+                    teamGroup.label = `👥 ${team.name}`;
+
+                    team.roles.forEach(role => {
+                        const option = document.createElement('option');
+                        option.value = role.id;
+                        option.textContent = `  ${role.name}`;
+                        teamGroup.appendChild(option);
+                    });
+
+                    selectEl.appendChild(teamGroup);
+                });
+
+                // Add orphan roles (roles not in any team)
+                if (roleHierarchy.orphanRoles.length > 0) {
+                    const hasHierarchy = roleHierarchy.units.length > 0 || roleHierarchy.orphanTeams.length > 0;
+
+                    if (hasHierarchy) {
+                        const otherGroup = document.createElement('optgroup');
+                        otherGroup.label = 'Other Roles';
+                        roleHierarchy.orphanRoles.forEach(role => {
+                            const option = document.createElement('option');
+                            option.value = role.id;
+                            option.textContent = role.name;
+                            otherGroup.appendChild(option);
+                        });
+                        selectEl.appendChild(otherGroup);
+                    } else {
+                        // No hierarchy - just add roles directly
+                        roleHierarchy.orphanRoles.forEach(role => {
+                            const option = document.createElement('option');
+                            option.value = role.id;
+                            option.textContent = role.name;
+                            selectEl.appendChild(option);
+                        });
+                    }
                 }
-            });
+            };
+
+            // Populate both role selectors
+            populateRoleSelect(roleSelect, false);
+            populateRoleSelect(roleSelectMain, true);
 
             // Add people
             (entities.person || []).forEach(person => {
@@ -31547,18 +31722,128 @@ Options:
                 return;
             }
 
-            container.innerHTML = roles.map(role => `
-                <div class="quick-add-dropdown-item ${quickAddModalState.roleId === role.id ? 'selected' : ''}"
-                     onclick="selectQuickAddRole('${role.id}')">
-                    <i class="ph ph-briefcase"></i> ${role.name}
-                </div>
-            `).join('');
+            const hierarchy = buildRoleHierarchyStructure();
+            const mostUsedTeamId = getMostUsedTeam();
+            const mostUsedUnitId = mostUsedTeamId ? getUnitForTeam(mostUsedTeamId) : null;
+
+            let html = '';
+
+            // Render units with their teams and roles
+            hierarchy.units.forEach(unit => {
+                const isUnitExpanded = mostUsedUnitId === unit.id;
+                html += `
+                    <div class="role-hierarchy-section">
+                        <div class="role-hierarchy-header ${isUnitExpanded ? 'expanded' : ''}"
+                             data-section-id="${unit.id}" data-section-type="unit"
+                             onclick="toggleRoleHierarchySection('${unit.id}', 'unit')">
+                            <i class="ph ph-caret-right toggle-icon"></i>
+                            <i class="ph ph-buildings header-icon"></i>
+                            <span>${unit.name}</span>
+                        </div>
+                        <div class="role-hierarchy-content ${isUnitExpanded ? 'expanded' : ''}"
+                             id="role-hierarchy-content-unit-${unit.id}">
+                `;
+
+                unit.teams.forEach(team => {
+                    const isTeamExpanded = mostUsedTeamId === team.id;
+                    html += `
+                        <div class="role-hierarchy-team">
+                            <div class="role-hierarchy-team-header ${isTeamExpanded ? 'expanded' : ''}"
+                                 data-section-id="${team.id}" data-section-type="team"
+                                 onclick="toggleRoleHierarchySection('${team.id}', 'team')">
+                                <i class="ph ph-caret-right toggle-icon"></i>
+                                <i class="ph ph-users-three header-icon"></i>
+                                <span>${team.name}</span>
+                            </div>
+                            <div class="role-hierarchy-team-content ${isTeamExpanded ? 'expanded' : ''}"
+                                 id="role-hierarchy-content-team-${team.id}">
+                                <div class="role-hierarchy-roles">
+                    `;
+
+                    team.roles.forEach(role => {
+                        html += `
+                            <div class="quick-add-dropdown-item ${quickAddModalState.roleId === role.id ? 'selected' : ''}"
+                                 onclick="selectQuickAddRole('${role.id}')">
+                                <i class="ph ph-briefcase"></i> ${role.name}
+                            </div>
+                        `;
+                    });
+
+                    html += `
+                                </div>
+                            </div>
+                        </div>
+                    `;
+                });
+
+                html += `
+                        </div>
+                    </div>
+                `;
+            });
+
+            // Render orphan teams (teams not in any unit)
+            hierarchy.orphanTeams.forEach(team => {
+                const isTeamExpanded = mostUsedTeamId === team.id;
+                html += `
+                    <div class="role-hierarchy-section">
+                        <div class="role-hierarchy-header ${isTeamExpanded ? 'expanded' : ''}"
+                             data-section-id="${team.id}" data-section-type="team"
+                             onclick="toggleRoleHierarchySection('${team.id}', 'team')">
+                            <i class="ph ph-caret-right toggle-icon"></i>
+                            <i class="ph ph-users-three header-icon"></i>
+                            <span>${team.name}</span>
+                        </div>
+                        <div class="role-hierarchy-content ${isTeamExpanded ? 'expanded' : ''}"
+                             id="role-hierarchy-content-team-${team.id}">
+                            <div class="role-hierarchy-roles">
+                `;
+
+                team.roles.forEach(role => {
+                    html += `
+                        <div class="quick-add-dropdown-item ${quickAddModalState.roleId === role.id ? 'selected' : ''}"
+                             onclick="selectQuickAddRole('${role.id}')">
+                            <i class="ph ph-briefcase"></i> ${role.name}
+                        </div>
+                    `;
+                });
+
+                html += `
+                            </div>
+                        </div>
+                    </div>
+                `;
+            });
+
+            // Render orphan roles (roles not in any team) - always expanded
+            if (hierarchy.orphanRoles.length > 0) {
+                // If there's any hierarchy structure, add a header for orphan roles
+                if (hierarchy.units.length > 0 || hierarchy.orphanTeams.length > 0) {
+                    html += `<div class="role-hierarchy-orphan-header">Other Roles</div>`;
+                }
+                hierarchy.orphanRoles.forEach(role => {
+                    html += `
+                        <div class="quick-add-dropdown-item ${quickAddModalState.roleId === role.id ? 'selected' : ''}"
+                             onclick="selectQuickAddRole('${role.id}')">
+                            <i class="ph ph-briefcase"></i> ${role.name}
+                        </div>
+                    `;
+                });
+            }
+
+            container.innerHTML = html;
         }
 
         function selectQuickAddRole(roleId) {
             quickAddModalState.roleId = roleId;
             hideAllQuickAddDropdowns();
             updateQuickAddModalChips();
+
+            // Track team usage for "most used team" feature
+            const teamId = getTeamForRole(roleId);
+            if (teamId) {
+                trackTeamUsage(teamId);
+            }
         }
 
         // Add Escape key handler for quick add modal
@@ -31978,6 +32263,193 @@ Options:
             }
 
             return hierarchy;
+        }
+
+        // ============================================
+        // HIERARCHICAL ROLE SELECTOR SYSTEM
+        // ============================================
+
+        // Build a hierarchical structure of roles grouped by Unit > Team
+        function buildRoleHierarchyStructure() {
+            const roles = entities.role || [];
+            const teams = entities.team || [];
+            const units = entities.unit || [];
+
+            // Track which roles/teams are already placed in hierarchy
+            const placedRoles = new Set();
+            const placedTeams = new Set();
+
+            // Build unit -> team -> role structure
+            const unitHierarchy = [];
+
+            units.forEach(unit => {
+                const unitData = {
+                    id: unit.id,
+                    name: unit.name,
+                    type: 'unit',
+                    teams: []
+                };
+
+                // Find teams that belong to this unit (Unit DES Team)
+                const unitTeams = teams.filter(team => {
+                    return relationships.some(r =>
+                        r.predicate === 'DES' &&
+                        r.subject === unit.id &&
+                        r.object === team.id
+                    );
+                });
+
+                unitTeams.forEach(team => {
+                    placedTeams.add(team.id);
+                    const teamData = {
+                        id: team.id,
+                        name: team.name,
+                        type: 'team',
+                        roles: []
+                    };
+
+                    // Find roles that belong to this team (Team DES Role)
+                    const teamRoles = roles.filter(role => {
+                        return relationships.some(r =>
+                            r.predicate === 'DES' &&
+                            r.subject === team.id &&
+                            r.object === role.id
+                        );
+                    });
+
+                    teamRoles.forEach(role => {
+                        placedRoles.add(role.id);
+                        teamData.roles.push(role);
+                    });
+
+                    // Sort roles alphabetically
+                    teamData.roles.sort((a, b) => a.name.localeCompare(b.name));
+
+                    if (teamData.roles.length > 0) {
+                        unitData.teams.push(teamData);
+                    }
+                });
+
+                // Sort teams alphabetically
+                unitData.teams.sort((a, b) => a.name.localeCompare(b.name));
+
+                if (unitData.teams.length > 0) {
+                    unitHierarchy.push(unitData);
+                }
+            });
+
+            // Sort units alphabetically
+            unitHierarchy.sort((a, b) => a.name.localeCompare(b.name));
+
+            // Find orphan teams (teams not in any unit but have roles)
+            const orphanTeams = [];
+            teams.filter(team => !placedTeams.has(team.id)).forEach(team => {
+                const teamRoles = roles.filter(role => {
+                    return relationships.some(r =>
+                        r.predicate === 'DES' &&
+                        r.subject === team.id &&
+                        r.object === role.id
+                    );
+                });
+
+                if (teamRoles.length > 0) {
+                    teamRoles.forEach(role => placedRoles.add(role.id));
+                    orphanTeams.push({
+                        id: team.id,
+                        name: team.name,
+                        type: 'team',
+                        roles: teamRoles.sort((a, b) => a.name.localeCompare(b.name))
+                    });
+                }
+            });
+
+            orphanTeams.sort((a, b) => a.name.localeCompare(b.name));
+
+            // Find orphan roles (roles not in any team)
+            const orphanRoles = roles
+                .filter(role => !placedRoles.has(role.id))
+                .sort((a, b) => a.name.localeCompare(b.name));
+
+            return {
+                units: unitHierarchy,
+                orphanTeams: orphanTeams,
+                orphanRoles: orphanRoles
+            };
+        }
+
+        // Get the team ID for a role (if it has one)
+        function getTeamForRole(roleId) {
+            const teamRel = relationships.find(r =>
+                r.predicate === 'DES' &&
+                r.object === roleId &&
+                entities.team?.some(t => t.id === r.subject)
+            );
+            return teamRel ? teamRel.subject : null;
+        }
+
+        // Track team usage for "most used team" feature
+        function trackTeamUsage(teamId) {
+            if (!teamId || !currentWorkspaceId) return;
+
+            const storageKey = `teamUsage_${currentWorkspaceId}`;
+            let usage = {};
+
+            try {
+                usage = JSON.parse(localStorage.getItem(storageKey)) || {};
+            } catch (e) {
+                usage = {};
+            }
+
+            usage[teamId] = (usage[teamId] || 0) + 1;
+            localStorage.setItem(storageKey, JSON.stringify(usage));
+        }
+
+        // Get the most used team for the current workspace
+        function getMostUsedTeam() {
+            if (!currentWorkspaceId) return null;
+
+            const storageKey = `teamUsage_${currentWorkspaceId}`;
+            let usage = {};
+
+            try {
+                usage = JSON.parse(localStorage.getItem(storageKey)) || {};
+            } catch (e) {
+                return null;
+            }
+
+            let maxCount = 0;
+            let mostUsedTeamId = null;
+
+            for (const [teamId, count] of Object.entries(usage)) {
+                // Verify team still exists
+                if (count > maxCount && entities.team?.some(t => t.id === teamId)) {
+                    maxCount = count;
+                    mostUsedTeamId = teamId;
+                }
+            }
+
+            return mostUsedTeamId;
+        }
+
+        // Get the unit that contains a team
+        function getUnitForTeam(teamId) {
+            const unitRel = relationships.find(r =>
+                r.predicate === 'DES' &&
+                r.object === teamId &&
+                entities.unit?.some(u => u.id === r.subject)
+            );
+            return unitRel ? unitRel.subject : null;
+        }
+
+        // Toggle hierarchy section expansion
+        function toggleRoleHierarchySection(sectionId, type) {
+            const header = document.querySelector(`[data-section-id="${sectionId}"][data-section-type="${type}"]`);
+            const content = document.getElementById(`role-hierarchy-content-${type}-${sectionId}`);
+
+            if (header && content) {
+                header.classList.toggle('expanded');
+                content.classList.toggle('expanded');
+            }
         }
 
         // ============================================
@@ -33348,6 +33820,12 @@ Options:
                         object_type: 'relationship',
                         object_label: `${role.name} → ${taskName}`
                     });
+
+                    // Track team usage for "most used team" feature
+                    const teamId = getTeamForRole(role.id);
+                    if (teamId) {
+                        trackTeamUsage(teamId);
+                    }
                 }
 
                 // 4. If person selected and role selected, assign person to role (Person INS Role)
