@@ -31146,6 +31146,18 @@ Options:
             // Update the task board with animation
             if (document.getElementById('taskBoardView')?.classList.contains('active')) {
                 renderTaskBoard();
+                // Also refresh the current view (kanban, table, timeline, etc.)
+                if (currentView === 'kanban') {
+                    renderKanbanBoard();
+                } else if (currentView === 'table') {
+                    renderTaskTable();
+                } else if (currentView === 'timeline') {
+                    renderTimeline();
+                } else if (currentView === 'gantt') {
+                    renderGanttView();
+                } else if (currentView === 'calendar') {
+                    renderCalendarView();
+                }
 
                 // Add animation to the new card
                 setTimeout(() => {
@@ -31431,6 +31443,18 @@ Options:
             // Update the task board with animation
             if (document.getElementById('taskBoardView')?.classList.contains('active')) {
                 renderTaskBoard();
+                // Also refresh the current view (kanban, table, timeline, etc.)
+                if (currentView === 'kanban') {
+                    renderKanbanBoard();
+                } else if (currentView === 'table') {
+                    renderTaskTable();
+                } else if (currentView === 'timeline') {
+                    renderTimeline();
+                } else if (currentView === 'gantt') {
+                    renderGanttView();
+                } else if (currentView === 'calendar') {
+                    renderCalendarView();
+                }
 
                 // Add animation to the new card
                 setTimeout(() => {
@@ -33144,6 +33168,18 @@ Options:
                 populateSelects();
                 updateTaskCountBadge();
                 renderTaskBoardView();
+                // Also refresh the current view (kanban, table, timeline, etc.)
+                if (currentView === 'kanban') {
+                    renderKanbanBoard();
+                } else if (currentView === 'table') {
+                    renderTaskTable();
+                } else if (currentView === 'timeline') {
+                    renderTimeline();
+                } else if (currentView === 'gantt') {
+                    renderGanttView();
+                } else if (currentView === 'calendar') {
+                    renderCalendarView();
+                }
             } catch (renderError) {
                 console.error('Error refreshing UI after task creation:', renderError);
             }
