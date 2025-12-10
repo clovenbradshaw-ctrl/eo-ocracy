@@ -8931,6 +8931,300 @@
         }
 
         /* ============================================
+           QUICK ADD MODAL STYLES
+           ============================================ */
+
+        .quick-add-modal-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(61, 46, 31, 0.5);
+            backdrop-filter: blur(4px);
+            z-index: 2000;
+            display: none;
+            align-items: center;
+            justify-content: center;
+            animation: fadeIn 0.2s ease-out;
+        }
+
+        .quick-add-modal-overlay.active {
+            display: flex;
+        }
+
+        .quick-add-modal {
+            background: white;
+            border-radius: 12px;
+            width: 90%;
+            max-width: 600px;
+            max-height: 90vh;
+            overflow: visible;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+            animation: slideUp 0.3s ease-out;
+            position: relative;
+        }
+
+        .quick-add-modal-header {
+            padding: 24px 24px 16px 24px;
+            border-bottom: 1px solid #f0f0f0;
+        }
+
+        .quick-add-modal-title-input {
+            font-size: 20px;
+            font-weight: 600;
+            border: none;
+            width: 100%;
+            outline: none;
+            color: #333;
+            background: #fafafa;
+            padding: 12px 16px;
+            border-radius: 8px;
+            transition: background 0.2s, box-shadow 0.2s;
+        }
+
+        .quick-add-modal-title-input:focus {
+            background: white;
+            box-shadow: 0 0 0 2px rgba(200, 143, 74, 0.3);
+        }
+
+        .quick-add-modal-prompt {
+            background: linear-gradient(135deg, #f0fdf4 0%, #ecfdf5 100%);
+            border-left: 3px solid #10b981;
+            padding: 12px 16px;
+            margin-top: 16px;
+            border-radius: 6px;
+            font-size: 14px;
+            color: #065f46;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            animation: gentle-pulse 2.5s ease-in-out infinite;
+        }
+
+        @keyframes gentle-pulse {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.85; }
+        }
+
+        .quick-add-modal-prompt i {
+            font-size: 18px;
+            color: #10b981;
+        }
+
+        .quick-add-modal-prompt strong {
+            background: rgba(16, 185, 129, 0.15);
+            padding: 2px 6px;
+            border-radius: 4px;
+            font-family: 'SF Mono', Monaco, monospace;
+            font-size: 12px;
+        }
+
+        .quick-add-modal-meta {
+            padding: 16px 24px;
+            background: #fafafa;
+            border-bottom: 1px solid #f0f0f0;
+            display: flex;
+            gap: 12px;
+            flex-wrap: wrap;
+        }
+
+        .quick-add-meta-chip {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            padding: 10px 16px;
+            background: white;
+            border: 1px dashed #d0d0d0;
+            border-radius: 8px;
+            font-size: 13px;
+            color: #888;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .quick-add-meta-chip:hover {
+            border-color: #C88F4A;
+            color: #333;
+            transform: translateY(-2px);
+            box-shadow: 0 4px 8px rgba(200, 143, 74, 0.15);
+        }
+
+        .quick-add-meta-chip.filled {
+            background: linear-gradient(135deg, #C88F4A 0%, #B87B5B 100%);
+            color: white;
+            border: 1px solid #C88F4A;
+            border-style: solid;
+        }
+
+        .quick-add-meta-chip.filled:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(200, 143, 74, 0.3);
+        }
+
+        .quick-add-meta-chip i {
+            font-size: 16px;
+        }
+
+        .quick-add-dropdown {
+            position: absolute;
+            background: white;
+            border-radius: 8px;
+            box-shadow: 0 8px 30px rgba(0, 0, 0, 0.15);
+            border: 1px solid #e5e5e5;
+            padding: 8px 0;
+            min-width: 180px;
+            z-index: 100;
+            display: none;
+            left: 24px;
+            top: auto;
+            margin-top: 4px;
+        }
+
+        .quick-add-dropdown.show {
+            display: block;
+            animation: dropdownSlide 0.2s ease-out;
+        }
+
+        @keyframes dropdownSlide {
+            from { opacity: 0; transform: translateY(-8px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .quick-add-dropdown-item {
+            padding: 10px 16px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            color: #555;
+            font-size: 14px;
+            transition: background 0.15s;
+        }
+
+        .quick-add-dropdown-item:hover {
+            background: #f5f5f5;
+            color: #333;
+        }
+
+        .quick-add-dropdown-item i {
+            font-size: 16px;
+            color: #C88F4A;
+        }
+
+        .quick-add-dropdown-item.selected {
+            background: rgba(200, 143, 74, 0.1);
+            color: #C88F4A;
+            font-weight: 500;
+        }
+
+        .quick-add-modal-description {
+            padding: 20px 24px;
+        }
+
+        .quick-add-description-label {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            font-size: 12px;
+            color: #888;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            margin-bottom: 10px;
+            font-weight: 600;
+        }
+
+        .quick-add-description-label i {
+            font-size: 14px;
+        }
+
+        .quick-add-description-textarea {
+            width: 100%;
+            border: 1px solid #e5e5e5;
+            border-radius: 8px;
+            padding: 14px;
+            font-size: 14px;
+            font-family: inherit;
+            resize: vertical;
+            min-height: 100px;
+            outline: none;
+            transition: border-color 0.2s, box-shadow 0.2s;
+            line-height: 1.5;
+        }
+
+        .quick-add-description-textarea:focus {
+            border-color: #C88F4A;
+            box-shadow: 0 0 0 3px rgba(200, 143, 74, 0.1);
+        }
+
+        .quick-add-description-textarea::placeholder {
+            color: #aaa;
+        }
+
+        .quick-add-modal-footer {
+            padding: 16px 24px;
+            border-top: 1px solid #f0f0f0;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            background: #fafafa;
+            border-radius: 0 0 12px 12px;
+        }
+
+        .quick-add-footer-hint {
+            font-size: 13px;
+            color: #888;
+        }
+
+        .quick-add-footer-hint strong {
+            background: #e5e5e5;
+            padding: 3px 8px;
+            border-radius: 4px;
+            font-family: 'SF Mono', Monaco, monospace;
+            font-size: 11px;
+            color: #555;
+        }
+
+        .quick-add-footer-actions {
+            display: flex;
+            gap: 10px;
+        }
+
+        .quick-add-btn {
+            padding: 10px 18px;
+            border-radius: 8px;
+            border: none;
+            font-size: 14px;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.2s;
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+        .quick-add-btn-ghost {
+            background: transparent;
+            color: #666;
+        }
+
+        .quick-add-btn-ghost:hover {
+            background: #f0f0f0;
+            color: #333;
+        }
+
+        .quick-add-btn-primary {
+            background: linear-gradient(135deg, #C88F4A 0%, #B87B5B 100%);
+            color: white;
+            box-shadow: 0 2px 8px rgba(200, 143, 74, 0.3);
+        }
+
+        .quick-add-btn-primary:hover {
+            transform: translateY(-1px);
+            box-shadow: 0 4px 12px rgba(200, 143, 74, 0.4);
+        }
+
+        /* ============================================
            WORKFLOW SUGGESTION MODAL STYLES
            ============================================ */
 
@@ -30567,7 +30861,8 @@ Options:
                 const taskName = input.value.trim();
 
                 if (taskName) {
-                    createQuickTask(taskName);
+                    // Open modal with task name pre-filled instead of creating directly
+                    openQuickAddModal(taskName);
                     input.value = '';
                     hideQuickAddSuggestions();
                 }
@@ -30615,6 +30910,377 @@ Options:
                 quickAddSuggestionsVisible = false;
             }
         }
+
+        // ============================================
+        // QUICK ADD MODAL FUNCTIONS
+        // ============================================
+
+        // State for the quick add modal
+        let quickAddModalState = {
+            taskName: '',
+            dueDate: null,
+            priority: 'medium',
+            roleId: null,
+            description: '',
+            tags: []
+        };
+
+        function openQuickAddModal(rawTaskName) {
+            // Parse shortcuts from the raw task name
+            let taskName = rawTaskName;
+            let dueDate = null;
+            let tags = [];
+            let priority = quickAddPriority; // Use priority from dots if selected
+
+            // Extract and remove priority markers
+            if (taskName.includes('!!!')) {
+                priority = 'urgent';
+            } else if (taskName.includes('!!')) {
+                priority = 'high';
+            } else if (taskName.includes('!') && !taskName.includes('!!')) {
+                priority = 'low';
+            }
+            taskName = taskName.replace(/!!!/g, '').replace(/!!/g, '').replace(/!/g, '');
+
+            // Extract @date shortcuts
+            const dateMatch = taskName.match(/@(today|tomorrow|monday|tuesday|wednesday|thursday|friday|saturday|sunday|next\s*week)/i);
+            if (dateMatch) {
+                const dateStr = dateMatch[1].toLowerCase();
+                dueDate = parseDateShortcut(dateStr);
+                taskName = taskName.replace(/@\w+/gi, '');
+            }
+
+            // Extract #tags
+            const tagMatches = taskName.match(/#(\w+)/g);
+            if (tagMatches) {
+                tags = tagMatches.map(t => t.replace('#', ''));
+                taskName = taskName.replace(/#\w+/g, '');
+            }
+
+            taskName = taskName.trim();
+
+            if (!taskName) {
+                showToast('Task name is required', 'error');
+                return;
+            }
+
+            // Get default role (first role if exists)
+            const roles = entities.role || [];
+            const defaultRoleId = roles.length > 0 ? roles[0].id : null;
+
+            // Initialize modal state
+            quickAddModalState = {
+                taskName: taskName,
+                dueDate: dueDate,
+                priority: priority,
+                roleId: defaultRoleId,
+                description: '',
+                tags: tags
+            };
+
+            // Show the modal
+            const overlay = document.getElementById('quickAddModalOverlay');
+            overlay.classList.add('active');
+
+            // Pre-fill the form
+            document.getElementById('quickAddModalTitle').value = taskName;
+            document.getElementById('quickAddModalDescription').value = '';
+
+            // Update chips to reflect current state
+            updateQuickAddModalChips();
+
+            // Populate role dropdown
+            populateQuickAddRoleOptions();
+
+            // Focus on description field (task name is already filled)
+            setTimeout(() => {
+                document.getElementById('quickAddModalDescription').focus();
+            }, 100);
+
+            // Show a toast to guide the user
+            showToast('✨ Task created! Add details or press Escape to save', 'success');
+        }
+
+        function closeQuickAddModal() {
+            const overlay = document.getElementById('quickAddModalOverlay');
+            overlay.classList.remove('active');
+
+            // Close any open dropdowns
+            hideAllQuickAddDropdowns();
+
+            // Reset quick add priority dots to medium
+            selectQuickAddPriority('medium');
+        }
+
+        function closeQuickAddModalOnBackdrop(event) {
+            if (event.target === event.currentTarget) {
+                saveQuickAddModal();
+            }
+        }
+
+        function saveQuickAddModal() {
+            // Get values from form
+            const taskName = document.getElementById('quickAddModalTitle').value.trim();
+            const description = document.getElementById('quickAddModalDescription').value.trim();
+
+            if (!taskName) {
+                showToast('Task name is required', 'error');
+                return;
+            }
+
+            // Check if any roles exist for task assignment
+            const roles = entities.role || [];
+            if (roles.length === 0) {
+                // Close modal and redirect to hero modal for role creation
+                closeQuickAddModal();
+                showToast('Create a role first to assign this task', 'info');
+                document.getElementById('heroTaskName').value = taskName;
+                openHeroTaskModal();
+                return;
+            }
+
+            // Use the selected role or default to first role
+            const roleId = quickAddModalState.roleId || roles[0].id;
+
+            // Create the task
+            const taskId = 'task' + Date.now();
+            const taskObject = {
+                id: taskId,
+                name: taskName,
+                type: 'task',
+                description: description,
+                dueDate: quickAddModalState.dueDate,
+                predecessorId: null,
+                status: 'pending',
+                priority: quickAddModalState.priority,
+                tags: quickAddModalState.tags,
+                collaborators: [],
+                recurring: null,
+                producesProductId: null,
+                followsWorkflowId: null,
+                createdAt: new Date().toISOString()
+            };
+            entities.task.push(taskObject);
+
+            // Connect role to task (Role CON Task)
+            const roleTaskRel = {
+                id: 'rel' + (Date.now() + 1),
+                subject: roleId,
+                predicate: 'CON',
+                object: taskId,
+                description: ''
+            };
+            relationships.push(roleTaskRel);
+
+            // Log activity
+            logActivityToXano({
+                event_verb: 'Add Entity',
+                object_type: 'task',
+                object_label: taskName
+            });
+
+            // Save to local storage
+            saveToLocalStorage();
+
+            // Close modal
+            closeQuickAddModal();
+
+            // Update the task board with animation
+            if (document.getElementById('taskBoardView')?.classList.contains('active')) {
+                renderTaskBoard();
+
+                // Add animation to the new card
+                setTimeout(() => {
+                    const newCard = document.querySelector(`.kanban-card[data-id="${taskId}"]`);
+                    if (newCard) {
+                        newCard.classList.add('new-task');
+                        setTimeout(() => newCard.classList.remove('new-task'), 300);
+                    }
+                }, 50);
+            }
+
+            showToast('✓ Task saved!', 'success');
+        }
+
+        function updateQuickAddModalChips() {
+            // Update date chip
+            const dateChip = document.getElementById('quickAddDateChip');
+            const dateLabel = document.getElementById('quickAddDateLabel');
+            if (quickAddModalState.dueDate) {
+                dateChip.classList.add('filled');
+                dateLabel.textContent = formatDateForDisplay(quickAddModalState.dueDate);
+            } else {
+                dateChip.classList.remove('filled');
+                dateLabel.textContent = 'Add due date';
+            }
+
+            // Update priority chip
+            const priorityChip = document.getElementById('quickAddPriorityChip');
+            const priorityLabel = document.getElementById('quickAddPriorityLabel');
+            const priorityLabels = {
+                low: 'Low',
+                medium: 'Medium',
+                high: 'High',
+                urgent: 'Urgent'
+            };
+            if (quickAddModalState.priority && quickAddModalState.priority !== 'medium') {
+                priorityChip.classList.add('filled');
+                priorityLabel.textContent = priorityLabels[quickAddModalState.priority];
+            } else {
+                priorityChip.classList.remove('filled');
+                priorityLabel.textContent = 'Set priority';
+            }
+
+            // Update role chip
+            const roleChip = document.getElementById('quickAddRoleChip');
+            const roleLabel = document.getElementById('quickAddRoleLabel');
+            if (quickAddModalState.roleId) {
+                const role = (entities.role || []).find(r => r.id === quickAddModalState.roleId);
+                if (role) {
+                    roleChip.classList.add('filled');
+                    roleLabel.textContent = role.name;
+                } else {
+                    roleChip.classList.remove('filled');
+                    roleLabel.textContent = 'Assign role';
+                }
+            } else {
+                roleChip.classList.remove('filled');
+                roleLabel.textContent = 'Assign role';
+            }
+        }
+
+        function formatDateForDisplay(dateStr) {
+            if (!dateStr) return '';
+            const date = new Date(dateStr);
+            const today = new Date();
+            today.setHours(0, 0, 0, 0);
+            const tomorrow = new Date(today);
+            tomorrow.setDate(tomorrow.getDate() + 1);
+
+            if (date.toDateString() === today.toDateString()) {
+                return 'Today';
+            } else if (date.toDateString() === tomorrow.toDateString()) {
+                return 'Tomorrow';
+            } else {
+                return date.toLocaleDateString('en-US', { month: 'short', day: 'numeric' });
+            }
+        }
+
+        function hideAllQuickAddDropdowns() {
+            document.getElementById('quickAddDateDropdown')?.classList.remove('show');
+            document.getElementById('quickAddRoleDropdown')?.classList.remove('show');
+        }
+
+        function toggleQuickAddDatePicker() {
+            const dropdown = document.getElementById('quickAddDateDropdown');
+            const wasOpen = dropdown.classList.contains('show');
+            hideAllQuickAddDropdowns();
+            if (!wasOpen) {
+                dropdown.classList.add('show');
+            }
+        }
+
+        function setQuickAddDate(preset) {
+            let dateStr = null;
+            switch (preset) {
+                case 'today':
+                    dateStr = parseDateShortcut('today');
+                    break;
+                case 'tomorrow':
+                    dateStr = parseDateShortcut('tomorrow');
+                    break;
+                case 'nextWeek':
+                    dateStr = parseDateShortcut('next week');
+                    break;
+                case 'custom':
+                    // Show the date input
+                    const dateInput = document.getElementById('quickAddDateInput');
+                    dateInput.style.display = 'block';
+                    dateInput.focus();
+                    dateInput.click();
+                    return;
+            }
+            quickAddModalState.dueDate = dateStr;
+            hideAllQuickAddDropdowns();
+            updateQuickAddModalChips();
+        }
+
+        function setQuickAddCustomDate(dateValue) {
+            if (dateValue) {
+                quickAddModalState.dueDate = dateValue;
+            }
+            document.getElementById('quickAddDateInput').style.display = 'none';
+            hideAllQuickAddDropdowns();
+            updateQuickAddModalChips();
+        }
+
+        function cycleQuickAddPriority() {
+            const priorities = ['medium', 'high', 'urgent', 'low'];
+            const currentIndex = priorities.indexOf(quickAddModalState.priority);
+            const nextIndex = (currentIndex + 1) % priorities.length;
+            quickAddModalState.priority = priorities[nextIndex];
+            updateQuickAddModalChips();
+        }
+
+        function toggleQuickAddRolePicker() {
+            const dropdown = document.getElementById('quickAddRoleDropdown');
+            const wasOpen = dropdown.classList.contains('show');
+            hideAllQuickAddDropdowns();
+            if (!wasOpen) {
+                populateQuickAddRoleOptions();
+                dropdown.classList.add('show');
+            }
+        }
+
+        function populateQuickAddRoleOptions() {
+            const container = document.getElementById('quickAddRoleOptions');
+            const roles = entities.role || [];
+
+            if (roles.length === 0) {
+                container.innerHTML = `
+                    <div class="quick-add-dropdown-item" style="color: #888; cursor: default;">
+                        <i class="ph ph-info"></i> No roles yet
+                    </div>
+                `;
+                return;
+            }
+
+            container.innerHTML = roles.map(role => `
+                <div class="quick-add-dropdown-item ${quickAddModalState.roleId === role.id ? 'selected' : ''}"
+                     onclick="selectQuickAddRole('${role.id}')">
+                    <i class="ph ph-briefcase"></i> ${role.name}
+                </div>
+            `).join('');
+        }
+
+        function selectQuickAddRole(roleId) {
+            quickAddModalState.roleId = roleId;
+            hideAllQuickAddDropdowns();
+            updateQuickAddModalChips();
+        }
+
+        // Add Escape key handler for quick add modal
+        document.addEventListener('keydown', function(e) {
+            if (e.key === 'Escape') {
+                const quickAddOverlay = document.getElementById('quickAddModalOverlay');
+                if (quickAddOverlay && quickAddOverlay.classList.contains('active')) {
+                    e.preventDefault();
+                    e.stopPropagation();
+                    saveQuickAddModal();
+                }
+            }
+        });
+
+        // Close dropdowns when clicking outside
+        document.addEventListener('click', function(e) {
+            const quickAddOverlay = document.getElementById('quickAddModalOverlay');
+            if (quickAddOverlay && quickAddOverlay.classList.contains('active')) {
+                // Check if click is outside any dropdown
+                if (!e.target.closest('.quick-add-dropdown') && !e.target.closest('.quick-add-meta-chip')) {
+                    hideAllQuickAddDropdowns();
+                }
+            }
+        });
 
         function createQuickTask(rawTaskName) {
             // Parse out shortcuts from task name
@@ -34894,6 +35560,85 @@ Options:
                     </button>
                     <button class="hero-task-btn hero-task-btn-primary" id="heroTaskSubmitBtn" onclick="submitHeroTask()" disabled>
                         <i class="ph ph-check"></i> Create Task
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Quick Add Modal (Lightweight task creation from quick-add bar) -->
+    <div class="quick-add-modal-overlay" id="quickAddModalOverlay" onclick="closeQuickAddModalOnBackdrop(event)">
+        <div class="quick-add-modal" onclick="event.stopPropagation()">
+            <div class="quick-add-modal-header">
+                <input type="text"
+                       id="quickAddModalTitle"
+                       class="quick-add-modal-title-input"
+                       placeholder="Task name..."
+                       onkeypress="if(event.key==='Enter') saveQuickAddModal()">
+                <div class="quick-add-modal-prompt">
+                    <i class="ph ph-sparkle"></i>
+                    <span>Add more details or press <strong>Escape</strong> to save quickly</span>
+                </div>
+            </div>
+
+            <div class="quick-add-modal-meta">
+                <div class="quick-add-meta-chip" id="quickAddDateChip" onclick="toggleQuickAddDatePicker()">
+                    <i class="ph ph-calendar"></i>
+                    <span id="quickAddDateLabel">Add due date</span>
+                </div>
+                <div class="quick-add-meta-chip" id="quickAddPriorityChip" onclick="cycleQuickAddPriority()">
+                    <i class="ph ph-flag"></i>
+                    <span id="quickAddPriorityLabel">Set priority</span>
+                </div>
+                <div class="quick-add-meta-chip" id="quickAddRoleChip" onclick="toggleQuickAddRolePicker()">
+                    <i class="ph ph-briefcase"></i>
+                    <span id="quickAddRoleLabel">Assign role</span>
+                </div>
+            </div>
+
+            <!-- Date Picker Dropdown -->
+            <div class="quick-add-dropdown" id="quickAddDateDropdown">
+                <div class="quick-add-dropdown-item" onclick="setQuickAddDate('today')">
+                    <i class="ph ph-calendar-check"></i> Today
+                </div>
+                <div class="quick-add-dropdown-item" onclick="setQuickAddDate('tomorrow')">
+                    <i class="ph ph-sun"></i> Tomorrow
+                </div>
+                <div class="quick-add-dropdown-item" onclick="setQuickAddDate('nextWeek')">
+                    <i class="ph ph-calendar-plus"></i> Next week
+                </div>
+                <div class="quick-add-dropdown-item" onclick="setQuickAddDate('custom')">
+                    <i class="ph ph-calendar-blank"></i> Pick a date...
+                </div>
+                <input type="date" id="quickAddDateInput" style="display: none;" onchange="setQuickAddCustomDate(this.value)">
+            </div>
+
+            <!-- Role Picker Dropdown -->
+            <div class="quick-add-dropdown" id="quickAddRoleDropdown">
+                <div id="quickAddRoleOptions">
+                    <!-- Populated dynamically -->
+                </div>
+            </div>
+
+            <div class="quick-add-modal-description">
+                <label class="quick-add-description-label">
+                    <i class="ph ph-text-aa"></i> Description (Optional)
+                </label>
+                <textarea id="quickAddModalDescription"
+                          class="quick-add-description-textarea"
+                          placeholder="Add any details, context, or notes about this task..."></textarea>
+            </div>
+
+            <div class="quick-add-modal-footer">
+                <span class="quick-add-footer-hint">
+                    Press <strong>Esc</strong> to save and close
+                </span>
+                <div class="quick-add-footer-actions">
+                    <button class="quick-add-btn quick-add-btn-ghost" onclick="closeQuickAddModal()">
+                        Cancel
+                    </button>
+                    <button class="quick-add-btn quick-add-btn-primary" onclick="saveQuickAddModal()">
+                        <i class="ph ph-check"></i> Save & Close
                     </button>
                 </div>
             </div>
