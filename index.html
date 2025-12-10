@@ -9800,12 +9800,12 @@
             color: #C88F4A;
         }
 
-        .kanban-card-blocked {
+        .kanban-card-parent-link {
             display: flex;
             align-items: center;
             gap: 0.25rem;
-            color: #D97706;
-            background: #FEF3C7;
+            color: #7B95A3;
+            background: #E8F4F8;
             padding: 0.25rem 0.5rem;
             border-radius: 4px;
             font-size: 0.75rem;
@@ -9813,13 +9813,200 @@
             margin-bottom: 0.25rem;
         }
 
-        .kanban-card-blocked i {
-            color: #D97706;
+        .kanban-card-parent-link i {
+            color: #7B95A3;
         }
 
-        .kanban-card-blocked em {
+        .kanban-card-parent-link em {
             font-style: normal;
             font-weight: 600;
+            color: #4A6D7C;
+        }
+
+        /* Hierarchy badges for clear parent/subtask identification */
+        .kanban-card-hierarchy-badge {
+            display: flex;
+            align-items: center;
+            gap: 0.35rem;
+            font-size: 0.65rem;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            padding: 0.3rem 0.5rem;
+            border-radius: 4px;
+            margin-bottom: 0.5rem;
+        }
+
+        .kanban-card-hierarchy-badge.parent-badge {
+            background: linear-gradient(135deg, #E8F4F8, #D4E9F0);
+            color: #3A5F6F;
+            border: 1px solid #7B95A3;
+        }
+
+        .kanban-card-hierarchy-badge.parent-badge i {
+            color: #5A8A9A;
+            font-size: 0.85rem;
+        }
+
+        .kanban-card-hierarchy-badge.subtask-badge {
+            background: linear-gradient(135deg, #FEF3C7, #FDE68A);
+            color: #92400E;
+            border: 1px solid #D97706;
+        }
+
+        .kanban-card-hierarchy-badge.subtask-badge i {
+            color: #D97706;
+            font-size: 0.85rem;
+        }
+
+        /* Info icon with tooltip for hierarchy badges */
+        .hierarchy-badge-info {
+            margin-left: auto;
+            position: relative;
+            cursor: help;
+        }
+
+        .hierarchy-badge-info > i {
+            font-size: 0.75rem;
+            opacity: 0.7;
+        }
+
+        .hierarchy-badge-tooltip {
+            display: none;
+            position: absolute;
+            bottom: 100%;
+            right: 0;
+            background: #1F2937;
+            color: white;
+            padding: 0.5rem 0.75rem;
+            border-radius: 6px;
+            font-size: 0.7rem;
+            font-weight: 500;
+            text-transform: none;
+            letter-spacing: normal;
+            white-space: nowrap;
+            z-index: 1000;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.3);
+            margin-bottom: 0.5rem;
+        }
+
+        .hierarchy-badge-tooltip::after {
+            content: '';
+            position: absolute;
+            top: 100%;
+            right: 0.75rem;
+            border: 6px solid transparent;
+            border-top-color: #1F2937;
+        }
+
+        .hierarchy-badge-info:hover .hierarchy-badge-tooltip {
+            display: block;
+        }
+
+        /* Kanban hierarchy legend */
+        .kanban-hierarchy-legend {
+            background: linear-gradient(135deg, #FAF7F5, #F5F0EB);
+            border: 1px solid #E5DDD1;
+            border-radius: 10px;
+            padding: 1rem 1.25rem;
+            margin: 0 1rem 1rem 1rem;
+        }
+
+        .kanban-legend-title {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            font-weight: 600;
+            color: #6B5642;
+            font-size: 0.85rem;
+            margin-bottom: 0.75rem;
+        }
+
+        .kanban-legend-title i {
+            color: #7B95A3;
+        }
+
+        .kanban-legend-items {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 1rem;
+        }
+
+        .kanban-legend-item {
+            display: flex;
+            align-items: flex-start;
+            gap: 0.5rem;
+            flex: 1 1 280px;
+            min-width: 250px;
+        }
+
+        .kanban-legend-indicator {
+            width: 20px;
+            height: 36px;
+            border-radius: 4px;
+            flex-shrink: 0;
+            margin-top: 2px;
+        }
+
+        .kanban-legend-indicator.parent-indicator {
+            border-left: 4px solid #7B95A3;
+            background: linear-gradient(to right, rgba(123, 149, 163, 0.15), rgba(123, 149, 163, 0.05));
+        }
+
+        .kanban-legend-indicator.subtask-indicator {
+            border-left: 4px solid #D97706;
+            background: linear-gradient(to right, rgba(217, 119, 6, 0.15), rgba(217, 119, 6, 0.05));
+            margin-left: 8px;
+            position: relative;
+        }
+
+        .kanban-legend-indicator.subtask-indicator::before {
+            content: '';
+            position: absolute;
+            left: -12px;
+            top: 50%;
+            width: 8px;
+            height: 2px;
+            background: #D97706;
+            opacity: 0.5;
+        }
+
+        .kanban-legend-indicator.regular-indicator {
+            border: 1px solid #E5DDD1;
+            background: white;
+        }
+
+        .kanban-legend-text {
+            display: flex;
+            flex-direction: column;
+            gap: 0.15rem;
+        }
+
+        .kanban-legend-text strong {
+            font-size: 0.8rem;
+            color: #3D2E1F;
+        }
+
+        .kanban-legend-text span {
+            font-size: 0.7rem;
+            color: #6B5642;
+            line-height: 1.4;
+        }
+
+        .kanban-legend-tip {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            margin-top: 0.75rem;
+            padding-top: 0.75rem;
+            border-top: 1px dashed #E5DDD1;
+            font-size: 0.75rem;
+            color: #8B6F47;
+        }
+
+        .kanban-legend-tip i {
+            color: #C88F4A;
+            font-size: 1rem;
         }
 
         .kanban-card-due.overdue {
@@ -9836,12 +10023,36 @@
 
         /* Parent-Subtask Kanban Styling */
         .kanban-card.has-subtasks {
-            border-left: 3px solid #7B95A3;
+            border-left: 4px solid #7B95A3;
+            background: linear-gradient(to right, rgba(123, 149, 163, 0.08), white 20%);
+            box-shadow: 0 2px 8px rgba(123, 149, 163, 0.15);
+        }
+
+        .kanban-card.has-subtasks:hover {
+            border-left-color: #5A8A9A;
+            box-shadow: 0 4px 12px rgba(123, 149, 163, 0.25);
         }
 
         .kanban-card.is-subtask {
-            margin-left: 0.5rem;
-            border-left: 3px solid #C88F4A;
+            margin-left: 1rem;
+            border-left: 4px solid #D97706;
+            background: linear-gradient(to right, rgba(217, 119, 6, 0.06), white 20%);
+            position: relative;
+        }
+
+        .kanban-card.is-subtask::before {
+            content: '';
+            position: absolute;
+            left: -1rem;
+            top: 50%;
+            width: 0.75rem;
+            height: 2px;
+            background: #D97706;
+            opacity: 0.5;
+        }
+
+        .kanban-card.is-subtask:hover {
+            border-left-color: #B45309;
         }
 
         .kanban-card.subtask-related {
@@ -9931,7 +10142,7 @@
         }
 
         .kanban-column-content.drop-blocked::before {
-            content: '\2717  Complete subtasks first to move parent task';
+            content: attr(data-block-reason);
             position: absolute;
             top: 50%;
             left: 50%;
@@ -9940,9 +10151,12 @@
             color: white;
             padding: 0.75rem 1.25rem;
             border-radius: 8px;
-            font-size: 0.85rem;
+            font-size: 0.8rem;
             font-weight: 600;
-            white-space: nowrap;
+            white-space: normal;
+            text-align: center;
+            max-width: 85%;
+            line-height: 1.4;
             z-index: 100;
             box-shadow: 0 4px 12px rgba(185, 28, 28, 0.3);
             animation: shake-blocked 0.5s ease-in-out;
@@ -31612,7 +31826,51 @@ Options:
                 { key: 'completed', label: 'Done', icon: 'ph-check-circle' }
             ];
 
-            let html = '<div class="kanban-board">';
+            // Check if there are any parent/subtask relationships
+            const hasParentTasks = tasks.some(t => tasks.some(st => st.predecessorId === t.id));
+            const hasSubtasks = tasks.some(t => t.predecessorId);
+
+            let html = '';
+
+            // Add hierarchy legend if there are parent/subtask relationships
+            if (hasParentTasks || hasSubtasks) {
+                html += `
+                    <div class="kanban-hierarchy-legend">
+                        <div class="kanban-legend-title">
+                            <i class="ph ph-info"></i> Task Hierarchy Guide
+                        </div>
+                        <div class="kanban-legend-items">
+                            <div class="kanban-legend-item">
+                                <div class="kanban-legend-indicator parent-indicator"></div>
+                                <div class="kanban-legend-text">
+                                    <strong>Parent Task</strong>
+                                    <span>Has subtasks that must be completed first. Cannot be moved to "Done" until all subtasks are done.</span>
+                                </div>
+                            </div>
+                            <div class="kanban-legend-item">
+                                <div class="kanban-legend-indicator subtask-indicator"></div>
+                                <div class="kanban-legend-text">
+                                    <strong>Subtask</strong>
+                                    <span>Part of a parent task. Must be completed before the parent can advance.</span>
+                                </div>
+                            </div>
+                            <div class="kanban-legend-item">
+                                <div class="kanban-legend-indicator regular-indicator"></div>
+                                <div class="kanban-legend-text">
+                                    <strong>Regular Task</strong>
+                                    <span>Standalone task with no hierarchy. Can be moved freely between columns.</span>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="kanban-legend-tip">
+                            <i class="ph ph-lightbulb"></i>
+                            <span>Drag a parent task to see connections to its subtasks and restricted columns.</span>
+                        </div>
+                    </div>
+                `;
+            }
+
+            html += '<div class="kanban-board">';
 
             statuses.forEach(status => {
                 const columnTasks = tasks.filter(t => t.status === status.key);
@@ -31652,6 +31910,22 @@ Options:
                     if (hasSubtasks) cardClasses += ' has-subtasks';
                     if (isSubtask) cardClasses += ' is-subtask';
 
+                    // Build subtask progress info for parent tasks
+                    const completedSubtasks = subtasks.filter(s => s.status === 'completed').length;
+                    const pendingSubtasks = subtasks.filter(s => s.status === 'pending').length;
+                    const inProgressSubtasks = subtasks.filter(s => s.status === 'in_progress').length;
+
+                    // Determine movement restrictions for parent tasks
+                    let movementNote = '';
+                    if (hasSubtasks) {
+                        if (completedSubtasks < subtasks.length) {
+                            movementNote = `Cannot move to "Done" until all ${subtasks.length} subtasks are complete`;
+                        }
+                        if (pendingSubtasks > 0) {
+                            movementNote = `Cannot move to "In Progress" or "Done" - ${pendingSubtasks} subtask(s) still in "To Do"`;
+                        }
+                    }
+
                     html += `
                         <div class="${cardClasses}"
                              draggable="true"
@@ -31660,12 +31934,26 @@ Options:
                              ondragstart="handleKanbanDragStart(event)"
                              ondragend="handleKanbanDragEnd(event)"
                              onclick="showEntityDetails('${task.id}')">
+                            ${hasSubtasks ? `
+                                <div class="kanban-card-hierarchy-badge parent-badge" title="${movementNote}">
+                                    <i class="ph ph-folder-notch-open"></i> PARENT TASK
+                                    <span class="hierarchy-badge-info">
+                                        <i class="ph ph-info"></i>
+                                        <span class="hierarchy-badge-tooltip">${movementNote || 'This task has subtasks that must be completed before this task can be moved to "Done"'}</span>
+                                    </span>
+                                </div>
+                            ` : ''}
+                            ${isSubtask ? `
+                                <div class="kanban-card-hierarchy-badge subtask-badge">
+                                    <i class="ph ph-arrow-elbow-down-right"></i> SUBTASK
+                                </div>
+                            ` : ''}
                             <div class="kanban-card-title" style="display: flex; align-items: center; gap: 0.5rem;">
                                 ${task.name}
-                                ${hasSubtasks ? `<span class="kanban-card-subtask-badge" title="${subtasks.filter(s => s.status === 'completed').length} of ${subtasks.length} subtasks complete"><i class="ph ph-list-checks"></i> ${subtasks.filter(s => s.status === 'completed').length}/${subtasks.length}</span>` : ''}
+                                ${hasSubtasks ? `<span class="kanban-card-subtask-badge" title="${completedSubtasks} of ${subtasks.length} subtasks complete"><i class="ph ph-list-checks"></i> ${completedSubtasks}/${subtasks.length}</span>` : ''}
                             </div>
                             <div class="kanban-card-meta">
-                                ${isSubtask && parentTask ? `<span class="kanban-card-blocked"><i class="ph ph-arrow-elbow-left-up"></i> <em>Blocked by:</em> ${parentTask.name}</span>` : ''}
+                                ${isSubtask && parentTask ? `<span class="kanban-card-parent-link"><i class="ph ph-git-branch"></i> <em>Subtask of:</em> ${parentTask.name}</span>` : ''}
                                 ${person ? `<span class="kanban-card-assignee" ${role ? `title="Role: ${role.name}"` : ''}><i class="ph ph-user-circle"></i> ${person.name}</span>` :
                                   (role ? `<span class="kanban-card-assignee kanban-card-role-only" title="No person assigned to this role"><i class="ph ph-briefcase"></i> ${role.name}</span>` : '')}
                                 ${task.dueDate ? `<span class="kanban-card-due ${dueDateStatus}"><i class="ph ph-calendar"></i> ${formatDateShort(task.dueDate)}</span>` : ''}
@@ -31714,10 +32002,26 @@ Options:
 
             // Mark columns that are blocked for parent tasks with subtasks
             if (hasSubtasks) {
+                const subtasks = getSubtasks(draggedTaskId);
+                const pendingCount = subtasks.filter(s => s.status === 'pending').length;
+                const inProgressCount = subtasks.filter(s => s.status === 'in_progress').length;
+                const incompleteCount = subtasks.filter(s => s.status !== 'completed').length;
+
                 document.querySelectorAll('.kanban-column').forEach(column => {
                     const targetStatus = column.dataset.status;
+                    const columnContent = column.querySelector('.kanban-column-content');
+
                     if (!canParentMoveToStatus(draggedTaskId, targetStatus)) {
-                        column.querySelector('.kanban-column-content').classList.add('drop-blocked');
+                        columnContent.classList.add('drop-blocked');
+
+                        // Set specific block reason
+                        let reason = '';
+                        if (targetStatus === 'completed') {
+                            reason = `✗ Cannot complete: ${incompleteCount} subtask(s) not done`;
+                        } else if (targetStatus === 'in_progress') {
+                            reason = `✗ Cannot start: ${pendingCount} subtask(s) still in "To Do"`;
+                        }
+                        columnContent.dataset.blockReason = reason;
                     }
                 });
             }
@@ -31731,6 +32035,7 @@ Options:
             document.querySelectorAll('.kanban-column-content').forEach(col => {
                 col.classList.remove('drag-over');
                 col.classList.remove('drop-blocked');
+                delete col.dataset.blockReason;
             });
 
             // Remove highlight/fade from all cards
