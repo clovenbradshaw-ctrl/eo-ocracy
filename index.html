@@ -11629,6 +11629,218 @@
             color: #C88F4A;
         }
 
+        /* ============================================
+           SIMPLIFIED TASK MODAL STYLES
+           ============================================ */
+
+        .simple-task-modal {
+            padding: 0;
+        }
+
+        .simple-task-meta-bar {
+            display: flex;
+            gap: 8px;
+            padding: 16px 0;
+            flex-wrap: wrap;
+            border-bottom: 1px solid #f0f0f0;
+            margin-bottom: 16px;
+        }
+
+        .simple-task-chip {
+            padding: 8px 14px;
+            border-radius: 8px;
+            font-size: 13px;
+            cursor: pointer;
+            transition: all 0.2s;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            font-weight: 500;
+        }
+
+        .simple-task-chip.empty {
+            border: 1px dashed #d0d0d0;
+            color: #888;
+            background: white;
+        }
+
+        .simple-task-chip.empty:hover {
+            border-color: #C88F4A;
+            color: #666;
+            transform: translateY(-1px);
+        }
+
+        .simple-task-chip.filled {
+            background: #f5f5f5;
+            color: #555;
+            border: 1px solid #e5e5e5;
+        }
+
+        .simple-task-chip.filled:hover {
+            background: #eee;
+            transform: translateY(-1px);
+        }
+
+        .simple-task-chip.status-pending {
+            background: #FEF3C7;
+            border-color: #F59E0B;
+            color: #92400E;
+        }
+
+        .simple-task-chip.status-in-progress {
+            background: #DBEAFE;
+            border-color: #3B82F6;
+            color: #1E40AF;
+        }
+
+        .simple-task-chip.status-completed {
+            background: #D1FAE5;
+            border-color: #10B981;
+            color: #065F46;
+        }
+
+        .simple-task-chip i {
+            font-size: 14px;
+        }
+
+        .simple-task-description {
+            margin-bottom: 20px;
+        }
+
+        .simple-task-description-field {
+            width: 100%;
+            border: 1px solid #e5e5e5;
+            border-radius: 8px;
+            padding: 14px;
+            font-size: 14px;
+            font-family: inherit;
+            resize: vertical;
+            min-height: 100px;
+            outline: none;
+            color: #555;
+            line-height: 1.6;
+            transition: border-color 0.2s, box-shadow 0.2s;
+        }
+
+        .simple-task-description-field:focus {
+            border-color: #C88F4A;
+            box-shadow: 0 0 0 3px rgba(200, 143, 74, 0.1);
+        }
+
+        .simple-task-description-field::placeholder {
+            color: #bbb;
+        }
+
+        .simple-task-options {
+            margin-bottom: 8px;
+        }
+
+        .simple-task-option-link {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 14px 4px;
+            color: #666;
+            font-size: 14px;
+            cursor: pointer;
+            border-bottom: 1px solid #f5f5f5;
+            transition: all 0.2s;
+        }
+
+        .simple-task-option-link:hover {
+            color: #333;
+            padding-left: 12px;
+            background: #fafafa;
+        }
+
+        .simple-task-option-link:last-child {
+            border-bottom: none;
+        }
+
+        .simple-task-option-text {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .simple-task-option-text i {
+            font-size: 18px;
+            color: #888;
+        }
+
+        .simple-task-option-link:hover .simple-task-option-text i {
+            color: #C88F4A;
+        }
+
+        .simple-task-option-arrow {
+            color: #ccc;
+            font-size: 14px;
+        }
+
+        .simple-task-option-badge {
+            background: #f0f0f0;
+            color: #666;
+            font-size: 11px;
+            padding: 2px 8px;
+            border-radius: 10px;
+            font-weight: 600;
+        }
+
+        .simple-task-expanded-section {
+            margin-top: 12px;
+            padding: 16px;
+            background: #fafafa;
+            border-radius: 8px;
+            border: 1px solid #f0f0f0;
+        }
+
+        /* Status dropdown for simplified modal */
+        .simple-task-status-dropdown {
+            position: absolute;
+            top: 100%;
+            left: 0;
+            margin-top: 4px;
+            background: white;
+            border-radius: 8px;
+            box-shadow: 0 8px 30px rgba(0, 0, 0, 0.15);
+            border: 1px solid #e5e5e5;
+            padding: 8px 0;
+            min-width: 160px;
+            z-index: 100;
+            display: none;
+        }
+
+        .simple-task-status-dropdown.show {
+            display: block;
+            animation: dropdownSlide 0.2s ease-out;
+        }
+
+        .simple-task-status-option {
+            padding: 10px 16px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            font-size: 14px;
+            transition: background 0.15s;
+        }
+
+        .simple-task-status-option:hover {
+            background: #f5f5f5;
+        }
+
+        .simple-task-status-option.pending {
+            color: #92400E;
+        }
+
+        .simple-task-status-option.in-progress {
+            color: #1E40AF;
+        }
+
+        .simple-task-status-option.completed {
+            color: #065F46;
+        }
+
         /* Role Work Dashboard Styles */
         .role-work-dashboard {
             display: flex;
@@ -18242,30 +18454,36 @@ Cmd/Ctrl + K - Command palette
             const descContent = entity.description && entity.description.trim() ? entity.description : '';
             const descCharCount = descContent.length;
 
-            descriptionEl.innerHTML = `
-                <div class="modal-section-title"><i class="ph ph-text-align-left"></i> Description</div>
-                <div class="modal-description-display ${descContent ? 'modal-description-text' : 'modal-description-empty'}"
-                     id="modalDescriptionDisplay" onclick="startInlineDescEdit()">
-                    ${descContent || 'No description yet. Click to add one.'}
-                    <span class="edit-hint-desc"><i class="ph ph-pencil-simple"></i> edit</span>
-                </div>
-                <div class="modal-description-edit-form" id="modalDescriptionEditForm">
-                    <textarea id="inlineDescInput" maxlength="240" placeholder="Add a description..."
-                              oninput="updateInlineDescCharCount()">${descContent}</textarea>
-                    <div class="desc-edit-footer">
-                        <span class="char-count"><span id="inlineDescCharCount">${descCharCount}</span>/240</span>
-                        <div class="desc-edit-actions">
-                            <button class="desc-edit-btn cancel" onclick="cancelInlineDescEdit()">
-                                <i class="ph ph-x"></i> Cancel
-                            </button>
-                            <button class="desc-edit-btn save" onclick="saveInlineDesc()">
-                                <i class="ph ph-check"></i> Save
-                            </button>
+            // Hide description section for tasks (simplified modal has its own)
+            if (entityType === 'task') {
+                descriptionEl.innerHTML = '';
+                descriptionEl.style.display = 'none';
+            } else {
+                descriptionEl.innerHTML = `
+                    <div class="modal-section-title"><i class="ph ph-text-align-left"></i> Description</div>
+                    <div class="modal-description-display ${descContent ? 'modal-description-text' : 'modal-description-empty'}"
+                         id="modalDescriptionDisplay" onclick="startInlineDescEdit()">
+                        ${descContent || 'No description yet. Click to add one.'}
+                        <span class="edit-hint-desc"><i class="ph ph-pencil-simple"></i> edit</span>
+                    </div>
+                    <div class="modal-description-edit-form" id="modalDescriptionEditForm">
+                        <textarea id="inlineDescInput" maxlength="240" placeholder="Add a description..."
+                                  oninput="updateInlineDescCharCount()">${descContent}</textarea>
+                        <div class="desc-edit-footer">
+                            <span class="char-count"><span id="inlineDescCharCount">${descCharCount}</span>/240</span>
+                            <div class="desc-edit-actions">
+                                <button class="desc-edit-btn cancel" onclick="cancelInlineDescEdit()">
+                                    <i class="ph ph-x"></i> Cancel
+                                </button>
+                                <button class="desc-edit-btn save" onclick="saveInlineDesc()">
+                                    <i class="ph ph-check"></i> Save
+                                </button>
+                            </div>
                         </div>
                     </div>
-                </div>
-            `;
-            descriptionEl.style.display = '';
+                `;
+                descriptionEl.style.display = '';
+            }
 
             // Role Assignment Section - show roles the person is assigned to
             const roleAssignmentEl = document.getElementById('modalRoleAssignment');
@@ -18706,11 +18924,11 @@ Cmd/Ctrl + K - Command palette
                     if (connectionsIcon) connectionsIcon.className = 'ph ph-flow-arrow';
                     switchModalTab('connections');
                 } else if (entityType === 'task') {
-                    // Tasks: hide structure, show Details
-                    if (structureTab) structureTab.style.display = 'none';
-                    if (connectionsLabel) connectionsLabel.textContent = 'Details';
-                    if (connectionsIcon) connectionsIcon.className = 'ph ph-info';
-                    switchModalTab('connections');
+                    // Tasks: hide all tabs - simplified modal has everything inline
+                    tabsContainer.style.display = 'none';
+                    document.querySelectorAll('.modal-tab-content').forEach(content => {
+                        content.classList.remove('active');
+                    });
                 } else if (entityType === 'product') {
                     // Products: hide structure, show Usage
                     if (structureTab) structureTab.style.display = 'none';
@@ -29961,7 +30179,7 @@ Cmd/Ctrl + K - Command palette
             return '';
         }
 
-        // Render task-specific modal info section
+        // Render task-specific modal info section - Simplified version
         function renderTaskModalInfo(task) {
             const dueDateStatus = getTaskDueDateStatus(task);
 
@@ -29990,73 +30208,81 @@ Cmd/Ctrl + K - Command palette
                 })
                 .filter(e => e && e.type === 'role');
 
-            // Get workflow connection
-            const workflow = task.followsWorkflowId ? entities.workflow?.find(w => w.id === task.followsWorkflowId) : null;
-
             // Format due date display
-            let dueDateDisplay = 'Not set';
-            let dueDateClass = 'empty';
+            let dueDateDisplay = 'Set date';
             if (task.dueDate) {
                 const date = parseLocalDate(task.dueDate);
                 const today = new Date();
                 today.setHours(0, 0, 0, 0);
                 const diffDays = Math.ceil((date - today) / (1000 * 60 * 60 * 24));
-
                 dueDateDisplay = formatDateShort(task.dueDate);
-                if (task.status === 'completed') {
-                    dueDateDisplay += ' (done)';
-                } else if (diffDays < 0) {
-                    dueDateDisplay += ` (${Math.abs(diffDays)} day${Math.abs(diffDays) !== 1 ? 's' : ''} overdue)`;
-                } else if (diffDays === 0) {
-                    dueDateDisplay += ' (today)';
-                } else if (diffDays <= 3) {
-                    dueDateDisplay += ` (in ${diffDays} day${diffDays !== 1 ? 's' : ''})`;
+                if (task.status !== 'completed') {
+                    if (diffDays < 0) {
+                        dueDateDisplay += ` (${Math.abs(diffDays)}d overdue)`;
+                    } else if (diffDays === 0) {
+                        dueDateDisplay += ' (today)';
+                    } else if (diffDays <= 3) {
+                        dueDateDisplay += ` (${diffDays}d)`;
+                    }
                 }
-                dueDateClass = dueDateStatus || 'pending';
             }
 
+            // Get status display info
+            const statusInfo = {
+                pending: { label: 'To Do', icon: 'ph-circle-dashed', class: 'status-pending' },
+                in_progress: { label: 'In Progress', icon: 'ph-spinner', class: 'status-in-progress' },
+                completed: { label: 'Done', icon: 'ph-check-circle', class: 'status-completed' }
+            };
+            const currentStatus = statusInfo[task.status] || statusInfo.pending;
+
+            // Count subtasks
+            const subtasks = entities.task.filter(t => t.parentTaskId === task.id);
+            const completedSubtasks = subtasks.filter(t => t.status === 'completed').length;
+
+            // Count dependencies
+            const dependencyCount = (predecessor ? 1 : 0) + dependents.length;
+
+            // Count comments
+            const comments = (task.comments || []);
+
             return `
-                <div class="task-modal-info">
-                    <!-- Violations Alert -->
+                <div class="simple-task-modal">
+                    <!-- Violations Alert (only shown when needed) -->
                     ${violations.length > 0 ? `
-                    <div class="task-violations-alert" style="background: #FEF3C7; border: 1px solid #F59E0B; border-radius: 8px; padding: 0.875rem; margin-bottom: 1rem;">
-                        <div style="display: flex; align-items: flex-start; gap: 0.75rem;">
-                            <i class="ph ph-warning" style="color: #D97706; font-size: 1.25rem; margin-top: 2px;"></i>
-                            <div style="flex: 1;">
-                                <div style="font-weight: 600; color: #92400E; margin-bottom: 0.25rem;">Workflow Mismatch</div>
-                                <div style="font-size: 0.875rem; color: #B45309;">${violations[0].message}</div>
-                                <div style="margin-top: 0.5rem;">
-                                    <button onclick="showViolationReconciliation('${task.id}')" style="background: #D97706; color: white; border: none; padding: 0.375rem 0.75rem; border-radius: 4px; font-size: 0.8rem; cursor: pointer;">
-                                        <i class="ph ph-chat-circle"></i> Reconcile
-                                    </button>
-                                </div>
-                            </div>
-                        </div>
+                    <div style="background: #FEF3C7; border: 1px solid #F59E0B; border-radius: 8px; padding: 12px; margin-bottom: 16px; display: flex; align-items: center; gap: 10px;">
+                        <i class="ph ph-warning" style="color: #D97706; font-size: 18px;"></i>
+                        <span style="flex: 1; font-size: 13px; color: #92400E;">${violations[0].message}</span>
+                        <button onclick="showViolationReconciliation('${task.id}')" style="background: #D97706; color: white; border: none; padding: 6px 12px; border-radius: 4px; font-size: 12px; cursor: pointer;">
+                            Reconcile
+                        </button>
                     </div>
                     ` : ''}
 
-                    <!-- Status Toggle -->
-                    <div class="task-status-section">
-                        <div class="task-status-toggle">
-                            <button class="task-status-btn ${task.status === 'pending' ? 'active pending' : ''}"
-                                    onclick="updateTaskStatus('${task.id}', 'pending')">
-                                <i class="ph ph-circle-dashed"></i> To Do
-                            </button>
-                            <button class="task-status-btn ${task.status === 'in_progress' ? 'active in-progress' : ''}"
-                                    onclick="updateTaskStatus('${task.id}', 'in_progress')">
-                                <i class="ph ph-spinner"></i> In Progress
-                            </button>
-                            <button class="task-status-btn ${task.status === 'completed' ? 'active completed' : ''}"
-                                    onclick="updateTaskStatus('${task.id}', 'completed')">
-                                <i class="ph ph-check-circle"></i> Done
-                            </button>
+                    <!-- Simplified Meta Bar with Chips -->
+                    <div class="simple-task-meta-bar">
+                        <!-- Status Chip with Dropdown -->
+                        <div style="position: relative;" id="statusChipWrapper_${task.id}">
+                            <div class="simple-task-chip filled ${currentStatus.class}" onclick="toggleSimpleTaskStatusDropdown('${task.id}')">
+                                <i class="ph ${currentStatus.icon}"></i>
+                                <span>${currentStatus.label}</span>
+                            </div>
+                            <div class="simple-task-status-dropdown" id="statusDropdown_${task.id}">
+                                <div class="simple-task-status-option pending" onclick="updateTaskStatus('${task.id}', 'pending'); closeSimpleTaskStatusDropdown('${task.id}');">
+                                    <i class="ph ph-circle-dashed"></i> To Do
+                                </div>
+                                <div class="simple-task-status-option in-progress" onclick="updateTaskStatus('${task.id}', 'in_progress'); closeSimpleTaskStatusDropdown('${task.id}');">
+                                    <i class="ph ph-spinner"></i> In Progress
+                                </div>
+                                <div class="simple-task-status-option completed" onclick="updateTaskStatus('${task.id}', 'completed'); closeSimpleTaskStatusDropdown('${task.id}');">
+                                    <i class="ph ph-check-circle"></i> Done
+                                </div>
+                            </div>
                         </div>
-                    </div>
 
-                    <!-- Quick Actions Row -->
-                    <div class="task-quick-actions">
-                        <button class="quick-action-btn ${task.dueDate ? 'active' : ''}" onclick="toggleTaskDatePicker('${task.id}')" style="position: relative;" id="taskDateBtn_${task.id}">
-                            <i class="ph ph-calendar"></i> ${task.dueDate ? dueDateDisplay : 'Set date'}
+                        <!-- Date Chip -->
+                        <div class="simple-task-chip ${task.dueDate ? 'filled' : 'empty'}" onclick="toggleTaskDatePicker('${task.id}')" style="position: relative;" id="taskDateBtn_${task.id}">
+                            <i class="ph ph-calendar"></i>
+                            <span>${dueDateDisplay}</span>
                             <div class="date-picker-popup" id="taskDatePicker_${task.id}">
                                 <div class="date-quick-options">
                                     <div class="date-option" onclick="event.stopPropagation(); setTaskDueDate('${task.id}', 'today')">Today</div>
@@ -30067,239 +30293,183 @@ Cmd/Ctrl + K - Command palette
                                     <div class="date-option" onclick="event.stopPropagation(); setTaskDueDate('${task.id}', 'none')">No Date</div>
                                 </div>
                             </div>
-                        </button>
-                        <button class="quick-action-btn priority-${task.priority || 'medium'}" onclick="cycleTaskPriority('${task.id}')" title="Click to change priority">
-                            <i class="ph ph-flag"></i> ${(task.priority || 'medium').charAt(0).toUpperCase() + (task.priority || 'medium').slice(1)}
-                        </button>
-                        <button class="quick-action-btn ${connectedRoles.length ? 'active' : ''}" ${connectedRoles.length ? `onclick="openEntityModal('${connectedRoles[0].id}', 'role')"` : `onclick="showToast('Use full modal to assign role', 'info')"`}>
-                            <i class="ph ph-briefcase"></i> ${connectedRoles.length ? connectedRoles[0].name : 'Assign role'}
-                        </button>
-                        ${task.recurring ? `
-                        <button class="quick-action-btn active">
-                            <i class="ph ph-repeat"></i> ${task.recurring.charAt(0).toUpperCase() + task.recurring.slice(1)}
-                        </button>
-                        ` : ''}
-                        ${workflow ? `
-                        <button class="quick-action-btn active" onclick="openEntityModal('${workflow.id}', 'workflow')">
-                            <i class="ph ph-flow-arrow"></i> ${workflow.name}
-                        </button>
-                        ` : ''}
-                    </div>
+                        </div>
 
-                    <!-- Legacy Meta Grid - hidden but kept for compatibility -->
-                    <div class="task-meta-grid" style="display: none;">
-                        <div class="task-meta-item">
-                            <div class="task-meta-label">Due Date</div>
-                            <div class="task-meta-value ${task.dueDate ? '' : 'empty'}">
-                                ${task.dueDate ? `
-                                    <span class="task-due-date ${dueDateClass}">
-                                        <i class="ph ph-calendar"></i> ${dueDateDisplay}
-                                    </span>
-                                ` : '<i class="ph ph-calendar-blank"></i> Not set'}
-                            </div>
+                        <!-- Priority Chip -->
+                        <div class="simple-task-chip filled" onclick="cycleTaskPriority('${task.id}')" title="Click to change priority">
+                            <i class="ph ph-flag"></i>
+                            <span>${(task.priority || 'medium').charAt(0).toUpperCase() + (task.priority || 'medium').slice(1)}</span>
                         </div>
-                        <div class="task-meta-item">
-                            <div class="task-meta-label">Priority</div>
-                            <div class="task-meta-value">
-                                <span class="task-priority ${task.priority || 'medium'}">
-                                    <i class="ph ph-flag"></i> ${(task.priority || 'medium').charAt(0).toUpperCase() + (task.priority || 'medium').slice(1)}
-                                </span>
-                            </div>
-                        </div>
-                        <div class="task-meta-item">
-                            <div class="task-meta-label">Assigned Role</div>
-                            <div class="task-meta-value ${connectedRoles.length ? 'clickable' : 'empty'}"
-                                 ${connectedRoles.length ? `onclick="openEntityModal('${connectedRoles[0].id}', 'role')"` : ''}>
-                                ${connectedRoles.length ? `
-                                    <i class="ph ph-briefcase"></i> ${connectedRoles[0].name}
-                                    ${connectedRoles.length > 1 ? `<span style="color:#8B6F47;font-size:0.8rem;">+${connectedRoles.length - 1}</span>` : ''}
-                                ` : '<i class="ph ph-user-circle"></i> Unassigned'}
-                            </div>
-                        </div>
-                        ${task.recurring ? `
-                        <div class="task-meta-item">
-                            <div class="task-meta-label">Recurring</div>
-                            <div class="task-meta-value">
-                                <span class="recurring-indicator">
-                                    <i class="ph ph-repeat"></i> ${task.recurring.charAt(0).toUpperCase() + task.recurring.slice(1)}
-                                </span>
-                            </div>
-                        </div>
-                        ` : ''}
-                        ${workflow ? `
-                        <div class="task-meta-item" style="grid-column: span 2;">
-                            <div class="task-meta-label">Workflow</div>
-                            <div class="task-meta-value clickable" onclick="openEntityModal('${workflow.id}', 'workflow')">
-                                <i class="ph ph-git-branch"></i> ${workflow.name}
-                            </div>
-                        </div>
-                        ` : ''}
-                    </div>
 
-                    <!-- Role Hierarchy Context -->
-                    ${connectedRoles.length > 0 ? (() => {
-                        const roleHierarchy = typeof getRoleHierarchy === 'function' ? getRoleHierarchy(connectedRoles[0].id) : [];
-                        if (roleHierarchy.length > 1) {
-                            return `
-                            <div class="role-context-display" style="margin-top: 1rem;">
-                                <div class="role-context-breadcrumb">
-                                    ${roleHierarchy.map((item, index) => {
-                                        const icon = item.type === 'unit' ? 'ph-buildings' :
-                                                     item.type === 'team' ? 'ph-users-three' : 'ph-briefcase';
-                                        return `${index > 0 ? '<i class="ph ph-caret-right"></i>' : ''}
-                                            <span class="role-context-item ${item.type}" onclick="openEntityModal('${item.id}', '${item.type}')">
-                                                <i class="ph ${icon}"></i>
-                                                ${item.name}
-                                            </span>`;
-                                    }).join('')}
-                                </div>
-                            </div>`;
-                        }
-                        return '';
-                    })() : ''}
-
-                    <!-- Tags -->
-                    ${(task.tags && task.tags.length > 0) ? `
-                    <div class="task-tags" style="margin-top: 1rem;">
-                        ${task.tags.map((tag, index) => {
-                            const colors = ['blue', 'green', 'yellow', 'red', 'purple', 'pink', 'orange'];
-                            return `<span class="task-tag" data-color="${colors[index % colors.length]}">${tag}</span>`;
-                        }).join('')}
-                    </div>
-                    ` : ''}
-
-                    <!-- Description -->
-                    ${task.description ? `
-                    <div style="margin-top: 1rem; padding: 1rem; background: #FAF7F5; border-radius: 8px; border-left: 3px solid #C88F4A;">
-                        <div style="font-size: 0.8rem; font-weight: 600; color: #6B5642; margin-bottom: 0.5rem;">
-                            <i class="ph ph-text-aa"></i> Description
-                        </div>
-                        <div style="font-size: 0.9rem; color: #3D2E1F; line-height: 1.5; white-space: pre-wrap;">${task.description}</div>
-                    </div>
-                    ` : ''}
-
-                    <!-- Collaborators -->
-                    ${(task.collaborators && task.collaborators.length > 0) ? `
-                    <div style="margin-top: 1rem;">
-                        <div style="font-size: 0.8rem; font-weight: 600; color: #6B5642; margin-bottom: 0.5rem;">
-                            <i class="ph ph-users"></i> Collaborators
-                        </div>
-                        <div class="task-collaborators">
-                            <div class="collaborator-avatars">
-                                ${task.collaborators.map(personId => {
-                                    const person = entities.person?.find(p => p.id === personId);
-                                    if (person) {
-                                        const initials = person.name.split(' ').map(n => n[0]).join('').substring(0, 2).toUpperCase();
-                                        return `<div class="collaborator-avatar" title="${person.name}" onclick="openEntityModal('${person.id}', 'person')">${initials}</div>`;
-                                    }
-                                    return '';
-                                }).join('')}
-                            </div>
-                        </div>
-                    </div>
-                    ` : ''}
-
-                    <!-- Subtasks Section -->
-                    ${renderSubtasksSection(task.id)}
-
-                    <!-- Linked Tasks Section (Collapsible) -->
-                    <div class="collapsible-section collapsed" id="linkedTasks_${task.id}">
-                        <div class="collapsible-header" onclick="toggleCollapsibleSection('linkedTasks_${task.id}')">
-                            <span class="collapsible-title">
-                                <i class="ph ph-link"></i> Related Tasks
-                                <span class="section-help-tooltip" title="Related tasks are cross-references to other tasks. Unlike subtasks, they don't block completion—they're just for tracking connections between work items.">
-                                    <i class="ph ph-question"></i>
-                                </span>
-                                ${linkedTasksData.length > 0 ? `<span class="collapsible-badge">${linkedTasksData.length}</span>` : ''}
-                            </span>
-                            <div class="collapsible-toggle">
-                                <button onclick="event.stopPropagation(); openTaskLinkModal('${task.id}')" style="background: #7B95A3; color: white; border: none; padding: 0.25rem 0.5rem; border-radius: 4px; font-size: 0.75rem; cursor: pointer; display: flex; align-items: center; gap: 0.25rem;">
-                                    <i class="ph ph-plus"></i> Link
-                                </button>
-                                <i class="ph ph-caret-down"></i>
-                            </div>
-                        </div>
-                        <div class="collapsible-content">
-                            ${linkedTasksData.length > 0 ? `
-                            <div class="task-links-list">
-                                ${linkedTasksData.map(({ task: lt, link }) => `
-                                    <div class="task-dep-item ${lt.status === 'completed' ? 'completed' : ''}" style="display: flex; align-items: center; gap: 0.75rem; padding: 0.625rem; background: #FAF7F5; border-radius: 6px; margin-bottom: 0.5rem; cursor: pointer;" onclick="openEntityModal('${lt.id}', 'task')">
-                                        <div class="dep-checkbox ${lt.status === 'completed' ? 'completed' : ''}" style="width: 20px; height: 20px; border-radius: 50%; border: 2px solid ${lt.status === 'completed' ? '#10B981' : '#E5DDD1'}; display: flex; align-items: center; justify-content: center; flex-shrink: 0;">
-                                            ${lt.status === 'completed' ? '<i class="ph ph-check" style="color: #10B981; font-size: 12px;"></i>' : ''}
-                                        </div>
-                                        <span style="flex: 1; font-size: 0.9rem; color: #3D2E1F;">${lt.name}</span>
-                                        <span class="task-linked-badge ${link.linkType === 'hard' ? 'hard-link' : ''}">
-                                            <i class="ph ph-${link.linkType === 'hard' ? 'calendar-check' : 'link-simple'}"></i>
-                                            ${link.linkType === 'hard' ? 'Dates Linked' : 'Linked'}
-                                        </span>
-                                    </div>
-                                `).join('')}
-                            </div>
-                            ` : `
-                            <div style="padding: 0.75rem; background: #FAF7F5; border-radius: 6px; text-align: center; color: #8B6F47; font-size: 0.875rem;">
-                                <em>No linked tasks yet</em>
-                            </div>
-                            `}
+                        <!-- Role Chip -->
+                        <div class="simple-task-chip ${connectedRoles.length ? 'filled' : 'empty'}" ${connectedRoles.length ? `onclick="openEntityModal('${connectedRoles[0].id}', 'role')"` : `onclick="showToast('Use Edit button to assign role', 'info')"`}>
+                            <i class="ph ph-briefcase"></i>
+                            <span>${connectedRoles.length ? connectedRoles[0].name : 'Assign role'}</span>
                         </div>
                     </div>
 
-                    <!-- Dependencies Section (Collapsible) -->
-                    ${predecessor || dependents.length > 0 ? `
-                    <div class="collapsible-section collapsed" id="dependencies_${task.id}">
-                        <div class="collapsible-header" onclick="toggleCollapsibleSection('dependencies_${task.id}')">
-                            <span class="collapsible-title">
-                                <i class="ph ph-git-branch"></i> Dependencies
-                                <span class="collapsible-badge">${(predecessor ? 1 : 0) + dependents.length}</span>
-                            </span>
-                            <div class="collapsible-toggle">
-                                <i class="ph ph-caret-down"></i>
+                    <!-- Editable Description -->
+                    <div class="simple-task-description">
+                        <textarea
+                            class="simple-task-description-field"
+                            id="simpleTaskDescription_${task.id}"
+                            placeholder="Add notes or details about this task..."
+                            onblur="saveSimpleTaskDescription('${task.id}')"
+                        >${task.description || ''}</textarea>
+                    </div>
+
+                    <!-- Option Links for Additional Features -->
+                    <div class="simple-task-options">
+                        <!-- Subtasks Link -->
+                        <div class="simple-task-option-link" onclick="toggleSimpleTaskSection('subtasks_${task.id}')">
+                            <div class="simple-task-option-text">
+                                <i class="ph ph-list-checks"></i>
+                                <span>Subtasks</span>
+                                ${subtasks.length > 0 ? `<span class="simple-task-option-badge">${completedSubtasks}/${subtasks.length}</span>` : ''}
                             </div>
+                            <span class="simple-task-option-arrow"><i class="ph ph-caret-right"></i></span>
                         </div>
-                        <div class="collapsible-content">
-                            ${predecessor ? `
-                            <div class="task-dep-group">
-                                <div class="task-dep-label">
-                                    <i class="ph ph-arrow-bend-left-up"></i> Blocked By
-                                </div>
-                                <div class="task-dep-list">
-                                    <div class="task-dep-item ${predecessor.status === 'completed' ? 'completed' : ''}"
-                                         onclick="openEntityModal('${predecessor.id}', 'task')">
+                        <div class="simple-task-expanded-section" id="subtasks_${task.id}" style="display: none;">
+                            ${renderSubtasksSection(task.id)}
+                        </div>
+
+                        <!-- Dependencies Link -->
+                        <div class="simple-task-option-link" onclick="toggleSimpleTaskSection('deps_${task.id}')">
+                            <div class="simple-task-option-text">
+                                <i class="ph ph-git-branch"></i>
+                                <span>Dependencies</span>
+                                ${dependencyCount > 0 ? `<span class="simple-task-option-badge">${dependencyCount}</span>` : ''}
+                            </div>
+                            <span class="simple-task-option-arrow"><i class="ph ph-caret-right"></i></span>
+                        </div>
+                        <div class="simple-task-expanded-section" id="deps_${task.id}" style="display: none;">
+                            ${predecessor || dependents.length > 0 ? `
+                                ${predecessor ? `
+                                <div style="margin-bottom: 12px;">
+                                    <div style="font-size: 11px; color: #888; text-transform: uppercase; margin-bottom: 6px;">Blocked by</div>
+                                    <div class="task-dep-item ${predecessor.status === 'completed' ? 'completed' : ''}" onclick="openEntityModal('${predecessor.id}', 'task')">
                                         <div class="dep-checkbox ${predecessor.status === 'completed' ? 'completed' : ''}">
                                             ${predecessor.status === 'completed' ? '<i class="ph ph-check"></i>' : ''}
                                         </div>
                                         <span class="dep-name">${predecessor.name}</span>
-                                        ${predecessor.dueDate ? `<span class="dep-due">${formatDateShort(predecessor.dueDate)}</span>` : ''}
                                     </div>
                                 </div>
-                            </div>
-                            ` : ''}
-                            ${dependents.length > 0 ? `
-                            <div class="task-dep-group">
-                                <div class="task-dep-label">
-                                    <i class="ph ph-arrow-bend-right-down"></i> Blocking (${dependents.length})
-                                </div>
-                                <div class="task-dep-list">
+                                ` : ''}
+                                ${dependents.length > 0 ? `
+                                <div>
+                                    <div style="font-size: 11px; color: #888; text-transform: uppercase; margin-bottom: 6px;">Blocking (${dependents.length})</div>
                                     ${dependents.map(dep => `
-                                        <div class="task-dep-item ${dep.status === 'completed' ? 'completed' : ''}"
-                                             onclick="openEntityModal('${dep.id}', 'task')">
+                                        <div class="task-dep-item ${dep.status === 'completed' ? 'completed' : ''}" onclick="openEntityModal('${dep.id}', 'task')" style="margin-bottom: 6px;">
                                             <div class="dep-checkbox ${dep.status === 'completed' ? 'completed' : ''}">
                                                 ${dep.status === 'completed' ? '<i class="ph ph-check"></i>' : ''}
                                             </div>
                                             <span class="dep-name">${dep.name}</span>
-                                            ${dep.dueDate ? `<span class="dep-due">${formatDateShort(dep.dueDate)}</span>` : ''}
                                         </div>
                                     `).join('')}
                                 </div>
+                                ` : ''}
+                            ` : `
+                            <div style="text-align: center; color: #888; font-size: 13px; padding: 8px;">
+                                No dependencies set
                             </div>
-                            ` : ''}
+                            `}
+                        </div>
+
+                        <!-- Related Tasks Link -->
+                        <div class="simple-task-option-link" onclick="toggleSimpleTaskSection('related_${task.id}')">
+                            <div class="simple-task-option-text">
+                                <i class="ph ph-link"></i>
+                                <span>Related tasks</span>
+                                ${linkedTasksData.length > 0 ? `<span class="simple-task-option-badge">${linkedTasksData.length}</span>` : ''}
+                            </div>
+                            <span class="simple-task-option-arrow"><i class="ph ph-caret-right"></i></span>
+                        </div>
+                        <div class="simple-task-expanded-section" id="related_${task.id}" style="display: none;">
+                            ${linkedTasksData.length > 0 ? `
+                                ${linkedTasksData.map(({ task: lt, link }) => `
+                                    <div class="task-dep-item ${lt.status === 'completed' ? 'completed' : ''}" onclick="openEntityModal('${lt.id}', 'task')" style="margin-bottom: 6px;">
+                                        <div class="dep-checkbox ${lt.status === 'completed' ? 'completed' : ''}">
+                                            ${lt.status === 'completed' ? '<i class="ph ph-check"></i>' : ''}
+                                        </div>
+                                        <span class="dep-name">${lt.name}</span>
+                                    </div>
+                                `).join('')}
+                                <button onclick="event.stopPropagation(); openTaskLinkModal('${task.id}')" style="background: #f5f5f5; color: #666; border: 1px dashed #ddd; padding: 8px 12px; border-radius: 6px; font-size: 13px; cursor: pointer; width: 100%; margin-top: 8px;">
+                                    <i class="ph ph-plus"></i> Link another task
+                                </button>
+                            ` : `
+                            <div style="text-align: center; padding: 8px;">
+                                <button onclick="event.stopPropagation(); openTaskLinkModal('${task.id}')" style="background: #f5f5f5; color: #666; border: 1px dashed #ddd; padding: 8px 16px; border-radius: 6px; font-size: 13px; cursor: pointer;">
+                                    <i class="ph ph-plus"></i> Link a task
+                                </button>
+                            </div>
+                            `}
+                        </div>
+
+                        <!-- Comments Link -->
+                        <div class="simple-task-option-link" onclick="toggleSimpleTaskSection('comments_${task.id}')">
+                            <div class="simple-task-option-text">
+                                <i class="ph ph-chat-circle"></i>
+                                <span>Comments</span>
+                                ${comments.length > 0 ? `<span class="simple-task-option-badge">${comments.length}</span>` : ''}
+                            </div>
+                            <span class="simple-task-option-arrow"><i class="ph ph-caret-right"></i></span>
+                        </div>
+                        <div class="simple-task-expanded-section" id="comments_${task.id}" style="display: none;">
+                            ${renderTaskComments(task.id)}
                         </div>
                     </div>
-                    ` : ''}
-
-                    <!-- Comments Section -->
-                    ${renderTaskComments(task.id)}
                 </div>
             `;
+        }
+
+        // Toggle simple task section visibility
+        function toggleSimpleTaskSection(sectionId) {
+            const section = document.getElementById(sectionId);
+            if (section) {
+                const isHidden = section.style.display === 'none';
+                section.style.display = isHidden ? 'block' : 'none';
+                // Update arrow direction
+                const link = section.previousElementSibling;
+                if (link) {
+                    const arrow = link.querySelector('.simple-task-option-arrow i');
+                    if (arrow) {
+                        arrow.className = isHidden ? 'ph ph-caret-down' : 'ph ph-caret-right';
+                    }
+                }
+            }
+        }
+
+        // Toggle status dropdown
+        function toggleSimpleTaskStatusDropdown(taskId) {
+            const dropdown = document.getElementById(`statusDropdown_${taskId}`);
+            if (dropdown) {
+                dropdown.classList.toggle('show');
+            }
+        }
+
+        // Close status dropdown
+        function closeSimpleTaskStatusDropdown(taskId) {
+            const dropdown = document.getElementById(`statusDropdown_${taskId}`);
+            if (dropdown) {
+                dropdown.classList.remove('show');
+            }
+        }
+
+        // Save description from simple task modal
+        function saveSimpleTaskDescription(taskId) {
+            const textarea = document.getElementById(`simpleTaskDescription_${taskId}`);
+            if (!textarea) return;
+
+            const task = entities.task.find(t => t.id === taskId);
+            if (!task) return;
+
+            const newDescription = textarea.value.trim();
+            if (newDescription !== (task.description || '')) {
+                task.description = newDescription;
+                saveData();
+                showToast('Description saved', 'success');
+            }
         }
 
         // Show violation reconciliation dialog
