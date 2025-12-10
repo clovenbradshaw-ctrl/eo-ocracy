@@ -9062,6 +9062,18 @@
             box-shadow: 0 4px 12px rgba(200, 143, 74, 0.3);
         }
 
+        .quick-add-meta-chip.error {
+            border: 2px solid #e74c3c;
+            background: rgba(231, 76, 60, 0.1);
+            animation: shake 0.5s ease-in-out;
+        }
+
+        @keyframes shake {
+            0%, 100% { transform: translateX(0); }
+            20%, 60% { transform: translateX(-5px); }
+            40%, 80% { transform: translateX(5px); }
+        }
+
         .quick-add-meta-chip i {
             font-size: 16px;
         }
@@ -30964,16 +30976,12 @@ Options:
                 return;
             }
 
-            // Get default role (first role if exists)
-            const roles = entities.role || [];
-            const defaultRoleId = roles.length > 0 ? roles[0].id : null;
-
-            // Initialize modal state
+            // Initialize modal state - don't auto-assign role, require explicit selection
             quickAddModalState = {
                 taskName: taskName,
                 dueDate: dueDate,
                 priority: priority,
-                roleId: defaultRoleId,
+                roleId: null,
                 description: '',
                 tags: tags
             };
@@ -30998,7 +31006,7 @@ Options:
             }, 100);
 
             // Show a toast to guide the user
-            showToast('✨ Task created! Add details or press Escape to save', 'success');
+            showToast('Select a role to assign this task', 'info');
         }
 
         function closeQuickAddModal() {
@@ -31039,8 +31047,18 @@ Options:
                 return;
             }
 
-            // Use the selected role or default to first role
-            const roleId = quickAddModalState.roleId || roles[0].id;
+            // Require explicit role selection
+            if (!quickAddModalState.roleId) {
+                showToast('Please select a role to assign this task', 'error');
+                // Highlight the role chip to draw attention
+                const roleChip = document.getElementById('quickAddRoleChip');
+                roleChip.classList.add('error');
+                setTimeout(() => roleChip.classList.remove('error'), 2000);
+                toggleQuickAddRolePicker();
+                return;
+            }
+
+            const roleId = quickAddModalState.roleId;
 
             // Create the task
             const taskId = 'task' + Date.now();
