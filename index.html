@@ -33473,9 +33473,10 @@ Options:
                 const children = (entities.task || [])
                     .filter(t => t.predecessorId === parentId)
                     .sort((a, b) => {
+                        // Sort by orderIndex descending (higher = first to do = top of list)
                         const orderA = a.orderIndex ?? new Date(a.createdAt).getTime();
                         const orderB = b.orderIndex ?? new Date(b.createdAt).getTime();
-                        return orderA - orderB;
+                        return orderB - orderA;
                     });
 
                 children.forEach(child => {
@@ -33812,11 +33813,12 @@ Options:
             return (entities.task || [])
                 .filter(t => t.predecessorId === parentTaskId)
                 .sort((a, b) => {
-                    // Sort by orderIndex (lower = first to do = top of list)
+                    // Sort by orderIndex descending (higher = first to do = top of list)
+                    // This matches workflow where tasks added first (lower orderIndex) are done last
                     // Fallback to createdAt for backward compatibility
                     const orderA = a.orderIndex ?? new Date(a.createdAt).getTime();
                     const orderB = b.orderIndex ?? new Date(b.createdAt).getTime();
-                    return orderA - orderB;
+                    return orderB - orderA;
                 });
         }
 
@@ -33826,13 +33828,24 @@ Options:
             return order[status] ?? 0;
         }
 
-        // Check if parent can move to target status (all subtasks must be at or beyond target)
+        // Check if parent can move to target status (parents can always move - they're the prerequisite)
         function canParentMoveToStatus(parentTaskId, targetStatus) {
-            const subtasks = getSubtasks(parentTaskId);
-            if (subtasks.length === 0) return true; // No subtasks, can move freely
+            return true; // Parents can always advance - children depend on them, not vice versa
+        }
+
+        // Check if a subtask can move to target status (predecessor must be at or beyond target)
+        function canSubtaskMoveToStatus(taskId, targetStatus) {
+            const task = entities.task.find(t => t.id === taskId);
+            if (!task || !task.predecessorId) return true; // No predecessor, can move freely
+
+            const predecessor = entities.task.find(t => t.id === task.predecessorId);
+            if (!predecessor) return true; // Predecessor not found, allow move
 
             const targetOrder = getStatusOrder(targetStatus);
-            return subtasks.every(subtask => getStatusOrder(subtask.status) >= targetOrder);
+            const predecessorOrder = getStatusOrder(predecessor.status);
+
+            // Subtask can only advance if predecessor is at or beyond target status
+            return predecessorOrder >= targetOrder;
         }
 
         // Get all related task IDs (parent and all its subtasks)
@@ -34066,30 +34079,29 @@ Options:
                 drawSubtaskConnections(draggedTaskId, relatedIds);
             }
 
-            // Mark columns that are blocked for parent tasks with subtasks
-            if (hasSubtasks) {
-                const subtasks = getSubtasks(draggedTaskId);
-                const pendingCount = subtasks.filter(s => s.status === 'pending').length;
-                const inProgressCount = subtasks.filter(s => s.status === 'in_progress').length;
-                const incompleteCount = subtasks.filter(s => s.status !== 'completed').length;
+            // Mark columns that are blocked for subtasks (predecessor must be at/beyond target)
+            const task = entities.task.find(t => t.id === draggedTaskId);
+            if (task && task.predecessorId) {
+                const predecessor = entities.task.find(t => t.id === task.predecessorId);
+                if (predecessor) {
+                    const predecessorStatus = getStatusOrder(predecessor.status);
 
-                document.querySelectorAll('.kanban-column').forEach(column => {
-                    const targetStatus = column.dataset.status;
-                    const columnContent = column.querySelector('.kanban-column-content');
+                    document.querySelectorAll('.kanban-column').forEach(column => {
+                        const targetStatus = column.dataset.status;
+                        const targetOrder = getStatusOrder(targetStatus);
+                        const columnContent = column.querySelector('.kanban-column-content');
 
-                    if (!canParentMoveToStatus(draggedTaskId, targetStatus)) {
-                        columnContent.classList.add('drop-blocked');
+                        // Subtask can't advance beyond predecessor's status
+                        if (targetOrder > predecessorStatus) {
+                            columnContent.classList.add('drop-blocked');
 
-                        // Set specific block reason
-                        let reason = '';
-                        if (targetStatus === 'completed') {
-                            reason = `✗ Cannot complete: ${incompleteCount} subtask(s) not done`;
-                        } else if (targetStatus === 'in_progress') {
-                            reason = `✗ Cannot start: ${pendingCount} subtask(s) still in "To Do"`;
+                            // Set specific block reason
+                            const predecessorStatusLabel = predecessor.status === 'completed' ? 'Done' : (predecessor.status === 'in_progress' ? 'In Progress' : 'To Do');
+                            const targetStatusLabel = targetStatus === 'completed' ? 'Done' : (targetStatus === 'in_progress' ? 'In Progress' : 'To Do');
+                            columnContent.dataset.blockReason = `✗ "${predecessor.name}" must be "${targetStatusLabel}" first`;
                         }
-                        columnContent.dataset.blockReason = reason;
-                    }
-                });
+                    });
+                }
             }
         }
 
@@ -34143,18 +34155,13 @@ Options:
 
             if (!task || task.status === newStatus) return;
 
-            // Check if this is a parent task with subtasks
-            const subtasks = getSubtasks(draggedTaskId);
-            if (subtasks.length > 0) {
-                // Check if all subtasks are at or beyond the target status
-                if (!canParentMoveToStatus(draggedTaskId, newStatus)) {
-                    const pendingSubtasks = subtasks.filter(s => {
-                        if (newStatus === 'completed') return s.status !== 'completed';
-                        if (newStatus === 'in_progress') return s.status === 'pending';
-                        return false;
-                    });
-                    const count = pendingSubtasks.length;
-                    showToast(`${count} subtask${count > 1 ? 's' : ''} must be moved to "${newStatus === 'completed' ? 'Done' : 'In Progress'}" first`, 'warning');
+            // Check if this is a subtask - it can only advance if predecessor is at/beyond target
+            if (task.predecessorId) {
+                if (!canSubtaskMoveToStatus(draggedTaskId, newStatus)) {
+                    const predecessor = entities.task.find(t => t.id === task.predecessorId);
+                    const predecessorName = predecessor ? predecessor.name : 'predecessor task';
+                    const targetStatusLabel = newStatus === 'completed' ? 'Done' : (newStatus === 'in_progress' ? 'In Progress' : 'To Do');
+                    showToast(`Cannot advance: "${predecessorName}" must be moved to "${targetStatusLabel}" first`, 'warning');
                     return;
                 }
             }
