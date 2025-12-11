@@ -40015,17 +40015,10 @@ Cmd/Ctrl + K - Command palette
             // Reset UI state
             document.getElementById('airtablePickerSearch').value = '';
 
-            // Set "All" button as active
-            document.querySelectorAll('.airtable-picker-category-btn').forEach(btn => {
-                btn.classList.remove('active');
-            });
-            const allBtn = document.querySelector('.airtable-picker-category-btn[onclick*="\'all\'"]');
-            if (allBtn) allBtn.classList.add('active');
-
             // Show overlay
             overlay.classList.add('show');
 
-            // Load all records immediately
+            // Load all records immediately (unified search across all categories)
             loadAirtableRecords('all');
         }
 
@@ -40054,36 +40047,6 @@ Cmd/Ctrl + K - Command palette
                         <button class="airtable-picker-close" onclick="closeAirtableTagPicker()">
                             <i class="ph ph-x"></i>
                         </button>
-                    </div>
-
-                    <div class="airtable-picker-categories">
-                        <div class="airtable-picker-categories-label">Filter by Type</div>
-                        <div class="airtable-picker-category-grid">
-                            <button class="airtable-picker-category-btn active" onclick="selectAirtableCategory('all')">
-                                <i class="ph ph-magnifying-glass cat-icon"></i>
-                                <span class="cat-label">All</span>
-                            </button>
-                            <button class="airtable-picker-category-btn" onclick="selectAirtableCategory('clients')">
-                                <i class="ph ph-user cat-icon"></i>
-                                <span class="cat-label">Client</span>
-                            </button>
-                            <button class="airtable-picker-category-btn" onclick="selectAirtableCategory('cases')">
-                                <i class="ph ph-folder-open cat-icon"></i>
-                                <span class="cat-label">Case</span>
-                            </button>
-                            <button class="airtable-picker-category-btn" onclick="selectAirtableCategory('events')">
-                                <i class="ph ph-calendar cat-icon"></i>
-                                <span class="cat-label">Event</span>
-                            </button>
-                            <button class="airtable-picker-category-btn" onclick="selectAirtableCategory('applications')">
-                                <i class="ph ph-file-text cat-icon"></i>
-                                <span class="cat-label">App</span>
-                            </button>
-                            <button class="airtable-picker-category-btn" onclick="selectAirtableCategory('users')">
-                                <i class="ph ph-user-circle cat-icon"></i>
-                                <span class="cat-label">User</span>
-                            </button>
-                        </div>
                     </div>
 
                     <div class="airtable-picker-search">
@@ -40115,73 +40078,37 @@ Cmd/Ctrl + K - Command palette
             document.body.appendChild(modal);
         }
 
-        // Select a category and load records
-        async function selectAirtableCategory(category) {
-            airtablePickerState.selectedCategory = category;
-            airtablePickerState.searchQuery = '';
-
-            // Update UI - highlight selected category
-            document.querySelectorAll('.airtable-picker-category-btn').forEach(btn => {
-                btn.classList.remove('active');
-            });
-            event.target.closest('.airtable-picker-category-btn').classList.add('active');
-
-            // Clear search
-            document.getElementById('airtablePickerSearch').value = '';
-
-            // Load records
-            await loadAirtableRecords(category);
-        }
-
-        // Load records for a category (uses cached data)
+        // Load records - unified search across all cached categories
         async function loadAirtableRecords(category, searchQuery = '') {
             const resultsContainer = document.getElementById('airtablePickerResults');
             airtablePickerState.isLoading = true;
 
             // Update cache status display
-            updateAirtableCacheStatus(category);
+            updateAirtableCacheStatus();
 
-            // For 'all' mode, check if any cache is empty
-            if (category === 'all') {
-                const categories = Object.keys(AirtableAPI.tables);
-                const anyEmpty = categories.some(cat => {
-                    const cache = AirtableAPI.recordsCache[cat];
-                    return !cache || !cache.records;
-                });
-                if (anyEmpty) {
-                    resultsContainer.innerHTML = `
-                        <div class="airtable-picker-loading">
-                            <i class="ph ph-spinner"></i> Loading records...
-                        </div>
-                    `;
-                }
-            } else {
-                // Show loading only if cache is empty
-                const cache = AirtableAPI.recordsCache[category];
-                if (!cache || !cache.records) {
-                    resultsContainer.innerHTML = `
-                        <div class="airtable-picker-loading">
-                            <i class="ph ph-spinner"></i> Loading records...
-                        </div>
-                    `;
-                }
+            // Check if any cache is empty
+            const categories = Object.keys(AirtableAPI.tables);
+            const anyEmpty = categories.some(cat => {
+                const cache = AirtableAPI.recordsCache[cat];
+                return !cache || !cache.records;
+            });
+            if (anyEmpty) {
+                resultsContainer.innerHTML = `
+                    <div class="airtable-picker-loading">
+                        <i class="ph ph-spinner"></i> Loading records...
+                    </div>
+                `;
             }
 
             try {
-                let records;
-                if (category === 'all') {
-                    // Search across all categories
-                    records = AirtableAPI.searchAllRecordsLocal(searchQuery);
-                } else {
-                    // Use cached data with local search for specific category
-                    records = await AirtableAPI.getCachedRecords(category, searchQuery);
-                }
+                // Search across all categories using cached data
+                const records = AirtableAPI.searchAllRecordsLocal(searchQuery);
 
                 airtablePickerState.results = records;
                 renderAirtablePickerResults();
 
                 // Update cache status after load
-                updateAirtableCacheStatus(category);
+                updateAirtableCacheStatus();
 
             } catch (error) {
                 console.error('Error loading Airtable records:', error);
@@ -40199,31 +40126,8 @@ Cmd/Ctrl + K - Command palette
 
         // Refresh data for current category in picker
         async function refreshAirtablePickerData() {
-            const category = airtablePickerState.selectedCategory;
             const refreshBtn = document.getElementById('airtablePickerRefreshBtn');
             const resultsContainer = document.getElementById('airtablePickerResults');
-
-            if (!category) {
-                // No category selected - refresh all data
-                if (refreshBtn) {
-                    refreshBtn.classList.add('spinning');
-                    refreshBtn.disabled = true;
-                }
-
-                try {
-                    await AirtableAPI.refreshAllData();
-                    showToast('All data refreshed from Airtable', 'success');
-                } catch (error) {
-                    console.error('Error refreshing data:', error);
-                    showToast('Error refreshing data', 'error');
-                } finally {
-                    if (refreshBtn) {
-                        refreshBtn.classList.remove('spinning');
-                        refreshBtn.disabled = false;
-                    }
-                }
-                return;
-            }
 
             // Show refreshing state
             if (refreshBtn) {
@@ -40233,21 +40137,21 @@ Cmd/Ctrl + K - Command palette
 
             resultsContainer.innerHTML = `
                 <div class="airtable-picker-loading">
-                    <i class="ph ph-spinner"></i> Refreshing ${category}...
+                    <i class="ph ph-spinner"></i> Refreshing all data...
                 </div>
             `;
 
             try {
-                // Force refresh the category
-                await AirtableAPI.refreshCategory(category);
+                // Refresh all cached data
+                await AirtableAPI.refreshAllData();
 
                 // Update cache status
-                updateAirtableCacheStatus(category);
+                updateAirtableCacheStatus();
 
                 // Reload with current search query
-                await loadAirtableRecords(category, airtablePickerState.searchQuery);
+                await loadAirtableRecords('all', airtablePickerState.searchQuery);
 
-                showToast(`${category} data refreshed`, 'success');
+                showToast('All data refreshed', 'success');
             } catch (error) {
                 console.error('Error refreshing data:', error);
                 showToast('Error refreshing data', 'error');
@@ -40259,63 +40163,26 @@ Cmd/Ctrl + K - Command palette
             }
         }
 
-        // Update cache status display in picker
-        function updateAirtableCacheStatus(category) {
+        // Update cache status display in picker - shows total count across all categories
+        function updateAirtableCacheStatus() {
             const statusEl = document.getElementById('airtablePickerCacheStatus');
             if (!statusEl) return;
 
-            if (!category) {
-                statusEl.innerHTML = '';
-                return;
-            }
+            const categories = Object.keys(AirtableAPI.tables);
+            let totalCount = 0;
+            let oldestFetch = null;
 
-            // Handle 'all' mode - show total count across all categories
-            if (category === 'all') {
-                const categories = Object.keys(AirtableAPI.tables);
-                let totalCount = 0;
-                let oldestFetch = null;
-
-                for (const cat of categories) {
-                    const cache = AirtableAPI.recordsCache[cat];
-                    if (cache && cache.records) {
-                        totalCount += cache.records.length;
-                        if (!oldestFetch || (cache.lastFetch && cache.lastFetch < oldestFetch)) {
-                            oldestFetch = cache.lastFetch;
-                        }
+            for (const cat of categories) {
+                const cache = AirtableAPI.recordsCache[cat];
+                if (cache && cache.records) {
+                    totalCount += cache.records.length;
+                    if (!oldestFetch || (cache.lastFetch && cache.lastFetch < oldestFetch)) {
+                        oldestFetch = cache.lastFetch;
                     }
                 }
-
-                const ageMinutes = oldestFetch ? Math.floor((Date.now() - oldestFetch) / 60000) : null;
-                let ageText = '';
-                if (ageMinutes !== null) {
-                    if (ageMinutes < 1) {
-                        ageText = 'just now';
-                    } else if (ageMinutes === 1) {
-                        ageText = '1 min ago';
-                    } else {
-                        ageText = `${ageMinutes} mins ago`;
-                    }
-                }
-
-                statusEl.innerHTML = `
-                    <span class="cache-status-info">
-                        ${totalCount} records cached ${ageText ? `(${ageText})` : ''}
-                    </span>
-                    <span class="cache-status-hint">Don't see what you're looking for? Click refresh</span>
-                `;
-                return;
             }
 
-            const cache = AirtableAPI.recordsCache[category];
-            if (!cache || !cache.records) {
-                statusEl.innerHTML = `<span class="cache-status-loading">Loading ${category}...</span>`;
-                return;
-            }
-
-            const recordCount = cache.records.length;
-            const lastFetch = cache.lastFetch;
-            const ageMinutes = lastFetch ? Math.floor((Date.now() - lastFetch) / 60000) : null;
-
+            const ageMinutes = oldestFetch ? Math.floor((Date.now() - oldestFetch) / 60000) : null;
             let ageText = '';
             if (ageMinutes !== null) {
                 if (ageMinutes < 1) {
@@ -40329,7 +40196,7 @@ Cmd/Ctrl + K - Command palette
 
             statusEl.innerHTML = `
                 <span class="cache-status-info">
-                    ${recordCount} ${category} cached ${ageText ? `(${ageText})` : ''}
+                    ${totalCount} records cached ${ageText ? `(${ageText})` : ''}
                 </span>
                 <span class="cache-status-hint">Don't see what you're looking for? Click refresh</span>
             `;
@@ -40379,39 +40246,14 @@ Cmd/Ctrl + K - Command palette
             }).join('');
         }
 
-        // Search records - instant local search when cache is available
-        let airtableSearchTimeout = null;
+        // Search records - unified search across all cached categories
         function searchAirtableRecords(query) {
-            clearTimeout(airtableSearchTimeout);
             airtablePickerState.searchQuery = query;
 
-            if (!airtablePickerState.selectedCategory) {
-                return;
-            }
-
-            const category = airtablePickerState.selectedCategory;
-
-            // Handle 'all' mode - search across all categories
-            if (category === 'all') {
-                const results = AirtableAPI.searchAllRecordsLocal(query);
-                airtablePickerState.results = results;
-                renderAirtablePickerResults();
-                return;
-            }
-
-            const cache = AirtableAPI.recordsCache[category];
-
-            // If cache is available, search instantly (no debounce needed for local search)
-            if (cache && cache.records) {
-                const results = AirtableAPI.searchRecordsLocal(category, query);
-                airtablePickerState.results = results;
-                renderAirtablePickerResults();
-            } else {
-                // Fallback to async loading with debounce
-                airtableSearchTimeout = setTimeout(() => {
-                    loadAirtableRecords(category, query);
-                }, 300);
-            }
+            // Search across all categories using cached data
+            const results = AirtableAPI.searchAllRecordsLocal(query);
+            airtablePickerState.results = results;
+            renderAirtablePickerResults();
         }
 
         // Select a record and add it as a tag
