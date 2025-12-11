@@ -10213,6 +10213,107 @@
             font-weight: 500;
         }
 
+        /* Visibility Chip Styles */
+        .quick-add-meta-chip.visibility-public {
+            background: linear-gradient(135deg, #27ae60 0%, #2ecc71 100%);
+            color: white;
+            border: 1px solid #27ae60;
+            border-style: solid;
+        }
+
+        .quick-add-meta-chip.visibility-team {
+            background: linear-gradient(135deg, #3498db 0%, #2980b9 100%);
+            color: white;
+            border: 1px solid #3498db;
+            border-style: solid;
+        }
+
+        .quick-add-meta-chip.visibility-private {
+            background: linear-gradient(135deg, #9b59b6 0%, #8e44ad 100%);
+            color: white;
+            border: 1px solid #9b59b6;
+            border-style: solid;
+        }
+
+        .visibility-dropdown-item {
+            padding: 12px 16px;
+            cursor: pointer;
+            display: flex;
+            align-items: flex-start;
+            gap: 12px;
+            color: #555;
+            font-size: 14px;
+            transition: background 0.15s;
+        }
+
+        .visibility-dropdown-item:hover {
+            background: #f5f5f5;
+        }
+
+        .visibility-dropdown-item.selected {
+            background: rgba(200, 143, 74, 0.1);
+        }
+
+        .visibility-dropdown-item i {
+            font-size: 18px;
+            margin-top: 2px;
+        }
+
+        .visibility-dropdown-item.public i { color: #27ae60; }
+        .visibility-dropdown-item.team i { color: #3498db; }
+        .visibility-dropdown-item.private i { color: #9b59b6; }
+
+        .visibility-option-content {
+            display: flex;
+            flex-direction: column;
+            gap: 2px;
+        }
+
+        .visibility-option-title {
+            font-weight: 500;
+            color: #333;
+        }
+
+        .visibility-option-desc {
+            font-size: 12px;
+            color: #888;
+        }
+
+        .visibility-team-select {
+            margin-top: 8px;
+            padding: 8px 16px;
+            border-top: 1px solid #eee;
+            display: none;
+        }
+
+        .visibility-team-select.show {
+            display: block;
+        }
+
+        .visibility-team-select label {
+            display: block;
+            font-size: 12px;
+            color: #666;
+            margin-bottom: 6px;
+            font-weight: 500;
+        }
+
+        .visibility-team-select select {
+            width: 100%;
+            padding: 8px 12px;
+            border: 1px solid #ddd;
+            border-radius: 6px;
+            font-size: 13px;
+            background: white;
+            cursor: pointer;
+        }
+
+        .visibility-team-select select:focus {
+            outline: none;
+            border-color: #3498db;
+            box-shadow: 0 0 0 2px rgba(52, 152, 219, 0.2);
+        }
+
         /* Hierarchical Role Selector Styles */
         .role-hierarchy-section {
             border-bottom: 1px solid #eee;
@@ -20599,10 +20700,154 @@ John Doe,Engineering,john@example.com"
             applyViewFilters();
         }
 
+        // ==========================================
+        // VISIBILITY ACCESS CONTROL
+        // ==========================================
+
+        // Check if the current user can see a task based on its visibility settings
+        function canUserSeeTask(task) {
+            const visibility = task.visibility || 'public';  // Default to public for legacy tasks
+
+            // Public tasks are visible to everyone
+            if (visibility === 'public') {
+                return true;
+            }
+
+            // Get current user info
+            const softrUser = SoftrIdentity.getUser();
+            const currentUserId = softrUser?.id || softrUser?.email || 'anonymous';
+
+            // Private tasks are only visible to the creator
+            if (visibility === 'private') {
+                return task.createdBy === currentUserId;
+            }
+
+            // Team visibility - check if user is a member of the specified team
+            if (visibility === 'team') {
+                const teamId = task.visibilityTeamId;
+                if (!teamId) {
+                    // If no team specified, treat as public
+                    return true;
+                }
+
+                // Check if current user is in the specified team
+                return isUserInTeam(currentUserId, teamId);
+            }
+
+            // Default: allow access for unknown visibility types
+            return true;
+        }
+
+        // Check if a user (by softr ID or email) is a member of a team
+        function isUserInTeam(userId, teamId) {
+            // Find persons that might match this user
+            // A person might be linked by email or by matching the softr_user_id
+            const persons = entities.person || [];
+
+            // Get the current user's email for matching
+            const softrUser = SoftrIdentity.getUser();
+            const userEmail = softrUser?.email?.toLowerCase();
+            const userName = softrUser?.name?.toLowerCase();
+
+            // Find person entities that might represent this user
+            const matchingPersons = persons.filter(person => {
+                // Match by ID
+                if (person.id === userId) return true;
+
+                // Match by email in description or name (common patterns)
+                if (userEmail && person.name?.toLowerCase() === userEmail) return true;
+                if (userName && person.name?.toLowerCase() === userName) return true;
+
+                // Match by softrUserId property if it exists
+                if (person.softrUserId && person.softrUserId === userId) return true;
+
+                return false;
+            });
+
+            // If no matching person found, can't verify team membership
+            if (matchingPersons.length === 0) {
+                // For anonymous users or unmatched users, check if they created the task
+                return false;
+            }
+
+            // Check if any of the matching persons are in the specified team
+            for (const person of matchingPersons) {
+                // Find roles this person fills (person INS role)
+                const personRoles = relationships.filter(r =>
+                    r.subject === person.id && r.predicate === 'INS'
+                );
+
+                for (const personRoleRel of personRoles) {
+                    const roleId = personRoleRel.object;
+
+                    // Check if this role belongs to the specified team (team DES role)
+                    const teamRoleRel = relationships.find(r =>
+                        r.subject === teamId && r.predicate === 'DES' && r.object === roleId
+                    );
+
+                    if (teamRoleRel) {
+                        return true;
+                    }
+                }
+            }
+
+            return false;
+        }
+
+        // Get teams that the current user belongs to
+        function getCurrentUserTeams() {
+            const softrUser = SoftrIdentity.getUser();
+            if (!softrUser) return [];
+
+            const userId = softrUser.id || softrUser.email;
+            const userEmail = softrUser.email?.toLowerCase();
+            const userName = softrUser.name?.toLowerCase();
+
+            const persons = entities.person || [];
+            const teams = [];
+
+            // Find matching persons
+            const matchingPersons = persons.filter(person => {
+                if (person.id === userId) return true;
+                if (userEmail && person.name?.toLowerCase() === userEmail) return true;
+                if (userName && person.name?.toLowerCase() === userName) return true;
+                if (person.softrUserId && person.softrUserId === userId) return true;
+                return false;
+            });
+
+            for (const person of matchingPersons) {
+                // Find roles this person fills
+                const personRoles = relationships.filter(r =>
+                    r.subject === person.id && r.predicate === 'INS'
+                );
+
+                for (const personRoleRel of personRoles) {
+                    const roleId = personRoleRel.object;
+
+                    // Find teams that own this role
+                    const teamRoleRels = relationships.filter(r =>
+                        r.predicate === 'DES' && r.object === roleId
+                    );
+
+                    for (const teamRoleRel of teamRoleRels) {
+                        const team = (entities.team || []).find(t => t.id === teamRoleRel.subject);
+                        if (team && !teams.find(t => t.id === team.id)) {
+                            teams.push(team);
+                        }
+                    }
+                }
+            }
+
+            return teams;
+        }
+
         function getFilteredTasks() {
             let filteredTasks = [...(entities.task || [])];
 
-            // If all filters are enabled, return all tasks
+            // First, filter by visibility/access control
+            filteredTasks = filteredTasks.filter(task => canUserSeeTask(task));
+
+            // If all filters are enabled, return filtered tasks
             if (viewFilters.role && viewFilters.person && viewFilters.team && viewFilters.unit) {
                 return filteredTasks;
             }
@@ -20936,6 +21181,9 @@ John Doe,Engineering,john@example.com"
         // Enhanced getFilteredTasks with advanced filters
         function getAdvancedFilteredTasks() {
             let tasks = [...(entities.task || [])];
+
+            // First, filter by visibility/access control
+            tasks = tasks.filter(task => canUserSeeTask(task));
 
             // Filter by status
             if (advancedFilters.status.length < 3) {
@@ -35001,7 +35249,9 @@ Options:
             priority: 'medium',
             roleId: null,
             description: '',
-            tags: []
+            tags: [],
+            visibility: 'public',      // 'public', 'team', or 'private'
+            visibilityTeamId: null     // Team ID when visibility is 'team'
         };
 
         function openQuickAddModal(rawTaskName) {
@@ -35050,7 +35300,9 @@ Options:
                 priority: priority,
                 roleId: null,
                 description: '',
-                tags: tags
+                tags: tags,
+                visibility: 'public',
+                visibilityTeamId: null
             };
 
             // Show the modal
@@ -35064,8 +35316,9 @@ Options:
             // Update chips to reflect current state
             updateQuickAddModalChips();
 
-            // Populate role dropdown
+            // Populate role dropdown and visibility team dropdown
             populateQuickAddRoleOptions();
+            populateVisibilityTeamDropdown();
 
             // Focus on description field (task name is already filled)
             setTimeout(() => {
@@ -35127,6 +35380,10 @@ Options:
 
             const roleId = quickAddModalState.roleId;
 
+            // Get current user info for createdBy
+            const softrUser = SoftrIdentity.getUser();
+            const createdByUserId = softrUser?.id || softrUser?.email || 'anonymous';
+
             // Create the task
             const taskId = 'task' + Date.now();
             const taskObject = {
@@ -35143,7 +35400,10 @@ Options:
                 recurring: null,
                 producesProductId: null,
                 followsWorkflowId: null,
-                createdAt: new Date().toISOString()
+                createdAt: new Date().toISOString(),
+                visibility: quickAddModalState.visibility,           // 'public', 'team', or 'private'
+                visibilityTeamId: quickAddModalState.visibilityTeamId, // Team ID when visibility is 'team'
+                createdBy: createdByUserId                           // User who created the task
             };
             entities.task.push(taskObject);
 
@@ -35161,7 +35421,8 @@ Options:
             logActivityToXano({
                 event_verb: 'Add Entity',
                 object_type: 'task',
-                object_label: taskName
+                object_label: taskName,
+                visibility: quickAddModalState.visibility
             });
 
             // Save to local storage
@@ -35244,6 +35505,40 @@ Options:
                 roleChip.classList.remove('filled');
                 roleLabel.textContent = 'Assign role';
             }
+
+            // Update visibility chip
+            const visibilityChip = document.getElementById('quickAddVisibilityChip');
+            const visibilityLabel = document.getElementById('quickAddVisibilityLabel');
+            const visibilityIcon = visibilityChip.querySelector('i');
+
+            // Remove all visibility-specific classes
+            visibilityChip.classList.remove('visibility-public', 'visibility-team', 'visibility-private', 'filled');
+
+            const visibility = quickAddModalState.visibility || 'public';
+
+            // Set appropriate class, icon, and label based on visibility
+            switch (visibility) {
+                case 'public':
+                    visibilityChip.classList.add('visibility-public');
+                    visibilityIcon.className = 'ph ph-globe';
+                    visibilityLabel.textContent = 'Public';
+                    break;
+                case 'team':
+                    visibilityChip.classList.add('visibility-team');
+                    visibilityIcon.className = 'ph ph-users-three';
+                    if (quickAddModalState.visibilityTeamId) {
+                        const team = (entities.team || []).find(t => t.id === quickAddModalState.visibilityTeamId);
+                        visibilityLabel.textContent = team ? team.name : 'Team Only';
+                    } else {
+                        visibilityLabel.textContent = 'Team Only';
+                    }
+                    break;
+                case 'private':
+                    visibilityChip.classList.add('visibility-private');
+                    visibilityIcon.className = 'ph ph-lock';
+                    visibilityLabel.textContent = 'Private';
+                    break;
+            }
         }
 
         function formatDateForDisplay(dateStr) {
@@ -35266,6 +35561,7 @@ Options:
         function hideAllQuickAddDropdowns() {
             document.getElementById('quickAddDateDropdown')?.classList.remove('show');
             document.getElementById('quickAddRoleDropdown')?.classList.remove('show');
+            document.getElementById('quickAddVisibilityDropdown')?.classList.remove('show');
         }
 
         function toggleQuickAddDatePicker() {
@@ -35466,6 +35762,82 @@ Options:
             }
         }
 
+        // ============================================
+        // VISIBILITY PICKER FUNCTIONS
+        // ============================================
+
+        function toggleQuickAddVisibilityPicker() {
+            const dropdown = document.getElementById('quickAddVisibilityDropdown');
+            const wasOpen = dropdown.classList.contains('show');
+            hideAllQuickAddDropdowns();
+            if (!wasOpen) {
+                updateVisibilityDropdownSelection();
+                dropdown.classList.add('show');
+            }
+        }
+
+        function selectQuickAddVisibility(visibility) {
+            quickAddModalState.visibility = visibility;
+
+            // Show/hide team selector based on visibility type
+            const teamSelect = document.getElementById('visibilityTeamSelect');
+            if (visibility === 'team') {
+                teamSelect.classList.add('show');
+                // If no team selected yet, keep dropdown open
+                if (!quickAddModalState.visibilityTeamId) {
+                    updateVisibilityDropdownSelection();
+                    return;
+                }
+            } else {
+                teamSelect.classList.remove('show');
+                quickAddModalState.visibilityTeamId = null;
+            }
+
+            hideAllQuickAddDropdowns();
+            updateQuickAddModalChips();
+        }
+
+        function selectVisibilityTeam(teamId) {
+            quickAddModalState.visibilityTeamId = teamId;
+            if (teamId) {
+                hideAllQuickAddDropdowns();
+                updateQuickAddModalChips();
+            }
+        }
+
+        function populateVisibilityTeamDropdown() {
+            const dropdown = document.getElementById('visibilityTeamDropdown');
+            const teams = entities.team || [];
+
+            let html = '<option value="">Choose a team...</option>';
+            teams.forEach(team => {
+                html += `<option value="${team.id}">${team.name}</option>`;
+            });
+
+            dropdown.innerHTML = html;
+        }
+
+        function updateVisibilityDropdownSelection() {
+            // Update selected state in dropdown
+            document.querySelectorAll('.visibility-dropdown-item').forEach(item => {
+                item.classList.remove('selected');
+            });
+
+            const currentVisibility = quickAddModalState.visibility;
+            const selectedItem = document.querySelector(`.visibility-dropdown-item.${currentVisibility}`);
+            if (selectedItem) {
+                selectedItem.classList.add('selected');
+            }
+
+            // Update team select visibility
+            const teamSelect = document.getElementById('visibilityTeamSelect');
+            if (currentVisibility === 'team') {
+                teamSelect.classList.add('show');
+            } else {
+                teamSelect.classList.remove('show');
+            }
+        }
+
         // Add Escape key handler for quick add modal
         document.addEventListener('keydown', function(e) {
             if (e.key === 'Escape') {
@@ -35534,6 +35906,10 @@ Options:
             // In a production app, you might want to let users set a default role
             const defaultRole = roles[0];
 
+            // Get current user info for createdBy
+            const softrUser = SoftrIdentity.getUser();
+            const createdByUserId = softrUser?.id || softrUser?.email || 'anonymous';
+
             // Create the task
             const taskId = 'task' + Date.now();
             const taskObject = {
@@ -35550,7 +35926,10 @@ Options:
                 recurring: null,
                 producesProductId: null,
                 followsWorkflowId: null,
-                createdAt: new Date().toISOString()
+                createdAt: new Date().toISOString(),
+                visibility: 'public',        // Default to public for quick add
+                visibilityTeamId: null,
+                createdBy: createdByUserId
             };
             entities.task.push(taskObject);
 
@@ -35568,7 +35947,8 @@ Options:
             logActivityToXano({
                 event_verb: 'Add Entity',
                 object_type: 'task',
-                object_label: taskName
+                object_label: taskName,
+                visibility: 'public'
             });
 
             // Save to local storage
@@ -37162,6 +37542,11 @@ Options:
                 return idx > max ? idx : max;
             }, 0);
 
+            // Inherit visibility from parent task
+            const parentTask = (entities.task || []).find(t => t.id === parentTaskId);
+            const softrUser = SoftrIdentity.getUser();
+            const createdByUserId = softrUser?.id || softrUser?.email || 'anonymous';
+
             const subtask = {
                 id: subtaskId,
                 name: subtaskName,
@@ -37174,7 +37559,10 @@ Options:
                 tags: [],
                 description: '',
                 createdAt: new Date().toISOString(),
-                orderIndex: maxOrderIndex + 1 // Lower orderIndex = first to complete (top of list)
+                orderIndex: maxOrderIndex + 1, // Lower orderIndex = first to complete (top of list)
+                visibility: parentTask?.visibility || 'public',           // Inherit from parent
+                visibilityTeamId: parentTask?.visibilityTeamId || null,   // Inherit from parent
+                createdBy: createdByUserId
             };
 
             entities.task.push(subtask);
@@ -37624,6 +38012,10 @@ Options:
                 const person = personId ? entities.person.find(p => p.id === personId) : null;
                 const workflow = workflowId ? entities.workflow.find(w => w.id === workflowId) : null;
 
+                // Get current user info for createdBy
+                const softrUser = SoftrIdentity.getUser();
+                const createdByUserId = softrUser?.id || softrUser?.email || 'anonymous';
+
                 // 1. Create task entity with enhanced fields
                 taskId = 'task' + Date.now();
                 const taskObject = {
@@ -37640,14 +38032,18 @@ Options:
                     recurring: recurringValue || null,
                     producesProductId: null,
                     followsWorkflowId: workflowId || null,
-                    createdAt: new Date().toISOString()
+                    createdAt: new Date().toISOString(),
+                    visibility: 'public',        // Default to public for hero modal
+                    visibilityTeamId: null,
+                    createdBy: createdByUserId
                 };
                 entities.task.push(taskObject);
 
                 logActivityToXano({
                     event_verb: 'Add Entity',
                     object_type: 'task',
-                    object_label: taskName
+                    object_label: taskName,
+                    visibility: 'public'
                 });
 
                 // 2. Connect workflow to task (Workflow CON Task) - only if workflow is selected
@@ -40509,6 +40905,10 @@ Options:
                     <i class="ph ph-briefcase"></i>
                     <span id="quickAddRoleLabel">Assign role</span>
                 </div>
+                <div class="quick-add-meta-chip visibility-public" id="quickAddVisibilityChip" onclick="toggleQuickAddVisibilityPicker()">
+                    <i class="ph ph-globe"></i>
+                    <span id="quickAddVisibilityLabel">Public</span>
+                </div>
             </div>
 
             <!-- Date Picker Dropdown -->
@@ -40532,6 +40932,38 @@ Options:
             <div class="quick-add-dropdown" id="quickAddRoleDropdown">
                 <div id="quickAddRoleOptions">
                     <!-- Populated dynamically -->
+                </div>
+            </div>
+
+            <!-- Visibility Picker Dropdown -->
+            <div class="quick-add-dropdown" id="quickAddVisibilityDropdown">
+                <div class="visibility-dropdown-item public" onclick="selectQuickAddVisibility('public')">
+                    <i class="ph ph-globe"></i>
+                    <div class="visibility-option-content">
+                        <span class="visibility-option-title">Public</span>
+                        <span class="visibility-option-desc">Visible to everyone</span>
+                    </div>
+                </div>
+                <div class="visibility-dropdown-item team" onclick="selectQuickAddVisibility('team')">
+                    <i class="ph ph-users-three"></i>
+                    <div class="visibility-option-content">
+                        <span class="visibility-option-title">Team Only</span>
+                        <span class="visibility-option-desc">Only visible to team members</span>
+                    </div>
+                </div>
+                <div class="visibility-dropdown-item private" onclick="selectQuickAddVisibility('private')">
+                    <i class="ph ph-lock"></i>
+                    <div class="visibility-option-content">
+                        <span class="visibility-option-title">Private</span>
+                        <span class="visibility-option-desc">Only visible to you</span>
+                    </div>
+                </div>
+                <div class="visibility-team-select" id="visibilityTeamSelect">
+                    <label>Select Team</label>
+                    <select id="visibilityTeamDropdown" onchange="selectVisibilityTeam(this.value)">
+                        <option value="">Choose a team...</option>
+                        <!-- Populated dynamically -->
+                    </select>
                 </div>
             </div>
 
