@@ -20202,6 +20202,9 @@
                         <button class="api-test-preset-btn" onclick="setApiTestPreset('getRecordWithParents')">
                             <i class="ph ph-tree-structure"></i> Get with Parents
                         </button>
+                        <button class="api-test-preset-btn" onclick="setApiTestPreset('filterExample')">
+                            <i class="ph ph-funnel"></i> Filter Example
+                        </button>
                         <button class="api-test-preset-btn" onclick="setApiTestPreset('custom')">
                             <i class="ph ph-code"></i> Custom
                         </button>
@@ -22439,15 +22442,22 @@ John Doe,Engineering,john@example.com"
             },
 
             // Get record with parent chain resolved (for cases/applications)
-            async getRecordWithParents(tableType, recordId) {
+            async getRecordWithParents(tableType, recordId, options = {}) {
                 const config = this.getTableConfig(tableType);
                 if (!config) throw new Error(`Unknown table type: ${tableType}`);
 
-                const result = await this.request('getRecordWithParents', {
+                const params = {
                     table: config.tableId,
                     tableName: tableType,
                     recordId
-                });
+                };
+
+                // Only include filterFormula when provided
+                if (options.filterFormula) {
+                    params.filterFormula = options.filterFormula;
+                }
+
+                const result = await this.request('getRecordWithParents', params);
 
                 return result;
             },
