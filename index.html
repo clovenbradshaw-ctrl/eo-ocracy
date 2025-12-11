@@ -22933,6 +22933,16 @@ John Doe,Engineering,john@example.com"
         // LOAD USERS FROM AIRTABLE API
         // ==========================================
 
+        // Helper function to get only active users with valid names
+        function getValidActivePeople() {
+            return (entities.person || []).filter(p =>
+                p.name &&
+                p.name.trim() !== '' &&
+                p.name !== 'Unknown User' &&
+                (!p.activityStatus || p.activityStatus === 'Active')
+            );
+        }
+
         // Load users from Airtable and add them as person entities
         async function loadUsersFromAPI() {
             console.log('📡 Loading users from Airtable API...');
@@ -22955,9 +22965,14 @@ John Doe,Engineering,john@example.com"
                     const email = fields['Email'] || '';
                     const activityStatus = fields['Activity Status'] || 'Active'; // Default to Active if not set
 
-                    // Only include users with Activity Status = "Active"
+                    // Only include users with Activity Status = "Active" and valid names
                     if (activityStatus !== 'Active') {
                         return; // Skip inactive users
+                    }
+
+                    // Skip users without proper names
+                    if (!userName || userName.trim() === '' || userName === 'Unknown User') {
+                        return; // Skip users without valid names
                     }
 
                     // Create a unique ID using the Airtable record ID or generate one
@@ -24787,7 +24802,7 @@ John Doe,Engineering,john@example.com"
 
         function populateAssigneeList() {
             const container = document.getElementById('filterAssigneeList');
-            const people = entities.person || [];
+            const people = getValidActivePeople();
 
             if (people.length === 0) {
                 container.innerHTML = '<div style="padding: 0.75rem; color: #8B6F47; font-size: 0.8rem;">No people found</div>';
@@ -32366,8 +32381,8 @@ Cmd/Ctrl + K - Command palette
             const searchTerm = document.getElementById('entitySearch')?.value.toLowerCase() || '';
             list.innerHTML = '';
 
-            // Get all people
-            const people = entities.person || [];
+            // Get all valid active people with names
+            const people = getValidActivePeople();
 
             // Filter by search
             const filteredPeople = searchTerm
@@ -36153,17 +36168,18 @@ Cmd/Ctrl + K - Command palette
         function renderPeopleGrouped(container, filters) {
             container.innerHTML = '';
             const groupBy = treeViewState.peopleGroupBy;
+            const validPeople = getValidActivePeople();
 
             if (groupBy === 'none') {
                 // No grouping - just list all people
-                entities.person.forEach(person => {
+                validPeople.forEach(person => {
                     const personEl = createTreeNodeDetailed(person, filters);
                     container.appendChild(personEl);
                 });
             } else if (groupBy === 'alphabetical') {
                 // Group alphabetically by first letter
                 const grouped = {};
-                entities.person.forEach(person => {
+                validPeople.forEach(person => {
                     const letter = (person.name || 'Unknown').charAt(0).toUpperCase();
                     if (!grouped[letter]) grouped[letter] = [];
                     grouped[letter].push(person);
@@ -36204,7 +36220,7 @@ Cmd/Ctrl + K - Command palette
                 const roleGroups = {};
                 const unassigned = [];
 
-                entities.person.forEach(person => {
+                validPeople.forEach(person => {
                     const roles = getPersonRoles(person.id);
                     if (roles.length === 0) {
                         unassigned.push(person);
