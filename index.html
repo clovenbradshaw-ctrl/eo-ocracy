@@ -22743,8 +22743,11 @@ John Doe,Engineering,john@example.com"
 
             // Get cached records for a category (or load if not cached)
             async getCachedRecords(category, query = '') {
-                // Ensure data is loaded
-                if (!this.isCacheValid(category)) {
+                // Only load if no records exist - don't check TTL
+                // TTL is only for hinting user to refresh, not for triggering automatic API calls
+                // Data refreshes via: (1) page reload or (2) user clicks refresh button
+                const cache = this.recordsCache[category];
+                if (!cache || !cache.records || cache.records.length === 0) {
                     await this.loadAllRecords(category);
                 }
 
