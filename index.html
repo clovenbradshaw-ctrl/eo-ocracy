@@ -22106,6 +22106,58 @@ John Doe,Engineering,john@example.com"
                 }
             },
 
+            // Normalize a single record to ensure fields are in the expected format
+            // Handles both flat format (fields directly on record) and nested format (fields in record.fields)
+            normalizeRecord(record) {
+                if (!record) return record;
+
+                // If record already has a fields object, return as-is
+                if (record.fields && typeof record.fields === 'object') {
+                    return record;
+                }
+
+                // Extract known system fields
+                const { id, createdTime, ...fields } = record;
+
+                // Return normalized record with fields nested
+                return {
+                    id,
+                    createdTime,
+                    fields
+                };
+            },
+
+            // Normalize API response to ensure consistent format
+            // Handles array response or { records: [...] } format
+            normalizeResponse(result) {
+                if (!result) return { records: [] };
+
+                // If result is an array, wrap it and normalize each record
+                if (Array.isArray(result)) {
+                    return {
+                        records: result.map(record => this.normalizeRecord(record))
+                    };
+                }
+
+                // If result has a records array, normalize each record
+                if (result.records && Array.isArray(result.records)) {
+                    return {
+                        ...result,
+                        records: result.records.map(record => this.normalizeRecord(record))
+                    };
+                }
+
+                // Single record response - normalize and wrap
+                if (result.id) {
+                    return {
+                        records: [this.normalizeRecord(result)]
+                    };
+                }
+
+                // Return as-is for other response types
+                return result;
+            },
+
             // Get records from a table
             async getRecords(tableType, options = {}) {
                 const config = this.getTableConfig(tableType);
@@ -22120,7 +22172,8 @@ John Doe,Engineering,john@example.com"
                     maxRecords: options.maxRecords || 50
                 });
 
-                return result;
+                // Normalize response to handle both flat and nested field formats
+                return this.normalizeResponse(result);
             },
 
             // Get a single record by ID
@@ -22134,7 +22187,8 @@ John Doe,Engineering,john@example.com"
                     recordId
                 });
 
-                return result;
+                // Normalize single record response
+                return this.normalizeRecord(result);
             },
 
             // Get record with parent chain resolved (for cases/applications)
@@ -22163,7 +22217,8 @@ John Doe,Engineering,john@example.com"
                     searchField: config.displayField
                 });
 
-                return result;
+                // Normalize response to handle both flat and nested field formats
+                return this.normalizeResponse(result);
             },
 
             // Get Softr URL for a tag
@@ -22224,7 +22279,9 @@ John Doe,Engineering,john@example.com"
                         maxRecords: 10000  // Get all clients
                     });
 
-                    this.clientsCache.records = result.records || [];
+                    // Normalize response to handle both flat and nested field formats
+                    const normalized = this.normalizeResponse(result);
+                    this.clientsCache.records = normalized.records || [];
                     this.clientsCache.lastFetch = Date.now();
                     return this.clientsCache.records;
                 } finally {
