@@ -14058,6 +14058,92 @@
         }
 
         /* ============================================
+           TASK MODAL BREADCRUMBS & NAVIGATION
+           ============================================ */
+
+        .task-modal-breadcrumb {
+            display: flex;
+            align-items: center;
+            gap: 0.4rem;
+            font-size: 0.75rem;
+            color: rgba(255, 255, 255, 0.85);
+            margin-bottom: 0.5rem;
+            flex-wrap: wrap;
+        }
+
+        .task-breadcrumb-item {
+            cursor: pointer;
+            padding: 0.2rem 0.5rem;
+            border-radius: 4px;
+            transition: all 0.15s;
+            max-width: 150px;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            white-space: nowrap;
+            background: rgba(255, 255, 255, 0.15);
+        }
+
+        .task-breadcrumb-item:hover {
+            background: rgba(255, 255, 255, 0.25);
+            color: white;
+        }
+
+        .task-breadcrumb-item.current {
+            background: rgba(255, 255, 255, 0.3);
+            font-weight: 600;
+            cursor: default;
+        }
+
+        .task-breadcrumb-separator {
+            color: rgba(255, 255, 255, 0.5);
+            font-size: 0.65rem;
+        }
+
+        .task-modal-nav {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            margin-left: auto;
+        }
+
+        .task-nav-btn {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            width: 32px;
+            height: 32px;
+            background: rgba(255, 255, 255, 0.2);
+            border: none;
+            border-radius: 6px;
+            color: white;
+            cursor: pointer;
+            transition: all 0.2s;
+            font-size: 1rem;
+        }
+
+        .task-nav-btn:hover:not(:disabled) {
+            background: rgba(255, 255, 255, 0.3);
+        }
+
+        .task-nav-btn:disabled {
+            opacity: 0.3;
+            cursor: not-allowed;
+        }
+
+        .task-nav-info {
+            font-size: 0.7rem;
+            color: rgba(255, 255, 255, 0.7);
+            padding: 0 0.25rem;
+        }
+
+        .task-modal-header-row {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 1rem;
+        }
+
+        /* ============================================
            SIMPLIFIED TASK MODAL STYLES
            ============================================ */
 
@@ -18795,6 +18881,8 @@
                 <button class="modal-close-btn" onclick="closeEntityModal()">
                     <i class="ph ph-x"></i>
                 </button>
+                <!-- Task breadcrumb and navigation (shown only for tasks in sequences) -->
+                <div id="taskModalBreadcrumbNav" class="task-modal-header-row" style="display: none;"></div>
                 <div class="modal-header-top">
                     <span class="modal-header-icon" id="modalEntityIcon"></span>
                     <div class="modal-header-content">
@@ -23560,6 +23648,18 @@ Cmd/Ctrl + K - Command palette
             // Set header content
             document.getElementById('modalEntityIcon').innerHTML = getIcon(entityType);
             document.getElementById('modalEntityName').textContent = entity.name;
+
+            // Render task breadcrumb and navigation (for tasks in sequences)
+            const breadcrumbNavEl = document.getElementById('taskModalBreadcrumbNav');
+            if (entityType === 'task' && isPartOfSequence(entityId)) {
+                const breadcrumbHtml = renderTaskModalBreadcrumb(entityId);
+                const navHtml = renderTaskModalNavigation(entityId);
+                breadcrumbNavEl.innerHTML = breadcrumbHtml + navHtml;
+                breadcrumbNavEl.style.display = 'flex';
+            } else {
+                breadcrumbNavEl.innerHTML = '';
+                breadcrumbNavEl.style.display = 'none';
+            }
 
             // Reset inline editing state for title
             const titleDisplay = document.getElementById('modalTitleDisplay');
@@ -41001,6 +41101,91 @@ Options:
             // Has dependents?
             const hasDependents = (entities.task || []).some(t => t.predecessorId === taskId);
             return hasDependents;
+        }
+
+        // Get ancestry path for a task (from root to current task)
+        function getTaskAncestryPath(taskId) {
+            const path = [];
+            const task = (entities.task || []).find(t => t.id === taskId);
+            if (!task) return path;
+
+            // Walk up the chain
+            let current = task;
+            while (current) {
+                path.unshift(current);
+                if (current.predecessorId) {
+                    current = (entities.task || []).find(t => t.id === current.predecessorId);
+                } else {
+                    break;
+                }
+            }
+            return path;
+        }
+
+        // Render task modal breadcrumb HTML
+        function renderTaskModalBreadcrumb(taskId) {
+            const path = getTaskAncestryPath(taskId);
+            if (path.length <= 1) return ''; // No ancestors, no breadcrumb needed
+
+            let html = '<div class="task-modal-breadcrumb">';
+            path.forEach((task, index) => {
+                const isLast = index === path.length - 1;
+                const shortName = task.name.length > 25 ? task.name.substring(0, 25) + '...' : task.name;
+
+                if (isLast) {
+                    html += `<span class="task-breadcrumb-item current" title="${task.name}">${shortName}</span>`;
+                } else {
+                    html += `<span class="task-breadcrumb-item" title="${task.name}" onclick="openTaskModal('${task.id}')">${shortName}</span>`;
+                    html += '<span class="task-breadcrumb-separator"><i class="ph ph-caret-right"></i></span>';
+                }
+            });
+            html += '</div>';
+            return html;
+        }
+
+        // Get navigation info for task modal (prev/next in sequence)
+        function getTaskNavigationInfo(taskId) {
+            const root = findSequenceRoot(taskId);
+            if (!root) return { prev: null, next: null, current: 0, total: 1 };
+
+            const sequence = getTaskSequence(root.id);
+            const currentIndex = sequence.findIndex(t => t.id === taskId);
+
+            return {
+                prev: currentIndex > 0 ? sequence[currentIndex - 1] : null,
+                next: currentIndex < sequence.length - 1 ? sequence[currentIndex + 1] : null,
+                current: currentIndex + 1,
+                total: sequence.length
+            };
+        }
+
+        // Render task modal navigation HTML
+        function renderTaskModalNavigation(taskId) {
+            const navInfo = getTaskNavigationInfo(taskId);
+
+            // Only show nav if task is part of a sequence with multiple tasks
+            if (navInfo.total <= 1) return '';
+
+            const prevDisabled = !navInfo.prev;
+            const nextDisabled = !navInfo.next;
+
+            return `
+                <div class="task-modal-nav">
+                    <button class="task-nav-btn"
+                            onclick="event.stopPropagation(); ${navInfo.prev ? `openTaskModal('${navInfo.prev.id}')` : ''}"
+                            ${prevDisabled ? 'disabled' : ''}
+                            title="${navInfo.prev ? navInfo.prev.name : 'No previous task'}">
+                        <i class="ph ph-caret-left"></i>
+                    </button>
+                    <span class="task-nav-info">${navInfo.current}/${navInfo.total}</span>
+                    <button class="task-nav-btn"
+                            onclick="event.stopPropagation(); ${navInfo.next ? `openTaskModal('${navInfo.next.id}')` : ''}"
+                            ${nextDisabled ? 'disabled' : ''}
+                            title="${navInfo.next ? navInfo.next.name : 'No next task'}">
+                        <i class="ph ph-caret-right"></i>
+                    </button>
+                </div>
+            `;
         }
 
         // ============================================
