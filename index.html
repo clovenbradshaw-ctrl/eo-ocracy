@@ -11181,6 +11181,120 @@
             font-weight: 600;
         }
 
+        /* Content-Level Filter Bar - filters at engagement level */
+        .content-filter-bar {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 12px 16px;
+            background: #FDFBF8;
+            border-radius: 12px;
+            margin-bottom: 16px;
+            border: 1px solid #EDE8E0;
+        }
+
+        .content-filter-left {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .content-filter-group {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+        .content-filter-chip {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            padding: 8px 14px;
+            border: 1px solid #E5DDD1;
+            border-radius: 20px;
+            background: white;
+            font-size: 0.85rem;
+            cursor: pointer;
+            color: #8B6F47;
+            transition: all 0.15s ease;
+        }
+
+        .content-filter-chip:hover {
+            border-color: #C88F4A;
+            background: #FDF8F3;
+        }
+
+        .content-filter-chip.active {
+            background: #3D2E1F;
+            border-color: #3D2E1F;
+            color: white;
+        }
+
+        .content-filter-chip.active:hover {
+            background: #2A1F14;
+            border-color: #2A1F14;
+        }
+
+        .content-filter-chip i {
+            font-size: 1rem;
+        }
+
+        .content-filter-count {
+            font-size: 0.75rem;
+            font-weight: 600;
+            background: rgba(0,0,0,0.08);
+            padding: 2px 6px;
+            border-radius: 10px;
+        }
+
+        .content-filter-chip.active .content-filter-count {
+            background: rgba(255,255,255,0.2);
+        }
+
+        .content-filter-right {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .content-filter-more {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            padding: 8px 16px;
+            border: 1px solid #E5DDD1;
+            border-radius: 8px;
+            background: white;
+            font-size: 0.85rem;
+            cursor: pointer;
+            color: #6B5642;
+            transition: all 0.15s ease;
+        }
+
+        .content-filter-more:hover {
+            border-color: #C88F4A;
+            background: #FDF8F3;
+        }
+
+        .content-filter-more.has-filters {
+            background: #FDF8F3;
+            border-color: #C88F4A;
+            color: #C88F4A;
+        }
+
+        .content-filter-more i {
+            font-size: 1rem;
+        }
+
+        .content-filter-badge {
+            background: #C88F4A;
+            color: white;
+            font-size: 0.7rem;
+            padding: 2px 6px;
+            border-radius: 10px;
+            font-weight: 600;
+        }
+
         /* Quick Add Bar - Simplified task creation */
         .quick-add-bar {
             display: flex;
@@ -21125,6 +21239,16 @@ John Doe,Engineering,john@example.com"
                     moreBtn.classList.remove('has-filters');
                 }
             }
+        }
+
+        // Get count of active non-status filters for badges
+        function getActiveAdvancedFilterCount() {
+            let count = 0;
+            if (advancedFilters.priority.length < 3) count++;
+            if (advancedFilters.dateFrom || advancedFilters.dateTo || advancedFilters.datePreset) count++;
+            if (advancedFilters.assignees.length > 0) count++;
+            if (advancedFilters.tags.length > 0) count++;
+            return count;
         }
 
         function setDatePreset(preset) {
@@ -38947,7 +39071,47 @@ Options:
                 { key: 'completed', label: 'Done', icon: 'ph-check-circle' }
             ];
 
-            let html = '<div class="kanban-board">';
+            // Build content-level filter bar
+            const hasAdvancedFilters = advancedFilters.priority.length !== 3 ||
+                advancedFilters.dateFrom || advancedFilters.dateTo || advancedFilters.datePreset ||
+                advancedFilters.assignees.length > 0 || advancedFilters.tags.length > 0;
+            const activeFilterCount = getActiveAdvancedFilterCount();
+
+            let html = `
+                <div class="content-filter-bar">
+                    <div class="content-filter-left">
+                        <div class="content-filter-group">
+                            <button class="content-filter-chip ${advancedFilters.status.includes('pending') ? 'active' : ''}"
+                                    onclick="toggleInlineStatusFilter('pending')" title="To Do tasks">
+                                <i class="ph ph-circle-dashed"></i>
+                                <span>To Do</span>
+                                <span class="content-filter-count">${tasks.filter(t => t.status === 'pending').length}</span>
+                            </button>
+                            <button class="content-filter-chip ${advancedFilters.status.includes('in_progress') ? 'active' : ''}"
+                                    onclick="toggleInlineStatusFilter('in_progress')" title="In Progress tasks">
+                                <i class="ph ph-spinner"></i>
+                                <span>In Progress</span>
+                                <span class="content-filter-count">${tasks.filter(t => t.status === 'in_progress').length}</span>
+                            </button>
+                            <button class="content-filter-chip ${advancedFilters.status.includes('completed') ? 'active' : ''}"
+                                    onclick="toggleInlineStatusFilter('completed')" title="Done tasks">
+                                <i class="ph ph-check-circle"></i>
+                                <span>Done</span>
+                                <span class="content-filter-count">${tasks.filter(t => t.status === 'completed').length}</span>
+                            </button>
+                        </div>
+                    </div>
+                    <div class="content-filter-right">
+                        <button class="content-filter-more ${hasAdvancedFilters ? 'has-filters' : ''}" onclick="openAdvancedFilterPanel()">
+                            <i class="ph ph-funnel"></i>
+                            <span>Filter</span>
+                            ${activeFilterCount > 0 ? `<span class="content-filter-badge">${activeFilterCount}</span>` : ''}
+                        </button>
+                    </div>
+                </div>
+            `;
+
+            html += '<div class="kanban-board">';
 
             statuses.forEach(status => {
                 // Get tasks for this column
