@@ -18245,20 +18245,9 @@
                     </div>
                     <!-- Inline Filters -->
                     <div class="inline-filter-bar" id="inlineFilterBar">
-                        <div class="inline-filter-group">
-                            <button class="inline-filter-btn status-pending active" data-status="pending" onclick="toggleInlineStatusFilter('pending')" title="To Do">
-                                <i class="ph ph-circle"></i> To Do
-                            </button>
-                            <button class="inline-filter-btn status-in_progress active" data-status="in_progress" onclick="toggleInlineStatusFilter('in_progress')" title="In Progress">
-                                <i class="ph ph-spinner"></i> In Progress
-                            </button>
-                            <button class="inline-filter-btn status-completed active" data-status="completed" onclick="toggleInlineStatusFilter('completed')" title="Done">
-                                <i class="ph ph-check-circle"></i> Done
-                            </button>
-                        </div>
-                        <button class="inline-filter-more-btn" id="inlineFilterMoreBtn" onclick="openAdvancedFilterPanel()" title="More filters">
+                        <button class="inline-filter-more-btn" id="inlineFilterMoreBtn" onclick="openAdvancedFilterPanel()" title="Filter tasks">
                             <i class="ph ph-funnel"></i>
-                            <span>More</span>
+                            <span>Filter</span>
                             <span class="inline-filter-badge" id="inlineFilterBadge" style="display: none;">0</span>
                         </button>
                     </div>
@@ -21827,7 +21816,9 @@ John Doe,Engineering,john@example.com"
             datePreset: null,
             assignees: [], // Array of person IDs
             entities: ['unit', 'team', 'role', 'person'],
-            tags: []
+            tags: [],
+            onlyMe: false,      // Quick filter: only tasks related to current user
+            onlyMyTeams: false  // Quick filter: only tasks related to user's teams
         };
 
         // Time travel state
@@ -21932,32 +21923,41 @@ John Doe,Engineering,john@example.com"
             applyAdvancedFilters();
         }
 
+        // Toggle quick filter (onlyMe / onlyMyTeams)
+        function toggleQuickFilter(filterType) {
+            if (filterType === 'onlyMe') {
+                advancedFilters.onlyMe = !advancedFilters.onlyMe;
+                // If enabling onlyMe, disable onlyMyTeams
+                if (advancedFilters.onlyMe) {
+                    advancedFilters.onlyMyTeams = false;
+                }
+            } else if (filterType === 'onlyMyTeams') {
+                advancedFilters.onlyMyTeams = !advancedFilters.onlyMyTeams;
+                // If enabling onlyMyTeams, disable onlyMe
+                if (advancedFilters.onlyMyTeams) {
+                    advancedFilters.onlyMe = false;
+                }
+            }
+
+            updateFilterActiveCount();
+            applyAdvancedFilters();
+        }
+
         // Update inline filter buttons to match advancedFilters state
         function updateInlineFilterUI() {
-            // Update status buttons
-            ['pending', 'in_progress', 'completed'].forEach(status => {
-                const btn = document.querySelector(`.inline-filter-btn[data-status="${status}"]`);
-                if (btn) {
-                    if (advancedFilters.status.includes(status)) {
-                        btn.classList.add('active');
-                    } else {
-                        btn.classList.remove('active');
-                    }
-                }
-            });
-
-            // Count non-status active filters for badge
-            let additionalFilters = 0;
-            if (advancedFilters.priority.length < 3) additionalFilters++;
-            if (advancedFilters.dateFrom || advancedFilters.dateTo || advancedFilters.datePreset) additionalFilters++;
-            if (advancedFilters.assignees.length > 0) additionalFilters++;
-            if (advancedFilters.tags.length > 0) additionalFilters++;
+            // Count all active advanced filters for badge
+            let activeFilters = 0;
+            if (advancedFilters.status.length < 3) activeFilters++;
+            if (advancedFilters.priority.length < 3) activeFilters++;
+            if (advancedFilters.dateFrom || advancedFilters.dateTo || advancedFilters.datePreset) activeFilters++;
+            if (advancedFilters.assignees.length > 0) activeFilters++;
+            if (advancedFilters.tags.length > 0) activeFilters++;
 
             const badge = document.getElementById('inlineFilterBadge');
             const moreBtn = document.getElementById('inlineFilterMoreBtn');
             if (badge && moreBtn) {
-                if (additionalFilters > 0) {
-                    badge.textContent = additionalFilters;
+                if (activeFilters > 0) {
+                    badge.textContent = activeFilters;
                     badge.style.display = 'inline';
                     moreBtn.classList.add('has-filters');
                 } else {
@@ -22136,7 +22136,9 @@ John Doe,Engineering,john@example.com"
                 datePreset: null,
                 assignees: [],
                 entities: ['unit', 'team', 'role', 'person'],
-                tags: []
+                tags: [],
+                onlyMe: false,
+                onlyMyTeams: false
             };
 
             // Reset UI
@@ -22266,6 +22268,68 @@ John Doe,Engineering,john@example.com"
                     if (!task.tags || !Array.isArray(task.tags)) return false;
                     return advancedFilters.tags.some(tag => task.tags.includes(tag));
                 });
+            }
+
+            // Quick filter: Only tasks related to me
+            if (advancedFilters.onlyMe) {
+                const currentUserId = getCurrentUserId();
+                const currentUserEmail = SoftrIdentity.currentUser?.email;
+
+                // Find person entities matching current user
+                const myPersonIds = (entities.person || [])
+                    .filter(p => {
+                        if (p.userId === currentUserId) return true;
+                        if (currentUserEmail && p.email && p.email.toLowerCase() === currentUserEmail.toLowerCase()) return true;
+                        if (currentUserEmail && p.name && p.name.toLowerCase() === currentUserEmail.split('@')[0].toLowerCase()) return true;
+                        return false;
+                    })
+                    .map(p => p.id);
+
+                tasks = tasks.filter(task => {
+                    // Check if task was created by current user
+                    if (task.createdBy === currentUserId || task.createdBy === currentUserEmail) return true;
+
+                    // Check if task is assigned to current user's role
+                    const taskRoleRel = relationships.find(r =>
+                        r.object === task.id && r.predicate === 'CON' && r.subject.startsWith('r')
+                    );
+                    if (taskRoleRel) {
+                        const personRel = relationships.find(r =>
+                            r.object === taskRoleRel.subject && r.predicate === 'INS' && r.subject.startsWith('p')
+                        );
+                        if (personRel && myPersonIds.includes(personRel.subject)) return true;
+                    }
+
+                    return false;
+                });
+            }
+
+            // Quick filter: Only tasks related to my teams
+            if (advancedFilters.onlyMyTeams) {
+                const userTeamIds = getCurrentUserTeams();
+
+                if (userTeamIds.length > 0) {
+                    tasks = tasks.filter(task => {
+                        // Check if task's visibility team is one of user's teams
+                        if (task.visibilityTeamId && userTeamIds.includes(task.visibilityTeamId)) return true;
+
+                        // Check if task is assigned to a role within user's teams
+                        const taskRoleRel = relationships.find(r =>
+                            r.object === task.id && r.predicate === 'CON' && r.subject.startsWith('r')
+                        );
+                        if (taskRoleRel) {
+                            // Find the team this role belongs to
+                            const teamRel = relationships.find(r =>
+                                r.predicate === 'DES' &&
+                                r.object === taskRoleRel.subject &&
+                                (entities.team || []).some(t => t.id === r.subject)
+                            );
+                            if (teamRel && userTeamIds.includes(teamRel.subject)) return true;
+                        }
+
+                        return false;
+                    });
+                }
             }
 
             return tasks;
@@ -40361,28 +40425,20 @@ Options:
                 <div class="content-filter-bar">
                     <div class="content-filter-left">
                         <div class="content-filter-group">
-                            <button class="content-filter-chip ${advancedFilters.status.includes('pending') ? 'active' : ''}"
-                                    onclick="toggleInlineStatusFilter('pending')" title="To Do tasks">
-                                <i class="ph ph-circle-dashed"></i>
-                                <span>To Do</span>
-                                <span class="content-filter-count">${tasks.filter(t => t.status === 'pending').length}</span>
+                            <button class="content-filter-chip quick-filter ${advancedFilters.onlyMe ? 'active' : ''}"
+                                    onclick="toggleQuickFilter('onlyMe')" title="Show only tasks related to me">
+                                <i class="ph ph-user"></i>
+                                <span>Only me</span>
                             </button>
-                            <button class="content-filter-chip ${advancedFilters.status.includes('in_progress') ? 'active' : ''}"
-                                    onclick="toggleInlineStatusFilter('in_progress')" title="In Progress tasks">
-                                <i class="ph ph-spinner"></i>
-                                <span>In Progress</span>
-                                <span class="content-filter-count">${tasks.filter(t => t.status === 'in_progress').length}</span>
-                            </button>
-                            <button class="content-filter-chip ${advancedFilters.status.includes('completed') ? 'active' : ''}"
-                                    onclick="toggleInlineStatusFilter('completed')" title="Done tasks">
-                                <i class="ph ph-check-circle"></i>
-                                <span>Done</span>
-                                <span class="content-filter-count">${tasks.filter(t => t.status === 'completed').length}</span>
+                            <button class="content-filter-chip quick-filter ${advancedFilters.onlyMyTeams ? 'active' : ''}"
+                                    onclick="toggleQuickFilter('onlyMyTeams')" title="Show only tasks from my team(s)">
+                                <i class="ph ph-users-three"></i>
+                                <span>My team(s)</span>
                             </button>
                         </div>
                     </div>
                     <div class="content-filter-right">
-                        <button class="content-filter-more ${hasAdvancedFilters ? 'has-filters' : ''}" onclick="openAdvancedFilterPanel()">
+                        <button class="content-filter-more ${hasAdvancedFilters || activeFilterCount > 0 ? 'has-filters' : ''}" onclick="openAdvancedFilterPanel()">
                             <i class="ph ph-funnel"></i>
                             <span>Filter</span>
                             ${activeFilterCount > 0 ? `<span class="content-filter-badge">${activeFilterCount}</span>` : ''}
