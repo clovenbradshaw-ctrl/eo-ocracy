@@ -88,16 +88,59 @@
         .header {
             background: linear-gradient(135deg, #C88F4A 0%, #B87B5B 100%);
             color: white;
-            padding: 1rem 2rem;
+            padding: 0.75rem 1.5rem;
             box-shadow: 0 2px 8px rgba(0,0,0,0.1);
             display: flex;
             justify-content: space-between;
             align-items: center;
+            gap: 1rem;
+        }
+
+        .header-left {
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+            flex-shrink: 0;
+        }
+
+        .header-center {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            flex: 1;
+        }
+
+        .header-right {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            flex-shrink: 0;
         }
 
         .header h1 {
             font-size: 1.5rem;
             font-weight: 600;
+        }
+
+        /* Loading Status */
+        .header-loading-status {
+            display: none;
+            align-items: center;
+            gap: 0.4rem;
+            color: rgba(255,255,255,0.9);
+            font-size: 0.75rem;
+            padding: 0.35rem 0.6rem;
+            background: rgba(0,0,0,0.15);
+            border-radius: 6px;
+        }
+
+        .header-loading-status[style*="display: block"],
+        .header-loading-status[style*="display:block"] {
+            display: flex !important;
+        }
+
+        .header-loading-status i {
+            animation: spin 1s linear infinite;
         }
 
         /* Workspace Selector Styles */
@@ -346,6 +389,113 @@
             align-items: center;
         }
 
+        /* View Tabs - Clean tab design */
+        .view-tabs {
+            display: flex;
+            background: rgba(0,0,0,0.15);
+            border-radius: 8px;
+            padding: 4px;
+            gap: 2px;
+        }
+
+        .view-tab {
+            display: flex;
+            align-items: center;
+            gap: 0.4rem;
+            background: transparent;
+            color: rgba(255,255,255,0.85);
+            border: none;
+            padding: 0.5rem 0.875rem;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 0.8125rem;
+            font-weight: 500;
+            transition: all 0.2s ease;
+            white-space: nowrap;
+        }
+
+        .view-tab i {
+            font-size: 1rem;
+            opacity: 0.9;
+        }
+
+        .view-tab:hover {
+            background: rgba(255,255,255,0.15);
+            color: white;
+        }
+
+        .view-tab.active {
+            background: white;
+            color: #9A6B3A;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+        }
+
+        .view-tab.active i {
+            opacity: 1;
+        }
+
+        /* Header Icon Buttons */
+        .header-icon-btn {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            width: 36px;
+            height: 36px;
+            background: rgba(255,255,255,0.1);
+            border: 1px solid rgba(255,255,255,0.15);
+            border-radius: 8px;
+            color: white;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            position: relative;
+        }
+
+        .header-icon-btn:hover {
+            background: rgba(255,255,255,0.2);
+            border-color: rgba(255,255,255,0.25);
+        }
+
+        .header-icon-btn:disabled {
+            opacity: 0.4;
+            cursor: not-allowed;
+        }
+
+        .header-icon-btn:disabled:hover {
+            background: rgba(255,255,255,0.1);
+            border-color: rgba(255,255,255,0.15);
+        }
+
+        .header-icon-btn i {
+            font-size: 1.125rem;
+        }
+
+        /* Undo Group */
+        .header-undo-group {
+            display: flex;
+            gap: 2px;
+            background: rgba(0,0,0,0.1);
+            border-radius: 8px;
+            padding: 2px;
+        }
+
+        .header-undo-group .header-icon-btn {
+            background: transparent;
+            border: none;
+            width: 32px;
+            height: 32px;
+            border-radius: 6px;
+        }
+
+        .header-undo-group .header-icon-btn:hover:not(:disabled) {
+            background: rgba(255,255,255,0.15);
+        }
+
+        /* Actions Menu */
+        .header-actions-menu {
+            position: relative;
+        }
+
+        /* Legacy view toggle support */
         .view-toggle {
             display: flex;
             gap: 0.5rem;
@@ -489,8 +639,8 @@
 
         .filter-active-badge {
             position: absolute;
-            top: 2px;
-            right: 2px;
+            top: -2px;
+            right: -2px;
             width: 8px;
             height: 8px;
             background: #C88F4A;
@@ -7808,6 +7958,20 @@
             font-size: 0.75rem;
             min-width: 1.25rem;
             text-align: center;
+        }
+
+        .header-icon-btn .undo-count {
+            position: absolute;
+            top: -4px;
+            right: -4px;
+            background: rgba(255,255,255,0.9);
+            color: #9A6B3A;
+            border-radius: 10px;
+            padding: 0 0.3rem;
+            font-size: 0.65rem;
+            min-width: 1rem;
+            text-align: center;
+            font-weight: 600;
         }
 
         /* Undo Notification Styles */
@@ -15665,7 +15829,8 @@
     <!-- Main App Container (hidden until authenticated) -->
     <div id="mainAppContainer">
     <div class="header">
-        <h1>
+        <!-- LEFT ZONE: Navigation & Context -->
+        <div class="header-left">
             <div class="workspace-selector">
                 <button class="workspace-dropdown-toggle" onclick="toggleWorkspaceDropdown(event)">
                     <span class="workspace-name" id="workspaceNameText">My Organization</span>
@@ -15683,128 +15848,149 @@
                     </div>
                 </div>
             </div>
-        </h1>
-        <div class="header-controls">
-            <div id="loadingStatus" style="color: rgba(255,255,255,0.9); font-size: 0.875rem; margin-right: 0.5rem; padding: 0.25rem 0.5rem; background: rgba(0,0,0,0.2); border-radius: 4px;">
-                <i class="ph ph-spinner" style="animation: spin 1s linear infinite;"></i> Loading...
+            <div id="loadingStatus" class="header-loading-status">
+                <i class="ph ph-spinner"></i>
             </div>
-            <!-- Xano Connection Status Indicator -->
-            <div class="xano-status-indicator checking" id="xanoStatusIndicator" title="Xano database connection status">
+        </div>
+
+        <!-- CENTER ZONE: View Tabs -->
+        <div class="header-center">
+            <div class="view-tabs">
+                <button class="view-tab active" data-view="kanban" onclick="switchView('kanban')">
+                    <i class="ph ph-columns"></i>
+                    <span>Kanban</span>
+                </button>
+                <button class="view-tab" data-view="table" onclick="switchView('table')">
+                    <i class="ph ph-table"></i>
+                    <span>Table</span>
+                </button>
+                <button class="view-tab" data-view="gantt" onclick="switchView('gantt')">
+                    <i class="ph ph-chart-bar-horizontal"></i>
+                    <span>Gantt</span>
+                </button>
+                <button class="view-tab" data-view="timeline" onclick="switchView('timeline')">
+                    <i class="ph ph-clock-countdown"></i>
+                    <span>Timeline</span>
+                </button>
+                <button class="view-tab" data-view="calendar" onclick="switchView('calendar')">
+                    <i class="ph ph-calendar"></i>
+                    <span>Calendar</span>
+                </button>
+            </div>
+        </div>
+
+        <!-- RIGHT ZONE: Actions & User -->
+        <div class="header-right">
+            <!-- Filter Button -->
+            <div class="view-filter-dropdown">
+                <button class="header-icon-btn" onclick="toggleViewFilter(event)" title="Filter entities">
+                    <i class="ph ph-funnel"></i>
+                    <span class="filter-active-badge" id="viewFilterBadge" style="display: none;"></span>
+                </button>
+                <div class="view-filter-menu" id="viewFilterMenu">
+                    <div class="view-filter-section">
+                        <div class="view-filter-section-title">Filter by</div>
+                        <label class="view-filter-item">
+                            <input type="checkbox" id="viewFilterRole" checked onchange="applyViewFilters()">
+                            <i class="ph ph-briefcase"></i> Roles
+                        </label>
+                        <label class="view-filter-item">
+                            <input type="checkbox" id="viewFilterPerson" checked onchange="applyViewFilters()">
+                            <i class="ph ph-user"></i> People
+                        </label>
+                        <label class="view-filter-item">
+                            <input type="checkbox" id="viewFilterTeam" checked onchange="applyViewFilters()">
+                            <i class="ph ph-users"></i> Teams
+                        </label>
+                        <label class="view-filter-item">
+                            <input type="checkbox" id="viewFilterUnit" checked onchange="applyViewFilters()">
+                            <i class="ph ph-buildings"></i> Units
+                        </label>
+                    </div>
+                    <div class="view-filter-actions">
+                        <button class="btn btn-small" onclick="selectAllViewFilters()">All</button>
+                        <button class="btn btn-small btn-outline" onclick="clearViewFilters()">None</button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Undo/Redo -->
+            <div class="header-undo-group">
+                <button class="header-icon-btn" id="undoBtn" onclick="undo()" disabled title="Undo (Ctrl+Z)">
+                    <i class="ph ph-arrow-counter-clockwise"></i>
+                    <span class="undo-count" id="undoCount" style="display: none;">0</span>
+                </button>
+                <button class="header-icon-btn" id="redoBtn" onclick="redo()" disabled title="Redo (Ctrl+Y)">
+                    <i class="ph ph-arrow-clockwise"></i>
+                    <span class="undo-count" id="redoCount" style="display: none;">0</span>
+                </button>
+            </div>
+
+            <!-- Actions Menu -->
+            <div class="header-actions-menu">
+                <button class="header-icon-btn" onclick="toggleActionsMenu(event)" title="Actions">
+                    <i class="ph ph-dots-three"></i>
+                </button>
+                <div class="header-dropdown" id="actionsDropdown">
+                    <button class="header-dropdown-item" onclick="exportData(); closeActionsMenu()">
+                        <i class="ph ph-download"></i> Export Data
+                    </button>
+                    <button class="header-dropdown-item" onclick="importData(); closeActionsMenu()">
+                        <i class="ph ph-upload"></i> Import (JSON)
+                    </button>
+                    <button class="header-dropdown-item" onclick="openBulkImportModal(); closeActionsMenu()">
+                        <i class="ph ph-upload-simple"></i> Bulk Import (CSV)
+                    </button>
+                    <div class="header-dropdown-divider"></div>
+                    <button class="header-dropdown-item" onclick="toggleAutoRefresh(); closeActionsMenu()" id="autoRefreshMenuItem">
+                        <i class="ph ph-arrows-clockwise"></i>
+                        <span id="autoRefreshMenuText">Enable Auto-Refresh</span>
+                    </button>
+                    <button class="header-dropdown-item" onclick="restoreFromXano(); closeActionsMenu()">
+                        <i class="ph ph-cloud-arrow-down"></i> Restore from Cloud
+                    </button>
+                    <div class="header-dropdown-divider"></div>
+                    <button class="header-dropdown-item" onclick="toggleSampleData(); closeActionsMenu()" id="sampleDataBtn">
+                        <i class="ph ph-database"></i> <span id="sampleDataText">Toggle Sample Data</span>
+                    </button>
+                    <button class="header-dropdown-item" onclick="resetGraph(); closeActionsMenu()">
+                        <i class="ph ph-arrow-counter-clockwise"></i> Reset View
+                    </button>
+                    <div class="header-dropdown-divider"></div>
+                    <button class="header-dropdown-item danger" onclick="clearAllData(); closeActionsMenu()">
+                        <i class="ph ph-trash"></i> Clear All Data
+                    </button>
+                </div>
+            </div>
+
+            <!-- Notifications -->
+            <button class="header-icon-btn" onclick="toggleNotificationsPanel()" title="Notifications">
+                <i class="ph ph-bell"></i>
+                <span class="notification-badge" id="notificationBadge" style="display: none;"></span>
+            </button>
+
+            <!-- User Menu -->
+            <div class="user-menu-container" id="userMenuContainer"></div>
+
+            <!-- Hidden elements for backwards compatibility -->
+            <div class="xano-status-indicator checking" id="xanoStatusIndicator" style="display: none !important;">
                 <span class="status-dot"></span>
                 <span class="status-text">Checking...</span>
                 <span class="activity-count" id="xanoActivityCount" style="display: none;">0</span>
             </div>
-            <!-- Auto-Refresh Toggle -->
-            <div class="auto-refresh-toggle" id="autoRefreshToggle" onclick="toggleAutoRefresh()" title="Auto-refresh: Click to enable automatic syncing of new data">
-                <i class="ph ph-arrows-clockwise refresh-icon"></i>
-                <span class="refresh-label">Auto</span>
+            <div class="auto-refresh-toggle" id="autoRefreshToggle" style="display: none !important;">
                 <span class="refresh-status" id="autoRefreshStatus">Off</span>
             </div>
-            <!-- User Menu (populated by AuthManager) -->
-            <div class="user-menu-container" id="userMenuContainer"></div>
-            <!-- Softr User Identity Indicator (hidden) -->
             <div class="softr-user-indicator no-user" id="softrUserIndicator" style="display: none !important;">
-                <div class="user-avatar">
-                    <i class="ph ph-user"></i>
-                </div>
+                <div class="user-avatar"><i class="ph ph-user"></i></div>
                 <div class="user-info">
                     <span class="user-name">No user detected</span>
                     <span class="user-email">Embed on Softr to see user</span>
                 </div>
             </div>
-            <div class="view-toggle">
-                <button class="view-toggle-btn active" data-view="kanban" onclick="switchView('kanban')">
-                    <i class="ph ph-columns"></i> Kanban
-                </button>
-                <button class="view-toggle-btn" data-view="table" onclick="switchView('table')">
-                    <i class="ph ph-table"></i> Table
-                </button>
-                <button class="view-toggle-btn" data-view="gantt" onclick="switchView('gantt')">
-                    <i class="ph ph-chart-bar-horizontal"></i> Gantt
-                </button>
-                <button class="view-toggle-btn" data-view="timeline" onclick="switchView('timeline')">
-                    <i class="ph ph-clock-countdown"></i> Timeline
-                </button>
-                <button class="view-toggle-btn" data-view="calendar" onclick="switchView('calendar')">
-                    <i class="ph ph-calendar"></i> Calendar
-                </button>
-                <!-- View Filter Dropdown -->
-                <div class="view-filter-dropdown">
-                    <button class="view-toggle-btn view-filter-btn" onclick="toggleViewFilter(event)">
-                        <i class="ph ph-funnel"></i> Filter
-                        <span class="filter-active-badge" id="viewFilterBadge" style="display: none;"></span>
-                    </button>
-                    <div class="view-filter-menu" id="viewFilterMenu">
-                        <div class="view-filter-section">
-                            <div class="view-filter-section-title">Filter by</div>
-                            <label class="view-filter-item">
-                                <input type="checkbox" id="viewFilterRole" checked onchange="applyViewFilters()">
-                                <i class="ph ph-briefcase"></i> Roles
-                            </label>
-                            <label class="view-filter-item">
-                                <input type="checkbox" id="viewFilterPerson" checked onchange="applyViewFilters()">
-                                <i class="ph ph-user"></i> People
-                            </label>
-                            <label class="view-filter-item">
-                                <input type="checkbox" id="viewFilterTeam" checked onchange="applyViewFilters()">
-                                <i class="ph ph-users"></i> Teams
-                            </label>
-                            <label class="view-filter-item">
-                                <input type="checkbox" id="viewFilterUnit" checked onchange="applyViewFilters()">
-                                <i class="ph ph-buildings"></i> Units
-                            </label>
-                        </div>
-                        <div class="view-filter-actions">
-                            <button class="btn btn-small" onclick="selectAllViewFilters()">All</button>
-                            <button class="btn btn-small btn-outline" onclick="clearViewFilters()">None</button>
-                        </div>
-                    </div>
-                </div>
-            </div>
-            <button class="undo-btn" id="undoBtn" onclick="undo()" disabled title="Nothing to undo">
-                <i class="ph ph-arrow-counter-clockwise"></i>
-                Undo
-                <span class="undo-count" id="undoCount" style="display: none;">0</span>
-            </button>
-            <button class="undo-btn" id="redoBtn" onclick="redo()" disabled title="Nothing to redo">
-                <i class="ph ph-arrow-clockwise"></i>
-                Redo
-                <span class="undo-count" id="redoCount" style="display: none;">0</span>
-            </button>
-            <!-- Notifications Bell -->
-            <button class="btn btn-small" onclick="toggleNotificationsPanel()" style="position: relative;" title="Notifications">
-                <i class="ph ph-bell"></i>
-                <span class="notification-badge" id="notificationBadge" style="display: none;"></span>
-            </button>
-            <button class="btn btn-small" onclick="exportData()">
-                <i class="ph ph-download"></i> Export
-            </button>
-            <div class="header-more-menu">
-                <button class="btn btn-small btn-outline" onclick="toggleHeaderMenu(event)">
-                    <i class="ph ph-dots-three-outline"></i>
-                </button>
-                <div class="header-dropdown" id="headerDropdown">
-                    <button class="header-dropdown-item" onclick="importData(); closeHeaderMenu()">
-                        <i class="ph ph-upload"></i> Import Data (JSON)
-                    </button>
-                    <button class="header-dropdown-item" onclick="openBulkImportModal(); closeHeaderMenu()">
-                        <i class="ph ph-upload-simple"></i> Bulk Import (CSV)
-                    </button>
-                    <button class="header-dropdown-item" onclick="restoreFromXano(); closeHeaderMenu()">
-                        <i class="ph ph-cloud-arrow-down"></i> Restore from Xano
-                    </button>
-                    <div class="header-dropdown-divider"></div>
-                    <button class="header-dropdown-item" onclick="toggleSampleData(); closeHeaderMenu()" id="sampleDataBtn">
-                        <i class="ph ph-database"></i> <span id="sampleDataText">Toggle Sample Data</span>
-                    </button>
-                    <button class="header-dropdown-item" onclick="resetGraph(); closeHeaderMenu()">
-                        <i class="ph ph-arrows-clockwise"></i> Reset View
-                    </button>
-                    <div class="header-dropdown-divider"></div>
-                    <button class="header-dropdown-item danger" onclick="clearAllData(); closeHeaderMenu()">
-                        <i class="ph ph-trash"></i> Clear All Data
-                    </button>
-                </div>
+            <!-- Old header menu kept for compatibility -->
+            <div class="header-more-menu" style="display: none !important;">
+                <div class="header-dropdown" id="headerDropdown"></div>
             </div>
         </div>
     </div>
@@ -19265,7 +19451,8 @@ John Doe,Engineering,john@example.com"
         function switchView(view) {
             currentView = view;
 
-            document.querySelectorAll('.view-toggle-btn').forEach(btn => {
+            // Update both old view-toggle-btn and new view-tab classes
+            document.querySelectorAll('.view-toggle-btn, .view-tab').forEach(btn => {
                 btn.classList.remove('active');
                 if (btn.dataset.view === view) {
                     btn.classList.add('active');
@@ -19446,6 +19633,9 @@ John Doe,Engineering,john@example.com"
             if (!e.target.closest('.header-more-menu')) {
                 closeHeaderMenu();
             }
+            if (!e.target.closest('.header-actions-menu')) {
+                closeActionsMenu();
+            }
             if (!e.target.closest('.view-filter-dropdown')) {
                 closeViewFilter();
             }
@@ -19461,6 +19651,28 @@ John Doe,Engineering,john@example.com"
         function closeHeaderMenu() {
             const dropdown = document.getElementById('headerDropdown');
             dropdown.classList.remove('open');
+        }
+
+        // Actions Menu (new consolidated menu)
+        function toggleActionsMenu(event) {
+            event.stopPropagation();
+            const dropdown = document.getElementById('actionsDropdown');
+            dropdown.classList.toggle('open');
+            // Update auto-refresh menu text
+            updateAutoRefreshMenuText();
+        }
+
+        function closeActionsMenu() {
+            const dropdown = document.getElementById('actionsDropdown');
+            if (dropdown) dropdown.classList.remove('open');
+        }
+
+        function updateAutoRefreshMenuText() {
+            const menuText = document.getElementById('autoRefreshMenuText');
+            if (menuText) {
+                const isActive = autoRefreshInterval !== null;
+                menuText.textContent = isActive ? 'Disable Auto-Refresh' : 'Enable Auto-Refresh';
+            }
         }
 
         // Command Palette (Cmd+K)
