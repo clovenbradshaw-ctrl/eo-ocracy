@@ -562,6 +562,588 @@
             margin-top: 0.25rem;
         }
 
+        /* Advanced Filter Panel Styles */
+        .advanced-filter-dropdown {
+            position: relative;
+        }
+
+        .advanced-filter-btn {
+            position: relative;
+        }
+
+        .advanced-filter-badge {
+            position: absolute;
+            top: -4px;
+            right: -4px;
+            width: 8px;
+            height: 8px;
+            background: #E07B5A;
+            border-radius: 50%;
+            display: none;
+        }
+
+        .advanced-filter-panel {
+            position: absolute;
+            top: calc(100% + 0.5rem);
+            right: 0;
+            background: white;
+            border-radius: 12px;
+            box-shadow: 0 8px 32px rgba(0,0,0,0.2);
+            min-width: 320px;
+            max-width: 380px;
+            z-index: 200;
+            display: none;
+            overflow: hidden;
+        }
+
+        .advanced-filter-panel.open {
+            display: block;
+        }
+
+        .advanced-filter-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 1rem 1.25rem;
+            border-bottom: 1px solid #E5DDD1;
+            background: #FAF7F5;
+        }
+
+        .advanced-filter-header h3 {
+            font-size: 0.875rem;
+            font-weight: 600;
+            color: #3D2E1F;
+            margin: 0;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .advanced-filter-header h3 i {
+            color: #8B6F47;
+        }
+
+        .advanced-filter-reset {
+            font-size: 0.75rem;
+            color: #8B6F47;
+            background: none;
+            border: none;
+            cursor: pointer;
+            padding: 0.25rem 0.5rem;
+            border-radius: 4px;
+            transition: all 0.15s;
+        }
+
+        .advanced-filter-reset:hover {
+            background: #E5DDD1;
+            color: #3D2E1F;
+        }
+
+        .advanced-filter-body {
+            max-height: 400px;
+            overflow-y: auto;
+            padding: 0.75rem 0;
+        }
+
+        .filter-section {
+            padding: 0.5rem 1.25rem;
+        }
+
+        .filter-section-title {
+            font-size: 0.7rem;
+            font-weight: 600;
+            color: #8B6F47;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            margin-bottom: 0.5rem;
+        }
+
+        .filter-row {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 0.5rem;
+        }
+
+        .filter-checkbox-item {
+            display: flex;
+            align-items: center;
+            gap: 0.375rem;
+            cursor: pointer;
+            font-size: 0.8125rem;
+            color: #3D2E1F;
+            padding: 0.25rem 0;
+        }
+
+        .filter-checkbox-item input[type="checkbox"] {
+            accent-color: #C88F4A;
+            width: 14px;
+            height: 14px;
+        }
+
+        .filter-checkbox-item.status-pending::before {
+            content: '';
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+            background: #A09080;
+            margin-right: 0.25rem;
+        }
+
+        .filter-checkbox-item.status-in_progress::before {
+            content: '';
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+            background: #D4A853;
+            margin-right: 0.25rem;
+        }
+
+        .filter-checkbox-item.status-completed::before {
+            content: '';
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+            background: #6B9E78;
+            margin-right: 0.25rem;
+        }
+
+        .filter-checkbox-item.priority-low::before {
+            content: '';
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+            background: #A0B8A0;
+            margin-right: 0.25rem;
+        }
+
+        .filter-checkbox-item.priority-medium::before {
+            content: '';
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+            background: #D4A853;
+            margin-right: 0.25rem;
+        }
+
+        .filter-checkbox-item.priority-high::before {
+            content: '';
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+            background: #E07B5A;
+            margin-right: 0.25rem;
+        }
+
+        .filter-checkbox-item.priority-urgent::before {
+            content: '';
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+            background: #C23B22;
+            margin-right: 0.25rem;
+        }
+
+        .filter-date-row {
+            display: flex;
+            gap: 0.5rem;
+            align-items: center;
+        }
+
+        .filter-date-input {
+            flex: 1;
+            padding: 0.375rem 0.5rem;
+            border: 1px solid #E5DDD1;
+            border-radius: 6px;
+            font-size: 0.8125rem;
+            color: #3D2E1F;
+            background: white;
+        }
+
+        .filter-date-input:focus {
+            outline: none;
+            border-color: #C88F4A;
+        }
+
+        .filter-date-separator {
+            color: #A09080;
+            font-size: 0.75rem;
+        }
+
+        .filter-chips-container {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 0.375rem;
+            max-height: 100px;
+            overflow-y: auto;
+        }
+
+        .filter-chip {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.25rem;
+            padding: 0.25rem 0.5rem;
+            background: #F5F2ED;
+            border: 1px solid #E5DDD1;
+            border-radius: 16px;
+            font-size: 0.75rem;
+            color: #5C4D3C;
+            cursor: pointer;
+            transition: all 0.15s;
+        }
+
+        .filter-chip:hover {
+            background: #E5DDD1;
+        }
+
+        .filter-chip.active {
+            background: #C88F4A;
+            border-color: #C88F4A;
+            color: white;
+        }
+
+        .filter-chip input[type="checkbox"] {
+            display: none;
+        }
+
+        .filter-empty-hint {
+            font-size: 0.75rem;
+            color: #A09080;
+            font-style: italic;
+        }
+
+        .filter-section-divider {
+            height: 1px;
+            background: #E5DDD1;
+            margin: 0.5rem 1.25rem;
+        }
+
+        /* History Timeline Panel Styles */
+        .history-timeline-btn {
+            position: relative;
+        }
+
+        .history-viewing-indicator {
+            position: absolute;
+            top: -4px;
+            right: -4px;
+            width: 8px;
+            height: 8px;
+            background: #6B9E78;
+            border-radius: 50%;
+            display: none;
+        }
+
+        .history-timeline-panel {
+            position: fixed;
+            top: 0;
+            right: -400px;
+            width: 400px;
+            height: 100vh;
+            background: white;
+            box-shadow: -4px 0 24px rgba(0,0,0,0.15);
+            z-index: 1000;
+            transition: right 0.3s ease;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .history-timeline-panel.open {
+            right: 0;
+        }
+
+        .history-timeline-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 1rem 1.25rem;
+            border-bottom: 1px solid #E5DDD1;
+            background: #FAF7F5;
+        }
+
+        .history-timeline-header h3 {
+            font-size: 1rem;
+            font-weight: 600;
+            color: #3D2E1F;
+            margin: 0;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .history-timeline-header h3 i {
+            color: #8B6F47;
+        }
+
+        .history-close-btn {
+            background: none;
+            border: none;
+            color: #8B6F47;
+            cursor: pointer;
+            padding: 0.5rem;
+            border-radius: 6px;
+            transition: all 0.15s;
+        }
+
+        .history-close-btn:hover {
+            background: #E5DDD1;
+            color: #3D2E1F;
+        }
+
+        .history-date-picker {
+            padding: 1rem 1.25rem;
+            border-bottom: 1px solid #E5DDD1;
+            background: #FDFCFB;
+        }
+
+        .history-date-label {
+            font-size: 0.75rem;
+            font-weight: 600;
+            color: #8B6F47;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            margin-bottom: 0.5rem;
+        }
+
+        .history-date-input-row {
+            display: flex;
+            gap: 0.5rem;
+            align-items: center;
+        }
+
+        .history-date-input {
+            flex: 1;
+            padding: 0.5rem 0.75rem;
+            border: 1px solid #E5DDD1;
+            border-radius: 8px;
+            font-size: 0.875rem;
+            color: #3D2E1F;
+            background: white;
+        }
+
+        .history-date-input:focus {
+            outline: none;
+            border-color: #C88F4A;
+        }
+
+        .history-time-input {
+            width: 100px;
+            padding: 0.5rem 0.75rem;
+            border: 1px solid #E5DDD1;
+            border-radius: 8px;
+            font-size: 0.875rem;
+            color: #3D2E1F;
+            background: white;
+        }
+
+        .history-time-input:focus {
+            outline: none;
+            border-color: #C88F4A;
+        }
+
+        .history-jump-btn {
+            padding: 0.5rem 1rem;
+            background: #C88F4A;
+            color: white;
+            border: none;
+            border-radius: 8px;
+            font-size: 0.875rem;
+            font-weight: 500;
+            cursor: pointer;
+            transition: background 0.15s;
+        }
+
+        .history-jump-btn:hover {
+            background: #B07D3A;
+        }
+
+        .history-back-to-live {
+            display: none;
+            padding: 0.5rem 1rem;
+            background: #6B9E78;
+            color: white;
+            border: none;
+            border-radius: 8px;
+            font-size: 0.875rem;
+            font-weight: 500;
+            cursor: pointer;
+            margin-top: 0.5rem;
+            width: 100%;
+            transition: background 0.15s;
+        }
+
+        .history-back-to-live.visible {
+            display: block;
+        }
+
+        .history-back-to-live:hover {
+            background: #5A8A66;
+        }
+
+        .history-viewing-banner {
+            display: none;
+            padding: 0.75rem 1.25rem;
+            background: #F0F8F2;
+            border-bottom: 1px solid #C4DBC8;
+            color: #3D5E43;
+            font-size: 0.875rem;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .history-viewing-banner.visible {
+            display: flex;
+        }
+
+        .history-viewing-banner i {
+            color: #6B9E78;
+        }
+
+        .history-timeline-content {
+            flex: 1;
+            overflow-y: auto;
+            padding: 1rem 0;
+        }
+
+        .history-day-group {
+            margin-bottom: 1rem;
+        }
+
+        .history-day-header {
+            position: sticky;
+            top: 0;
+            background: #FAF7F5;
+            padding: 0.5rem 1.25rem;
+            font-size: 0.75rem;
+            font-weight: 600;
+            color: #8B6F47;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            border-bottom: 1px solid #E5DDD1;
+        }
+
+        .history-item {
+            display: flex;
+            gap: 0.75rem;
+            padding: 0.75rem 1.25rem;
+            cursor: pointer;
+            transition: background 0.15s;
+            border-left: 3px solid transparent;
+        }
+
+        .history-item:hover {
+            background: #FAF7F5;
+        }
+
+        .history-item.active {
+            background: #F0F8F2;
+            border-left-color: #6B9E78;
+        }
+
+        .history-item-time {
+            font-size: 0.75rem;
+            color: #A09080;
+            white-space: nowrap;
+            min-width: 50px;
+        }
+
+        .history-item-content {
+            flex: 1;
+        }
+
+        .history-item-action {
+            font-size: 0.8125rem;
+            color: #3D2E1F;
+            font-weight: 500;
+            margin-bottom: 0.25rem;
+        }
+
+        .history-item-details {
+            font-size: 0.75rem;
+            color: #8B6F47;
+        }
+
+        .history-item-user {
+            font-size: 0.7rem;
+            color: #A09080;
+            margin-top: 0.25rem;
+        }
+
+        .history-empty {
+            text-align: center;
+            padding: 2rem 1.25rem;
+            color: #A09080;
+        }
+
+        .history-empty i {
+            font-size: 2rem;
+            margin-bottom: 0.5rem;
+            display: block;
+        }
+
+        .history-load-more {
+            padding: 0.75rem 1.25rem;
+            text-align: center;
+        }
+
+        .history-load-more-btn {
+            padding: 0.5rem 1rem;
+            background: #F5F2ED;
+            color: #5C4D3C;
+            border: 1px solid #E5DDD1;
+            border-radius: 6px;
+            font-size: 0.8125rem;
+            cursor: pointer;
+            transition: all 0.15s;
+        }
+
+        .history-load-more-btn:hover {
+            background: #E5DDD1;
+        }
+
+        /* History viewing mode overlay indicator */
+        .history-mode-indicator {
+            display: none;
+            position: fixed;
+            bottom: 1rem;
+            left: 50%;
+            transform: translateX(-50%);
+            background: #3D5E43;
+            color: white;
+            padding: 0.75rem 1.5rem;
+            border-radius: 24px;
+            font-size: 0.875rem;
+            font-weight: 500;
+            box-shadow: 0 4px 16px rgba(0,0,0,0.2);
+            z-index: 1000;
+            gap: 0.75rem;
+            align-items: center;
+        }
+
+        .history-mode-indicator.visible {
+            display: flex;
+        }
+
+        .history-mode-indicator i {
+            font-size: 1rem;
+        }
+
+        .history-exit-btn {
+            background: white;
+            color: #3D5E43;
+            border: none;
+            padding: 0.375rem 0.75rem;
+            border-radius: 16px;
+            font-size: 0.8125rem;
+            font-weight: 500;
+            cursor: pointer;
+            margin-left: 0.5rem;
+            transition: all 0.15s;
+        }
+
+        .history-exit-btn:hover {
+            background: #F0F8F2;
+        }
+
         /* Command Palette Styles */
         .command-palette-overlay {
             position: fixed;
@@ -15776,6 +16358,11 @@
                 <i class="ph ph-bell"></i>
                 <span class="notification-badge" id="notificationBadge" style="display: none;"></span>
             </button>
+            <!-- History Timeline Button -->
+            <button class="btn btn-small history-timeline-btn" onclick="toggleHistoryPanel()" title="View history timeline">
+                <i class="ph ph-clock-counter-clockwise"></i> History
+                <span class="history-viewing-indicator" id="historyViewingIndicator"></span>
+            </button>
             <button class="btn btn-small" onclick="exportData()">
                 <i class="ph ph-download"></i> Export
             </button>
@@ -15825,6 +16412,41 @@
         <div class="notifications-list" id="notificationsList">
             <!-- Populated dynamically -->
         </div>
+    </div>
+
+    <!-- History Timeline Panel -->
+    <div class="history-timeline-panel" id="historyTimelinePanel">
+        <div class="history-timeline-header">
+            <h3><i class="ph ph-clock-counter-clockwise"></i> History Timeline</h3>
+            <button class="history-close-btn" onclick="closeHistoryPanel()">
+                <i class="ph ph-x"></i>
+            </button>
+        </div>
+        <div class="history-date-picker">
+            <div class="history-date-label">Jump to Date & Time</div>
+            <div class="history-date-input-row">
+                <input type="date" id="historyDateInput" class="history-date-input">
+                <input type="time" id="historyTimeInput" class="history-time-input" value="23:59">
+                <button class="history-jump-btn" onclick="jumpToHistoryDate()">Go</button>
+            </div>
+            <button class="history-back-to-live" id="historyBackToLive" onclick="exitHistoryMode()">
+                <i class="ph ph-arrow-counter-clockwise"></i> Back to Live View
+            </button>
+        </div>
+        <div class="history-viewing-banner" id="historyViewingBanner">
+            <i class="ph ph-clock"></i>
+            <span id="historyViewingDate">Viewing data as of...</span>
+        </div>
+        <div class="history-timeline-content" id="historyTimelineContent">
+            <!-- Populated dynamically -->
+        </div>
+    </div>
+
+    <!-- History Mode Indicator (shown at bottom when viewing historical data) -->
+    <div class="history-mode-indicator" id="historyModeIndicator">
+        <i class="ph ph-clock-counter-clockwise"></i>
+        <span>Viewing history: <span id="historyModeDate"></span></span>
+        <button class="history-exit-btn" onclick="exitHistoryMode()">Exit</button>
     </div>
 
     <div class="container" id="mainContainer">
@@ -16021,6 +16643,96 @@
                            placeholder="Search..."
                            oninput="filterTaskBoard()"
                            style="max-width: 160px;">
+                    <!-- Advanced Filter Dropdown -->
+                    <div class="advanced-filter-dropdown">
+                        <button class="hero-task-btn hero-task-btn-secondary advanced-filter-btn" onclick="toggleAdvancedFilterPanel(event)" title="Advanced filters">
+                            <i class="ph ph-funnel-simple"></i>
+                            <span class="advanced-filter-badge" id="advancedFilterBadge"></span>
+                        </button>
+                        <div class="advanced-filter-panel" id="advancedFilterPanel">
+                            <div class="advanced-filter-header">
+                                <h3><i class="ph ph-funnel-simple"></i> Filters</h3>
+                                <button class="advanced-filter-reset" onclick="resetAdvancedFilters()">Reset All</button>
+                            </div>
+                            <div class="advanced-filter-body">
+                                <!-- Status Filter -->
+                                <div class="filter-section">
+                                    <div class="filter-section-title">Status</div>
+                                    <div class="filter-row">
+                                        <label class="filter-checkbox-item status-pending">
+                                            <input type="checkbox" id="filterStatus_pending" checked onchange="updateStatusFilter('pending', this.checked)">
+                                            To Do
+                                        </label>
+                                        <label class="filter-checkbox-item status-in_progress">
+                                            <input type="checkbox" id="filterStatus_in_progress" checked onchange="updateStatusFilter('in_progress', this.checked)">
+                                            In Progress
+                                        </label>
+                                        <label class="filter-checkbox-item status-completed">
+                                            <input type="checkbox" id="filterStatus_completed" checked onchange="updateStatusFilter('completed', this.checked)">
+                                            Done
+                                        </label>
+                                    </div>
+                                </div>
+                                <div class="filter-section-divider"></div>
+                                <!-- Priority Filter -->
+                                <div class="filter-section">
+                                    <div class="filter-section-title">Priority</div>
+                                    <div class="filter-row">
+                                        <label class="filter-checkbox-item priority-low">
+                                            <input type="checkbox" id="filterPriority_low" checked onchange="updatePriorityFilter('low', this.checked)">
+                                            Low
+                                        </label>
+                                        <label class="filter-checkbox-item priority-medium">
+                                            <input type="checkbox" id="filterPriority_medium" checked onchange="updatePriorityFilter('medium', this.checked)">
+                                            Medium
+                                        </label>
+                                        <label class="filter-checkbox-item priority-high">
+                                            <input type="checkbox" id="filterPriority_high" checked onchange="updatePriorityFilter('high', this.checked)">
+                                            High
+                                        </label>
+                                        <label class="filter-checkbox-item priority-urgent">
+                                            <input type="checkbox" id="filterPriority_urgent" checked onchange="updatePriorityFilter('urgent', this.checked)">
+                                            Urgent
+                                        </label>
+                                    </div>
+                                </div>
+                                <div class="filter-section-divider"></div>
+                                <!-- Date Range Filter -->
+                                <div class="filter-section">
+                                    <div class="filter-section-title">Due Date Range</div>
+                                    <div class="filter-date-row">
+                                        <input type="date" id="filterDateStart" class="filter-date-input" onchange="updateDateRangeFilter('startDate', this.value)">
+                                        <span class="filter-date-separator">to</span>
+                                        <input type="date" id="filterDateEnd" class="filter-date-input" onchange="updateDateRangeFilter('endDate', this.value)">
+                                    </div>
+                                    <label class="filter-checkbox-item" style="margin-top: 0.5rem;">
+                                        <input type="checkbox" id="filterOverdue" onchange="toggleOverdueFilter(this.checked)">
+                                        Show only overdue tasks
+                                    </label>
+                                </div>
+                                <div class="filter-section-divider"></div>
+                                <!-- Assignees Filter -->
+                                <div class="filter-section">
+                                    <div class="filter-section-title">Assignees</div>
+                                    <div class="filter-chips-container" id="filterAssigneesContainer">
+                                        <!-- Populated dynamically -->
+                                    </div>
+                                    <label class="filter-checkbox-item" style="margin-top: 0.5rem;">
+                                        <input type="checkbox" id="filterUnassigned" onchange="toggleUnassignedFilter(this.checked)">
+                                        Show only unassigned tasks
+                                    </label>
+                                </div>
+                                <div class="filter-section-divider"></div>
+                                <!-- Tags Filter -->
+                                <div class="filter-section">
+                                    <div class="filter-section-title">Tags</div>
+                                    <div class="filter-chips-container" id="filterTagsContainer">
+                                        <!-- Populated dynamically -->
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
                     <button class="hero-task-btn hero-task-btn-secondary" onclick="openHeroTaskModal()" style="padding: 0.625rem 1rem;" title="Advanced task creation">
                         <i class="ph ph-dots-three"></i>
                     </button>
@@ -19170,6 +19882,306 @@ John Doe,Engineering,john@example.com"
         }
 
         // ==========================================
+        // HISTORY TIMELINE FUNCTIONS
+        // ==========================================
+
+        // Toggle history timeline panel
+        function toggleHistoryPanel() {
+            const panel = document.getElementById('historyTimelinePanel');
+            if (panel) {
+                panel.classList.toggle('open');
+                if (panel.classList.contains('open')) {
+                    loadHistoryTimeline();
+                    // Set default date to today
+                    const today = new Date().toISOString().split('T')[0];
+                    document.getElementById('historyDateInput').value = today;
+                }
+            }
+        }
+
+        function closeHistoryPanel() {
+            const panel = document.getElementById('historyTimelinePanel');
+            if (panel) panel.classList.remove('open');
+        }
+
+        // Load and display history timeline from Xano activities
+        async function loadHistoryTimeline() {
+            const content = document.getElementById('historyTimelineContent');
+            if (!content) return;
+
+            content.innerHTML = `
+                <div class="history-empty">
+                    <i class="ph ph-spinner" style="animation: spin 1s linear infinite;"></i>
+                    <p>Loading history...</p>
+                </div>
+            `;
+
+            try {
+                // Fetch activities from Xano
+                const activities = await getActivitiesFromXano();
+
+                if (activities.length === 0) {
+                    content.innerHTML = `
+                        <div class="history-empty">
+                            <i class="ph ph-clock-counter-clockwise"></i>
+                            <p>No activity history yet</p>
+                            <p style="font-size: 0.75rem;">Changes will appear here as you work</p>
+                        </div>
+                    `;
+                    return;
+                }
+
+                // Sort activities by date (newest first)
+                const sortedActivities = [...activities]
+                    .filter(a => a.eo_operator !== 'AGENT_DECLARED') // Skip agent declarations
+                    .sort((a, b) => new Date(b.created_at) - new Date(a.created_at));
+
+                // Group by day
+                const groupedByDay = new Map();
+                sortedActivities.forEach(activity => {
+                    const date = new Date(activity.created_at);
+                    const dayKey = date.toISOString().split('T')[0];
+                    if (!groupedByDay.has(dayKey)) {
+                        groupedByDay.set(dayKey, []);
+                    }
+                    groupedByDay.get(dayKey).push(activity);
+                });
+
+                // Render timeline
+                let html = '';
+                groupedByDay.forEach((dayActivities, dayKey) => {
+                    const date = new Date(dayKey);
+                    const isToday = dayKey === new Date().toISOString().split('T')[0];
+                    const isYesterday = dayKey === new Date(Date.now() - 86400000).toISOString().split('T')[0];
+                    const dayLabel = isToday ? 'Today' : isYesterday ? 'Yesterday' : date.toLocaleDateString('en-US', { weekday: 'short', month: 'short', day: 'numeric' });
+
+                    html += `<div class="history-day-group">`;
+                    html += `<div class="history-day-header">${dayLabel}</div>`;
+
+                    dayActivities.slice(0, 50).forEach(activity => { // Limit to 50 per day
+                        const time = new Date(activity.created_at).toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit' });
+                        const action = formatHistoryAction(activity);
+                        const details = formatHistoryDetails(activity);
+                        const user = activity.agent_name || activity.agent_email || 'Unknown';
+
+                        html += `
+                            <div class="history-item" onclick="jumpToHistoryPoint('${activity.created_at}')" title="View data as of this time">
+                                <div class="history-item-time">${time}</div>
+                                <div class="history-item-content">
+                                    <div class="history-item-action">${action}</div>
+                                    ${details ? `<div class="history-item-details">${details}</div>` : ''}
+                                    <div class="history-item-user">by ${user}</div>
+                                </div>
+                            </div>
+                        `;
+                    });
+
+                    html += `</div>`;
+                });
+
+                content.innerHTML = html || `
+                    <div class="history-empty">
+                        <i class="ph ph-clock-counter-clockwise"></i>
+                        <p>No activity history yet</p>
+                    </div>
+                `;
+
+            } catch (error) {
+                console.error('Error loading history:', error);
+                content.innerHTML = `
+                    <div class="history-empty">
+                        <i class="ph ph-warning"></i>
+                        <p>Could not load history</p>
+                        <p style="font-size: 0.75rem;">${error.message}</p>
+                    </div>
+                `;
+            }
+        }
+
+        // Format activity into human-readable action
+        function formatHistoryAction(activity) {
+            const verb = activity.event_verb || activity.event_type || 'Changed';
+            const objectType = activity.object_type || 'item';
+            const objectLabel = activity.object_label || '';
+
+            // Map common verbs to friendly names
+            const verbMap = {
+                'Create': 'Created',
+                'Update': 'Updated',
+                'Delete': 'Deleted',
+                'Update Status': 'Status changed',
+                'ADD': 'Added',
+                'ALT': 'Modified',
+                'NUL': 'Removed'
+            };
+
+            const friendlyVerb = verbMap[verb] || verb;
+
+            if (objectLabel) {
+                return `${friendlyVerb} "${objectLabel}"`;
+            }
+            return `${friendlyVerb} ${objectType}`;
+        }
+
+        // Format additional details for activity
+        function formatHistoryDetails(activity) {
+            const details = [];
+
+            if (activity.object_type === 'task' && activity.event_verb === 'Update Status') {
+                // Extract new status from label if available
+                const statusMatch = activity.object_label?.match(/→ (\w+)$/);
+                if (statusMatch) {
+                    const statusLabel = statusMatch[1] === 'pending' ? 'To Do' :
+                                       statusMatch[1] === 'in_progress' ? 'In Progress' :
+                                       statusMatch[1] === 'completed' ? 'Done' : statusMatch[1];
+                    details.push(`Status: ${statusLabel}`);
+                }
+            }
+
+            if (activity.object_type) {
+                const typeLabels = {
+                    'task': 'Task',
+                    'person': 'Person',
+                    'role': 'Role',
+                    'team': 'Team',
+                    'unit': 'Unit',
+                    'product': 'Product',
+                    'workflow': 'Workflow'
+                };
+                details.push(typeLabels[activity.object_type] || activity.object_type);
+            }
+
+            return details.join(' · ');
+        }
+
+        // Jump to specific date from date picker
+        function jumpToHistoryDate() {
+            const dateInput = document.getElementById('historyDateInput');
+            const timeInput = document.getElementById('historyTimeInput');
+
+            if (!dateInput.value) {
+                showToast('Please select a date', 'error');
+                return;
+            }
+
+            const dateStr = dateInput.value;
+            const timeStr = timeInput.value || '23:59';
+            const targetDate = new Date(`${dateStr}T${timeStr}:59`);
+
+            enterHistoryMode(targetDate);
+        }
+
+        // Jump to specific activity point
+        function jumpToHistoryPoint(timestamp) {
+            const targetDate = new Date(timestamp);
+            enterHistoryMode(targetDate);
+        }
+
+        // Enter history viewing mode
+        async function enterHistoryMode(targetDate) {
+            historyViewDate = targetDate;
+
+            // Update UI to show we're in history mode
+            const indicator = document.getElementById('historyViewingIndicator');
+            if (indicator) indicator.style.display = 'block';
+
+            const backToLiveBtn = document.getElementById('historyBackToLive');
+            if (backToLiveBtn) backToLiveBtn.classList.add('visible');
+
+            const viewingBanner = document.getElementById('historyViewingBanner');
+            if (viewingBanner) {
+                viewingBanner.classList.add('visible');
+                document.getElementById('historyViewingDate').textContent = `Viewing data as of ${targetDate.toLocaleString()}`;
+            }
+
+            const modeIndicator = document.getElementById('historyModeIndicator');
+            if (modeIndicator) {
+                modeIndicator.classList.add('visible');
+                document.getElementById('historyModeDate').textContent = targetDate.toLocaleString();
+            }
+
+            // Fetch and reconstruct historical state
+            try {
+                const activities = await getActivitiesFromXano();
+
+                // Filter activities up to the target date
+                const historicalActivities = activities.filter(a => {
+                    const activityDate = new Date(a.created_at);
+                    return activityDate <= targetDate;
+                });
+
+                // Reconstruct entities from historical activities
+                const reconstructed = reconstructEntitiesFromActivities(historicalActivities);
+
+                // Store current state for restoration
+                if (!window._liveEntities) {
+                    window._liveEntities = JSON.parse(JSON.stringify(entities));
+                    window._liveRelationships = JSON.parse(JSON.stringify(relationships));
+                }
+
+                // Apply historical state
+                Object.keys(reconstructed.entities || {}).forEach(type => {
+                    entities[type] = reconstructed.entities[type] || [];
+                });
+                relationships.length = 0;
+                relationships.push(...(reconstructed.relationships || []));
+
+                // Refresh views with historical data
+                refreshAllViews();
+
+                showToast(`Viewing data as of ${targetDate.toLocaleDateString()}`, 'success');
+
+            } catch (error) {
+                console.error('Error entering history mode:', error);
+                showToast('Could not load historical data', 'error');
+                exitHistoryMode();
+            }
+        }
+
+        // Exit history viewing mode and return to live data
+        function exitHistoryMode() {
+            historyViewDate = null;
+
+            // Restore live data if we have it
+            if (window._liveEntities) {
+                Object.keys(window._liveEntities).forEach(type => {
+                    entities[type] = window._liveEntities[type] || [];
+                });
+                relationships.length = 0;
+                relationships.push(...(window._liveRelationships || []));
+
+                window._liveEntities = null;
+                window._liveRelationships = null;
+            } else {
+                // Reload from localStorage if no backup
+                loadFromLocalStorage();
+            }
+
+            // Update UI to show we're back in live mode
+            const indicator = document.getElementById('historyViewingIndicator');
+            if (indicator) indicator.style.display = 'none';
+
+            const backToLiveBtn = document.getElementById('historyBackToLive');
+            if (backToLiveBtn) backToLiveBtn.classList.remove('visible');
+
+            const viewingBanner = document.getElementById('historyViewingBanner');
+            if (viewingBanner) viewingBanner.classList.remove('visible');
+
+            const modeIndicator = document.getElementById('historyModeIndicator');
+            if (modeIndicator) modeIndicator.classList.remove('visible');
+
+            // Refresh views with live data
+            refreshAllViews();
+
+            showToast('Back to live view', 'success');
+        }
+
+        // Check if we're in history mode
+        function isInHistoryMode() {
+            return historyViewDate !== null;
+        }
+
+        // ==========================================
         // TOAST NOTIFICATION SYSTEM
         // ==========================================
 
@@ -19347,6 +20359,34 @@ John Doe,Engineering,john@example.com"
             unit: true
         };
 
+        // Advanced task filter state
+        let advancedFilters = {
+            status: {
+                pending: true,
+                in_progress: true,
+                completed: true
+            },
+            priority: {
+                low: true,
+                medium: true,
+                high: true,
+                urgent: true
+            },
+            dateRange: {
+                startDate: null,
+                endDate: null
+            },
+            assignees: [], // Array of person IDs
+            tags: [], // Array of tag strings
+            showOverdue: false,
+            showUnassigned: false
+        };
+
+        // History state for time travel
+        let historySnapshots = [];
+        let historyViewDate = null; // null means current/live view
+        const MAX_HISTORY_SNAPSHOTS = 200;
+
         function toggleViewFilter(event) {
             event.stopPropagation();
             const menu = document.getElementById('viewFilterMenu');
@@ -19438,6 +20478,345 @@ John Doe,Engineering,john@example.com"
             });
         }
 
+        // Advanced filtering function for tasks
+        function getAdvancedFilteredTasks(searchTerm = '') {
+            // Start with view-filtered tasks (organizational hierarchy)
+            let filteredTasks = getFilteredTasks();
+
+            // Apply status filter
+            filteredTasks = filteredTasks.filter(task => {
+                const status = task.status || 'pending';
+                return advancedFilters.status[status] !== false;
+            });
+
+            // Apply priority filter
+            filteredTasks = filteredTasks.filter(task => {
+                const priority = task.priority || 'medium';
+                return advancedFilters.priority[priority] !== false;
+            });
+
+            // Apply date range filter
+            if (advancedFilters.dateRange.startDate || advancedFilters.dateRange.endDate) {
+                filteredTasks = filteredTasks.filter(task => {
+                    if (!task.dueDate) return true; // Show tasks without due dates
+                    const dueDate = new Date(task.dueDate);
+                    if (advancedFilters.dateRange.startDate) {
+                        const start = new Date(advancedFilters.dateRange.startDate);
+                        if (dueDate < start) return false;
+                    }
+                    if (advancedFilters.dateRange.endDate) {
+                        const end = new Date(advancedFilters.dateRange.endDate);
+                        end.setHours(23, 59, 59); // Include the entire end date
+                        if (dueDate > end) return false;
+                    }
+                    return true;
+                });
+            }
+
+            // Apply overdue filter
+            if (advancedFilters.showOverdue) {
+                const today = new Date();
+                today.setHours(0, 0, 0, 0);
+                filteredTasks = filteredTasks.filter(task => {
+                    if (!task.dueDate) return false;
+                    const dueDate = new Date(task.dueDate);
+                    return dueDate < today && task.status !== 'completed';
+                });
+            }
+
+            // Apply assignee filter
+            if (advancedFilters.assignees.length > 0) {
+                filteredTasks = filteredTasks.filter(task => {
+                    // Find role connected to task
+                    const taskRoleRel = relationships.find(r =>
+                        r.object === task.id && r.predicate === 'CON' && r.subject.startsWith('r')
+                    );
+                    if (!taskRoleRel) {
+                        return advancedFilters.showUnassigned;
+                    }
+                    // Find person assigned to role
+                    const personRel = relationships.find(r =>
+                        r.object === taskRoleRel.subject && r.predicate === 'INS' && r.subject.startsWith('p')
+                    );
+                    if (!personRel) {
+                        return advancedFilters.showUnassigned;
+                    }
+                    return advancedFilters.assignees.includes(personRel.subject);
+                });
+            }
+
+            // Apply unassigned filter (only if explicitly filtering for unassigned)
+            if (advancedFilters.showUnassigned && advancedFilters.assignees.length === 0) {
+                filteredTasks = filteredTasks.filter(task => {
+                    const taskRoleRel = relationships.find(r =>
+                        r.object === task.id && r.predicate === 'CON' && r.subject.startsWith('r')
+                    );
+                    if (!taskRoleRel) return true;
+                    const personRel = relationships.find(r =>
+                        r.object === taskRoleRel.subject && r.predicate === 'INS' && r.subject.startsWith('p')
+                    );
+                    return !personRel;
+                });
+            }
+
+            // Apply tag filter
+            if (advancedFilters.tags.length > 0) {
+                filteredTasks = filteredTasks.filter(task => {
+                    if (!task.tags || task.tags.length === 0) return false;
+                    // Match any of the selected tags (OR logic)
+                    return advancedFilters.tags.some(tag => task.tags.includes(tag));
+                });
+            }
+
+            // Apply search term
+            if (searchTerm) {
+                const term = searchTerm.toLowerCase();
+                filteredTasks = filteredTasks.filter(task => {
+                    const nameMatch = task.name && task.name.toLowerCase().includes(term);
+                    const descMatch = task.description && task.description.toLowerCase().includes(term);
+                    const tagMatch = task.tags && task.tags.some(t => t.toLowerCase().includes(term));
+                    return nameMatch || descMatch || tagMatch;
+                });
+            }
+
+            return filteredTasks;
+        }
+
+        // Check if any advanced filters are active
+        function hasActiveAdvancedFilters() {
+            const { status, priority, dateRange, assignees, tags, showOverdue, showUnassigned } = advancedFilters;
+
+            // Check status filters
+            const statusFiltersActive = !status.pending || !status.in_progress || !status.completed;
+
+            // Check priority filters
+            const priorityFiltersActive = !priority.low || !priority.medium || !priority.high || !priority.urgent;
+
+            // Check date range
+            const dateFiltersActive = dateRange.startDate || dateRange.endDate;
+
+            // Check other filters
+            const otherFiltersActive = assignees.length > 0 || tags.length > 0 || showOverdue || showUnassigned;
+
+            return statusFiltersActive || priorityFiltersActive || dateFiltersActive || otherFiltersActive;
+        }
+
+        // Get all unique tags from tasks
+        function getAllTaskTags() {
+            const tagSet = new Set();
+            (entities.task || []).forEach(task => {
+                if (task.tags && Array.isArray(task.tags)) {
+                    task.tags.forEach(tag => tagSet.add(tag));
+                }
+            });
+            return Array.from(tagSet).sort();
+        }
+
+        // Get all assignable people
+        function getAllAssignees() {
+            return (entities.person || []).map(p => ({
+                id: p.id,
+                name: p.name
+            })).sort((a, b) => a.name.localeCompare(b.name));
+        }
+
+        // Reset advanced filters to defaults
+        function resetAdvancedFilters() {
+            advancedFilters = {
+                status: { pending: true, in_progress: true, completed: true },
+                priority: { low: true, medium: true, high: true, urgent: true },
+                dateRange: { startDate: null, endDate: null },
+                assignees: [],
+                tags: [],
+                showOverdue: false,
+                showUnassigned: false
+            };
+            updateAdvancedFilterUI();
+            applyAdvancedFilters();
+        }
+
+        // Apply advanced filters and refresh views
+        function applyAdvancedFilters() {
+            // Update filter badge
+            const badge = document.getElementById('advancedFilterBadge');
+            if (badge) {
+                badge.style.display = hasActiveAdvancedFilters() ? 'block' : 'none';
+            }
+
+            // Save filter state to localStorage
+            try {
+                localStorage.setItem('advancedFilters', JSON.stringify(advancedFilters));
+            } catch (e) {
+                console.warn('Could not save filter state:', e);
+            }
+
+            // Re-render current view
+            if (currentView === 'kanban') {
+                renderKanbanBoard();
+            } else if (currentView === 'table') {
+                renderTaskTable();
+            } else if (currentView === 'timeline') {
+                renderTimeline();
+            } else if (currentView === 'gantt') {
+                renderGanttView();
+            } else if (currentView === 'calendar') {
+                renderCalendarView();
+            }
+        }
+
+        // Load saved filter state
+        function loadAdvancedFilters() {
+            try {
+                const saved = localStorage.getItem('advancedFilters');
+                if (saved) {
+                    const parsed = JSON.parse(saved);
+                    advancedFilters = { ...advancedFilters, ...parsed };
+                }
+            } catch (e) {
+                console.warn('Could not load filter state:', e);
+            }
+        }
+
+        // Update advanced filter UI to match state
+        function updateAdvancedFilterUI() {
+            // Status checkboxes
+            ['pending', 'in_progress', 'completed'].forEach(status => {
+                const el = document.getElementById(`filterStatus_${status}`);
+                if (el) el.checked = advancedFilters.status[status];
+            });
+
+            // Priority checkboxes
+            ['low', 'medium', 'high', 'urgent'].forEach(priority => {
+                const el = document.getElementById(`filterPriority_${priority}`);
+                if (el) el.checked = advancedFilters.priority[priority];
+            });
+
+            // Date range inputs
+            const startDateEl = document.getElementById('filterDateStart');
+            const endDateEl = document.getElementById('filterDateEnd');
+            if (startDateEl) startDateEl.value = advancedFilters.dateRange.startDate || '';
+            if (endDateEl) endDateEl.value = advancedFilters.dateRange.endDate || '';
+
+            // Overdue checkbox
+            const overdueEl = document.getElementById('filterOverdue');
+            if (overdueEl) overdueEl.checked = advancedFilters.showOverdue;
+
+            // Unassigned checkbox
+            const unassignedEl = document.getElementById('filterUnassigned');
+            if (unassignedEl) unassignedEl.checked = advancedFilters.showUnassigned;
+        }
+
+        // Toggle advanced filter panel
+        function toggleAdvancedFilterPanel(event) {
+            if (event) event.stopPropagation();
+            const panel = document.getElementById('advancedFilterPanel');
+            if (panel) {
+                panel.classList.toggle('open');
+                if (panel.classList.contains('open')) {
+                    updateAdvancedFilterUI();
+                    populateAdvancedFilterOptions();
+                }
+            }
+        }
+
+        function closeAdvancedFilterPanel() {
+            const panel = document.getElementById('advancedFilterPanel');
+            if (panel) panel.classList.remove('open');
+        }
+
+        // Populate dynamic filter options (tags, assignees)
+        function populateAdvancedFilterOptions() {
+            // Populate tags
+            const tagsContainer = document.getElementById('filterTagsContainer');
+            if (tagsContainer) {
+                const allTags = getAllTaskTags();
+                if (allTags.length === 0) {
+                    tagsContainer.innerHTML = '<div class="filter-empty-hint">No tags found</div>';
+                } else {
+                    tagsContainer.innerHTML = allTags.map(tag => `
+                        <label class="filter-chip ${advancedFilters.tags.includes(tag) ? 'active' : ''}">
+                            <input type="checkbox"
+                                   ${advancedFilters.tags.includes(tag) ? 'checked' : ''}
+                                   onchange="toggleFilterTag('${tag.replace(/'/g, "\\'")}')">
+                            <span>#${tag}</span>
+                        </label>
+                    `).join('');
+                }
+            }
+
+            // Populate assignees
+            const assigneesContainer = document.getElementById('filterAssigneesContainer');
+            if (assigneesContainer) {
+                const allAssignees = getAllAssignees();
+                if (allAssignees.length === 0) {
+                    assigneesContainer.innerHTML = '<div class="filter-empty-hint">No people found</div>';
+                } else {
+                    assigneesContainer.innerHTML = allAssignees.map(person => `
+                        <label class="filter-chip ${advancedFilters.assignees.includes(person.id) ? 'active' : ''}">
+                            <input type="checkbox"
+                                   ${advancedFilters.assignees.includes(person.id) ? 'checked' : ''}
+                                   onchange="toggleFilterAssignee('${person.id}')">
+                            <span>${person.name}</span>
+                        </label>
+                    `).join('');
+                }
+            }
+        }
+
+        // Toggle tag in filter
+        function toggleFilterTag(tag) {
+            const index = advancedFilters.tags.indexOf(tag);
+            if (index > -1) {
+                advancedFilters.tags.splice(index, 1);
+            } else {
+                advancedFilters.tags.push(tag);
+            }
+            populateAdvancedFilterOptions();
+            applyAdvancedFilters();
+        }
+
+        // Toggle assignee in filter
+        function toggleFilterAssignee(personId) {
+            const index = advancedFilters.assignees.indexOf(personId);
+            if (index > -1) {
+                advancedFilters.assignees.splice(index, 1);
+            } else {
+                advancedFilters.assignees.push(personId);
+            }
+            populateAdvancedFilterOptions();
+            applyAdvancedFilters();
+        }
+
+        // Update status filter
+        function updateStatusFilter(status, checked) {
+            advancedFilters.status[status] = checked;
+            applyAdvancedFilters();
+        }
+
+        // Update priority filter
+        function updatePriorityFilter(priority, checked) {
+            advancedFilters.priority[priority] = checked;
+            applyAdvancedFilters();
+        }
+
+        // Update date range filter
+        function updateDateRangeFilter(field, value) {
+            advancedFilters.dateRange[field] = value || null;
+            applyAdvancedFilters();
+        }
+
+        // Toggle overdue filter
+        function toggleOverdueFilter(checked) {
+            advancedFilters.showOverdue = checked;
+            applyAdvancedFilters();
+        }
+
+        // Toggle unassigned filter
+        function toggleUnassignedFilter(checked) {
+            advancedFilters.showUnassigned = checked;
+            applyAdvancedFilters();
+        }
+
         // Close dropdown when clicking outside
         document.addEventListener('click', function(e) {
             if (!e.target.closest('.view-toggle-more')) {
@@ -19448,6 +20827,12 @@ John Doe,Engineering,john@example.com"
             }
             if (!e.target.closest('.view-filter-dropdown')) {
                 closeViewFilter();
+            }
+            if (!e.target.closest('.advanced-filter-dropdown')) {
+                closeAdvancedFilterPanel();
+            }
+            if (!e.target.closest('.history-timeline-panel') && !e.target.closest('.history-timeline-btn')) {
+                closeHistoryPanel();
             }
         });
 
@@ -35864,15 +37249,26 @@ Options:
 
         function renderKanbanBoard() {
             const content = document.getElementById('taskBoardContent');
-            const tasks = entities.task || [];
+            const allTasks = entities.task || [];
 
-            // Update total count
-            document.getElementById('taskBoardTotal').textContent = tasks.length;
+            // Get search term from search input
+            const searchTerm = (document.getElementById('taskBoardSearch')?.value || '').trim();
+
+            // Apply advanced filters (including search term)
+            const tasks = getAdvancedFilteredTasks(searchTerm);
+
+            // Update total count - show filtered count vs total
+            const totalEl = document.getElementById('taskBoardTotal');
+            if (tasks.length !== allTasks.length) {
+                totalEl.textContent = `${tasks.length}/${allTasks.length}`;
+            } else {
+                totalEl.textContent = allTasks.length;
+            }
             updateTaskCountBadge();
 
             const fab = document.querySelector('.task-fab');
 
-            if (tasks.length === 0) {
+            if (allTasks.length === 0) {
                 if (fab) fab.style.display = 'none';
                 content.innerHTML = `
                     <div class="task-board-empty">
@@ -35881,6 +37277,21 @@ Options:
                         <p>Create tasks to see them organized by status on this Kanban board.</p>
                         <button class="hero-task-btn hero-task-btn-primary" onclick="openHeroTaskModal()" style="padding: 0.75rem 1.25rem;">
                             <i class="ph ph-plus"></i> Create Task
+                        </button>
+                    </div>
+                `;
+                return;
+            }
+
+            if (tasks.length === 0) {
+                if (fab) fab.style.display = 'flex';
+                content.innerHTML = `
+                    <div class="task-board-empty">
+                        <i class="ph ph-funnel-simple"></i>
+                        <h3>No matching tasks</h3>
+                        <p>Try adjusting your filters or search term.</p>
+                        <button class="hero-task-btn hero-task-btn-secondary" onclick="resetAdvancedFilters()" style="padding: 0.75rem 1.25rem;">
+                            <i class="ph ph-arrow-counter-clockwise"></i> Reset Filters
                         </button>
                     </div>
                 `;
@@ -35898,7 +37309,7 @@ Options:
             let html = '<div class="kanban-board">';
 
             statuses.forEach(status => {
-                // Get tasks for this column
+                // Get tasks for this column (already filtered by getAdvancedFilteredTasks)
                 const columnTasks = tasks.filter(t => t.status === status.key);
 
                 // Group tasks by their sequence root
@@ -37639,6 +39050,9 @@ Options:
                 loadTaskComments();
                 loadNotifications();
                 loadAutomationRules();
+
+                // Load saved advanced filter state
+                loadAdvancedFilters();
 
                 // Render everything
                 try {
