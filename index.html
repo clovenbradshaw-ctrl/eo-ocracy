@@ -10165,6 +10165,92 @@
             color: #8B6F47;
         }
 
+        /* Entity type badges in dropdown */
+        .hero-dropdown-type-badge {
+            margin-left: auto;
+            font-size: 0.7rem;
+            padding: 0.15rem 0.4rem;
+            border-radius: 4px;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.02em;
+        }
+
+        .hero-dropdown-type-badge.unit {
+            background: linear-gradient(135deg, #E3D5C7 0%, #D4C4B0 100%);
+            color: #5C4A32;
+        }
+
+        .hero-dropdown-type-badge.team {
+            background: linear-gradient(135deg, #FFE8D0 0%, #FFD9B3 100%);
+            color: #8B5A2B;
+        }
+
+        /* Entity type styling in dropdown items */
+        .hero-dropdown-unit-item {
+            padding-left: 1rem !important;
+            font-weight: 600;
+            background: linear-gradient(135deg, #FAF7F4 0%, #F5F0EB 100%);
+        }
+
+        .hero-dropdown-team-item {
+            padding-left: 1.5rem !important;
+            font-weight: 500;
+        }
+
+        .hero-dropdown-role-item {
+            padding-left: 2rem !important;
+        }
+
+        /* Trigger badge styling */
+        .hero-trigger-type-badge {
+            font-size: 0.65rem;
+            padding: 0.1rem 0.35rem;
+            border-radius: 3px;
+            font-weight: 600;
+            text-transform: uppercase;
+            margin-left: 0.5rem;
+            letter-spacing: 0.02em;
+        }
+
+        .hero-trigger-type-badge.unit {
+            background: linear-gradient(135deg, #E3D5C7 0%, #D4C4B0 100%);
+            color: #5C4A32;
+        }
+
+        .hero-trigger-type-badge.team {
+            background: linear-gradient(135deg, #FFE8D0 0%, #FFD9B3 100%);
+            color: #8B5A2B;
+        }
+
+        .hero-trigger-type-badge.role {
+            background: linear-gradient(135deg, #FFF4E8 0%, #FFEDD5 100%);
+            color: #C88F4A;
+        }
+
+        /* Section header for orphan roles */
+        .hero-dropdown-section-header {
+            padding: 0.5rem 1rem;
+            font-size: 0.8rem;
+            font-weight: 600;
+            color: #8B6F47;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            border-bottom: 1px solid #E5DDD1;
+        }
+
+        /* Preview item styling for unit and team */
+        .hero-task-preview-item.unit {
+            background: linear-gradient(135deg, #E3D5C7 0%, #D4C4B0 100%);
+            color: #5C4A32;
+        }
+
+        .hero-task-preview-item.team {
+            background: linear-gradient(135deg, #FFE8D0 0%, #FFD9B3 100%);
+            color: #8B5A2B;
+        }
+
         .hero-dropdown-unassigned .hero-dropdown-team-header i {
             color: #8B6F47;
         }
@@ -33172,7 +33258,7 @@ Cmd/Ctrl + K - Command palette
                         <div class="tree-node-name" title="${team.name}">${team.name}</div>
                     </div>
                     <div class="tree-node-actions">
-                        <button class="btn-icon add" onclick="event.stopPropagation(); quickAddChild('${team.id}', 'team')" title="Add role"><i class="ph ph-plus"></i></button>
+                        <button class="btn-icon add" onclick="event.stopPropagation(); openHeroTaskModal('${team.id}', 'team')" title="Create task for this team"><i class="ph ph-plus"></i></button>
                         <button class="btn-icon" onclick="event.stopPropagation(); deleteEntity('${team.id}', 'team')" title="Delete"><i class="ph ph-x"></i></button>
                     </div>
                 `;
@@ -33242,7 +33328,7 @@ Cmd/Ctrl + K - Command palette
                         <div class="tree-node-name" title="${unit.name}">${unit.name}</div>
                     </div>
                     <div class="tree-node-actions">
-                        <button class="btn-icon add" onclick="event.stopPropagation(); quickAddChild('${unit.id}', 'unit')" title="Add team/role"><i class="ph ph-plus"></i></button>
+                        <button class="btn-icon add" onclick="event.stopPropagation(); openHeroTaskModal('${unit.id}', 'unit')" title="Create task for this unit"><i class="ph ph-plus"></i></button>
                         <button class="btn-icon" onclick="event.stopPropagation(); deleteEntity('${unit.id}', 'unit')" title="Delete"><i class="ph ph-x"></i></button>
                     </div>
                 `;
@@ -40182,21 +40268,31 @@ Cmd/Ctrl + K - Command palette
         // Flatpickr instance for due date picker
         let heroDatePicker = null;
 
+        // Track the selected entity for task assignment (can be unit, team, or role)
+        let heroSelectedEntityId = null;
+        let heroSelectedEntityType = null;
+        let heroSelectedEntityName = null;
+
         // Open the hero task modal
-        function openHeroTaskModal(preselectedRoleId = null) {
+        // Can pre-select any entity type: role, team, or unit
+        function openHeroTaskModal(preselectedEntityId = null, preselectedEntityType = 'role') {
             const overlay = document.getElementById('heroTaskOverlay');
             overlay.classList.add('active');
+
+            // Reset entity selection
+            heroSelectedEntityId = null;
+            heroSelectedEntityType = null;
+            heroSelectedEntityName = null;
 
             // Populate role and person selects
             populateHeroSelects();
 
-            // Pre-select role if provided
-            if (preselectedRoleId) {
-                const roleSelect = document.getElementById('heroTaskRole');
-                if (roleSelect) {
-                    roleSelect.value = preselectedRoleId;
-                    // Trigger change event to update person dropdown and preview
-                    roleSelect.dispatchEvent(new Event('change'));
+            // Pre-select entity if provided
+            if (preselectedEntityId) {
+                const entity = findEntity(preselectedEntityId);
+                if (entity) {
+                    // Use the new unified selection function
+                    selectHeroAssignment(preselectedEntityId, entity.name, preselectedEntityType || entity.type);
                 }
             }
 
@@ -40226,6 +40322,11 @@ Cmd/Ctrl + K - Command palette
         function closeHeroTaskModal() {
             const overlay = document.getElementById('heroTaskOverlay');
             overlay.classList.remove('active');
+
+            // Reset entity selection tracking
+            heroSelectedEntityId = null;
+            heroSelectedEntityType = null;
+            heroSelectedEntityName = null;
 
             // Reset form - basic fields
             document.getElementById('heroTaskName').value = '';
@@ -40484,7 +40585,7 @@ Cmd/Ctrl + K - Command palette
             const trigger = document.querySelector('#heroRoleDropdownContainer .hero-dropdown-trigger');
             if (trigger) {
                 const triggerText = trigger.querySelector('.trigger-text');
-                triggerText.innerHTML = '<i class="ph ph-briefcase"></i> Select a role...';
+                triggerText.innerHTML = '<i class="ph ph-sitemap"></i> Select unit, team, or role...';
                 triggerText.classList.remove('has-selection');
                 trigger.classList.remove('open');
             }
@@ -40493,40 +40594,69 @@ Cmd/Ctrl + K - Command palette
         }
 
         // Populate the custom hero role dropdown with hierarchical structure
+        // Now allows selecting units, teams, OR roles for task assignment
         function populateHeroRoleDropdown(roleHierarchy) {
             const menuEl = document.getElementById('heroRoleDropdownMenu');
             if (!menuEl) return;
 
             let html = '';
+            const hasUnits = roleHierarchy.units.length > 0;
+            const hasOrphanTeams = roleHierarchy.orphanTeams.length > 0;
+            const hasOrphanRoles = roleHierarchy.orphanRoles.length > 0;
 
-            // Add units with their teams and roles
+            // Add units with their teams and roles - all selectable
             roleHierarchy.units.forEach(unit => {
                 html += `<div class="hero-dropdown-group">`;
-                html += `<div class="hero-dropdown-unit-header">
+                // Unit is now selectable
+                html += `<div class="hero-dropdown-item hero-dropdown-unit-item" data-entity-id="${unit.id}" data-entity-type="unit"
+                    onclick="selectHeroAssignment('${unit.id}', '${unit.name.replace(/'/g, "\\'")}', 'unit')">
                     <i class="ph ph-buildings"></i> ${unit.name}
+                    <span class="hero-dropdown-type-badge unit">Unit</span>
                 </div>`;
 
                 unit.teams.forEach(team => {
-                    html += `<div class="hero-dropdown-team-header">
+                    // Team is now selectable
+                    html += `<div class="hero-dropdown-item hero-dropdown-team-item" data-entity-id="${team.id}" data-entity-type="team"
+                        onclick="selectHeroAssignment('${team.id}', '${team.name.replace(/'/g, "\\'")}', 'team')">
                         <i class="ph ph-users-three"></i> ${team.name}
+                        <span class="hero-dropdown-type-badge team">Team</span>
                     </div>`;
                     team.roles.forEach(role => {
-                        html += `<div class="hero-dropdown-item" data-role-id="${role.id}" onclick="selectHeroRole('${role.id}', '${role.name.replace(/'/g, "\\'")}')">
+                        html += `<div class="hero-dropdown-item hero-dropdown-role-item" data-entity-id="${role.id}" data-entity-type="role"
+                            onclick="selectHeroAssignment('${role.id}', '${role.name.replace(/'/g, "\\'")}', 'role')">
                             <i class="ph ph-briefcase"></i> ${role.name}
                         </div>`;
                     });
                 });
+
+                // Direct roles under unit (not in a team)
+                const directRoles = (entities.role || []).filter(role => {
+                    return relationships.some(r =>
+                        r.predicate === 'DES' &&
+                        r.subject === unit.id &&
+                        r.object === role.id
+                    );
+                });
+                directRoles.forEach(role => {
+                    html += `<div class="hero-dropdown-item hero-dropdown-role-item" data-entity-id="${role.id}" data-entity-type="role"
+                        onclick="selectHeroAssignment('${role.id}', '${role.name.replace(/'/g, "\\'")}', 'role')">
+                        <i class="ph ph-briefcase"></i> ${role.name}
+                    </div>`;
+                });
                 html += `</div>`;
             });
 
-            // Add orphan teams (teams not in any unit)
+            // Add orphan teams (teams not in any unit) - now selectable
             roleHierarchy.orphanTeams.forEach(team => {
                 html += `<div class="hero-dropdown-group">`;
-                html += `<div class="hero-dropdown-team-header">
+                html += `<div class="hero-dropdown-item hero-dropdown-team-item" data-entity-id="${team.id}" data-entity-type="team"
+                    onclick="selectHeroAssignment('${team.id}', '${team.name.replace(/'/g, "\\'")}', 'team')">
                     <i class="ph ph-users-three"></i> ${team.name}
+                    <span class="hero-dropdown-type-badge team">Team</span>
                 </div>`;
                 team.roles.forEach(role => {
-                    html += `<div class="hero-dropdown-item" data-role-id="${role.id}" onclick="selectHeroRole('${role.id}', '${role.name.replace(/'/g, "\\'")}')">
+                    html += `<div class="hero-dropdown-item hero-dropdown-role-item" data-entity-id="${role.id}" data-entity-type="role"
+                        onclick="selectHeroAssignment('${role.id}', '${role.name.replace(/'/g, "\\'")}', 'role')">
                         <i class="ph ph-briefcase"></i> ${role.name}
                     </div>`;
                 });
@@ -40534,18 +40664,19 @@ Cmd/Ctrl + K - Command palette
             });
 
             // Add orphan roles (roles not in any team)
-            if (roleHierarchy.orphanRoles.length > 0) {
-                const hasHierarchy = roleHierarchy.units.length > 0 || roleHierarchy.orphanTeams.length > 0;
+            if (hasOrphanRoles) {
+                const hasHierarchy = hasUnits || hasOrphanTeams;
 
                 if (hasHierarchy) {
                     html += `<div class="hero-dropdown-group hero-dropdown-unassigned">`;
-                    html += `<div class="hero-dropdown-team-header">
+                    html += `<div class="hero-dropdown-section-header">
                         <i class="ph ph-briefcase"></i> Other Roles
                     </div>`;
                 }
 
                 roleHierarchy.orphanRoles.forEach(role => {
-                    html += `<div class="hero-dropdown-item" data-role-id="${role.id}" onclick="selectHeroRole('${role.id}', '${role.name.replace(/'/g, "\\'")}')">
+                    html += `<div class="hero-dropdown-item hero-dropdown-role-item" data-entity-id="${role.id}" data-entity-type="role"
+                        onclick="selectHeroAssignment('${role.id}', '${role.name.replace(/'/g, "\\'")}', 'role')">
                         <i class="ph ph-briefcase"></i> ${role.name}
                     </div>`;
                 });
@@ -40555,15 +40686,55 @@ Cmd/Ctrl + K - Command palette
                 }
             }
 
-            // Show empty state if no roles
+            // Show empty state if nothing to show
             if (!html) {
                 html = `<div class="hero-dropdown-empty">
-                    <i class="ph ph-briefcase"></i>
-                    No roles available yet
+                    <i class="ph ph-sitemap"></i>
+                    No organizational entities yet
+                    <div style="font-size: 0.75rem; margin-top: 0.5rem; color: #888;">
+                        Create units, teams, or roles to assign tasks
+                    </div>
                 </div>`;
             }
 
             menuEl.innerHTML = html;
+        }
+
+        // Unified function to select any entity type for task assignment
+        function selectHeroAssignment(entityId, entityName, entityType) {
+            // Update tracking variables
+            heroSelectedEntityId = entityId;
+            heroSelectedEntityType = entityType;
+            heroSelectedEntityName = entityName;
+
+            // Update hidden input (for backwards compatibility)
+            const hiddenInput = document.getElementById('heroTaskRoleMain');
+            if (hiddenInput) {
+                hiddenInput.value = entityId;
+                hiddenInput.dataset.entityType = entityType;
+            }
+
+            // Update trigger text with appropriate icon
+            const container = document.getElementById('heroRoleDropdownContainer');
+            const trigger = container.querySelector('.hero-dropdown-trigger');
+            const triggerText = trigger.querySelector('.trigger-text');
+
+            const iconClass = entityType === 'unit' ? 'ph-buildings' :
+                             entityType === 'team' ? 'ph-users-three' : 'ph-briefcase';
+            const typeLabel = entityType.charAt(0).toUpperCase() + entityType.slice(1);
+
+            triggerText.innerHTML = `<i class="ph ${iconClass}"></i> ${entityName} <span class="hero-trigger-type-badge ${entityType}">${typeLabel}</span>`;
+            triggerText.classList.add('has-selection');
+
+            // Close dropdown
+            trigger.classList.remove('open');
+            const menu = document.getElementById('heroRoleDropdownMenu');
+            if (menu) menu.classList.remove('open');
+            document.removeEventListener('click', closeHeroRoleDropdownOnOutsideClick);
+
+            // Update preview and context
+            updateHeroTaskPreview();
+            updateAssignmentContext();
         }
 
         // Toggle the hero role dropdown
@@ -40607,35 +40778,78 @@ Cmd/Ctrl + K - Command palette
             }
         }
 
-        // Select a role from the hero dropdown
+        // Select a role from the hero dropdown (backwards compatibility wrapper)
         function selectHeroRole(roleId, roleName) {
-            // Update hidden input
-            document.getElementById('heroTaskRoleMain').value = roleId;
+            selectHeroAssignment(roleId, roleName, 'role');
+        }
 
-            // Update trigger text
-            const container = document.getElementById('heroRoleDropdownContainer');
-            const trigger = container.querySelector('.hero-dropdown-trigger');
-            const triggerText = trigger.querySelector('.trigger-text');
-            triggerText.innerHTML = `<i class="ph ph-briefcase"></i> ${roleName}`;
-            triggerText.classList.add('has-selection');
+        // Update assignment context display (shows hierarchy for selected entity)
+        function updateAssignmentContext() {
+            const contextDisplay = document.getElementById('roleContextDisplay');
+            const breadcrumb = document.getElementById('roleContextBreadcrumb');
 
-            // Update selected state in menu
-            const menu = document.getElementById('heroRoleDropdownMenu');
-            menu.querySelectorAll('.hero-dropdown-item').forEach(item => {
-                item.classList.remove('selected');
-                if (item.dataset.roleId === roleId) {
-                    item.classList.add('selected');
+            if (!heroSelectedEntityId || !contextDisplay || !breadcrumb) {
+                if (contextDisplay) contextDisplay.style.display = 'none';
+                return;
+            }
+
+            // Build hierarchy for the selected entity
+            const hierarchy = getEntityHierarchy(heroSelectedEntityId, heroSelectedEntityType);
+
+            if (hierarchy.length > 0) {
+                contextDisplay.style.display = 'block';
+                let html = '';
+                hierarchy.forEach((item, index) => {
+                    if (index > 0) {
+                        html += '<span class="role-context-arrow">›</span>';
+                    }
+                    const icon = item.type === 'unit' ? 'ph-buildings' :
+                                 item.type === 'team' ? 'ph-users-three' : 'ph-briefcase';
+                    html += `<span class="role-context-item ${item.type}" onclick="openEntityModal('${item.id}', '${item.type}')">
+                        <i class="ph ${icon}"></i>
+                        ${item.name}
+                    </span>`;
+                });
+                breadcrumb.innerHTML = html;
+            } else {
+                contextDisplay.style.display = 'none';
+            }
+        }
+
+        // Get hierarchy for any entity type (unit, team, or role)
+        function getEntityHierarchy(entityId, entityType) {
+            const hierarchy = [];
+            let currentId = entityId;
+            let currentType = entityType;
+
+            // Start with the selected entity
+            const entity = findEntity(entityId);
+            if (entity) {
+                hierarchy.unshift({ id: entity.id, name: entity.name, type: entity.type || currentType });
+            }
+
+            // Only traverse up if it's a role or team
+            if (currentType === 'role' || currentType === 'team') {
+                while (currentId) {
+                    const parentRel = relationships.find(r =>
+                        r.predicate === 'DES' && r.object === currentId
+                    );
+
+                    if (parentRel) {
+                        const parent = findEntity(parentRel.subject);
+                        if (parent && (parent.type === 'team' || parent.type === 'unit')) {
+                            hierarchy.unshift({ id: parent.id, name: parent.name, type: parent.type });
+                            currentId = parent.id;
+                        } else {
+                            break;
+                        }
+                    } else {
+                        break;
+                    }
                 }
-            });
+            }
 
-            // Close dropdown
-            trigger.classList.remove('open');
-            menu.classList.remove('open');
-            document.removeEventListener('click', closeHeroRoleDropdownOnOutsideClick);
-
-            // Trigger updates
-            updateHeroTaskPreview();
-            updateRoleContext();
+            return hierarchy;
         }
 
         // Parse date string to local Date object (avoids timezone issues)
@@ -45311,7 +45525,10 @@ Options:
         // Update preview as user fills in form
         function updateHeroTaskPreview() {
             const taskName = document.getElementById('heroTaskName').value.trim();
-            const roleId = document.getElementById('heroTaskRole').value;
+            // Use tracked entity selection (supports unit, team, or role)
+            const entityId = heroSelectedEntityId;
+            const entityType = heroSelectedEntityType;
+            const entityName = heroSelectedEntityName;
             const personId = document.getElementById('heroTaskPerson').value;
             const dueDate = document.getElementById('heroTaskDueDate').value;
             const predecessorId = document.getElementById('heroTaskPredecessor').value;
@@ -45334,7 +45551,7 @@ Options:
 
             previewDiv.style.display = 'block';
 
-            const role = entities.role.find(r => r.id === roleId);
+            const assignedEntity = entityId ? findEntity(entityId) : null;
             const person = entities.person.find(p => p.id === personId);
             const predecessor = entities.task.find(t => t.id === predecessorId);
             const workflow = entities.workflow.find(w => w.id === workflowId);
@@ -45347,12 +45564,14 @@ Options:
                 </span>
             `;
 
-            // Add role before task if selected
-            if (role) {
+            // Add assigned entity before task if selected (can be unit, team, or role)
+            if (assignedEntity && entityType) {
+                const iconClass = entityType === 'unit' ? 'ph-buildings' :
+                                 entityType === 'team' ? 'ph-users-three' : 'ph-briefcase';
                 html = `
-                    <span class="hero-task-preview-item role">
-                        <i class="ph ph-briefcase"></i>
-                        ${role.name}
+                    <span class="hero-task-preview-item ${entityType}">
+                        <i class="ph ${iconClass}"></i>
+                        ${assignedEntity.name}
                     </span>
                     <span class="hero-task-preview-arrow">→</span>
                 ` + html;
@@ -45407,10 +45626,13 @@ Options:
         function submitHeroTask() {
             const taskName = document.getElementById('heroTaskName').value.trim();
             const description = document.getElementById('heroTaskDescription')?.value.trim() || '';
-            // Use main role selector (required), fall back to legacy selector
-            const roleIdMain = document.getElementById('heroTaskRoleMain')?.value;
+            // Use tracked entity selection (supports unit, team, or role)
+            const assignedEntityId = heroSelectedEntityId;
+            const assignedEntityType = heroSelectedEntityType;
+            const assignedEntityName = heroSelectedEntityName;
+            // Fall back to legacy role selector for backwards compatibility
             const roleIdLegacy = document.getElementById('heroTaskRole')?.value;
-            const roleId = roleIdMain || roleIdLegacy;
+            const roleId = assignedEntityType === 'role' ? assignedEntityId : roleIdLegacy;
             const personId = document.getElementById('heroTaskPerson')?.value;
             const dueDate = document.getElementById('heroTaskDueDate')?.value;
             const predecessorId = document.getElementById('heroTaskPredecessor')?.value;
@@ -45423,12 +45645,15 @@ Options:
                 return;
             }
 
-            // Role is optional - users can assign later
+            // Assignment is optional - users can assign later
 
             let taskId = null;
 
             try {
-                const role = entities.role.find(r => r.id === roleId);
+                const role = assignedEntityType === 'role' ? entities.role.find(r => r.id === assignedEntityId) : null;
+                const team = assignedEntityType === 'team' ? entities.team.find(t => t.id === assignedEntityId) : null;
+                const unit = assignedEntityType === 'unit' ? entities.unit.find(u => u.id === assignedEntityId) : null;
+                const assignedEntity = role || team || unit;
                 const person = personId ? entities.person.find(p => p.id === personId) : null;
                 const workflow = workflowId ? entities.workflow.find(w => w.id === workflowId) : null;
 
@@ -45457,7 +45682,10 @@ Options:
                     createdAt: new Date().toISOString(),
                     createdBy: currentUserId,
                     visibility: heroVisibility || 'public',
-                    visibilityTeamId: visibilityTeamIdValue
+                    visibilityTeamId: visibilityTeamIdValue,
+                    // Track assignment at any level (unit, team, or role)
+                    assignedEntityId: assignedEntityId || null,
+                    assignedEntityType: assignedEntityType || null
                 };
                 entities.task.push(taskObject);
 
@@ -45510,35 +45738,40 @@ Options:
                     });
                 }
 
-                // 3. Connect role to task (Role CON Task) - only if role is selected
-                if (role) {
-                    const roleTaskRelId = 'rel' + (Date.now() + 1);
-                    const roleTaskRel = {
-                        id: roleTaskRelId,
-                        subject: role.id,
+                // 3. Connect entity to task (Entity CON Task) - supports unit, team, or role
+                if (assignedEntity && assignedEntityId) {
+                    const entityTaskRelId = 'rel' + (Date.now() + 1);
+                    const entityTaskRel = {
+                        id: entityTaskRelId,
+                        subject: assignedEntityId,
                         predicate: 'CON',
                         object: taskId,
                         description: ''
                     };
-                    relationships.push(roleTaskRel);
+                    relationships.push(entityTaskRel);
 
                     logActivityToXano({
                         event_verb: 'Link Connection',
                         eo_operator: 'CON',
                         object_type: 'relationship',
-                        object_id: roleTaskRelId,
-                        object_label: `${role.name} → ${taskName}`,
+                        object_id: entityTaskRelId,
+                        object_label: `${assignedEntity.name} → ${taskName}`,
                         data_json: {
-                            subject_id: role.id,
+                            subject_id: assignedEntityId,
+                            subject_type: assignedEntityType,
                             predicate: 'CON',
                             target_id: taskId
                         }
                     });
 
-                    // Track team usage for "most used team" feature
-                    const teamId = getTeamForRole(role.id);
-                    if (teamId) {
-                        trackTeamUsage(teamId);
+                    // Track team/unit usage for "most used" feature
+                    if (assignedEntityType === 'role') {
+                        const teamId = getTeamForRole(assignedEntityId);
+                        if (teamId) {
+                            trackTeamUsage(teamId);
+                        }
+                    } else if (assignedEntityType === 'team') {
+                        trackTeamUsage(assignedEntityId);
                     }
                 }
 
@@ -45580,8 +45813,13 @@ Options:
                 saveToLocalStorage();
 
                 // Trigger automation rules for task assignment
-                if (role) {
-                    executeAutomationRules('task_assigned', { roleId: roleId, taskId: taskId });
+                if (assignedEntity) {
+                    executeAutomationRules('task_assigned', {
+                        entityId: assignedEntityId,
+                        entityType: assignedEntityType,
+                        roleId: assignedEntityType === 'role' ? assignedEntityId : null,
+                        taskId: taskId
+                    });
                 }
 
                 console.log('Task created via hero modal:', taskName);
@@ -48781,16 +49019,16 @@ Options:
                     </div>
                 </div>
 
-                <!-- Role Assignment (Optional) -->
+                <!-- Assignment (Optional) - Supports Unit, Team, or Role -->
                 <div class="hero-task-input-group" style="margin-top: 1rem;">
                     <label class="hero-task-label">
-                        <i class="ph ph-briefcase"></i> Assign to Role
+                        <i class="ph ph-sitemap"></i> Assign to
                     </label>
                     <div class="hero-dropdown-container" id="heroRoleDropdownContainer">
-                        <input type="hidden" id="heroTaskRoleMain" value="">
+                        <input type="hidden" id="heroTaskRoleMain" value="" data-entity-type="">
                         <div class="hero-dropdown-trigger" onclick="toggleHeroRoleDropdown(event)">
                             <span class="trigger-text">
-                                <i class="ph ph-briefcase"></i> Select a role...
+                                <i class="ph ph-sitemap"></i> Select unit, team, or role...
                             </span>
                             <i class="ph ph-caret-down trigger-arrow"></i>
                         </div>
