@@ -1228,7 +1228,7 @@
 
         .container {
             display: grid;
-            grid-template-columns: 260px 1fr;
+            grid-template-columns: 320px 1fr;
             height: calc(100vh - 65px);
         }
 
@@ -1332,7 +1332,7 @@
 
         /* Right panel removed - no longer needed */
         .container.right-collapsed {
-            grid-template-columns: 260px 1fr;
+            grid-template-columns: 320px 1fr;
         }
 
         .container.left-collapsed.right-collapsed {
@@ -4258,9 +4258,12 @@
             font-size: 0.875rem;
             line-height: 1.4;
             font-weight: inherit;
-            white-space: nowrap;
+            display: -webkit-box;
+            -webkit-line-clamp: 2;
+            -webkit-box-orient: vertical;
             overflow: hidden;
             text-overflow: ellipsis;
+            word-break: break-word;
         }
 
         .tree-node-meta {
@@ -8360,9 +8363,12 @@
         .person-roles {
             font-size: 0.75rem;
             color: #8B6F47;
-            white-space: nowrap;
+            display: -webkit-box;
+            -webkit-line-clamp: 2;
+            -webkit-box-orient: vertical;
             overflow: hidden;
             text-overflow: ellipsis;
+            word-break: break-word;
         }
 
         .person-actions {
@@ -25227,7 +25233,7 @@ Cmd/Ctrl + K - Command palette
                     <span class="tree-expand-icon" style="visibility: hidden;">▶</span>
                     <span class="tree-node-icon"><i class="ph ph-briefcase"></i></span>
                     <div class="tree-node-content">
-                        <div class="tree-node-name">${role.name}</div>
+                        <div class="tree-node-name" title="${role.name}">${role.name}</div>
                     </div>
                     <div class="tree-node-actions">
                         <button class="btn-icon add" onclick="event.stopPropagation(); openHeroTaskModal('${role.id}')" title="Create task for this role"><i class="ph ph-plus"></i></button>
@@ -25272,7 +25278,7 @@ Cmd/Ctrl + K - Command palette
                     <span class="tree-expand-icon ${hasRoles ? 'expanded' : ''}" style="${hasRoles ? '' : 'visibility: hidden;'}">▶</span>
                     <span class="tree-node-icon"><i class="ph ph-users-three"></i></span>
                     <div class="tree-node-content">
-                        <div class="tree-node-name">${team.name}</div>
+                        <div class="tree-node-name" title="${team.name}">${team.name}</div>
                     </div>
                     <div class="tree-node-actions">
                         <button class="btn-icon add" onclick="event.stopPropagation(); quickAddChild('${team.id}', 'team')" title="Add role"><i class="ph ph-plus"></i></button>
@@ -25342,7 +25348,7 @@ Cmd/Ctrl + K - Command palette
                     <span class="tree-expand-icon ${hasChildren ? 'expanded' : ''}" style="${hasChildren ? '' : 'visibility: hidden;'}">▶</span>
                     <span class="tree-node-icon"><i class="ph ph-buildings"></i></span>
                     <div class="tree-node-content">
-                        <div class="tree-node-name">${unit.name}</div>
+                        <div class="tree-node-name" title="${unit.name}">${unit.name}</div>
                     </div>
                     <div class="tree-node-actions">
                         <button class="btn-icon add" onclick="event.stopPropagation(); quickAddChild('${unit.id}', 'unit')" title="Add team/role"><i class="ph ph-plus"></i></button>
@@ -25684,11 +25690,12 @@ Cmd/Ctrl + K - Command palette
                 // Get initials for avatar
                 const initials = person.name.split(' ').map(n => n[0]).join('').toUpperCase().slice(0, 2);
 
+                const rolesText = rolesForPerson.length > 0 ? rolesForPerson.join(', ') : 'No roles assigned';
                 card.innerHTML = `
                     <div class="person-avatar">${initials}</div>
                     <div class="person-info">
-                        <div class="person-name">${person.name}</div>
-                        <div class="person-roles">${rolesForPerson.length > 0 ? rolesForPerson.join(', ') : 'No roles assigned'}</div>
+                        <div class="person-name" title="${person.name}">${person.name}</div>
+                        <div class="person-roles" title="${rolesText}">${rolesText}</div>
                     </div>
                     <div class="person-actions">
                         <button class="btn-icon" onclick="event.stopPropagation(); deleteEntity('${person.id}', 'person')" title="Delete">
@@ -29658,7 +29665,7 @@ Cmd/Ctrl + K - Command palette
                 ${expandIcon}
                 <span style="font-size: 1.2rem;">${icon}</span>
                 <div class="tree-node-content">
-                    <div class="tree-node-name">${entity.name}</div>
+                    <div class="tree-node-name" title="${entity.name}">${entity.name}</div>
                     <div class="tree-node-meta">${entity.type}</div>
                     ${peopleHTML}
                 </div>
