@@ -11677,6 +11677,273 @@
         }
 
         /* ============================================
+           STRUCTURE VIEW STYLES
+           ============================================ */
+
+        .structure-view {
+            display: none;
+            flex-direction: column;
+            height: 100%;
+            background: #FAF7F5;
+            overflow: auto;
+        }
+
+        .structure-view.active {
+            display: flex;
+        }
+
+        .structure-container {
+            padding: 1.5rem;
+            max-width: 900px;
+            margin: 0 auto;
+            width: 100%;
+        }
+
+        .structure-header {
+            margin-bottom: 1.5rem;
+        }
+
+        .structure-header h2 {
+            font-size: 1.25rem;
+            font-weight: 600;
+            color: #3D2E1F;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .structure-header h2 i {
+            color: #9A6B3A;
+        }
+
+        .structure-stats {
+            display: flex;
+            gap: 1.5rem;
+            margin-top: 0.75rem;
+            font-size: 0.875rem;
+            color: #6B5B4F;
+        }
+
+        .structure-stats span {
+            display: flex;
+            align-items: center;
+            gap: 0.35rem;
+        }
+
+        .structure-tree {
+            background: white;
+            border-radius: 12px;
+            border: 1px solid #E5DDD1;
+            overflow: hidden;
+        }
+
+        .structure-unit {
+            border-bottom: 1px solid #E5DDD1;
+        }
+
+        .structure-unit:last-child {
+            border-bottom: none;
+        }
+
+        .structure-unit-header {
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+            padding: 1rem 1.25rem;
+            background: #F8F5F1;
+            cursor: pointer;
+            transition: background 0.15s;
+        }
+
+        .structure-unit-header:hover {
+            background: #F0EBE5;
+        }
+
+        .structure-unit-header i.toggle {
+            color: #9A6B3A;
+            font-size: 1.125rem;
+            transition: transform 0.2s;
+        }
+
+        .structure-unit-header.collapsed i.toggle {
+            transform: rotate(-90deg);
+        }
+
+        .structure-unit-header .unit-icon {
+            width: 32px;
+            height: 32px;
+            background: linear-gradient(135deg, #C88F4A 0%, #B87B5B 100%);
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-size: 1rem;
+        }
+
+        .structure-unit-header .unit-name {
+            font-weight: 600;
+            color: #3D2E1F;
+            flex: 1;
+        }
+
+        .structure-unit-header .unit-count {
+            font-size: 0.75rem;
+            color: #6B5B4F;
+            background: #E5DDD1;
+            padding: 0.25rem 0.5rem;
+            border-radius: 10px;
+        }
+
+        .structure-unit-content {
+            padding-left: 1rem;
+        }
+
+        .structure-unit-content.collapsed {
+            display: none;
+        }
+
+        .structure-team {
+            border-left: 2px solid #E5DDD1;
+            margin-left: 1rem;
+        }
+
+        .structure-team-header {
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+            padding: 0.875rem 1rem;
+            cursor: pointer;
+            transition: background 0.15s;
+        }
+
+        .structure-team-header:hover {
+            background: #FAF7F5;
+        }
+
+        .structure-team-header i.toggle {
+            color: #9A6B3A;
+            font-size: 1rem;
+            transition: transform 0.2s;
+        }
+
+        .structure-team-header.collapsed i.toggle {
+            transform: rotate(-90deg);
+        }
+
+        .structure-team-header .team-icon {
+            width: 28px;
+            height: 28px;
+            background: #E8DFD5;
+            border-radius: 6px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: #9A6B3A;
+            font-size: 0.875rem;
+        }
+
+        .structure-team-header .team-name {
+            font-weight: 500;
+            color: #3D2E1F;
+            flex: 1;
+        }
+
+        .structure-team-header .team-count {
+            font-size: 0.7rem;
+            color: #6B5B4F;
+            background: #F0EBE5;
+            padding: 0.2rem 0.4rem;
+            border-radius: 8px;
+        }
+
+        .structure-team-content {
+            padding-left: 0.5rem;
+        }
+
+        .structure-team-content.collapsed {
+            display: none;
+        }
+
+        .structure-role {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            padding: 0.5rem 1rem 0.5rem 2.5rem;
+            font-size: 0.875rem;
+            color: #6B5B4F;
+            border-left: 2px solid #E5DDD1;
+            margin-left: 1rem;
+        }
+
+        .structure-role i {
+            color: #9A6B3A;
+            font-size: 0.875rem;
+        }
+
+        .structure-role .role-name {
+            flex: 1;
+        }
+
+        .structure-role .role-people {
+            font-size: 0.75rem;
+            color: #8B7B6B;
+        }
+
+        .structure-empty {
+            text-align: center;
+            padding: 3rem;
+            color: #8B7B6B;
+        }
+
+        .structure-empty i {
+            font-size: 3rem;
+            color: #C8BFB5;
+            margin-bottom: 1rem;
+        }
+
+        .structure-empty p {
+            font-size: 0.9375rem;
+        }
+
+        .structure-orphans {
+            margin-top: 1.5rem;
+        }
+
+        .structure-orphans-header {
+            font-size: 0.875rem;
+            font-weight: 500;
+            color: #8B7B6B;
+            margin-bottom: 0.75rem;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .structure-orphan-list {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 0.5rem;
+        }
+
+        .structure-orphan-item {
+            display: flex;
+            align-items: center;
+            gap: 0.35rem;
+            padding: 0.35rem 0.65rem;
+            background: white;
+            border: 1px solid #E5DDD1;
+            border-radius: 6px;
+            font-size: 0.8125rem;
+            color: #6B5B4F;
+        }
+
+        .structure-orphan-item i {
+            font-size: 0.875rem;
+            color: #9A6B3A;
+        }
+
+        /* ============================================
            TASK BOARD VIEW STYLES
            ============================================ */
 
@@ -19764,6 +20031,10 @@
                     <i class="ph ph-calendar"></i>
                     <span>Calendar</span>
                 </button>
+                <button class="view-tab" data-view="structure" onclick="switchView('structure')">
+                    <i class="ph ph-tree-structure"></i>
+                    <span>Structure</span>
+                </button>
             </div>
         </div>
 
@@ -20277,6 +20548,9 @@
 
             <!-- Org Chart View -->
             <div id="orgchartView" class="orgchart-view"></div>
+
+            <!-- Structure View (Units/Teams/Roles) -->
+            <div id="structureView" class="structure-view"></div>
 
             <!-- Task Board View (Work) -->
             <div id="taskBoardView" class="task-board-view">
@@ -24354,6 +24628,7 @@ John Doe,Engineering,john@example.com"
             document.getElementById('graphView').classList.remove('active');
             document.getElementById('vennView').classList.remove('active');
             document.getElementById('orgchartView').classList.remove('active');
+            document.getElementById('structureView').classList.remove('active');
             document.getElementById('taskBoardView').classList.remove('active');
             document.getElementById('flowView').classList.remove('active');
             document.getElementById('shapeView').classList.remove('active');
@@ -24396,6 +24671,9 @@ John Doe,Engineering,john@example.com"
             } else if (view === 'calendar') {
                 document.getElementById('calendarView').classList.add('active');
                 renderCalendarView();
+            } else if (view === 'structure') {
+                document.getElementById('structureView').classList.add('active');
+                renderStructureView();
             } else {
                 document.getElementById('graphView').classList.add('active');
                 setTimeout(() => updateGraph(), 100);
@@ -34969,6 +35247,211 @@ Cmd/Ctrl + K - Command palette
         // Clear the first column entity (called when manually changing groupBy)
         function clearFirstColumnEntity() {
             cardViewFirstColumnEntity = null;
+        }
+
+        // ==========================================
+        // STRUCTURE VIEW - Simple hierarchy of Units/Teams/Roles
+        // ==========================================
+
+        function renderStructureView() {
+            const container = document.getElementById('structureView');
+            if (!container) return;
+
+            // Get all DES relationships (defines hierarchy)
+            const desRelationships = relationships.filter(r => r.predicate === 'DES');
+
+            // Track which entities have parents
+            const entitiesWithParents = new Set(desRelationships.map(r => r.object));
+
+            // Helper: get children of a parent
+            function getChildren(parentId) {
+                return desRelationships
+                    .filter(r => r.subject === parentId)
+                    .map(r => findEntity(r.object))
+                    .filter(e => e !== null);
+            }
+
+            // Helper: get people in a role (via INS relationships)
+            function getPeopleInRole(roleId) {
+                return relationships
+                    .filter(r => r.predicate === 'INS' && r.object === roleId)
+                    .map(r => findEntity(r.subject))
+                    .filter(e => e !== null && e.type === 'person');
+            }
+
+            // Get top-level units (units without parents)
+            const topLevelUnits = entities.unit.filter(u => !entitiesWithParents.has(u.id));
+
+            // Get orphaned teams and roles (no parent)
+            const orphanedTeams = entities.team.filter(t => !entitiesWithParents.has(t.id));
+            const orphanedRoles = entities.role.filter(r => !entitiesWithParents.has(r.id));
+
+            // Count totals
+            const unitCount = entities.unit.length;
+            const teamCount = entities.team.length;
+            const roleCount = entities.role.length;
+
+            // Build HTML
+            let html = `
+                <div class="structure-container">
+                    <div class="structure-header">
+                        <h2><i class="ph ph-tree-structure"></i> Organization Structure</h2>
+                        <div class="structure-stats">
+                            <span><i class="ph ph-buildings"></i> ${unitCount} Unit${unitCount !== 1 ? 's' : ''}</span>
+                            <span><i class="ph ph-users-three"></i> ${teamCount} Team${teamCount !== 1 ? 's' : ''}</span>
+                            <span><i class="ph ph-briefcase"></i> ${roleCount} Role${roleCount !== 1 ? 's' : ''}</span>
+                        </div>
+                    </div>
+            `;
+
+            if (topLevelUnits.length === 0 && orphanedTeams.length === 0 && orphanedRoles.length === 0) {
+                html += `
+                    <div class="structure-empty">
+                        <i class="ph ph-tree-structure"></i>
+                        <p>No organizational structure defined yet.</p>
+                        <p style="font-size: 0.8125rem; margin-top: 0.5rem; color: #A89A8C;">Create units, teams, and roles to see them here.</p>
+                    </div>
+                `;
+            } else {
+                html += '<div class="structure-tree">';
+
+                // Render each top-level unit
+                topLevelUnits.forEach(unit => {
+                    const teams = getChildren(unit.id).filter(e => e.type === 'team');
+                    const directRoles = getChildren(unit.id).filter(e => e.type === 'role');
+                    const childCount = teams.length + directRoles.length;
+
+                    html += `
+                        <div class="structure-unit">
+                            <div class="structure-unit-header" onclick="toggleStructureUnit(this)">
+                                <i class="ph ph-caret-down toggle"></i>
+                                <div class="unit-icon"><i class="ph ph-buildings"></i></div>
+                                <span class="unit-name">${escapeHtml(unit.name)}</span>
+                                <span class="unit-count">${childCount} item${childCount !== 1 ? 's' : ''}</span>
+                            </div>
+                            <div class="structure-unit-content">
+                    `;
+
+                    // Render teams within unit
+                    teams.forEach(team => {
+                        const roles = getChildren(team.id).filter(e => e.type === 'role');
+                        const roleCount = roles.length;
+
+                        html += `
+                            <div class="structure-team">
+                                <div class="structure-team-header" onclick="toggleStructureTeam(this)">
+                                    <i class="ph ph-caret-down toggle"></i>
+                                    <div class="team-icon"><i class="ph ph-users-three"></i></div>
+                                    <span class="team-name">${escapeHtml(team.name)}</span>
+                                    <span class="team-count">${roleCount} role${roleCount !== 1 ? 's' : ''}</span>
+                                </div>
+                                <div class="structure-team-content">
+                        `;
+
+                        // Render roles within team
+                        roles.forEach(role => {
+                            const people = getPeopleInRole(role.id);
+                            const peopleCount = people.length;
+                            html += `
+                                <div class="structure-role">
+                                    <i class="ph ph-briefcase"></i>
+                                    <span class="role-name">${escapeHtml(role.name)}</span>
+                                    ${peopleCount > 0 ? `<span class="role-people">${peopleCount} person${peopleCount !== 1 ? 's' : ''}</span>` : ''}
+                                </div>
+                            `;
+                        });
+
+                        html += `
+                                </div>
+                            </div>
+                        `;
+                    });
+
+                    // Render roles directly under unit (not in a team)
+                    directRoles.forEach(role => {
+                        const people = getPeopleInRole(role.id);
+                        const peopleCount = people.length;
+                        html += `
+                            <div class="structure-role" style="margin-left: 0; padding-left: 1rem;">
+                                <i class="ph ph-briefcase"></i>
+                                <span class="role-name">${escapeHtml(role.name)}</span>
+                                ${peopleCount > 0 ? `<span class="role-people">${peopleCount} person${peopleCount !== 1 ? 's' : ''}</span>` : ''}
+                            </div>
+                        `;
+                    });
+
+                    html += `
+                            </div>
+                        </div>
+                    `;
+                });
+
+                html += '</div>';
+            }
+
+            // Show orphaned teams and roles
+            if (orphanedTeams.length > 0 || orphanedRoles.length > 0) {
+                html += '<div class="structure-orphans">';
+
+                if (orphanedTeams.length > 0) {
+                    html += `
+                        <div class="structure-orphans-header">
+                            <i class="ph ph-warning-circle"></i> Unassigned Teams
+                        </div>
+                        <div class="structure-orphan-list">
+                    `;
+                    orphanedTeams.forEach(team => {
+                        html += `
+                            <div class="structure-orphan-item">
+                                <i class="ph ph-users-three"></i>
+                                ${escapeHtml(team.name)}
+                            </div>
+                        `;
+                    });
+                    html += '</div>';
+                }
+
+                if (orphanedRoles.length > 0) {
+                    html += `
+                        <div class="structure-orphans-header" style="margin-top: 1rem;">
+                            <i class="ph ph-warning-circle"></i> Unassigned Roles
+                        </div>
+                        <div class="structure-orphan-list">
+                    `;
+                    orphanedRoles.forEach(role => {
+                        html += `
+                            <div class="structure-orphan-item">
+                                <i class="ph ph-briefcase"></i>
+                                ${escapeHtml(role.name)}
+                            </div>
+                        `;
+                    });
+                    html += '</div>';
+                }
+
+                html += '</div>';
+            }
+
+            html += '</div>';
+            container.innerHTML = html;
+        }
+
+        // Toggle unit expansion
+        function toggleStructureUnit(header) {
+            header.classList.toggle('collapsed');
+            const content = header.nextElementSibling;
+            if (content) {
+                content.classList.toggle('collapsed');
+            }
+        }
+
+        // Toggle team expansion
+        function toggleStructureTeam(header) {
+            header.classList.toggle('collapsed');
+            const content = header.nextElementSibling;
+            if (content) {
+                content.classList.toggle('collapsed');
+            }
         }
 
         // Card View Rendering
