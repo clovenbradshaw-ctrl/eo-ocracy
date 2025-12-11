@@ -22177,14 +22177,15 @@ John Doe,Engineering,john@example.com"
             },
 
             // Get a single record by ID
-            async getRecord(tableType, recordId) {
+            async getRecord(tableType, recordId, options = {}) {
                 const config = this.getTableConfig(tableType);
                 if (!config) throw new Error(`Unknown table type: ${tableType}`);
 
                 const result = await this.request('getRecord', {
                     table: config.tableId,
                     tableName: tableType,
-                    recordId
+                    recordId,
+                    filterFormula: options.filterFormula || null
                 });
 
                 // Normalize single record response
@@ -22206,7 +22207,7 @@ John Doe,Engineering,john@example.com"
             },
 
             // Search records in a table
-            async search(tableType, query) {
+            async search(tableType, query, options = {}) {
                 const config = this.getTableConfig(tableType);
                 if (!config) throw new Error(`Unknown table type: ${tableType}`);
 
@@ -22214,7 +22215,9 @@ John Doe,Engineering,john@example.com"
                     table: config.tableId,
                     tableName: tableType,
                     query,
-                    searchField: config.displayField
+                    searchField: options.searchField || config.displayField,
+                    filterFormula: options.filterFormula || null,
+                    maxRecords: options.maxRecords || 50
                 });
 
                 // Normalize response to handle both flat and nested field formats
@@ -36172,23 +36175,34 @@ Cmd/Ctrl + K - Command palette
                 action: 'getRecords',
                 table: 'tbl0uHmtLkGyDnSP9',
                 fields: ['Client Name'],
+                filterFormula: null,
                 maxRecords: 10
             },
             getRecord: {
                 action: 'getRecord',
                 table: 'tbl0uHmtLkGyDnSP9',
-                recordId: 'ENTER_RECORD_ID_HERE'
+                recordId: 'ENTER_RECORD_ID_HERE',
+                filterFormula: null
             },
             search: {
                 action: 'search',
                 table: 'tbl0uHmtLkGyDnSP9',
                 query: 'search term',
-                searchField: 'Client Name'
+                searchField: 'Client Name',
+                filterFormula: null,
+                maxRecords: 50
             },
             getRecordWithParents: {
                 action: 'getRecordWithParents',
                 table: 'tblgynOzESGvAXAsK',
                 recordId: 'ENTER_RECORD_ID_HERE'
+            },
+            filterExample: {
+                action: 'getRecords',
+                table: 'tbl0uHmtLkGyDnSP9',
+                fields: ['Client Name'],
+                filterFormula: "AND({Status}='Active', NOT({Archived}))",
+                maxRecords: 50
             },
             custom: {
                 action: 'custom',
