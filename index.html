@@ -21848,6 +21848,7 @@ John Doe,Engineering,john@example.com"
                 clients: {
                     tableId: 'tbl0uHmtLkGyDnSP9',
                     displayField: 'Client Name',
+                    searchField: 'name search 2.0',  // Field containing name variations for matching
                     softrPath: '/client-info',
                     icon: 'ph-user',
                     color: '#1D4ED8',
@@ -22008,6 +22009,110 @@ John Doe,Engineering,john@example.com"
             openInSoftr(tag) {
                 const url = this.getSoftrUrl(tag);
                 window.open(url, '_blank');
+            },
+
+            // Client records cache for local name matching
+            clientsCache: {
+                records: null,
+                loading: false,
+                lastFetch: null
+            },
+
+            // Load all clients with name search field for local matching
+            async loadAllClients(forceRefresh = false) {
+                const cacheAge = this.clientsCache.lastFetch
+                    ? Date.now() - this.clientsCache.lastFetch
+                    : Infinity;
+
+                // Return cached if fresh (5 minutes) and not forcing refresh
+                if (!forceRefresh && this.clientsCache.records && cacheAge < 5 * 60 * 1000) {
+                    return this.clientsCache.records;
+                }
+
+                // If already loading, wait for it
+                if (this.clientsCache.loading) {
+                    return new Promise(resolve => {
+                        const checkInterval = setInterval(() => {
+                            if (!this.clientsCache.loading) {
+                                clearInterval(checkInterval);
+                                resolve(this.clientsCache.records);
+                            }
+                        }, 100);
+                    });
+                }
+
+                this.clientsCache.loading = true;
+                try {
+                    const config = this.tables.clients;
+                    const result = await this.request('getRecords', {
+                        table: config.tableId,
+                        fields: [config.displayField, config.searchField],
+                        maxRecords: 10000  // Get all clients
+                    });
+
+                    this.clientsCache.records = result.records || [];
+                    this.clientsCache.lastFetch = Date.now();
+                    return this.clientsCache.records;
+                } finally {
+                    this.clientsCache.loading = false;
+                }
+            },
+
+            // Local name matching against 'name search 2.0' field
+            searchClientsLocal(query, allClients) {
+                if (!query || query.trim().length === 0) {
+                    // Return first 50 if no query
+                    return allClients.slice(0, 50);
+                }
+
+                const searchTerms = query.toLowerCase().trim().split(/\s+/);
+                const config = this.tables.clients;
+
+                const scored = allClients.map(client => {
+                    const displayName = (client.fields?.[config.displayField] || '').toLowerCase();
+                    const searchVariations = (client.fields?.[config.searchField] || '').toLowerCase();
+
+                    let score = 0;
+                    let matchedTerms = 0;
+
+                    for (const term of searchTerms) {
+                        // Exact match in display name gets highest score
+                        if (displayName.includes(term)) {
+                            score += 100;
+                            matchedTerms++;
+                        }
+                        // Match in search variations gets good score
+                        else if (searchVariations.includes(term)) {
+                            score += 50;
+                            matchedTerms++;
+                        }
+                    }
+
+                    // Bonus for matching all terms
+                    if (matchedTerms === searchTerms.length) {
+                        score += 25 * matchedTerms;
+                    }
+
+                    // Bonus for display name starting with query
+                    if (displayName.startsWith(searchTerms[0])) {
+                        score += 50;
+                    }
+
+                    return { client, score };
+                });
+
+                // Filter to only matching records and sort by score
+                return scored
+                    .filter(item => item.score > 0)
+                    .sort((a, b) => b.score - a.score)
+                    .map(item => item.client)
+                    .slice(0, 100);  // Limit results
+            },
+
+            // Search clients using local name matching
+            async searchClientsWithVariations(query) {
+                const allClients = await this.loadAllClients();
+                return this.searchClientsLocal(query, allClients);
             }
         };
 
@@ -38078,14 +38183,20 @@ Cmd/Ctrl + K - Command palette
             `;
 
             try {
-                let result;
-                if (searchQuery) {
-                    result = await AirtableAPI.search(category, searchQuery);
+                let records;
+
+                // For clients, use local matching against 'name search 2.0' field
+                if (category === 'clients') {
+                    records = await AirtableAPI.searchClientsWithVariations(searchQuery);
+                } else if (searchQuery) {
+                    const result = await AirtableAPI.search(category, searchQuery);
+                    records = result.records || [];
                 } else {
-                    result = await AirtableAPI.getRecords(category);
+                    const result = await AirtableAPI.getRecords(category);
+                    records = result.records || [];
                 }
 
-                airtablePickerState.results = result.records || [];
+                airtablePickerState.results = records;
                 renderAirtablePickerResults();
 
             } catch (error) {
