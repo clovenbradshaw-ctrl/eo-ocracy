@@ -1251,6 +1251,89 @@
             display: block;
         }
 
+        /* Time Travel Modal */
+        .time-travel-modal-overlay {
+            position: fixed;
+            inset: 0;
+            background: rgba(0,0,0,0.3);
+            z-index: 1001;
+            display: none;
+        }
+
+        .time-travel-modal-overlay.open {
+            display: block;
+        }
+
+        .time-travel-modal {
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            background: white;
+            border-radius: 12px;
+            box-shadow: 0 16px 48px rgba(0,0,0,0.2);
+            width: 100%;
+            max-width: 400px;
+            z-index: 1002;
+            display: none;
+        }
+
+        .time-travel-modal.open {
+            display: block;
+        }
+
+        .time-travel-modal-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 16px 20px;
+            border-bottom: 1px solid #EDE8E0;
+        }
+
+        .time-travel-modal-title {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            font-weight: 600;
+            color: #3D2E1F;
+        }
+
+        .time-travel-modal-title i {
+            font-size: 1.2rem;
+            color: #C88F4A;
+        }
+
+        .time-travel-modal-close {
+            background: none;
+            border: none;
+            cursor: pointer;
+            color: #6B5642;
+            padding: 4px;
+            border-radius: 4px;
+            transition: all 0.15s ease;
+        }
+
+        .time-travel-modal-close:hover {
+            background: #F8F5F0;
+            color: #C88F4A;
+        }
+
+        .time-travel-modal-content {
+            padding: 20px;
+        }
+
+        .time-travel-modal-desc {
+            font-size: 0.85rem;
+            color: #6B5642;
+            margin-bottom: 16px;
+        }
+
+        .time-travel-modal-input {
+            display: flex;
+            gap: 12px;
+            align-items: center;
+        }
+
         /* Command Palette Styles */
         .command-palette-overlay {
             position: fixed;
@@ -11747,6 +11830,91 @@
             font-weight: 600;
         }
 
+        .inline-filter-icon-btn {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            width: 32px;
+            height: 32px;
+            border: 1px solid #E5DDD1;
+            border-radius: 6px;
+            background: white;
+            cursor: pointer;
+            color: #6B5642;
+            transition: all 0.15s ease;
+        }
+
+        .inline-filter-icon-btn:hover {
+            background: #F8F5F0;
+            border-color: #C88F4A;
+            color: #C88F4A;
+        }
+
+        .inline-filter-icon-btn i {
+            font-size: 1rem;
+        }
+
+        .inline-filter-settings-wrapper {
+            position: relative;
+        }
+
+        .view-settings-dropdown {
+            position: absolute;
+            top: 100%;
+            right: 0;
+            margin-top: 4px;
+            background: white;
+            border: 1px solid #E5DDD1;
+            border-radius: 8px;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+            padding: 8px 0;
+            min-width: 160px;
+            z-index: 100;
+            display: none;
+        }
+
+        .view-settings-dropdown.open {
+            display: block;
+        }
+
+        .view-settings-title {
+            font-size: 0.7rem;
+            font-weight: 600;
+            color: #8B6F47;
+            padding: 6px 12px 8px;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            border-bottom: 1px solid #EDE8E0;
+            margin-bottom: 4px;
+        }
+
+        .view-settings-item {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            padding: 8px 12px;
+            font-size: 0.85rem;
+            color: #3D2E1F;
+            cursor: pointer;
+            transition: background 0.15s ease;
+        }
+
+        .view-settings-item:hover {
+            background: #F8F5F0;
+        }
+
+        .view-settings-item input[type="checkbox"] {
+            width: 16px;
+            height: 16px;
+            accent-color: #C88F4A;
+            cursor: pointer;
+        }
+
+        .view-settings-item i {
+            font-size: 1rem;
+            color: #6B5642;
+        }
+
         /* Content-Level Filter Bar - filters at engagement level */
         .content-filter-bar {
             display: flex;
@@ -18301,24 +18469,6 @@
             </button>
         </div>
         <div class="filter-panel-content">
-            <!-- Status Filter -->
-            <div class="filter-group">
-                <div class="filter-group-title">
-                    <i class="ph ph-flag"></i> Status
-                </div>
-                <div class="filter-chips">
-                    <div class="filter-chip status-pending active" data-filter="status" data-value="pending" onclick="toggleFilterChip(this)">
-                        <i class="ph ph-circle"></i> Pending
-                    </div>
-                    <div class="filter-chip status-in_progress active" data-filter="status" data-value="in_progress" onclick="toggleFilterChip(this)">
-                        <i class="ph ph-spinner"></i> In Progress
-                    </div>
-                    <div class="filter-chip status-completed active" data-filter="status" data-value="completed" onclick="toggleFilterChip(this)">
-                        <i class="ph ph-check-circle"></i> Completed
-                    </div>
-                </div>
-            </div>
-
             <!-- Priority Filter -->
             <div class="filter-group">
                 <div class="filter-group-title">
@@ -18367,27 +18517,6 @@
                 </div>
             </div>
 
-            <!-- Entity Type Filter -->
-            <div class="filter-group">
-                <div class="filter-group-title">
-                    <i class="ph ph-squares-four"></i> Entity Type
-                </div>
-                <div class="filter-chips">
-                    <div class="filter-chip active" data-filter="entity" data-value="unit" onclick="toggleFilterChip(this)">
-                        <i class="ph ph-buildings"></i> Units
-                    </div>
-                    <div class="filter-chip active" data-filter="entity" data-value="team" onclick="toggleFilterChip(this)">
-                        <i class="ph ph-users"></i> Teams
-                    </div>
-                    <div class="filter-chip active" data-filter="entity" data-value="role" onclick="toggleFilterChip(this)">
-                        <i class="ph ph-briefcase"></i> Roles
-                    </div>
-                    <div class="filter-chip active" data-filter="entity" data-value="person" onclick="toggleFilterChip(this)">
-                        <i class="ph ph-user"></i> People
-                    </div>
-                </div>
-            </div>
-
             <!-- Tags Filter -->
             <div class="filter-group">
                 <div class="filter-group-title">
@@ -18398,25 +18527,33 @@
                 </div>
             </div>
 
-            <!-- Time Travel Section -->
-            <div class="filter-group" style="border-top: 1px solid #E5DDD1; padding-top: 1rem; margin-top: 0.5rem;">
-                <div class="filter-group-title">
-                    <i class="ph ph-clock-counter-clockwise"></i> Historical View
-                </div>
-                <p style="font-size: 0.8rem; color: #6B5642; margin-bottom: 0.75rem;">
-                    Travel back in time to see how things looked at a specific date.
-                </p>
-                <div class="filter-date-inputs">
-                    <input type="datetime-local" class="filter-date-input" id="timeTravelDateInput" style="flex: 2;">
-                    <button class="btn btn-primary" onclick="activateTimeTravel()" style="white-space: nowrap;">
-                        <i class="ph ph-clock-counter-clockwise"></i> Go
-                    </button>
-                </div>
-            </div>
         </div>
         <div class="filter-panel-footer">
             <button class="btn btn-outline" onclick="clearAllFilters()">Clear All</button>
             <button class="btn btn-primary" onclick="applyAdvancedFilters(); closeAdvancedFilterPanel()">Apply Filters</button>
+        </div>
+    </div>
+
+    <!-- Time Travel Modal -->
+    <div class="time-travel-modal-overlay" id="timeTravelModalOverlay" onclick="closeTimeTravelModal()"></div>
+    <div class="time-travel-modal" id="timeTravelModal">
+        <div class="time-travel-modal-header">
+            <div class="time-travel-modal-title">
+                <i class="ph ph-clock-counter-clockwise"></i>
+                Historical View
+            </div>
+            <button class="time-travel-modal-close" onclick="closeTimeTravelModal()">
+                <i class="ph ph-x"></i>
+            </button>
+        </div>
+        <div class="time-travel-modal-content">
+            <p class="time-travel-modal-desc">Travel back in time to see how things looked at a specific date.</p>
+            <div class="time-travel-modal-input">
+                <input type="datetime-local" class="filter-date-input" id="timeTravelDateInput" style="flex: 1;">
+                <button class="btn btn-primary" onclick="activateTimeTravel(); closeTimeTravelModal();">
+                    <i class="ph ph-clock-counter-clockwise"></i> Go
+                </button>
+            </div>
         </div>
     </div>
 
@@ -18628,11 +18765,53 @@
                     </div>
                     <!-- Inline Filters -->
                     <div class="inline-filter-bar" id="inlineFilterBar">
-                        <button class="inline-filter-more-btn" id="inlineFilterMoreBtn" onclick="openAdvancedFilterPanel()" title="Filter tasks">
+                        <div class="inline-filter-group">
+                            <button class="inline-filter-btn status-pending active" data-status="pending" onclick="toggleInlineStatusFilter('pending')" title="Show pending tasks">
+                                <i class="ph ph-circle"></i>
+                                <span>Pending</span>
+                            </button>
+                            <button class="inline-filter-btn status-in_progress active" data-status="in_progress" onclick="toggleInlineStatusFilter('in_progress')" title="Show in progress tasks">
+                                <i class="ph ph-spinner"></i>
+                                <span>In Progress</span>
+                            </button>
+                            <button class="inline-filter-btn status-completed active" data-status="completed" onclick="toggleInlineStatusFilter('completed')" title="Show completed tasks">
+                                <i class="ph ph-check-circle"></i>
+                                <span>Completed</span>
+                            </button>
+                        </div>
+                        <div class="inline-filter-divider"></div>
+                        <button class="inline-filter-more-btn" id="inlineFilterMoreBtn" onclick="openAdvancedFilterPanel()" title="More filters">
                             <i class="ph ph-funnel"></i>
-                            <span>Filter</span>
+                            <span>More</span>
                             <span class="inline-filter-badge" id="inlineFilterBadge" style="display: none;">0</span>
                         </button>
+                        <button class="inline-filter-icon-btn" onclick="openTimeTravelModal()" title="Historical view">
+                            <i class="ph ph-clock-counter-clockwise"></i>
+                        </button>
+                        <div class="inline-filter-settings-wrapper">
+                            <button class="inline-filter-icon-btn" onclick="toggleViewSettings()" title="View settings">
+                                <i class="ph ph-gear"></i>
+                            </button>
+                            <div class="view-settings-dropdown" id="viewSettingsDropdown">
+                                <div class="view-settings-title">Show Entity Types</div>
+                                <label class="view-settings-item">
+                                    <input type="checkbox" checked onchange="toggleEntityFilter('unit')" id="entityFilterUnit">
+                                    <i class="ph ph-buildings"></i> Units
+                                </label>
+                                <label class="view-settings-item">
+                                    <input type="checkbox" checked onchange="toggleEntityFilter('team')" id="entityFilterTeam">
+                                    <i class="ph ph-users"></i> Teams
+                                </label>
+                                <label class="view-settings-item">
+                                    <input type="checkbox" checked onchange="toggleEntityFilter('role')" id="entityFilterRole">
+                                    <i class="ph ph-briefcase"></i> Roles
+                                </label>
+                                <label class="view-settings-item">
+                                    <input type="checkbox" checked onchange="toggleEntityFilter('person')" id="entityFilterPerson">
+                                    <i class="ph ph-user"></i> People
+                                </label>
+                            </div>
+                        </div>
                     </div>
                     <input type="text"
                            id="taskBoardSearch"
@@ -22518,11 +22697,75 @@ John Doe,Engineering,john@example.com"
             applyAdvancedFilters();
         }
 
+        // Time Travel Modal functions
+        function openTimeTravelModal() {
+            document.getElementById('timeTravelModal').classList.add('open');
+            document.getElementById('timeTravelModalOverlay').classList.add('open');
+        }
+
+        function closeTimeTravelModal() {
+            document.getElementById('timeTravelModal').classList.remove('open');
+            document.getElementById('timeTravelModalOverlay').classList.remove('open');
+        }
+
+        // View Settings dropdown toggle
+        function toggleViewSettings() {
+            const dropdown = document.getElementById('viewSettingsDropdown');
+            dropdown.classList.toggle('open');
+        }
+
+        // Toggle entity filter from view settings
+        function toggleEntityFilter(entityType) {
+            const checkbox = document.getElementById(`entityFilter${entityType.charAt(0).toUpperCase() + entityType.slice(1)}`);
+            const isChecked = checkbox.checked;
+
+            if (isChecked) {
+                if (!advancedFilters.entities.includes(entityType)) {
+                    advancedFilters.entities.push(entityType);
+                }
+            } else {
+                advancedFilters.entities = advancedFilters.entities.filter(e => e !== entityType);
+            }
+
+            // Sync with legacy viewFilters
+            viewFilters[entityType] = isChecked;
+
+            applyAdvancedFilters();
+        }
+
+        // Close view settings dropdown when clicking outside
+        document.addEventListener('click', function(e) {
+            const wrapper = document.querySelector('.inline-filter-settings-wrapper');
+            const dropdown = document.getElementById('viewSettingsDropdown');
+            if (wrapper && dropdown && !wrapper.contains(e.target)) {
+                dropdown.classList.remove('open');
+            }
+        });
+
         // Update inline filter buttons to match advancedFilters state
         function updateInlineFilterUI() {
-            // Count all active advanced filters for badge
+            // Sync inline status buttons with advancedFilters state
+            ['pending', 'in_progress', 'completed'].forEach(status => {
+                const btn = document.querySelector(`.inline-filter-btn[data-status="${status}"]`);
+                if (btn) {
+                    if (advancedFilters.status.includes(status)) {
+                        btn.classList.add('active');
+                    } else {
+                        btn.classList.remove('active');
+                    }
+                }
+            });
+
+            // Sync entity filter checkboxes
+            ['unit', 'team', 'role', 'person'].forEach(entity => {
+                const checkbox = document.getElementById(`entityFilter${entity.charAt(0).toUpperCase() + entity.slice(1)}`);
+                if (checkbox) {
+                    checkbox.checked = advancedFilters.entities.includes(entity);
+                }
+            });
+
+            // Count active advanced filters for badge (excluding status and entities since they're now inline/in settings)
             let activeFilters = 0;
-            if (advancedFilters.status.length < 3) activeFilters++;
             if (advancedFilters.priority.length < 3) activeFilters++;
             if (advancedFilters.dateFrom || advancedFilters.dateTo || advancedFilters.datePreset) activeFilters++;
             if (advancedFilters.assignees.length > 0) activeFilters++;
@@ -22680,23 +22923,23 @@ John Doe,Engineering,john@example.com"
         function updateFilterActiveCount() {
             let count = 0;
 
-            // Count non-default filters
-            if (advancedFilters.status.length < 3) count++;
+            // Count non-default filters (excluding status - shown inline, and entities - in settings)
             if (advancedFilters.priority.length < 3) count++;
             if (advancedFilters.dateFrom || advancedFilters.dateTo || advancedFilters.datePreset) count++;
             if (advancedFilters.assignees.length > 0) count++;
-            if (advancedFilters.entities.length < 4) count++;
             if (advancedFilters.tags.length > 0) count++;
 
             const badge = document.getElementById('filterActiveCount');
             const viewBadge = document.getElementById('viewFilterBadge');
 
             if (count > 0) {
-                badge.textContent = count;
-                badge.style.display = 'inline';
+                if (badge) {
+                    badge.textContent = count;
+                    badge.style.display = 'inline';
+                }
                 if (viewBadge) viewBadge.style.display = 'block';
             } else {
-                badge.style.display = 'none';
+                if (badge) badge.style.display = 'none';
                 if (viewBadge) viewBadge.style.display = 'none';
             }
         }
