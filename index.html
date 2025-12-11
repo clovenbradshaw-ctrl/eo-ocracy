@@ -143,244 +143,23 @@
             animation: spin 1s linear infinite;
         }
 
-        /* Workspace Selector Styles */
+        /* Workspace Name Display Styles */
         .workspace-selector {
-            position: relative;
             display: flex;
             align-items: center;
-            gap: 0.5rem;
         }
 
-        .workspace-dropdown-toggle {
-            display: flex;
-            align-items: center;
-            gap: 0.5rem;
-            background: rgba(255,255,255,0.15);
-            border: 1px solid rgba(255,255,255,0.3);
-            border-radius: 6px;
-            padding: 0.4rem 0.75rem;
+        .workspace-name-display {
             color: white;
-            cursor: pointer;
             font-size: 0.875rem;
             font-weight: 500;
-            transition: all 0.2s;
             max-width: 280px;
-        }
-
-        .workspace-dropdown-toggle:hover {
-            background: rgba(255,255,255,0.25);
-            border-color: rgba(255,255,255,0.5);
-        }
-
-        .workspace-dropdown-toggle .workspace-name {
             overflow: hidden;
             text-overflow: ellipsis;
             white-space: nowrap;
-        }
-
-        .workspace-dropdown {
-            position: absolute;
-            top: calc(100% + 0.5rem);
-            left: 0;
-            background: white;
-            border-radius: 8px;
-            box-shadow: 0 4px 20px rgba(0,0,0,0.15);
-            min-width: 320px;
-            max-width: 400px;
-            z-index: 1000;
-            display: none;
-            overflow: hidden;
-        }
-
-        .workspace-dropdown.open {
-            display: block;
-        }
-
-        .workspace-dropdown-header {
-            padding: 0.75rem 1rem;
-            border-bottom: 1px solid #E5DDD1;
-            font-weight: 600;
-            color: #6B5642;
-            font-size: 0.75rem;
-            text-transform: uppercase;
-            letter-spacing: 0.5px;
-        }
-
-        .workspace-list {
-            max-height: 200px;
-            overflow-y: auto;
-        }
-
-        .workspace-item {
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-            padding: 0.75rem 1rem;
-            cursor: pointer;
-            transition: background 0.15s;
-            color: #3D2E1F;
-        }
-
-        .workspace-item:hover {
-            background: #FAF7F5;
-        }
-
-        .workspace-item.active {
-            background: #F5EFE6;
-        }
-
-        .workspace-item-name {
-            display: flex;
-            align-items: center;
-            gap: 0.5rem;
-            flex: 1;
-            overflow: hidden;
-        }
-
-        .workspace-item-name span {
-            overflow: hidden;
-            text-overflow: ellipsis;
-            white-space: nowrap;
-        }
-
-        .workspace-item-actions {
-            display: flex;
-            gap: 0.25rem;
-            opacity: 0;
-            transition: opacity 0.15s;
-        }
-
-        .workspace-item:hover .workspace-item-actions {
-            opacity: 1;
-        }
-
-        .workspace-action-btn {
-            background: none;
-            border: none;
-            padding: 0.25rem;
-            cursor: pointer;
-            color: #8B6F47;
-            border-radius: 4px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-        }
-
-        .workspace-action-btn:hover {
-            background: rgba(0,0,0,0.05);
-            color: #C88F4A;
-        }
-
-        .workspace-action-btn.delete:hover {
-            color: #d32f2f;
-        }
-
-        .workspace-dropdown-footer {
-            border-top: 1px solid #E5DDD1;
-            padding: 0.5rem;
-        }
-
-        .workspace-new-btn {
-            display: flex;
-            align-items: center;
-            gap: 0.5rem;
-            width: 100%;
-            padding: 0.75rem 1rem;
-            background: none;
-            border: none;
-            cursor: pointer;
-            color: #C88F4A;
-            font-size: 0.875rem;
-            font-weight: 500;
-            border-radius: 4px;
-            transition: background 0.15s;
-        }
-
-        .workspace-new-btn:hover {
-            background: #FAF7F5;
-        }
-
-        /* Workspace Modal Styles */
-        .workspace-modal-overlay {
-            position: fixed;
-            top: 0;
-            left: 0;
-            right: 0;
-            bottom: 0;
-            background: rgba(0,0,0,0.5);
-            display: none;
-            align-items: center;
-            justify-content: center;
-            z-index: 2000;
-        }
-
-        .workspace-modal-overlay.open {
-            display: flex;
-        }
-
-        .workspace-modal {
-            background: white;
-            border-radius: 12px;
-            padding: 1.5rem;
-            width: 100%;
-            max-width: 400px;
-            box-shadow: 0 8px 32px rgba(0,0,0,0.2);
-        }
-
-        .workspace-modal h3 {
-            margin-bottom: 1rem;
-            color: #3D2E1F;
-            font-size: 1.125rem;
-        }
-
-        .workspace-modal-input {
-            width: 100%;
-            padding: 0.75rem 1rem;
-            border: 2px solid #E5DDD1;
+            padding: 0.4rem 0.75rem;
+            background: rgba(255,255,255,0.15);
             border-radius: 6px;
-            font-size: 1rem;
-            margin-bottom: 1rem;
-            transition: border-color 0.2s;
-        }
-
-        .workspace-modal-input:focus {
-            outline: none;
-            border-color: #C88F4A;
-        }
-
-        .workspace-modal-actions {
-            display: flex;
-            gap: 0.75rem;
-            justify-content: flex-end;
-        }
-
-        .workspace-modal-btn {
-            padding: 0.6rem 1.25rem;
-            border-radius: 6px;
-            font-size: 0.875rem;
-            font-weight: 600;
-            cursor: pointer;
-            transition: all 0.2s;
-        }
-
-        .workspace-modal-btn.cancel {
-            background: #f5f5f5;
-            border: 1px solid #E5DDD1;
-            color: #6B5642;
-        }
-
-        .workspace-modal-btn.cancel:hover {
-            background: #eee;
-        }
-
-        .workspace-modal-btn.primary {
-            background: #D4A54A;
-            border: none;
-            color: white;
-        }
-
-        .workspace-modal-btn.primary:hover {
-            background: #E5B555;
         }
 
         .header-controls {
@@ -19572,21 +19351,7 @@
         <!-- LEFT ZONE: Navigation & Context -->
         <div class="header-left">
             <div class="workspace-selector">
-                <button class="workspace-dropdown-toggle" onclick="toggleWorkspaceDropdown(event)">
-                    <span class="workspace-name" id="workspaceNameText">My Organization</span>
-                    <i class="ph ph-caret-down"></i>
-                </button>
-                <div class="workspace-dropdown" id="workspaceDropdown">
-                    <div class="workspace-dropdown-header">Workspaces</div>
-                    <div class="workspace-list" id="workspaceList">
-                        <!-- Workspace items populated by JS -->
-                    </div>
-                    <div class="workspace-dropdown-footer">
-                        <button class="workspace-new-btn" onclick="openNewWorkspaceModal()">
-                            <i class="ph ph-plus-circle"></i> New Workspace
-                        </button>
-                    </div>
-                </div>
+                <span class="workspace-name-display" id="workspaceNameText">My Organization</span>
             </div>
             <div id="loadingStatus" class="header-loading-status">
                 <i class="ph ph-spinner"></i>
@@ -20552,18 +20317,6 @@
                 <button class="work-product-select-btn" id="confirmWorkProductSelection" onclick="confirmWorkProductSelection()" disabled>
                     Select
                 </button>
-            </div>
-        </div>
-    </div>
-
-    <!-- Workspace Modal (Create/Rename) -->
-    <div id="workspaceModal" class="workspace-modal-overlay" onclick="if(event.target === this) closeWorkspaceModal()">
-        <div class="workspace-modal">
-            <h3 id="workspaceModalTitle">New Workspace</h3>
-            <input type="text" class="workspace-modal-input" id="workspaceModalInput" placeholder="Workspace name..." onkeypress="if(event.key==='Enter') saveWorkspaceFromModal()">
-            <div class="workspace-modal-actions">
-                <button class="workspace-modal-btn cancel" onclick="closeWorkspaceModal()">Cancel</button>
-                <button class="workspace-modal-btn primary" onclick="saveWorkspaceFromModal()">Save</button>
             </div>
         </div>
     </div>
@@ -21821,11 +21574,9 @@ John Doe,Engineering,john@example.com"
         // WORKSPACE MANAGEMENT
         // ==========================================
 
-        // Workspace manager - stores all workspaces
+        // Workspace manager - stores single workspace
         let workspaces = {};  // { workspaceId: { id, name, entities, relationships, hasSampleData, createdAt, updatedAt } }
         let currentWorkspaceId = null;
-        let workspaceModalMode = 'create';  // 'create' or 'rename'
-        let workspaceToRename = null;
 
         function generateWorkspaceId() {
             return 'ws_' + Date.now() + '_' + Math.random().toString(36).substr(2, 9);
@@ -21959,9 +21710,6 @@ John Doe,Engineering,john@example.com"
             // Save the switch
             saveWorkspaces();
 
-            // Close dropdown
-            closeWorkspaceDropdown();
-
             console.log('Switched to workspace:', ws.name);
         }
 
@@ -21978,7 +21726,6 @@ John Doe,Engineering,john@example.com"
             };
             saveWorkspaces();
             switchWorkspace(wsId);
-            renderWorkspaceList();
             return wsId;
         }
 
@@ -21991,38 +21738,9 @@ John Doe,Engineering,john@example.com"
             if (workspaceId === currentWorkspaceId) {
                 const nameEl = document.getElementById('workspaceNameText');
                 nameEl.textContent = workspaces[workspaceId].name;
-                nameEl.title = workspaces[workspaceId].name;
             }
 
             saveWorkspaces();
-            renderWorkspaceList();
-        }
-
-        function deleteWorkspace(workspaceId) {
-            if (!workspaces[workspaceId]) return;
-
-            const wsName = workspaces[workspaceId].name;
-            const wsCount = Object.keys(workspaces).length;
-
-            if (wsCount <= 1) {
-                alert('Cannot delete the last workspace. Create a new workspace first.');
-                return;
-            }
-
-            if (!confirm(`Delete workspace "${wsName}"? This cannot be undone.`)) return;
-
-            delete workspaces[workspaceId];
-
-            // If we deleted the current workspace, switch to another
-            if (workspaceId === currentWorkspaceId) {
-                const remainingIds = Object.keys(workspaces);
-                if (remainingIds.length > 0) {
-                    switchWorkspace(remainingIds[0]);
-                }
-            }
-
-            saveWorkspaces();
-            renderWorkspaceList();
         }
 
         // ==========================================
@@ -22445,116 +22163,10 @@ John Doe,Engineering,john@example.com"
             }
         }
 
-        function toggleWorkspaceDropdown(event) {
-            event.stopPropagation();
-            const dropdown = document.getElementById('workspaceDropdown');
-            const isOpen = dropdown.classList.contains('open');
-
-            if (isOpen) {
-                closeWorkspaceDropdown();
-            } else {
-                dropdown.classList.add('open');
-                renderWorkspaceList();
-
-                // Close dropdown when clicking outside
-                setTimeout(() => {
-                    document.addEventListener('click', closeWorkspaceDropdownOnOutsideClick);
-                }, 0);
-            }
-        }
-
-        function closeWorkspaceDropdown() {
-            const dropdown = document.getElementById('workspaceDropdown');
-            dropdown.classList.remove('open');
-            document.removeEventListener('click', closeWorkspaceDropdownOnOutsideClick);
-        }
-
-        function closeWorkspaceDropdownOnOutsideClick(event) {
-            const dropdown = document.getElementById('workspaceDropdown');
-            const toggle = document.querySelector('.workspace-dropdown-toggle');
-
-            if (!dropdown.contains(event.target) && !toggle.contains(event.target)) {
-                closeWorkspaceDropdown();
-            }
-        }
-
-        function renderWorkspaceList() {
-            const listEl = document.getElementById('workspaceList');
-            if (!listEl) return;
-
-            const sortedWorkspaces = Object.values(workspaces).sort((a, b) => b.updatedAt - a.updatedAt);
-
-            listEl.innerHTML = sortedWorkspaces.map(ws => `
-                <div class="workspace-item ${ws.id === currentWorkspaceId ? 'active' : ''}" onclick="switchWorkspace('${ws.id}')">
-                    <div class="workspace-item-name" title="${escapeHtml(ws.name)}">
-                        <i class="ph ${ws.id === currentWorkspaceId ? 'ph-check-circle' : 'ph-folder'}"></i>
-                        <span>${escapeHtml(ws.name)}</span>
-                    </div>
-                    <div class="workspace-item-actions">
-                        <button class="workspace-action-btn" onclick="event.stopPropagation(); openRenameWorkspaceModal('${ws.id}')" title="Rename">
-                            <i class="ph ph-pencil-simple"></i>
-                        </button>
-                        <button class="workspace-action-btn delete" onclick="event.stopPropagation(); deleteWorkspace('${ws.id}')" title="Delete">
-                            <i class="ph ph-trash"></i>
-                        </button>
-                    </div>
-                </div>
-            `).join('');
-        }
-
         function escapeHtml(text) {
             const div = document.createElement('div');
             div.textContent = text;
             return div.innerHTML;
-        }
-
-        function openNewWorkspaceModal() {
-            workspaceModalMode = 'create';
-            workspaceToRename = null;
-            document.getElementById('workspaceModalTitle').textContent = 'New Workspace';
-            document.getElementById('workspaceModalInput').value = '';
-            document.getElementById('workspaceModalInput').placeholder = 'Workspace name...';
-            document.getElementById('workspaceModal').classList.add('open');
-            setTimeout(() => document.getElementById('workspaceModalInput').focus(), 100);
-            closeWorkspaceDropdown();
-        }
-
-        function openRenameWorkspaceModal(workspaceId) {
-            if (!workspaces[workspaceId]) return;
-            workspaceModalMode = 'rename';
-            workspaceToRename = workspaceId;
-            document.getElementById('workspaceModalTitle').textContent = 'Rename Workspace';
-            document.getElementById('workspaceModalInput').value = workspaces[workspaceId].name;
-            document.getElementById('workspaceModalInput').placeholder = 'Workspace name...';
-            document.getElementById('workspaceModal').classList.add('open');
-            setTimeout(() => {
-                const input = document.getElementById('workspaceModalInput');
-                input.focus();
-                input.select();
-            }, 100);
-            closeWorkspaceDropdown();
-        }
-
-        function closeWorkspaceModal() {
-            document.getElementById('workspaceModal').classList.remove('open');
-            workspaceModalMode = 'create';
-            workspaceToRename = null;
-        }
-
-        function saveWorkspaceFromModal() {
-            const name = document.getElementById('workspaceModalInput').value.trim();
-            if (!name) {
-                alert('Please enter a workspace name.');
-                return;
-            }
-
-            if (workspaceModalMode === 'create') {
-                createWorkspace(name);
-            } else if (workspaceModalMode === 'rename' && workspaceToRename) {
-                renameWorkspace(workspaceToRename, name);
-            }
-
-            closeWorkspaceModal();
         }
 
         // ==========================================
@@ -31755,7 +31367,6 @@ Cmd/Ctrl + K - Command palette
                 renderActivityList();
                 updateFilterStatus();
                 updateTaskCountBadge();
-                renderWorkspaceList();
 
                 if (currentView === 'graph') updateGraph();
                 else if (currentView === 'tree') renderTreeView();
@@ -37772,9 +37383,15 @@ Cmd/Ctrl + K - Command palette
                         data.relationships = [];
                     }
 
-                    // Create a new workspace with the imported data
-                    const wsId = generateWorkspaceId();
-                    const importedName = data.workspaceName + ' (Imported)';
+                    // Confirm replacement of current workspace data
+                    const currentName = workspaces[currentWorkspaceId]?.name || 'current workspace';
+                    if (!confirm(`This will replace all data in "${currentName}" with the imported data from "${data.workspaceName}". Continue?`)) {
+                        return;
+                    }
+
+                    // Replace current workspace data with imported data
+                    const wsId = currentWorkspaceId;
+                    const importedName = data.workspaceName;
 
                     workspaces[wsId] = {
                         id: wsId,
@@ -37782,13 +37399,12 @@ Cmd/Ctrl + K - Command palette
                         entities: JSON.parse(JSON.stringify(data.entities)),
                         relationships: JSON.parse(JSON.stringify(data.relationships)),
                         hasSampleData: false,
-                        createdAt: Date.now(),
+                        createdAt: workspaces[wsId]?.createdAt || Date.now(),
                         updatedAt: Date.now()
                     };
 
                     saveWorkspaces();
                     switchWorkspace(wsId);
-                    renderWorkspaceList();
 
                     // Calculate totals for reporting
                     const totalEntities = Object.values(data.entities).reduce((sum, arr) => sum + arr.length, 0);
@@ -37851,7 +37467,7 @@ Cmd/Ctrl + K - Command palette
                     // Show summary toast for the import
                     showActivityToast('success', 'JSON Import Complete', `${totalEntities} entities and ${totalRelationships} relationships synced to Xano`);
 
-                    alert(`Successfully imported "${data.workspaceName}" as a new workspace with ${totalEntities} entities and ${totalRelationships} relationships.`);
+                    alert(`Successfully imported "${data.workspaceName}" with ${totalEntities} entities and ${totalRelationships} relationships.`);
 
                 } catch (err) {
                     console.error('Import error:', err);
