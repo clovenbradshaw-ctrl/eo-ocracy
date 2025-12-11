@@ -14955,7 +14955,419 @@
         .priority-option.high.selected { background: #D97706; border-color: #D97706; }
         .priority-option.medium.selected { background: #2563EB; border-color: #2563EB; }
         .priority-option.low.selected { background: #6B7280; border-color: #6B7280; }
+
+        /* ==========================================
+           LOGIN / AUTHENTICATION STYLES
+           ========================================== */
+        .login-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: linear-gradient(135deg, #F5F2ED 0%, #E8E2D9 100%);
+            z-index: 10000;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: opacity 0.3s ease, visibility 0.3s ease;
+        }
+
+        .login-overlay.hidden {
+            opacity: 0;
+            visibility: hidden;
+            pointer-events: none;
+        }
+
+        .login-container {
+            background: white;
+            border-radius: 16px;
+            box-shadow: 0 8px 40px rgba(0,0,0,0.12);
+            padding: 2.5rem;
+            width: 100%;
+            max-width: 420px;
+            text-align: center;
+        }
+
+        .login-logo {
+            width: 64px;
+            height: 64px;
+            background: linear-gradient(135deg, #C88F4A 0%, #B87B5B 100%);
+            border-radius: 16px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: 0 auto 1.5rem;
+            color: white;
+            font-size: 2rem;
+        }
+
+        .login-title {
+            font-size: 1.5rem;
+            font-weight: 700;
+            color: #3D2E1F;
+            margin-bottom: 0.5rem;
+        }
+
+        .login-subtitle {
+            color: #6B5642;
+            font-size: 0.95rem;
+            margin-bottom: 2rem;
+        }
+
+        .login-form-group {
+            margin-bottom: 1.25rem;
+            text-align: left;
+        }
+
+        .login-label {
+            display: block;
+            font-size: 0.85rem;
+            font-weight: 600;
+            color: #3D2E1F;
+            margin-bottom: 0.5rem;
+        }
+
+        .login-input {
+            width: 100%;
+            padding: 0.875rem 1rem;
+            border: 2px solid #E5DDD1;
+            border-radius: 10px;
+            font-size: 1rem;
+            transition: border-color 0.2s, box-shadow 0.2s;
+            background: #FAF7F5;
+        }
+
+        .login-input:focus {
+            outline: none;
+            border-color: #C88F4A;
+            box-shadow: 0 0 0 3px rgba(200, 143, 74, 0.15);
+            background: white;
+        }
+
+        .login-input::placeholder {
+            color: #A89A8B;
+        }
+
+        .login-input.error {
+            border-color: #DC2626;
+            background: #FEF2F2;
+        }
+
+        .login-code-input {
+            text-align: center;
+            font-size: 1.75rem;
+            font-weight: 700;
+            letter-spacing: 0.5rem;
+            font-family: 'SF Mono', Monaco, monospace;
+        }
+
+        .login-btn {
+            width: 100%;
+            padding: 0.875rem 1.5rem;
+            background: linear-gradient(135deg, #C88F4A 0%, #B87B5B 100%);
+            color: white;
+            border: none;
+            border-radius: 10px;
+            font-size: 1rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: transform 0.15s, box-shadow 0.15s;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 0.5rem;
+        }
+
+        .login-btn:hover:not(:disabled) {
+            transform: translateY(-1px);
+            box-shadow: 0 4px 12px rgba(200, 143, 74, 0.3);
+        }
+
+        .login-btn:disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
+        }
+
+        .login-btn .spinner {
+            width: 18px;
+            height: 18px;
+            border: 2px solid rgba(255,255,255,0.3);
+            border-top-color: white;
+            border-radius: 50%;
+            animation: spin 0.8s linear infinite;
+        }
+
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+
+        .login-error {
+            background: #FEF2F2;
+            border: 1px solid #FECACA;
+            border-radius: 8px;
+            padding: 0.75rem 1rem;
+            color: #DC2626;
+            font-size: 0.875rem;
+            margin-bottom: 1rem;
+            display: none;
+        }
+
+        .login-error.show {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .login-success {
+            background: #F0FDF4;
+            border: 1px solid #BBF7D0;
+            border-radius: 8px;
+            padding: 0.75rem 1rem;
+            color: #166534;
+            font-size: 0.875rem;
+            margin-bottom: 1rem;
+            display: none;
+        }
+
+        .login-success.show {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .login-back-link {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.25rem;
+            color: #6B5642;
+            font-size: 0.875rem;
+            cursor: pointer;
+            margin-top: 1.25rem;
+            transition: color 0.15s;
+        }
+
+        .login-back-link:hover {
+            color: #C88F4A;
+        }
+
+        .login-step {
+            display: none;
+        }
+
+        .login-step.active {
+            display: block;
+        }
+
+        .login-email-display {
+            background: #FAF7F5;
+            border-radius: 8px;
+            padding: 0.75rem 1rem;
+            margin-bottom: 1.5rem;
+            font-size: 0.9rem;
+            color: #3D2E1F;
+            word-break: break-all;
+        }
+
+        .login-resend {
+            color: #6B5642;
+            font-size: 0.85rem;
+            margin-top: 1rem;
+        }
+
+        .login-resend-link {
+            color: #C88F4A;
+            cursor: pointer;
+            font-weight: 500;
+        }
+
+        .login-resend-link:hover {
+            text-decoration: underline;
+        }
+
+        .login-resend-link.disabled {
+            color: #A89A8B;
+            cursor: not-allowed;
+        }
+
+        /* User menu in header for logged-in users */
+        .user-menu-container {
+            position: relative;
+        }
+
+        .user-menu-btn {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            background: rgba(255,255,255,0.15);
+            border: 1px solid rgba(255,255,255,0.3);
+            border-radius: 6px;
+            padding: 0.35rem 0.75rem;
+            color: white;
+            cursor: pointer;
+            font-size: 0.8rem;
+            transition: all 0.2s;
+        }
+
+        .user-menu-btn:hover {
+            background: rgba(255,255,255,0.25);
+            border-color: rgba(255,255,255,0.5);
+        }
+
+        .user-menu-avatar {
+            width: 24px;
+            height: 24px;
+            border-radius: 50%;
+            background: rgba(255,255,255,0.25);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 600;
+            font-size: 0.7rem;
+        }
+
+        .user-menu-dropdown {
+            position: absolute;
+            top: calc(100% + 0.5rem);
+            right: 0;
+            background: white;
+            border-radius: 8px;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.15);
+            min-width: 200px;
+            z-index: 1000;
+            display: none;
+            overflow: hidden;
+        }
+
+        .user-menu-dropdown.open {
+            display: block;
+        }
+
+        .user-menu-header {
+            padding: 0.75rem 1rem;
+            border-bottom: 1px solid #E5DDD1;
+        }
+
+        .user-menu-email {
+            font-size: 0.85rem;
+            color: #3D2E1F;
+            font-weight: 500;
+            word-break: break-all;
+        }
+
+        .user-menu-item {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            width: 100%;
+            padding: 0.75rem 1rem;
+            border: none;
+            background: none;
+            cursor: pointer;
+            color: #3D2E1F;
+            font-size: 0.875rem;
+            transition: background 0.15s;
+            text-align: left;
+        }
+
+        .user-menu-item:hover {
+            background: #FAF7F5;
+        }
+
+        .user-menu-item.danger {
+            color: #DC2626;
+        }
+
+        .user-menu-item.danger:hover {
+            background: #FEF2F2;
+        }
     </style>
+
+    <!-- Login Overlay - gates app until authenticated -->
+    <div id="loginOverlay" class="login-overlay">
+        <div class="login-container">
+            <div class="login-logo">
+                <i class="ph ph-check-square"></i>
+            </div>
+
+            <!-- Step 1: Email Input -->
+            <div id="loginStepEmail" class="login-step active">
+                <h2 class="login-title">Welcome to Taskflow</h2>
+                <p class="login-subtitle">Enter your email to receive a login code</p>
+
+                <div id="loginErrorEmail" class="login-error">
+                    <i class="ph ph-warning-circle"></i>
+                    <span id="loginErrorEmailText">An error occurred</span>
+                </div>
+
+                <form id="loginEmailForm" onsubmit="AuthManager.handleEmailSubmit(event)">
+                    <div class="login-form-group">
+                        <label class="login-label" for="loginEmail">Email address</label>
+                        <input
+                            type="email"
+                            id="loginEmail"
+                            class="login-input"
+                            placeholder="you@example.com"
+                            required
+                            autocomplete="email"
+                        >
+                    </div>
+                    <button type="submit" class="login-btn" id="loginEmailBtn">
+                        <span id="loginEmailBtnText">Send Login Code</span>
+                    </button>
+                </form>
+            </div>
+
+            <!-- Step 2: Code Verification -->
+            <div id="loginStepCode" class="login-step">
+                <h2 class="login-title">Check your email</h2>
+                <p class="login-subtitle">We sent a 6-digit code to</p>
+                <div class="login-email-display" id="loginEmailDisplay">user@example.com</div>
+
+                <div id="loginSuccessCode" class="login-success">
+                    <i class="ph ph-check-circle"></i>
+                    <span>Code sent! Check your email.</span>
+                </div>
+
+                <div id="loginErrorCode" class="login-error">
+                    <i class="ph ph-warning-circle"></i>
+                    <span id="loginErrorCodeText">Invalid code</span>
+                </div>
+
+                <form id="loginCodeForm" onsubmit="AuthManager.handleCodeSubmit(event)">
+                    <div class="login-form-group">
+                        <label class="login-label" for="loginCode">Enter code</label>
+                        <input
+                            type="text"
+                            id="loginCode"
+                            class="login-input login-code-input"
+                            placeholder="000000"
+                            maxlength="6"
+                            pattern="[0-9]{6}"
+                            inputmode="numeric"
+                            autocomplete="one-time-code"
+                            required
+                        >
+                    </div>
+                    <button type="submit" class="login-btn" id="loginCodeBtn">
+                        <span id="loginCodeBtnText">Verify Code</span>
+                    </button>
+                </form>
+
+                <div class="login-resend">
+                    Didn't receive the code?
+                    <span class="login-resend-link" id="loginResendLink" onclick="AuthManager.resendCode()">Resend</span>
+                </div>
+
+                <div class="login-back-link" onclick="AuthManager.backToEmail()">
+                    <i class="ph ph-arrow-left"></i> Use a different email
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Main App Container (hidden until authenticated) -->
+    <div id="mainAppContainer">
     <div class="header">
         <h1>
             <div class="workspace-selector">
@@ -14992,6 +15404,8 @@
                 <span class="refresh-label">Auto</span>
                 <span class="refresh-status" id="autoRefreshStatus">Off</span>
             </div>
+            <!-- User Menu (populated by AuthManager) -->
+            <div class="user-menu-container" id="userMenuContainer"></div>
             <!-- Softr User Identity Indicator (hidden) -->
             <div class="softr-user-indicator no-user" id="softrUserIndicator" style="display: none !important;">
                 <div class="user-avatar">
@@ -15947,8 +16361,472 @@ John Doe,Engineering,john@example.com"
             </div>
         </div>
     </div>
+    </div><!-- End mainAppContainer -->
 
     <script>
+        // ==========================================
+        // AUTHENTICATION MANAGER
+        // ==========================================
+
+        const AuthManager = {
+            // Configuration
+            webhookUrl: 'https://n8n.intelechia.com/webhook-test/6dab38a9-d010-43b4-9669-5a58dbcfab36',
+            sessionKey: 'taskflow_auth_session',
+            pendingCodeKey: 'taskflow_pending_code',
+            codeExpiryMinutes: 10,
+
+            // State
+            currentEmail: null,
+            pendingCode: null,
+            codeExpiry: null,
+            isLoading: false,
+            resendCooldown: false,
+
+            // Initialize auth - check if user is already logged in
+            init() {
+                console.log('🔐 AuthManager: Initializing...');
+
+                // Check for existing session
+                const session = this.getSession();
+                if (session && session.email) {
+                    console.log('🔐 AuthManager: Found existing session for', session.email);
+                    this.onAuthSuccess(session.email, false);
+                    return true;
+                }
+
+                // No session - show login overlay
+                console.log('🔐 AuthManager: No session found, showing login');
+                this.showLoginOverlay();
+                return false;
+            },
+
+            // Get current session from localStorage
+            getSession() {
+                try {
+                    const data = localStorage.getItem(this.sessionKey);
+                    if (data) {
+                        const session = JSON.parse(data);
+                        // Check if session is still valid (30 day expiry)
+                        if (session.expiresAt && new Date(session.expiresAt) > new Date()) {
+                            return session;
+                        }
+                        // Session expired
+                        localStorage.removeItem(this.sessionKey);
+                    }
+                } catch (e) {
+                    console.error('🔐 AuthManager: Error reading session', e);
+                }
+                return null;
+            },
+
+            // Save session to localStorage
+            saveSession(email) {
+                const session = {
+                    email: email,
+                    loggedInAt: new Date().toISOString(),
+                    expiresAt: new Date(Date.now() + 30 * 24 * 60 * 60 * 1000).toISOString() // 30 days
+                };
+                localStorage.setItem(this.sessionKey, JSON.stringify(session));
+                console.log('🔐 AuthManager: Session saved for', email);
+            },
+
+            // Clear session (logout)
+            clearSession() {
+                localStorage.removeItem(this.sessionKey);
+                localStorage.removeItem(this.pendingCodeKey);
+                console.log('🔐 AuthManager: Session cleared');
+            },
+
+            // Generate a 6-digit code
+            generateCode() {
+                return Math.floor(100000 + Math.random() * 900000).toString();
+            },
+
+            // Store pending code for verification
+            storePendingCode(email, code) {
+                const data = {
+                    email: email,
+                    code: code,
+                    createdAt: new Date().toISOString(),
+                    expiresAt: new Date(Date.now() + this.codeExpiryMinutes * 60 * 1000).toISOString()
+                };
+                localStorage.setItem(this.pendingCodeKey, JSON.stringify(data));
+                this.currentEmail = email;
+                this.pendingCode = code;
+                this.codeExpiry = new Date(data.expiresAt);
+            },
+
+            // Get pending code data
+            getPendingCode() {
+                try {
+                    const data = localStorage.getItem(this.pendingCodeKey);
+                    if (data) {
+                        const pending = JSON.parse(data);
+                        if (new Date(pending.expiresAt) > new Date()) {
+                            return pending;
+                        }
+                        // Code expired
+                        localStorage.removeItem(this.pendingCodeKey);
+                    }
+                } catch (e) {
+                    console.error('🔐 AuthManager: Error reading pending code', e);
+                }
+                return null;
+            },
+
+            // Show login overlay
+            showLoginOverlay() {
+                const overlay = document.getElementById('loginOverlay');
+                if (overlay) {
+                    overlay.classList.remove('hidden');
+                }
+            },
+
+            // Hide login overlay
+            hideLoginOverlay() {
+                const overlay = document.getElementById('loginOverlay');
+                if (overlay) {
+                    overlay.classList.add('hidden');
+                }
+            },
+
+            // Show email step
+            showEmailStep() {
+                document.getElementById('loginStepEmail').classList.add('active');
+                document.getElementById('loginStepCode').classList.remove('active');
+                this.hideErrors();
+            },
+
+            // Show code step
+            showCodeStep() {
+                document.getElementById('loginStepEmail').classList.remove('active');
+                document.getElementById('loginStepCode').classList.add('active');
+                document.getElementById('loginEmailDisplay').textContent = this.currentEmail;
+                document.getElementById('loginCode').value = '';
+                document.getElementById('loginCode').focus();
+                this.hideErrors();
+            },
+
+            // Show/hide loading state
+            setLoading(isLoading, buttonId, textId) {
+                this.isLoading = isLoading;
+                const btn = document.getElementById(buttonId);
+                const text = document.getElementById(textId);
+
+                if (btn && text) {
+                    btn.disabled = isLoading;
+                    if (isLoading) {
+                        text.innerHTML = '<span class="spinner"></span>';
+                    } else {
+                        text.textContent = buttonId === 'loginEmailBtn' ? 'Send Login Code' : 'Verify Code';
+                    }
+                }
+            },
+
+            // Show error message
+            showError(step, message) {
+                const errorEl = document.getElementById(step === 'email' ? 'loginErrorEmail' : 'loginErrorCode');
+                const errorText = document.getElementById(step === 'email' ? 'loginErrorEmailText' : 'loginErrorCodeText');
+
+                if (errorEl && errorText) {
+                    errorText.textContent = message;
+                    errorEl.classList.add('show');
+                }
+            },
+
+            // Show success message
+            showSuccess() {
+                const successEl = document.getElementById('loginSuccessCode');
+                if (successEl) {
+                    successEl.classList.add('show');
+                    setTimeout(() => successEl.classList.remove('show'), 3000);
+                }
+            },
+
+            // Hide all errors
+            hideErrors() {
+                document.getElementById('loginErrorEmail')?.classList.remove('show');
+                document.getElementById('loginErrorCode')?.classList.remove('show');
+                document.getElementById('loginSuccessCode')?.classList.remove('show');
+            },
+
+            // Handle email form submission
+            async handleEmailSubmit(event) {
+                event.preventDefault();
+
+                if (this.isLoading) return;
+
+                const emailInput = document.getElementById('loginEmail');
+                const email = emailInput.value.trim().toLowerCase();
+
+                if (!email || !this.isValidEmail(email)) {
+                    this.showError('email', 'Please enter a valid email address');
+                    return;
+                }
+
+                this.hideErrors();
+                this.setLoading(true, 'loginEmailBtn', 'loginEmailBtnText');
+
+                try {
+                    await this.sendLoginCode(email);
+                    this.showCodeStep();
+                    this.showSuccess();
+                } catch (error) {
+                    console.error('🔐 AuthManager: Error sending code', error);
+                    this.showError('email', 'Failed to send login code. Please try again.');
+                } finally {
+                    this.setLoading(false, 'loginEmailBtn', 'loginEmailBtnText');
+                }
+            },
+
+            // Handle code form submission
+            async handleCodeSubmit(event) {
+                event.preventDefault();
+
+                if (this.isLoading) return;
+
+                const codeInput = document.getElementById('loginCode');
+                const code = codeInput.value.trim();
+
+                if (!code || code.length !== 6) {
+                    this.showError('code', 'Please enter a 6-digit code');
+                    return;
+                }
+
+                this.hideErrors();
+                this.setLoading(true, 'loginCodeBtn', 'loginCodeBtnText');
+
+                try {
+                    const isValid = await this.verifyCode(code);
+
+                    if (isValid) {
+                        this.onAuthSuccess(this.currentEmail, true);
+                    } else {
+                        this.showError('code', 'Invalid or expired code. Please try again.');
+                        codeInput.classList.add('error');
+                        setTimeout(() => codeInput.classList.remove('error'), 2000);
+                    }
+                } catch (error) {
+                    console.error('🔐 AuthManager: Error verifying code', error);
+                    this.showError('code', 'Failed to verify code. Please try again.');
+                } finally {
+                    this.setLoading(false, 'loginCodeBtn', 'loginCodeBtnText');
+                }
+            },
+
+            // Send login code via webhook
+            async sendLoginCode(email) {
+                const code = this.generateCode();
+                this.storePendingCode(email, code);
+
+                console.log('🔐 AuthManager: Sending code to', email);
+
+                const response = await fetch(this.webhookUrl, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({
+                        email: email,
+                        code: code,
+                        app: 'taskflow',
+                        timestamp: new Date().toISOString()
+                    })
+                });
+
+                if (!response.ok) {
+                    throw new Error('Webhook request failed: ' + response.status);
+                }
+
+                console.log('🔐 AuthManager: Code sent successfully');
+                return true;
+            },
+
+            // Verify the entered code
+            async verifyCode(enteredCode) {
+                const pending = this.getPendingCode();
+
+                if (!pending) {
+                    console.log('🔐 AuthManager: No pending code found');
+                    return false;
+                }
+
+                if (pending.code === enteredCode) {
+                    console.log('🔐 AuthManager: Code verified successfully');
+                    localStorage.removeItem(this.pendingCodeKey);
+                    return true;
+                }
+
+                console.log('🔐 AuthManager: Code mismatch');
+                return false;
+            },
+
+            // Resend code
+            async resendCode() {
+                if (this.resendCooldown || this.isLoading || !this.currentEmail) return;
+
+                const resendLink = document.getElementById('loginResendLink');
+                if (resendLink) {
+                    resendLink.classList.add('disabled');
+                    resendLink.textContent = 'Sending...';
+                }
+
+                this.resendCooldown = true;
+
+                try {
+                    await this.sendLoginCode(this.currentEmail);
+                    this.showSuccess();
+
+                    // 30 second cooldown
+                    let countdown = 30;
+                    const interval = setInterval(() => {
+                        countdown--;
+                        if (resendLink) {
+                            resendLink.textContent = `Resend (${countdown}s)`;
+                        }
+                        if (countdown <= 0) {
+                            clearInterval(interval);
+                            this.resendCooldown = false;
+                            if (resendLink) {
+                                resendLink.classList.remove('disabled');
+                                resendLink.textContent = 'Resend';
+                            }
+                        }
+                    }, 1000);
+                } catch (error) {
+                    console.error('🔐 AuthManager: Error resending code', error);
+                    this.showError('code', 'Failed to resend code');
+                    this.resendCooldown = false;
+                    if (resendLink) {
+                        resendLink.classList.remove('disabled');
+                        resendLink.textContent = 'Resend';
+                    }
+                }
+            },
+
+            // Go back to email step
+            backToEmail() {
+                this.currentEmail = null;
+                this.pendingCode = null;
+                localStorage.removeItem(this.pendingCodeKey);
+                this.showEmailStep();
+                document.getElementById('loginEmail').focus();
+            },
+
+            // Called when authentication is successful
+            onAuthSuccess(email, isNewLogin) {
+                console.log('🔐 AuthManager: Auth success for', email);
+
+                // Save session
+                if (isNewLogin) {
+                    this.saveSession(email);
+                }
+
+                // Update SoftrIdentity with the authenticated user
+                if (typeof SoftrIdentity !== 'undefined') {
+                    SoftrIdentity.setUser({
+                        email: email,
+                        name: email.split('@')[0],
+                        id: 'email_' + email.replace(/[^a-zA-Z0-9]/g, '_'),
+                        source: 'email_auth'
+                    });
+                }
+
+                // Update user menu in header
+                this.updateUserMenu(email);
+
+                // Hide login overlay
+                this.hideLoginOverlay();
+
+                // Dispatch auth event
+                document.dispatchEvent(new CustomEvent('auth:success', {
+                    detail: { email: email, isNewLogin: isNewLogin }
+                }));
+            },
+
+            // Update the user menu in the header
+            updateUserMenu(email) {
+                const userMenuContainer = document.getElementById('userMenuContainer');
+                if (!userMenuContainer) return;
+
+                const initials = email.substring(0, 2).toUpperCase();
+
+                userMenuContainer.innerHTML = `
+                    <button class="user-menu-btn" onclick="AuthManager.toggleUserMenu(event)">
+                        <div class="user-menu-avatar">${initials}</div>
+                        <i class="ph ph-caret-down"></i>
+                    </button>
+                    <div class="user-menu-dropdown" id="userMenuDropdown">
+                        <div class="user-menu-header">
+                            <div class="user-menu-email">${this.escapeHtml(email)}</div>
+                        </div>
+                        <button class="user-menu-item danger" onclick="AuthManager.logout()">
+                            <i class="ph ph-sign-out"></i> Sign out
+                        </button>
+                    </div>
+                `;
+            },
+
+            // Toggle user menu dropdown
+            toggleUserMenu(event) {
+                event.stopPropagation();
+                const dropdown = document.getElementById('userMenuDropdown');
+                if (dropdown) {
+                    dropdown.classList.toggle('open');
+
+                    // Close on outside click
+                    const closeHandler = (e) => {
+                        if (!e.target.closest('.user-menu-container')) {
+                            dropdown.classList.remove('open');
+                            document.removeEventListener('click', closeHandler);
+                        }
+                    };
+                    document.addEventListener('click', closeHandler);
+                }
+            },
+
+            // Logout
+            logout() {
+                this.clearSession();
+                this.currentEmail = null;
+                this.pendingCode = null;
+
+                // Reset login form
+                this.showEmailStep();
+                document.getElementById('loginEmail').value = '';
+
+                // Clear user menu
+                const userMenuContainer = document.getElementById('userMenuContainer');
+                if (userMenuContainer) {
+                    userMenuContainer.innerHTML = '';
+                }
+
+                // Show login overlay
+                this.showLoginOverlay();
+
+                // Dispatch logout event
+                document.dispatchEvent(new CustomEvent('auth:logout'));
+            },
+
+            // Utility: validate email
+            isValidEmail(email) {
+                return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
+            },
+
+            // Utility: escape HTML
+            escapeHtml(text) {
+                const div = document.createElement('div');
+                div.textContent = text;
+                return div.innerHTML;
+            },
+
+            // Get current user email
+            getCurrentUser() {
+                const session = this.getSession();
+                return session ? session.email : null;
+            }
+        };
+
         // ==========================================
         // SOFTR USER IDENTITY
         // ==========================================
@@ -22881,6 +23759,16 @@ Cmd/Ctrl + K - Command palette
                 // Ensure agent is declared (user details stored once, not repeated in every activity)
                 await ensureAgentDeclared(softrUser, agentId, agentName, agentEmail);
 
+                // Determine agent type based on authentication source
+                let agentType = 'anonymous';
+                if (softrUser) {
+                    if (softrUser.source === 'email_auth') {
+                        agentType = 'email_auth_user';
+                    } else {
+                        agentType = 'softr_user';
+                    }
+                }
+
                 // New schema: app_id, data (json), entity_id, event_type
                 // Only include agent_id - user details are in AGENT_DECLARED activity
                 const payload = {
@@ -22890,8 +23778,9 @@ Cmd/Ctrl + K - Command palette
                     data: {
                         event_verb: activity.event_verb,
                         eo_operator: activity.eo_operator,
-                        agent_type: softrUser ? 'softr_user' : 'anonymous',
+                        agent_type: agentType,
                         agent_id: agentId,
+                        agent_email: agentEmail,
                         object_type: activity.object_type,
                         object_id: activity.object_id,
                         object_label: activity.object_label,
@@ -36110,20 +36999,24 @@ Options:
         // Initialize when page loads
         window.addEventListener('DOMContentLoaded', () => {
             const loadingStatus = document.getElementById('loadingStatus');
-            
+
             function updateStatus(message, success = true) {
                 if (loadingStatus) {
-                    loadingStatus.innerHTML = success 
+                    loadingStatus.innerHTML = success
                         ? `<i class="ph ph-check-circle"></i> ${message}`
                         : `<i class="ph ph-warning-circle"></i> ${message}`;
                     loadingStatus.style.background = success ? 'rgba(76, 175, 80, 0.3)' : 'rgba(244, 67, 54, 0.3)';
                 }
                 console.log(success ? '✅' : '❌', message);
             }
-            
+
             console.log('🔧 Initializing Taskflow...');
             console.log('📍 Loading from:', window.location.protocol);
             console.log('🌐 D3.js loaded:', typeof d3 !== 'undefined');
+
+            // Initialize Authentication Manager - this gates access to the app
+            console.log('🔐 Checking authentication...');
+            AuthManager.init();
 
             // Detect iframe/embed context
             const isInIframe = window.parent !== window;
