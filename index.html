@@ -46127,6 +46127,25 @@ Options:
                     console.warn('⚠️ Could not preload Airtable data:', err);
                 });
 
+                // Always sync users from Airtable (ensures people list is up to date)
+                loadUsersFromAPI().then(() => {
+                    // Save updated entities to workspace
+                    if (currentWorkspaceId && workspaces[currentWorkspaceId]) {
+                        workspaces[currentWorkspaceId].entities = JSON.parse(JSON.stringify(entities));
+                        saveWorkspaces();
+                    }
+                    console.log('✅ Users synced from Airtable');
+                    // Re-render UI to show updated people
+                    if (typeof renderPeopleList === 'function') {
+                        renderPeopleList();
+                    }
+                    if (typeof populateAssigneeList === 'function') {
+                        populateAssigneeList();
+                    }
+                }).catch(err => {
+                    console.warn('⚠️ Could not sync users from Airtable:', err);
+                });
+
                 // Render everything
                 try {
                     updateStatus('Rendering interface...');
