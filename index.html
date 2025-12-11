@@ -14617,6 +14617,209 @@
             gap: 1rem;
         }
 
+        /* Simplified Role People Dashboard */
+        .role-people-dashboard {
+            display: flex;
+            flex-direction: column;
+            gap: 1rem;
+        }
+
+        .role-add-person-section {
+            display: flex;
+            gap: 0.5rem;
+            padding: 0.75rem;
+            background: linear-gradient(135deg, #FDF8F3 0%, #FAF5EE 100%);
+            border: 2px dashed #D4C4A8;
+            border-radius: 12px;
+        }
+
+        .role-add-person-select {
+            flex: 1;
+            padding: 0.625rem 1rem;
+            border: 1px solid #E5DDD1;
+            border-radius: 8px;
+            background: white;
+            font-size: 0.9375rem;
+            color: #3D2E1F;
+            cursor: pointer;
+            transition: all 0.15s;
+        }
+
+        .role-add-person-select:hover {
+            border-color: #C88F4A;
+        }
+
+        .role-add-person-select:focus {
+            outline: none;
+            border-color: #C88F4A;
+            box-shadow: 0 0 0 3px rgba(200, 143, 74, 0.15);
+        }
+
+        .role-add-person-btn {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            width: 42px;
+            height: 42px;
+            background: #C88F4A;
+            color: white;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: all 0.15s;
+            flex-shrink: 0;
+        }
+
+        .role-add-person-btn:hover {
+            background: #B07E3E;
+            transform: scale(1.05);
+        }
+
+        .role-add-person-btn:disabled {
+            background: #E5DDD1;
+            color: #A89984;
+            cursor: not-allowed;
+            transform: none;
+        }
+
+        .role-add-person-btn i {
+            font-size: 1.25rem;
+        }
+
+        .role-people-section {
+            background: #FAF7F5;
+            border-radius: 12px;
+            padding: 1rem;
+        }
+
+        .role-people-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-bottom: 0.75rem;
+            padding-bottom: 0.5rem;
+            border-bottom: 1px solid #E5DDD1;
+        }
+
+        .role-people-title {
+            font-size: 0.8125rem;
+            font-weight: 600;
+            text-transform: uppercase;
+            color: #8B6F47;
+            letter-spacing: 0.05em;
+        }
+
+        .role-people-count {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            min-width: 24px;
+            height: 24px;
+            padding: 0 0.5rem;
+            background: #C88F4A;
+            color: white;
+            font-size: 0.75rem;
+            font-weight: 600;
+            border-radius: 12px;
+        }
+
+        .role-person-row {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 0.625rem 0.75rem;
+            background: white;
+            border: 1px solid #E5DDD1;
+            border-radius: 8px;
+            margin-bottom: 0.5rem;
+            transition: all 0.15s;
+        }
+
+        .role-person-row:last-child {
+            margin-bottom: 0;
+        }
+
+        .role-person-row:hover {
+            border-color: #C88F4A;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.04);
+        }
+
+        .role-person-row.inactive-person {
+            background: #F9FAFB;
+            border-color: #E5E7EB;
+            opacity: 0.85;
+        }
+
+        .role-person-info {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            cursor: pointer;
+            flex: 1;
+        }
+
+        .role-person-info i {
+            color: #C88F4A;
+            font-size: 1rem;
+        }
+
+        .role-person-row.inactive-person .role-person-info i {
+            color: #9CA3AF;
+        }
+
+        .role-person-name {
+            font-size: 0.9375rem;
+            color: #3D2E1F;
+            font-weight: 500;
+        }
+
+        .role-person-remove {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            width: 28px;
+            height: 28px;
+            border: none;
+            background: transparent;
+            color: #A89984;
+            cursor: pointer;
+            border-radius: 6px;
+            transition: all 0.15s;
+            opacity: 0;
+        }
+
+        .role-person-row:hover .role-person-remove {
+            opacity: 1;
+        }
+
+        .role-person-remove:hover {
+            background: #FEE2E2;
+            color: #DC2626;
+        }
+
+        .role-person-remove i {
+            font-size: 0.875rem;
+        }
+
+        .role-people-empty {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 0.5rem;
+            padding: 2rem 1rem;
+            color: #A89984;
+        }
+
+        .role-people-empty i {
+            font-size: 2.5rem;
+            opacity: 0.5;
+        }
+
+        .role-people-empty span {
+            font-size: 0.9375rem;
+            font-style: italic;
+        }
+
         .role-work-section {
             background: #FAF7F5;
             border-radius: 12px;
@@ -40466,74 +40669,37 @@ Options:
                 !assignedPersonIds.includes(p.id)
             );
 
-            // Get current parent team/unit (DES relationship where role is the object)
-            const parentRelationship = relationships.find(r =>
-                r.predicate === 'DES' && r.object === roleId
-            );
-            const parentEntity = parentRelationship ? findEntity(parentRelationship.subject) : null;
-
-            // Get available teams and units to assign this role to
-            const availableTeams = entities.team.filter(t => !parentEntity || t.id !== parentEntity.id);
-            const availableUnits = entities.unit.filter(u => !parentEntity || u.id !== parentEntity.id);
-
-            // Get connected tasks (CON relationships)
-            const connectedTasks = relationships
-                .filter(r => r.predicate === 'CON' && (r.subject === roleId || r.object === roleId))
-                .map(r => {
-                    const otherId = r.subject === roleId ? r.object : r.subject;
-                    return findEntity(otherId);
-                })
-                .filter(e => e && e.type === 'task');
-
-            // Get connected workflows
-            const connectedWorkflows = relationships
-                .filter(r => r.predicate === 'CON' && (r.subject === roleId || r.object === roleId))
-                .map(r => {
-                    const otherId = r.subject === roleId ? r.object : r.subject;
-                    return findEntity(otherId);
-                })
-                .filter(e => e && e.type === 'workflow');
-
-            // Calculate task stats
-            const taskStats = {
-                pending: connectedTasks.filter(t => t.status === 'pending').length,
-                in_progress: connectedTasks.filter(t => t.status === 'in_progress').length,
-                completed: connectedTasks.filter(t => t.status === 'completed').length
-            };
-
-            // Get other roles in the same workflows
-            function getWorkflowRoles(workflowId) {
-                return relationships
-                    .filter(r => r.predicate === 'CON' && (r.subject === workflowId || r.object === workflowId))
-                    .map(r => {
-                        const otherId = r.subject === workflowId ? r.object : r.subject;
-                        return findEntity(otherId);
-                    })
-                    .filter(e => e && e.type === 'role');
-            }
-
             return `
-                <div class="role-work-dashboard">
-                    <!-- Assigned People Section -->
-                    <div class="role-work-section">
-                        <div class="role-work-section-header">
-                            <div class="role-work-section-title">
-                                <i class="ph ph-users"></i> Assigned People
-                            </div>
-                            <span class="role-work-count">${assignedPeople.length}</span>
+                <div class="role-people-dashboard">
+                    <!-- Add Person - prominent at top -->
+                    <div class="role-add-person-section">
+                        <select id="roleModalPersonSelect" class="role-add-person-select">
+                            <option value="">Add someone to this role...</option>
+                            ${unassignedPeople.map(person => `<option value="${person.id}">${person.name}</option>`).join('')}
+                        </select>
+                        <button class="role-add-person-btn" onclick="assignPersonToRoleFromRoleModal()" ${unassignedPeople.length === 0 ? 'disabled' : ''}>
+                            <i class="ph ph-user-plus"></i>
+                        </button>
+                    </div>
+
+                    <!-- Assigned People List -->
+                    <div class="role-people-section">
+                        <div class="role-people-header">
+                            <span class="role-people-title">People in this role</span>
+                            <span class="role-people-count">${assignedPeople.length}</span>
                         </div>
                         ${assignedPeopleWithRels.length > 0 ? `
                             <div class="role-people-list">
                                 ${assignedPeopleWithRels.map(item => {
                                     const isInactive = item.person.activityStatus && item.person.activityStatus !== 'Active';
                                     return `
-                                    <div class="role-person-chip-with-remove ${isInactive ? 'inactive-person' : ''}">
-                                        <div class="role-person-chip-content" onclick="openEntityModal('${item.person.id}', 'person')">
+                                    <div class="role-person-row ${isInactive ? 'inactive-person' : ''}">
+                                        <div class="role-person-info" onclick="openEntityModal('${item.person.id}', 'person')">
                                             <i class="ph ph-user"></i>
-                                            ${item.person.name}
+                                            <span class="role-person-name">${item.person.name}</span>
                                             ${isInactive ? '<span class="inactive-badge">Inactive</span>' : ''}
                                         </div>
-                                        <button class="role-person-remove-btn" onclick="removePersonFromRole('${item.relationshipId}', event)" title="Remove from role">
+                                        <button class="role-person-remove" onclick="removePersonFromRole('${item.relationshipId}', event)" title="Remove from role">
                                             <i class="ph ph-x"></i>
                                         </button>
                                     </div>
@@ -40541,140 +40707,10 @@ Options:
                                 }).join('')}
                             </div>
                         ` : `
-                            <div class="role-empty-state">No one assigned to this role</div>
-                        `}
-                        <!-- Assign Person UI -->
-                        <div class="role-assign-person-section">
-                            <div class="role-assign-person-row">
-                                <select id="roleModalPersonSelect" class="role-assign-person-select">
-                                    <option value="">Select person...</option>
-                                    ${unassignedPeople.map(person => `<option value="${person.id}">${person.name}</option>`).join('')}
-                                </select>
-                                <button class="role-assign-person-btn" onclick="assignPersonToRoleFromRoleModal()" ${unassignedPeople.length === 0 ? 'disabled' : ''}>
-                                    <i class="ph ph-plus"></i> Assign
-                                </button>
+                            <div class="role-people-empty">
+                                <i class="ph ph-user-circle-dashed"></i>
+                                <span>No one assigned yet</span>
                             </div>
-                        </div>
-                    </div>
-
-                    <!-- Parent Team/Unit Section -->
-                    <div class="role-work-section">
-                        <div class="role-work-section-header">
-                            <div class="role-work-section-title">
-                                <i class="ph ph-tree-structure"></i> Parent Team/Unit
-                            </div>
-                        </div>
-                        ${parentEntity ? `
-                            <div class="role-parent-display">
-                                <div class="role-parent-chip" onclick="openEntityModal('${parentEntity.id}', '${parentEntity.type}')">
-                                    <i class="ph ${parentEntity.type === 'team' ? 'ph-users-three' : 'ph-buildings'}"></i>
-                                    <span>${parentEntity.name}</span>
-                                    <span class="parent-type-badge">${parentEntity.type}</span>
-                                </div>
-                                <button class="role-parent-remove-btn" onclick="removeRoleFromParent('${roleId}', '${parentRelationship.id}', event)" title="Remove from ${parentEntity.type}">
-                                    <i class="ph ph-x"></i>
-                                </button>
-                            </div>
-                        ` : `
-                            <div class="role-empty-state">Not assigned to any team or unit</div>
-                        `}
-                        <!-- Assign to Team/Unit UI -->
-                        <div class="role-assign-parent-section">
-                            <div class="role-assign-parent-row">
-                                <select id="roleModalParentSelect" class="role-assign-parent-select">
-                                    <option value="">Select team or unit...</option>
-                                    ${availableTeams.length > 0 ? `<optgroup label="Teams">
-                                        ${availableTeams.map(team => `<option value="${team.id}" data-type="team">${team.name}</option>`).join('')}
-                                    </optgroup>` : ''}
-                                    ${availableUnits.length > 0 ? `<optgroup label="Units">
-                                        ${availableUnits.map(unit => `<option value="${unit.id}" data-type="unit">${unit.name}</option>`).join('')}
-                                    </optgroup>` : ''}
-                                </select>
-                                <button class="role-assign-parent-btn" onclick="assignRoleToTeamFromModal('${roleId}')" ${availableTeams.length === 0 && availableUnits.length === 0 ? 'disabled' : ''}>
-                                    <i class="ph ph-plus"></i> Assign
-                                </button>
-                            </div>
-                        </div>
-                    </div>
-
-                    <!-- Tasks Section -->
-                    <div class="role-work-section">
-                        <div class="role-work-section-header">
-                            <div class="role-work-section-title">
-                                <i class="ph ph-check-square"></i> Tasks
-                            </div>
-                            <span class="role-work-count">${connectedTasks.length}</span>
-                        </div>
-                        ${connectedTasks.length > 0 ? `
-                            <div class="role-task-summary">
-                                <div class="role-task-stat pending">
-                                    <i class="ph ph-circle-dashed"></i>
-                                    <span class="role-task-stat-count">${taskStats.pending}</span> pending
-                                </div>
-                                <div class="role-task-stat in_progress">
-                                    <i class="ph ph-spinner"></i>
-                                    <span class="role-task-stat-count">${taskStats.in_progress}</span> active
-                                </div>
-                                <div class="role-task-stat completed">
-                                    <i class="ph ph-check-circle"></i>
-                                    <span class="role-task-stat-count">${taskStats.completed}</span> done
-                                </div>
-                            </div>
-                            <div class="role-task-list">
-                                ${connectedTasks.map(task => {
-                                    const statusIcon = task.status === 'completed' ? 'ph-check' :
-                                                       task.status === 'in_progress' ? 'ph-spinner' : '';
-                                    return `
-                                    <div class="role-task-item" onclick="openEntityModal('${task.id}', 'task')">
-                                        <div class="role-task-status ${task.status}">
-                                            ${statusIcon ? `<i class="ph ${statusIcon}"></i>` : ''}
-                                        </div>
-                                        <div class="role-task-info">
-                                            <div class="role-task-name">${task.name}</div>
-                                            <div class="role-task-meta">
-                                                ${renderInlineDatePicker(task.id, task.dueDate)}
-                                            </div>
-                                        </div>
-                                    </div>
-                                    `;
-                                }).join('')}
-                            </div>
-                        ` : `
-                            <div class="role-empty-state">No tasks assigned to this role</div>
-                        `}
-                    </div>
-
-                    <!-- Workflows Section -->
-                    <div class="role-work-section">
-                        <div class="role-work-section-header">
-                            <div class="role-work-section-title">
-                                <i class="ph ph-git-branch"></i> Workflows
-                            </div>
-                            <span class="role-work-count">${connectedWorkflows.length}</span>
-                        </div>
-                        ${connectedWorkflows.length > 0 ? `
-                            <div class="role-workflow-list">
-                                ${connectedWorkflows.map(workflow => {
-                                    const workflowRoles = getWorkflowRoles(workflow.id);
-                                    return `
-                                    <div class="role-workflow-item" onclick="openEntityModal('${workflow.id}', 'workflow')">
-                                        <div class="role-workflow-header">
-                                            <i class="ph ph-git-branch"></i>
-                                            <span class="role-workflow-name">${workflow.name}</span>
-                                        </div>
-                                        ${workflowRoles.length > 0 ? `
-                                            <div class="role-workflow-roles">
-                                                ${workflowRoles.map(r => `
-                                                    <span class="role-workflow-role-chip ${r.id === roleId ? 'current' : ''}">${r.name}</span>
-                                                `).join('')}
-                                            </div>
-                                        ` : ''}
-                                    </div>
-                                    `;
-                                }).join('')}
-                            </div>
-                        ` : `
-                            <div class="role-empty-state">No workflows connected</div>
                         `}
                     </div>
                 </div>
