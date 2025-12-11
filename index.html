@@ -22409,6 +22409,62 @@ John Doe,Engineering,john@example.com"
         let taskLinks = [];          // Rich task-to-task links with metadata
 
         // ==========================================
+        // LOAD USERS FROM AIRTABLE API
+        // ==========================================
+
+        // Load users from Airtable and add them as person entities
+        async function loadUsersFromAPI() {
+            console.log('📡 Loading users from Airtable API...');
+            try {
+                const result = await AirtableAPI.getRecords('users', {
+                    fields: ['User Name', 'Email'],
+                    maxRecords: 100
+                });
+
+                const records = result.records || [];
+                console.log(`📥 Received ${records.length} users from API`);
+
+                // Clear existing people to avoid duplicates
+                entities.person = [];
+
+                // Convert Airtable users to person entities
+                records.forEach((record, index) => {
+                    const fields = record.fields || {};
+                    const userName = fields['User Name'] || fields['Name'] || 'Unknown User';
+                    const email = fields['Email'] || '';
+
+                    // Create a unique ID using the Airtable record ID or generate one
+                    const personId = record.id || `person_${Date.now()}_${index}`;
+
+                    entities.person.push({
+                        id: personId,
+                        name: userName,
+                        type: 'person',
+                        description: email ? `Email: ${email}` : '',
+                        email: email,
+                        airtableId: record.id,
+                        createdAt: new Date().toISOString()
+                    });
+                });
+
+                console.log(`✅ Created ${entities.person.length} person entities from API users`);
+
+                // Re-render the UI to show the new people
+                if (typeof renderEntityList === 'function') {
+                    renderEntityList();
+                }
+                if (typeof updateSelects === 'function') {
+                    updateSelects();
+                }
+
+                return entities.person;
+            } catch (error) {
+                console.error('❌ Error loading users from API:', error);
+                throw error;
+            }
+        }
+
+        // ==========================================
         // FUZZY MATCHING FOR TASK SIMILARITY
         // ==========================================
 
@@ -45119,37 +45175,45 @@ Options:
                 }
             }
 
-            // Function to load sample data as fallback
+            // Function to create default workspace (formerly loaded sample data)
             function loadSampleDataFallback() {
-                updateStatus('Loading sample data...');
-                console.log('📝 Creating default workspace with sample data...');
+                updateStatus('Creating default workspace...');
+                console.log('📝 Creating default workspace...');
                 try {
                     // Create default workspace
                     const wsId = generateWorkspaceId();
                     workspaces[wsId] = {
                         id: wsId,
-                        name: 'Acme Marketing Agency',
+                        name: 'Amino Immigration',
                         entities: { unit: [], team: [], role: [], person: [], task: [], product: [], workflow: [] },
                         relationships: [],
-                        hasSampleData: true,
+                        hasSampleData: false,
                         createdAt: Date.now(),
                         updatedAt: Date.now()
                     };
                     currentWorkspaceId = wsId;
 
-                    initSampleData();
-                    hasSampleData = true;
-
-                    // Update workspace with loaded sample data
-                    workspaces[wsId].entities = JSON.parse(JSON.stringify(entities));
-                    workspaces[wsId].relationships = JSON.parse(JSON.stringify(relationships));
+                    // Initialize with empty entities
+                    entities = { unit: [], team: [], role: [], person: [], task: [], product: [], workflow: [] };
+                    relationships = [];
+                    hasSampleData = false;
                     saveWorkspaces();
+
+                    // Load users from Airtable API
+                    loadUsersFromAPI().then(() => {
+                        // Update workspace with loaded users
+                        workspaces[wsId].entities = JSON.parse(JSON.stringify(entities));
+                        saveWorkspaces();
+                        console.log('✅ Users loaded from API');
+                    }).catch(err => {
+                        console.warn('⚠️ Could not load users from API:', err);
+                    });
 
                     const btnText = document.getElementById('sampleDataText');
                     if (btnText) {
-                        btnText.textContent = 'Clear Sample Data';
+                        btnText.textContent = 'Load Sample Data';
                     }
-                    console.log('✅ Sample data loaded. Entities:', {
+                    console.log('✅ Default workspace created. Entities:', {
                         units: entities.unit.length,
                         teams: entities.team.length,
                         roles: entities.role.length,
@@ -45159,11 +45223,11 @@ Options:
                         workflows: entities.workflow.length
                     });
                     console.log('✅ Relationships:', relationships.length);
-                    updateStatus('Sample data loaded');
+                    updateStatus('Workspace ready');
                 } catch (e) {
-                    console.error('❌ Error loading sample data:', e);
-                    updateStatus('Error loading sample data', false);
-                    alert('Error loading sample data. Check console for details.');
+                    console.error('❌ Error creating workspace:', e);
+                    updateStatus('Error creating workspace', false);
+                    alert('Error creating workspace. Check console for details.');
                 }
             }
 
