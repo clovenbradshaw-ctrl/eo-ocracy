@@ -16532,6 +16532,400 @@
         }
 
         /* ============================================
+           WORKFLOWS VIEW STYLES
+           ============================================ */
+
+        .workflows-view {
+            display: none;
+            flex-direction: column;
+            height: 100%;
+            background: #FAF7F5;
+        }
+
+        .workflows-view.active {
+            display: flex;
+        }
+
+        .workflows-view-content {
+            flex: 1;
+            overflow: auto;
+            padding: 1.5rem;
+        }
+
+        .workflows-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 1.5rem;
+        }
+
+        .workflows-title {
+            font-size: 1.25rem;
+            font-weight: 600;
+            color: #3D2E1F;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .workflows-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+            gap: 1rem;
+        }
+
+        .workflow-card {
+            background: white;
+            border-radius: 8px;
+            border: 1px solid #E5DDD1;
+            padding: 1.25rem;
+            transition: all 0.2s ease;
+            cursor: pointer;
+        }
+
+        .workflow-card:hover {
+            border-color: #C88F4A;
+            box-shadow: 0 4px 12px rgba(200, 143, 74, 0.15);
+            transform: translateY(-2px);
+        }
+
+        .workflow-card-header {
+            display: flex;
+            align-items: flex-start;
+            gap: 0.75rem;
+            margin-bottom: 0.75rem;
+        }
+
+        .workflow-card-icon {
+            width: 40px;
+            height: 40px;
+            border-radius: 8px;
+            background: linear-gradient(135deg, #C88F4A 0%, #B87B5B 100%);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-size: 1.25rem;
+            flex-shrink: 0;
+        }
+
+        .workflow-card-title {
+            font-size: 1rem;
+            font-weight: 600;
+            color: #3D2E1F;
+            margin-bottom: 0.25rem;
+        }
+
+        .workflow-card-description {
+            font-size: 0.8rem;
+            color: #6B5642;
+            line-height: 1.4;
+        }
+
+        .workflow-card-meta {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+            margin-top: 1rem;
+            padding-top: 0.75rem;
+            border-top: 1px solid #F5E6D3;
+            font-size: 0.75rem;
+            color: #8B6F47;
+        }
+
+        .workflow-card-meta span {
+            display: flex;
+            align-items: center;
+            gap: 0.35rem;
+        }
+
+        .workflow-card-status {
+            display: inline-flex;
+            align-items: center;
+            padding: 0.25rem 0.5rem;
+            border-radius: 4px;
+            font-size: 0.7rem;
+            font-weight: 600;
+            text-transform: uppercase;
+        }
+
+        .workflow-card-status.active {
+            background: #D1FAE5;
+            color: #059669;
+        }
+
+        .workflow-card-status.draft {
+            background: #FEF3C7;
+            color: #B45309;
+        }
+
+        .workflow-card-status.inactive {
+            background: #F3F4F6;
+            color: #6B7280;
+        }
+
+        .workflow-card-actions {
+            display: flex;
+            gap: 0.5rem;
+            margin-top: 1rem;
+        }
+
+        .workflow-card-btn {
+            flex: 1;
+            padding: 0.5rem 0.75rem;
+            border-radius: 6px;
+            font-size: 0.8rem;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.2s;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 0.35rem;
+        }
+
+        .workflow-card-btn.primary {
+            background: #C88F4A;
+            color: white;
+            border: none;
+        }
+
+        .workflow-card-btn.primary:hover {
+            background: #A87339;
+        }
+
+        .workflow-card-btn.secondary {
+            background: white;
+            color: #3D2E1F;
+            border: 1px solid #E5DDD1;
+        }
+
+        .workflow-card-btn.secondary:hover {
+            background: #FAF7F5;
+            border-color: #C88F4A;
+        }
+
+        .workflow-new-card {
+            background: white;
+            border-radius: 8px;
+            border: 2px dashed #E5DDD1;
+            padding: 1.25rem;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            min-height: 180px;
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+
+        .workflow-new-card:hover {
+            border-color: #C88F4A;
+            background: #FAF7F5;
+        }
+
+        .workflow-new-card i {
+            font-size: 2rem;
+            color: #C88F4A;
+            margin-bottom: 0.5rem;
+        }
+
+        .workflow-new-card span {
+            font-size: 0.9rem;
+            font-weight: 500;
+            color: #6B5642;
+        }
+
+        .workflows-empty {
+            text-align: center;
+            padding: 3rem;
+            color: #6B5642;
+        }
+
+        .workflows-empty i {
+            font-size: 3rem;
+            color: #C88F4A;
+            margin-bottom: 1rem;
+        }
+
+        .workflows-empty h3 {
+            margin-bottom: 0.5rem;
+            color: #3D2E1F;
+        }
+
+        /* Workflow Preview Modal */
+        .workflow-preview-modal {
+            max-width: 500px;
+        }
+
+        .workflow-preview-header {
+            background: linear-gradient(135deg, #C88F4A 0%, #B87B5B 100%);
+            color: white;
+            padding: 1.5rem;
+            border-radius: 8px 8px 0 0;
+        }
+
+        .workflow-preview-header h3 {
+            margin: 0 0 0.25rem 0;
+            font-size: 1.25rem;
+        }
+
+        .workflow-preview-header p {
+            margin: 0;
+            opacity: 0.9;
+            font-size: 0.85rem;
+        }
+
+        .workflow-preview-body {
+            padding: 1.5rem;
+        }
+
+        .workflow-preview-section {
+            margin-bottom: 1.25rem;
+        }
+
+        .workflow-preview-section:last-child {
+            margin-bottom: 0;
+        }
+
+        .workflow-preview-section-title {
+            font-size: 0.8rem;
+            font-weight: 600;
+            color: #8B6F47;
+            margin-bottom: 0.75rem;
+            text-transform: uppercase;
+            letter-spacing: 0.03em;
+        }
+
+        .workflow-task-list {
+            list-style: none;
+            padding: 0;
+            margin: 0;
+        }
+
+        .workflow-task-item {
+            display: flex;
+            align-items: flex-start;
+            gap: 0.75rem;
+            padding: 0.75rem;
+            background: #FAF7F5;
+            border-radius: 6px;
+            margin-bottom: 0.5rem;
+            border-left: 3px solid #C88F4A;
+        }
+
+        .workflow-task-item:last-child {
+            margin-bottom: 0;
+        }
+
+        .workflow-task-number {
+            width: 24px;
+            height: 24px;
+            border-radius: 50%;
+            background: #C88F4A;
+            color: white;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 0.75rem;
+            font-weight: 600;
+            flex-shrink: 0;
+        }
+
+        .workflow-task-info {
+            flex: 1;
+        }
+
+        .workflow-task-name {
+            font-weight: 500;
+            color: #3D2E1F;
+            margin-bottom: 0.25rem;
+        }
+
+        .workflow-task-role {
+            font-size: 0.75rem;
+            color: #8B6F47;
+            display: flex;
+            align-items: center;
+            gap: 0.25rem;
+        }
+
+        .workflow-preview-footer {
+            padding: 1rem 1.5rem;
+            border-top: 1px solid #E5DDD1;
+            display: flex;
+            justify-content: flex-end;
+            gap: 0.75rem;
+        }
+
+        /* Use Workflow Modal */
+        .workflow-use-modal {
+            max-width: 450px;
+        }
+
+        .workflow-use-form {
+            padding: 1.5rem;
+        }
+
+        .workflow-form-group {
+            margin-bottom: 1.25rem;
+        }
+
+        .workflow-form-group:last-child {
+            margin-bottom: 0;
+        }
+
+        .workflow-form-group label {
+            display: block;
+            font-size: 0.85rem;
+            font-weight: 500;
+            color: #3D2E1F;
+            margin-bottom: 0.5rem;
+        }
+
+        .workflow-form-group input,
+        .workflow-form-group select {
+            width: 100%;
+            padding: 0.625rem 0.75rem;
+            border: 1px solid #E5DDD1;
+            border-radius: 6px;
+            font-size: 0.9rem;
+            transition: border-color 0.2s;
+            box-sizing: border-box;
+        }
+
+        .workflow-form-group input:focus,
+        .workflow-form-group select:focus {
+            outline: none;
+            border-color: #C88F4A;
+        }
+
+        .workflow-form-checkbox {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            cursor: pointer;
+        }
+
+        .workflow-form-checkbox input {
+            width: auto;
+        }
+
+        .workflow-form-hint {
+            font-size: 0.75rem;
+            color: #8B6F47;
+            margin-top: 0.35rem;
+        }
+
+        .workflow-use-footer {
+            padding: 1rem 1.5rem;
+            border-top: 1px solid #E5DDD1;
+            display: flex;
+            justify-content: flex-end;
+            gap: 0.75rem;
+        }
+
+        /* ============================================
            ENHANCED TASK MANAGEMENT STYLES
            Asana-style features with EO holonic integration
            ============================================ */
@@ -19449,6 +19843,10 @@
                     <i class="ph ph-calendar"></i>
                     <span>Calendar</span>
                 </button>
+                <button class="view-tab" data-view="workflows" onclick="switchView('workflows')">
+                    <i class="ph ph-flow-arrow"></i>
+                    <span>Workflows</span>
+                </button>
             </div>
         </div>
 
@@ -20095,6 +20493,13 @@
             <!-- Calendar View -->
             <div id="calendarView" class="calendar-view">
                 <div class="calendar-view-content" id="calendarViewContent">
+                    <!-- Populated dynamically -->
+                </div>
+            </div>
+
+            <!-- Workflows View -->
+            <div id="workflowsView" class="workflows-view">
+                <div class="workflows-view-content" id="workflowsViewContent">
                     <!-- Populated dynamically -->
                 </div>
             </div>
@@ -24044,6 +24449,7 @@ John Doe,Engineering,john@example.com"
             document.getElementById('shapeView').classList.remove('active');
             document.getElementById('ganttView').classList.remove('active');
             document.getElementById('calendarView').classList.remove('active');
+            document.getElementById('workflowsView').classList.remove('active');
 
             if (view === 'tree') {
                 document.getElementById('treeView').classList.add('active');
@@ -24081,6 +24487,9 @@ John Doe,Engineering,john@example.com"
             } else if (view === 'calendar') {
                 document.getElementById('calendarView').classList.add('active');
                 renderCalendarView();
+            } else if (view === 'workflows') {
+                document.getElementById('workflowsView').classList.add('active');
+                renderWorkflowsView();
             } else {
                 document.getElementById('graphView').classList.add('active');
                 setTimeout(() => updateGraph(), 100);
@@ -46720,6 +47129,403 @@ Options:
 
             // Apply the filters
             applyFilters();
+        }
+
+        // ==========================================
+        // WORKFLOWS VIEW
+        // ==========================================
+
+        // Seed default workflow templates if none exist
+        function seedDefaultWorkflowTemplates() {
+            if (workflowTemplates.length > 0) return; // Already have templates
+
+            const defaultTemplates = [
+                {
+                    id: 'wftemplate_default_1',
+                    name: 'Client Onboarding',
+                    description: 'Standard process for onboarding new clients',
+                    createdBy: 'system',
+                    status: 'active',
+                    taskPatterns: [
+                        { order: 1, namePattern: 'Initial consultation call', roleConstraints: [], requiredFields: [] },
+                        { order: 2, namePattern: 'Send welcome packet', roleConstraints: [], requiredFields: [] },
+                        { order: 3, namePattern: 'Collect client information', roleConstraints: [], requiredFields: [] },
+                        { order: 4, namePattern: 'Setup client in system', roleConstraints: [], requiredFields: [] },
+                        { order: 5, namePattern: 'Schedule kickoff meeting', roleConstraints: [], requiredFields: ['dueDate'] }
+                    ],
+                    roleRequirements: [],
+                    approvals: [],
+                    createdAt: new Date().toISOString(),
+                    version: 1
+                },
+                {
+                    id: 'wftemplate_default_2',
+                    name: 'Weekly Review',
+                    description: 'Standard weekly review and reporting workflow',
+                    createdBy: 'system',
+                    status: 'active',
+                    taskPatterns: [
+                        { order: 1, namePattern: 'Gather weekly metrics', roleConstraints: [], requiredFields: [] },
+                        { order: 2, namePattern: 'Prepare status report', roleConstraints: [], requiredFields: [] },
+                        { order: 3, namePattern: 'Present findings to team', roleConstraints: [], requiredFields: ['dueDate'] }
+                    ],
+                    roleRequirements: [],
+                    approvals: [],
+                    createdAt: new Date().toISOString(),
+                    version: 1
+                },
+                {
+                    id: 'wftemplate_default_3',
+                    name: 'Project Kickoff',
+                    description: 'Steps to properly start a new project',
+                    createdBy: 'system',
+                    status: 'active',
+                    taskPatterns: [
+                        { order: 1, namePattern: 'Define project scope', roleConstraints: [], requiredFields: [] },
+                        { order: 2, namePattern: 'Identify stakeholders', roleConstraints: [], requiredFields: [] },
+                        { order: 3, namePattern: 'Create project timeline', roleConstraints: [], requiredFields: [] },
+                        { order: 4, namePattern: 'Assign team members', roleConstraints: [], requiredFields: [] },
+                        { order: 5, namePattern: 'Hold kickoff meeting', roleConstraints: [], requiredFields: ['dueDate'] },
+                        { order: 6, namePattern: 'Send meeting notes', roleConstraints: [], requiredFields: [] }
+                    ],
+                    roleRequirements: [],
+                    approvals: [],
+                    createdAt: new Date().toISOString(),
+                    version: 1
+                }
+            ];
+
+            workflowTemplates.push(...defaultTemplates);
+            saveToLocalStorage();
+            console.log('📋 Seeded default workflow templates');
+        }
+
+        // Render the workflows view
+        function renderWorkflowsView() {
+            const content = document.getElementById('workflowsViewContent');
+            if (!content) return;
+
+            // Seed default templates if needed
+            seedDefaultWorkflowTemplates();
+
+            const templates = workflowTemplates.filter(t => t.status === 'active' || t.status === 'draft');
+
+            let html = `
+                <div class="workflows-header">
+                    <div class="workflows-title">
+                        <i class="ph ph-flow-arrow"></i>
+                        Workflow Templates
+                    </div>
+                </div>
+            `;
+
+            if (templates.length === 0) {
+                html += `
+                    <div class="workflows-empty">
+                        <i class="ph ph-flow-arrow"></i>
+                        <h3>No workflow templates yet</h3>
+                        <p>Create workflows from existing task sequences or build new templates.</p>
+                    </div>
+                `;
+            } else {
+                html += '<div class="workflows-grid">';
+
+                templates.forEach(template => {
+                    html += renderWorkflowCard(template);
+                });
+
+                // Add "Create New" card
+                html += `
+                    <div class="workflow-new-card" onclick="showCreateWorkflowInfo()">
+                        <i class="ph ph-plus-circle"></i>
+                        <span>Create from Tasks</span>
+                    </div>
+                `;
+
+                html += '</div>';
+            }
+
+            content.innerHTML = html;
+        }
+
+        // Render a single workflow card
+        function renderWorkflowCard(template) {
+            const taskCount = template.taskPatterns ? template.taskPatterns.length : 0;
+            const roleCount = template.roleRequirements ? template.roleRequirements.length : 0;
+            const statusClass = template.status || 'active';
+
+            return `
+                <div class="workflow-card" data-template-id="${template.id}">
+                    <div class="workflow-card-header">
+                        <div class="workflow-card-icon">
+                            <i class="ph ph-flow-arrow"></i>
+                        </div>
+                        <div>
+                            <div class="workflow-card-title">${escapeHtml(template.name)}</div>
+                            <div class="workflow-card-description">${escapeHtml(template.description || '')}</div>
+                        </div>
+                    </div>
+                    <div class="workflow-card-meta">
+                        <span><i class="ph ph-list-checks"></i> ${taskCount} tasks</span>
+                        ${roleCount > 0 ? `<span><i class="ph ph-briefcase"></i> ${roleCount} roles</span>` : ''}
+                        <span class="workflow-card-status ${statusClass}">${statusClass}</span>
+                    </div>
+                    <div class="workflow-card-actions">
+                        <button class="workflow-card-btn secondary" onclick="event.stopPropagation(); openWorkflowPreviewModal('${template.id}')">
+                            <i class="ph ph-eye"></i> Preview
+                        </button>
+                        <button class="workflow-card-btn primary" onclick="event.stopPropagation(); openWorkflowUseModal('${template.id}')">
+                            <i class="ph ph-play"></i> Use
+                        </button>
+                    </div>
+                </div>
+            `;
+        }
+
+        // Show info about creating workflows from tasks
+        function showCreateWorkflowInfo() {
+            showToast('Select multiple tasks in Kanban view, then use "Create Workflow" to build a template from existing tasks.', 'info', 5000);
+        }
+
+        // Open workflow preview modal
+        function openWorkflowPreviewModal(templateId) {
+            const template = workflowTemplates.find(t => t.id === templateId);
+            if (!template) return;
+
+            // Create or update modal
+            let modal = document.getElementById('workflowPreviewModal');
+            if (!modal) {
+                modal = document.createElement('div');
+                modal.id = 'workflowPreviewModal';
+                modal.className = 'modal-overlay';
+                document.body.appendChild(modal);
+            }
+
+            const taskListHtml = (template.taskPatterns || []).map((pattern, idx) => {
+                const roleNames = (pattern.roleConstraints || [])
+                    .map(roleId => {
+                        const role = entities.role.find(r => r.id === roleId);
+                        return role ? role.name : null;
+                    })
+                    .filter(Boolean);
+
+                return `
+                    <li class="workflow-task-item">
+                        <div class="workflow-task-number">${idx + 1}</div>
+                        <div class="workflow-task-info">
+                            <div class="workflow-task-name">${escapeHtml(pattern.namePattern)}</div>
+                            ${roleNames.length > 0 ? `
+                                <div class="workflow-task-role">
+                                    <i class="ph ph-briefcase"></i> ${roleNames.join(', ')}
+                                </div>
+                            ` : ''}
+                        </div>
+                    </li>
+                `;
+            }).join('');
+
+            modal.innerHTML = `
+                <div class="modal-dialog workflow-preview-modal">
+                    <div class="workflow-preview-header">
+                        <h3>${escapeHtml(template.name)}</h3>
+                        <p>${escapeHtml(template.description || '')}</p>
+                    </div>
+                    <div class="workflow-preview-body">
+                        <div class="workflow-preview-section">
+                            <div class="workflow-preview-section-title">Tasks that will be created</div>
+                            <ul class="workflow-task-list">
+                                ${taskListHtml || '<li class="workflow-task-item"><div class="workflow-task-info"><div class="workflow-task-name">No tasks defined</div></div></li>'}
+                            </ul>
+                        </div>
+                    </div>
+                    <div class="workflow-preview-footer">
+                        <button class="workflow-card-btn secondary" onclick="closeWorkflowPreviewModal()">Close</button>
+                        <button class="workflow-card-btn primary" onclick="closeWorkflowPreviewModal(); openWorkflowUseModal('${template.id}')">
+                            <i class="ph ph-play"></i> Use This Workflow
+                        </button>
+                    </div>
+                </div>
+            `;
+
+            modal.classList.add('active');
+
+            // Close on outside click
+            modal.onclick = (e) => {
+                if (e.target === modal) closeWorkflowPreviewModal();
+            };
+        }
+
+        // Close workflow preview modal
+        function closeWorkflowPreviewModal() {
+            const modal = document.getElementById('workflowPreviewModal');
+            if (modal) modal.classList.remove('active');
+        }
+
+        // Open workflow use modal
+        function openWorkflowUseModal(templateId) {
+            const template = workflowTemplates.find(t => t.id === templateId);
+            if (!template) return;
+
+            // Create or update modal
+            let modal = document.getElementById('workflowUseModal');
+            if (!modal) {
+                modal = document.createElement('div');
+                modal.id = 'workflowUseModal';
+                modal.className = 'modal-overlay';
+                document.body.appendChild(modal);
+            }
+
+            const today = new Date().toISOString().split('T')[0];
+            const taskCount = template.taskPatterns ? template.taskPatterns.length : 0;
+
+            modal.innerHTML = `
+                <div class="modal-dialog workflow-use-modal">
+                    <div class="workflow-preview-header">
+                        <h3>Create Tasks from Workflow</h3>
+                        <p>${escapeHtml(template.name)}</p>
+                    </div>
+                    <div class="workflow-use-form">
+                        <div class="workflow-form-group">
+                            <label for="workflowInstanceName">Instance Name</label>
+                            <input type="text" id="workflowInstanceName" placeholder="e.g., Onboarding - Acme Corp" value="${escapeHtml(template.name)} - ${new Date().toLocaleDateString()}">
+                            <div class="workflow-form-hint">A label to identify this set of tasks</div>
+                        </div>
+                        <div class="workflow-form-group">
+                            <label for="workflowStartDate">Start Date</label>
+                            <input type="date" id="workflowStartDate" value="${today}">
+                        </div>
+                        <div class="workflow-form-group">
+                            <label class="workflow-form-checkbox">
+                                <input type="checkbox" id="workflowAssignMe" checked>
+                                <span>Assign me as collaborator on tasks</span>
+                            </label>
+                        </div>
+                        <div class="workflow-form-group">
+                            <label class="workflow-form-checkbox">
+                                <input type="checkbox" id="workflowLinkTasks" checked>
+                                <span>Link tasks as a sequence (with dependencies)</span>
+                            </label>
+                        </div>
+                    </div>
+                    <div class="workflow-use-footer">
+                        <button class="workflow-card-btn secondary" onclick="closeWorkflowUseModal()">Cancel</button>
+                        <button class="workflow-card-btn primary" onclick="instantiateWorkflow('${template.id}')">
+                            <i class="ph ph-plus"></i> Create ${taskCount} Tasks
+                        </button>
+                    </div>
+                </div>
+            `;
+
+            modal.classList.add('active');
+
+            // Close on outside click
+            modal.onclick = (e) => {
+                if (e.target === modal) closeWorkflowUseModal();
+            };
+        }
+
+        // Close workflow use modal
+        function closeWorkflowUseModal() {
+            const modal = document.getElementById('workflowUseModal');
+            if (modal) modal.classList.remove('active');
+        }
+
+        // Instantiate a workflow - create tasks from template
+        function instantiateWorkflow(templateId) {
+            const template = workflowTemplates.find(t => t.id === templateId);
+            if (!template || !template.taskPatterns || template.taskPatterns.length === 0) {
+                showToast('Workflow template has no tasks defined', 'error');
+                return;
+            }
+
+            const instanceName = document.getElementById('workflowInstanceName')?.value || template.name;
+            const startDate = document.getElementById('workflowStartDate')?.value || new Date().toISOString().split('T')[0];
+            const assignMe = document.getElementById('workflowAssignMe')?.checked || false;
+            const linkTasks = document.getElementById('workflowLinkTasks')?.checked || false;
+
+            const createdTaskIds = [];
+            let previousTaskId = null;
+
+            // Create tasks from patterns
+            template.taskPatterns.forEach((pattern, idx) => {
+                const taskId = 'task' + Date.now() + '_' + idx;
+
+                const task = {
+                    id: taskId,
+                    name: pattern.namePattern,
+                    type: 'task',
+                    description: `Part of: ${instanceName}`,
+                    dueDate: pattern.requiredFields?.includes('dueDate') ? startDate : null,
+                    status: 'pending',
+                    priority: 'medium',
+                    predecessorId: linkTasks && previousTaskId ? previousTaskId : null,
+                    tags: [instanceName],
+                    collaborators: assignMe && getCurrentUserId() ? [getCurrentUserId()] : [],
+                    recurring: null,
+                    producesProductId: null,
+                    followsWorkflowId: null,
+                    airtableTags: [],
+                    visibility: 'public',
+                    visibilityTeamId: null,
+                    createdAt: new Date().toISOString(),
+                    createdBy: getCurrentUserId()
+                };
+
+                entities.task.push(task);
+                createdTaskIds.push(taskId);
+
+                // Connect to roles if specified
+                if (pattern.roleConstraints && pattern.roleConstraints.length > 0) {
+                    pattern.roleConstraints.forEach(roleId => {
+                        relationships.push({
+                            id: 'rel' + Date.now() + '_' + Math.random().toString(36).substr(2, 9),
+                            subject: taskId,
+                            predicate: 'CON',
+                            object: roleId,
+                            createdAt: new Date().toISOString()
+                        });
+                    });
+                }
+
+                previousTaskId = taskId;
+            });
+
+            // Create workflow instance to track this set of tasks
+            const instance = {
+                id: 'wfinst' + Date.now(),
+                workflowTemplateId: templateId,
+                name: instanceName,
+                tasks: createdTaskIds,
+                status: 'in_progress',
+                createdAt: new Date().toISOString(),
+                templateVersion: template.version
+            };
+            workflowInstances.push(instance);
+
+            // Save and refresh
+            saveToLocalStorage();
+
+            // Log activity
+            logActivityToXano({
+                event_verb: 'Instantiate Workflow',
+                eo_operator: 'INS',
+                object_type: 'workflow_instance',
+                object_id: instance.id,
+                object_label: instanceName,
+                data_json: {
+                    templateId: templateId,
+                    templateName: template.name,
+                    taskCount: createdTaskIds.length,
+                    taskIds: createdTaskIds
+                }
+            });
+
+            closeWorkflowUseModal();
+
+            showToast(`Created ${createdTaskIds.length} tasks from "${template.name}"!`, 'success');
+
+            // Switch to kanban view to show the new tasks
+            switchView('kanban');
         }
 
         // Initialize when page loads
