@@ -14248,6 +14248,13 @@
             font-weight: 500;
         }
 
+        .subtask-prereq-label {
+            font-size: 0.75rem;
+            font-weight: 500;
+            color: #C88F4A;
+            font-style: italic;
+        }
+
         /* Comment Input Wrapper with Mention Dropdown */
         .comment-input-wrapper {
             position: relative;
@@ -14622,6 +14629,24 @@
 
         .subtask-input-row:focus-within .subtask-input-hint {
             color: #8B6F47;
+        }
+
+        .subtask-blocking-notice {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            padding: 0.75rem 1rem;
+            margin-top: 0.75rem;
+            background: #FEF3C7;
+            border: 1px solid #F59E0B;
+            border-radius: 6px;
+            font-size: 0.8rem;
+            color: #92400E;
+        }
+
+        .subtask-blocking-notice i {
+            font-size: 1rem;
+            color: #F59E0B;
         }
 
         /* Automation Rules */
@@ -34516,7 +34541,8 @@ Options:
                     <div class="collapsible-header" onclick="toggleCollapsibleSection('${sectionId}')">
                         <span class="collapsible-title">
                             <i class="ph ph-list-checks"></i> Subtasks
-                            <span class="section-help-tooltip" title="Subtasks are smaller steps that must be completed as part of this task. All subtasks must be done before this task can be marked complete.">
+                            <span class="subtask-prereq-label">(complete these first)</span>
+                            <span class="section-help-tooltip" title="Subtasks are prerequisites that block this task. You must complete all subtasks before this main task can be marked as done.">
                                 <i class="ph ph-question"></i>
                             </span>
                             ${totalCount > 0 ? `<span class="collapsible-badge">${completedCount}/${totalCount}</span>` : ''}
@@ -34566,6 +34592,12 @@ Options:
                                 </button>
                             </div>
                         </div>
+                        ${totalCount > 0 && completedCount < totalCount ? `
+                        <div class="subtask-blocking-notice">
+                            <i class="ph ph-warning-circle"></i>
+                            This task is blocked until all ${totalCount - completedCount} remaining subtask${totalCount - completedCount === 1 ? ' is' : 's are'} completed
+                        </div>
+                        ` : ''}
                     </div>
                 </div>
             `;
