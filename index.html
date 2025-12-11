@@ -22727,10 +22727,132 @@ John Doe,Engineering,john@example.com"
                     updateSelects();
                 }
 
+                // Sync users to activity history (adds new users, tracks removals)
+                await syncUsersToActivityHistory(entities.person);
+
                 return entities.person;
             } catch (error) {
                 console.error('❌ Error loading users from API:', error);
                 throw error;
+            }
+        }
+
+        // ==========================================
+        // SYNC USERS TO ACTIVITY HISTORY
+        // ==========================================
+
+        // Syncs Airtable users with the API dataset (Xano activity history)
+        // - If a user exists in Airtable but not in history, add them
+        // - If a user was in history but removed from Airtable, log removal
+        async function syncUsersToActivityHistory(airtableUsers) {
+            console.log('🔄 Syncing users to activity history...');
+
+            try {
+                // Get all activities from Xano to see which users are already tracked
+                const activities = await getActivitiesFromXano();
+
+                if (!activities) {
+                    console.warn('⚠️ Could not fetch activities for user sync');
+                    return;
+                }
+
+                // Build a set of person IDs that have been created (INS) in activity history
+                const existingPersonIds = new Set();
+                const removedPersonIds = new Set();
+
+                for (const activity of activities) {
+                    const objectType = activity.object_type;
+                    const objectId = activity.object_id || activity.entity_id;
+                    const operator = activity.eo_operator || activity.event_type;
+
+                    if (objectType === 'person') {
+                        if (operator === 'INS') {
+                            existingPersonIds.add(objectId);
+                        } else if (operator === 'NUL') {
+                            removedPersonIds.add(objectId);
+                        }
+                    }
+                }
+
+                // Remove IDs that were later deleted
+                for (const removedId of removedPersonIds) {
+                    existingPersonIds.delete(removedId);
+                }
+
+                console.log(`📊 Found ${existingPersonIds.size} existing users in activity history`);
+
+                // Build a set of current Airtable user IDs
+                const airtableUserIds = new Set(airtableUsers.map(u => u.id));
+
+                // Find users in Airtable that aren't in activity history (new users to add)
+                const usersToAdd = airtableUsers.filter(user => !existingPersonIds.has(user.id));
+
+                // Find users in activity history that aren't in Airtable anymore (removed users)
+                const usersToRemove = [...existingPersonIds].filter(id => !airtableUserIds.has(id));
+
+                console.log(`➕ Users to add to history: ${usersToAdd.length}`);
+                console.log(`➖ Users removed from Airtable: ${usersToRemove.length}`);
+
+                // Add new users to activity history
+                for (const user of usersToAdd) {
+                    console.log(`📝 Adding user to history: ${user.name} (${user.id})`);
+
+                    await logActivityToXano({
+                        event_verb: 'Import User',
+                        eo_operator: 'INS',
+                        object_type: 'person',
+                        object_id: user.id,
+                        object_label: user.name,
+                        data_json: {
+                            entity_type: 'person',
+                            entity_name: user.name,
+                            email: user.email || '',
+                            airtableId: user.airtableId,
+                            source: 'airtable_sync',
+                            description: user.description || ''
+                        }
+                    }, false); // Don't show toast for bulk imports
+                }
+
+                // Log removal activities for users no longer in Airtable
+                for (const removedId of usersToRemove) {
+                    // Try to find the user name from activities
+                    const userActivity = activities.find(a =>
+                        (a.object_id === removedId || a.entity_id === removedId) &&
+                        a.object_type === 'person'
+                    );
+                    const userName = userActivity?.object_label || userActivity?.entity_name || 'Unknown User';
+
+                    console.log(`📝 Logging removal for user: ${userName} (${removedId})`);
+
+                    await logActivityToXano({
+                        event_verb: 'Remove User',
+                        eo_operator: 'NUL',
+                        object_type: 'person',
+                        object_id: removedId,
+                        object_label: userName,
+                        data_json: {
+                            entity_type: 'person',
+                            entity_name: userName,
+                            source: 'airtable_sync',
+                            reason: 'User removed from Airtable Users table'
+                        }
+                    }, false); // Don't show toast for bulk operations
+                }
+
+                if (usersToAdd.length > 0 || usersToRemove.length > 0) {
+                    console.log(`✅ User sync complete: ${usersToAdd.length} added, ${usersToRemove.length} removed`);
+
+                    // Show a single toast summarizing the sync
+                    if (usersToAdd.length > 0) {
+                        showActivityToast('success', 'Users Synced', `${usersToAdd.length} user(s) imported from Airtable`);
+                    }
+                } else {
+                    console.log('✅ User sync complete: No changes needed');
+                }
+
+            } catch (error) {
+                console.error('❌ Error syncing users to activity history:', error);
             }
         }
 
