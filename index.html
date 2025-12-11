@@ -26710,10 +26710,15 @@ Cmd/Ctrl + K - Command palette
                         createdAt: activity.created_at
                     };
 
-                    // Copy additional fields from activity data
+                    // Copy additional fields from activity data (for tasks especially)
                     if (activity.dueDate) entity.dueDate = activity.dueDate;
                     if (activity.status) entity.status = activity.status;
                     if (activity.predecessorId) entity.predecessorId = activity.predecessorId;
+                    if (activity.priority) entity.priority = activity.priority;
+                    if (activity.tags) entity.tags = activity.tags;
+                    if (activity.collaborators) entity.collaborators = activity.collaborators;
+                    if (activity.recurring) entity.recurring = activity.recurring;
+                    if (activity.followsWorkflowId) entity.followsWorkflowId = activity.followsWorkflowId;
 
                     reconstructedEntities[objectType].push(entity);
                     entityMap.set(objectId, entity);
@@ -26760,10 +26765,33 @@ Cmd/Ctrl + K - Command palette
                 else if (operator === 'ALT' && objectType !== 'relationship') {
                     if (entityMap.has(objectId)) {
                         const existing = entityMap.get(objectId);
-                        if (objectLabel) existing.name = objectLabel;
-                        if (activity.description) existing.description = activity.description;
-                        if (activity.status) existing.status = activity.status;
-                        if (activity.dueDate) existing.dueDate = activity.dueDate;
+
+                        // Handle name changes (from object_label or new_name)
+                        if (activity.new_name) {
+                            existing.name = activity.new_name;
+                        } else if (objectLabel && objectLabel.includes('→')) {
+                            // Extract new name from "old → new" format
+                            const parts = objectLabel.split('→').map(s => s.trim());
+                            if (parts.length === 2) existing.name = parts[1];
+                        }
+
+                        // Handle field-specific updates (uses field + new_value pattern)
+                        if (activity.field && activity.new_value !== undefined) {
+                            existing[activity.field] = activity.new_value;
+                        }
+
+                        // Handle direct field updates (from data_json flattening)
+                        if (activity.new_description !== undefined) existing.description = activity.new_description;
+                        if (activity.new_status !== undefined) existing.status = activity.new_status;
+                        if (activity.new_dueDate !== undefined) existing.dueDate = activity.new_dueDate;
+                        if (activity.new_priority !== undefined) existing.priority = activity.new_priority;
+                        if (activity.new_predecessorId !== undefined) existing.predecessorId = activity.new_predecessorId;
+
+                        // Also check direct fields (for backwards compatibility)
+                        if (activity.description && !activity.old_description) existing.description = activity.description;
+                        if (activity.status && !activity.old_status) existing.status = activity.status;
+                        if (activity.dueDate && !activity.old_dueDate) existing.dueDate = activity.dueDate;
+                        if (activity.priority && !activity.old_priority) existing.priority = activity.priority;
                     }
                 }
             }
@@ -35515,8 +35543,9 @@ Options:
             entities.task.push(taskObject);
 
             // Connect role to task (Role CON Task)
+            const roleTaskRelId = 'rel' + (Date.now() + 1);
             const roleTaskRel = {
-                id: 'rel' + (Date.now() + 1),
+                id: roleTaskRelId,
                 subject: roleId,
                 predicate: 'CON',
                 object: taskId,
@@ -35524,11 +35553,36 @@ Options:
             };
             relationships.push(roleTaskRel);
 
-            // Log activity
+            // Log task creation activity
             logActivityToXano({
                 event_verb: 'Add Entity',
+                eo_operator: 'INS',
                 object_type: 'task',
-                object_label: taskName
+                object_id: taskId,
+                object_label: taskName,
+                data_json: {
+                    entity_name: taskName,
+                    description: description,
+                    dueDate: quickAddModalState.dueDate,
+                    status: 'pending',
+                    priority: quickAddModalState.priority,
+                    tags: quickAddModalState.tags
+                }
+            });
+
+            // Log role-task relationship
+            const role = entities.role.find(r => r.id === roleId);
+            logActivityToXano({
+                event_verb: 'Link Connection',
+                eo_operator: 'CON',
+                object_type: 'relationship',
+                object_id: roleTaskRelId,
+                object_label: `${role?.name || 'Role'} → ${taskName}`,
+                data_json: {
+                    subject_id: roleId,
+                    predicate: 'CON',
+                    target_id: taskId
+                }
             });
 
             // Save to local storage
@@ -38013,14 +38067,29 @@ Options:
 
                 logActivityToXano({
                     event_verb: 'Add Entity',
+                    eo_operator: 'INS',
                     object_type: 'task',
-                    object_label: taskName
+                    object_id: taskId,
+                    object_label: taskName,
+                    data_json: {
+                        entity_name: taskName,
+                        description: description,
+                        dueDate: dueDate || null,
+                        status: 'pending',
+                        priority: selectedPriority || 'medium',
+                        predecessorId: predecessorId || null,
+                        tags: [...heroTaskTags],
+                        collaborators: [...heroCollaborators],
+                        recurring: recurringValue || null,
+                        followsWorkflowId: workflowId || null
+                    }
                 });
 
                 // 2. Connect workflow to task (Workflow CON Task) - only if workflow is selected
                 if (workflow) {
+                    const workflowTaskRelId = 'rel' + Date.now();
                     const workflowTaskRel = {
-                        id: 'rel' + Date.now(),
+                        id: workflowTaskRelId,
                         subject: workflowId,
                         predicate: 'CON',
                         object: taskId,
@@ -38032,14 +38101,21 @@ Options:
                         event_verb: 'Link Connection',
                         eo_operator: 'CON',
                         object_type: 'relationship',
-                        object_label: `${workflow.name} → ${taskName}`
+                        object_id: workflowTaskRelId,
+                        object_label: `${workflow.name} → ${taskName}`,
+                        data_json: {
+                            subject_id: workflowId,
+                            predicate: 'CON',
+                            target_id: taskId
+                        }
                     });
                 }
 
                 // 3. Connect role to task (Role CON Task) - only if role is selected
                 if (role) {
+                    const roleTaskRelId = 'rel' + (Date.now() + 1);
                     const roleTaskRel = {
-                        id: 'rel' + (Date.now() + 1),
+                        id: roleTaskRelId,
                         subject: role.id,
                         predicate: 'CON',
                         object: taskId,
@@ -38051,7 +38127,13 @@ Options:
                         event_verb: 'Link Connection',
                         eo_operator: 'CON',
                         object_type: 'relationship',
-                        object_label: `${role.name} → ${taskName}`
+                        object_id: roleTaskRelId,
+                        object_label: `${role.name} → ${taskName}`,
+                        data_json: {
+                            subject_id: role.id,
+                            predicate: 'CON',
+                            target_id: taskId
+                        }
                     });
 
                     // Track team usage for "most used team" feature
@@ -38070,8 +38152,9 @@ Options:
                     );
 
                     if (!existingAssignment) {
+                        const personRoleRelId = 'rel' + (Date.now() + 2);
                         const personRoleRel = {
-                            id: 'rel' + (Date.now() + 1),
+                            id: personRoleRelId,
                             subject: person.id,
                             predicate: 'INS',
                             object: role.id,
@@ -38083,7 +38166,13 @@ Options:
                             event_verb: 'Start Assignment',
                             eo_operator: 'INS',
                             object_type: 'relationship',
-                            object_label: `${person.name} → ${role.name}`
+                            object_id: personRoleRelId,
+                            object_label: `${person.name} → ${role.name}`,
+                            data_json: {
+                                subject_id: person.id,
+                                predicate: 'INS',
+                                target_id: role.id
+                            }
                         });
                     }
                 }
