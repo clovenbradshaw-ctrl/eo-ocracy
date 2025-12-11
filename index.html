@@ -18225,6 +18225,399 @@
         .airtable-picker-footer-link:hover {
             color: #C88F4A;
         }
+
+        /* ========================================== */
+        /* API Test Interface Styles */
+        /* ========================================== */
+
+        .api-test-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(61, 46, 31, 0.7);
+            display: none;
+            align-items: center;
+            justify-content: center;
+            z-index: 2000;
+        }
+
+        .api-test-overlay.open {
+            display: flex;
+        }
+
+        .api-test-modal {
+            background: white;
+            border-radius: 16px;
+            width: 95%;
+            max-width: 1100px;
+            max-height: 90vh;
+            overflow: hidden;
+            box-shadow: 0 8px 40px rgba(61, 46, 31, 0.25);
+            display: flex;
+            flex-direction: column;
+        }
+
+        .api-test-header {
+            padding: 1.5rem 2rem;
+            background: linear-gradient(135deg, #C88F4A 0%, #B87B5B 100%);
+            color: white;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .api-test-header h2 {
+            font-size: 1.25rem;
+            font-weight: 700;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .api-test-close {
+            background: rgba(255,255,255,0.2);
+            border: none;
+            color: white;
+            width: 36px;
+            height: 36px;
+            border-radius: 8px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.25rem;
+            transition: background 0.2s;
+        }
+
+        .api-test-close:hover {
+            background: rgba(255,255,255,0.3);
+        }
+
+        .api-test-body {
+            padding: 1.5rem 2rem;
+            overflow-y: auto;
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            gap: 1.5rem;
+        }
+
+        .api-test-row {
+            display: flex;
+            gap: 1.5rem;
+        }
+
+        .api-test-section {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            gap: 1rem;
+        }
+
+        .api-test-section-title {
+            font-weight: 600;
+            color: #3D2E1F;
+            font-size: 0.875rem;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .api-test-url-bar {
+            display: flex;
+            gap: 0.75rem;
+            align-items: center;
+        }
+
+        .api-test-method {
+            padding: 0.75rem 1rem;
+            font-size: 0.875rem;
+            border: 2px solid #E5DDD4;
+            border-radius: 8px;
+            background: white;
+            color: #3D2E1F;
+            font-weight: 600;
+            cursor: pointer;
+            min-width: 100px;
+        }
+
+        .api-test-method:focus {
+            border-color: #C88F4A;
+            outline: none;
+        }
+
+        .api-test-url {
+            flex: 1;
+            padding: 0.75rem 1rem;
+            font-size: 0.875rem;
+            border: 2px solid #E5DDD4;
+            border-radius: 8px;
+            font-family: 'SF Mono', 'Consolas', monospace;
+            background: #F9F7F4;
+        }
+
+        .api-test-url:focus {
+            border-color: #C88F4A;
+            outline: none;
+        }
+
+        .api-test-actions-group {
+            display: flex;
+            gap: 0.5rem;
+        }
+
+        .api-test-action-select {
+            padding: 0.75rem 1rem;
+            font-size: 0.875rem;
+            border: 2px solid #E5DDD4;
+            border-radius: 8px;
+            background: white;
+            color: #3D2E1F;
+            font-weight: 500;
+            cursor: pointer;
+            min-width: 160px;
+        }
+
+        .api-test-action-select:focus {
+            border-color: #C88F4A;
+            outline: none;
+        }
+
+        .api-test-send-btn {
+            padding: 0.75rem 1.5rem;
+            font-size: 0.875rem;
+            font-weight: 600;
+            border: none;
+            border-radius: 8px;
+            background: linear-gradient(135deg, #C88F4A 0%, #B87B5B 100%);
+            color: white;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            transition: all 0.2s;
+        }
+
+        .api-test-send-btn:hover {
+            box-shadow: 0 4px 12px rgba(200, 143, 74, 0.4);
+            transform: translateY(-1px);
+        }
+
+        .api-test-send-btn:disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
+            transform: none;
+            box-shadow: none;
+        }
+
+        .api-test-send-btn.loading {
+            background: #8B6F47;
+        }
+
+        .api-test-panels {
+            display: flex;
+            gap: 1.5rem;
+            flex: 1;
+            min-height: 400px;
+        }
+
+        .api-test-panel {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            border: 2px solid #E5DDD4;
+            border-radius: 12px;
+            overflow: hidden;
+        }
+
+        .api-test-panel-header {
+            padding: 0.75rem 1rem;
+            background: #F9F7F4;
+            border-bottom: 2px solid #E5DDD4;
+            font-weight: 600;
+            font-size: 0.8rem;
+            color: #6B5642;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .api-test-panel-content {
+            flex: 1;
+            overflow: auto;
+        }
+
+        .api-test-textarea {
+            width: 100%;
+            height: 100%;
+            min-height: 300px;
+            padding: 1rem;
+            border: none;
+            resize: none;
+            font-family: 'SF Mono', 'Consolas', monospace;
+            font-size: 0.8rem;
+            line-height: 1.5;
+            background: white;
+            color: #3D2E1F;
+        }
+
+        .api-test-textarea:focus {
+            outline: none;
+        }
+
+        .api-test-response-display {
+            padding: 1rem;
+            font-family: 'SF Mono', 'Consolas', monospace;
+            font-size: 0.8rem;
+            line-height: 1.5;
+            white-space: pre-wrap;
+            word-break: break-word;
+        }
+
+        .api-test-response-display.success {
+            color: #15803D;
+        }
+
+        .api-test-response-display.error {
+            color: #DC2626;
+        }
+
+        .api-test-status {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            font-size: 0.75rem;
+        }
+
+        .api-test-status-badge {
+            padding: 0.25rem 0.5rem;
+            border-radius: 4px;
+            font-weight: 600;
+        }
+
+        .api-test-status-badge.success {
+            background: #DCFCE7;
+            color: #15803D;
+        }
+
+        .api-test-status-badge.error {
+            background: #FEE2E2;
+            color: #DC2626;
+        }
+
+        .api-test-status-badge.pending {
+            background: #FEF3C7;
+            color: #B45309;
+        }
+
+        .api-test-time {
+            color: #8B6F47;
+        }
+
+        .api-test-preset-btns {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 0.5rem;
+            margin-bottom: 0.5rem;
+        }
+
+        .api-test-preset-btn {
+            padding: 0.5rem 1rem;
+            font-size: 0.75rem;
+            font-weight: 500;
+            border: 2px solid #E5DDD4;
+            border-radius: 6px;
+            background: white;
+            color: #6B5642;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .api-test-preset-btn:hover {
+            border-color: #C88F4A;
+            color: #C88F4A;
+        }
+
+        .api-test-preset-btn.active {
+            background: linear-gradient(135deg, #C88F4A 0%, #B87B5B 100%);
+            color: white;
+            border-color: transparent;
+        }
+
+        .api-test-history {
+            max-height: 150px;
+            overflow-y: auto;
+            border: 2px solid #E5DDD4;
+            border-radius: 8px;
+        }
+
+        .api-test-history-item {
+            padding: 0.75rem 1rem;
+            border-bottom: 1px solid #E5DDD4;
+            cursor: pointer;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            font-size: 0.8rem;
+            transition: background 0.2s;
+        }
+
+        .api-test-history-item:last-child {
+            border-bottom: none;
+        }
+
+        .api-test-history-item:hover {
+            background: #F9F7F4;
+        }
+
+        .api-test-history-action {
+            font-weight: 600;
+            color: #3D2E1F;
+        }
+
+        .api-test-history-status {
+            font-size: 0.7rem;
+        }
+
+        .api-test-history-status.success {
+            color: #15803D;
+        }
+
+        .api-test-history-status.error {
+            color: #DC2626;
+        }
+
+        .api-test-empty-history {
+            padding: 1.5rem;
+            text-align: center;
+            color: #8B6F47;
+            font-size: 0.875rem;
+        }
+
+        @media (max-width: 768px) {
+            .api-test-panels {
+                flex-direction: column;
+            }
+
+            .api-test-row {
+                flex-direction: column;
+            }
+
+            .api-test-url-bar {
+                flex-direction: column;
+            }
+
+            .api-test-method,
+            .api-test-action-select {
+                width: 100%;
+            }
+        }
     </style>
 
     <!-- Login Overlay - gates app until authenticated -->
@@ -18431,6 +18824,9 @@
                     </button>
                     <button class="header-dropdown-item" onclick="openBulkImportModal(); closeActionsMenu()">
                         <i class="ph ph-upload-simple"></i> Bulk Import (CSV)
+                    </button>
+                    <button class="header-dropdown-item" onclick="openApiTestModal()">
+                        <i class="ph ph-plugs-connected"></i> API Test Interface
                     </button>
                     <div class="header-dropdown-divider"></div>
                     <!-- Update Settings -->
@@ -19353,6 +19749,122 @@
                 <span><kbd>↑↓</kbd> navigate</span>
                 <span><kbd>↵</kbd> select</span>
                 <span><kbd>esc</kbd> close</span>
+            </div>
+        </div>
+    </div>
+
+    <!-- API Test Modal -->
+    <div id="apiTestModal" class="api-test-overlay" onclick="if(event.target === this) closeApiTestModal()">
+        <div class="api-test-modal">
+            <div class="api-test-header">
+                <h2><i class="ph ph-plugs-connected"></i> API Test Interface</h2>
+                <button class="api-test-close" onclick="closeApiTestModal()">
+                    <i class="ph ph-x"></i>
+                </button>
+            </div>
+            <div class="api-test-body">
+                <!-- URL Bar -->
+                <div class="api-test-section">
+                    <div class="api-test-section-title">
+                        <i class="ph ph-link"></i> Endpoint
+                    </div>
+                    <div class="api-test-url-bar">
+                        <select class="api-test-method" id="apiTestMethod">
+                            <option value="POST">POST</option>
+                            <option value="GET">GET</option>
+                            <option value="PUT">PUT</option>
+                            <option value="DELETE">DELETE</option>
+                        </select>
+                        <input type="text" class="api-test-url" id="apiTestUrl"
+                               value="https://n8n.intelechia.com/webhook-test/b04bd460-fd56-4d55-8a01-6c47581789b9"
+                               placeholder="Enter webhook URL...">
+                    </div>
+                </div>
+
+                <!-- Quick Actions -->
+                <div class="api-test-section">
+                    <div class="api-test-section-title">
+                        <i class="ph ph-lightning"></i> Quick Actions
+                    </div>
+                    <div class="api-test-preset-btns" id="apiTestPresets">
+                        <button class="api-test-preset-btn active" onclick="setApiTestPreset('getRecords')">
+                            <i class="ph ph-list"></i> Get Records
+                        </button>
+                        <button class="api-test-preset-btn" onclick="setApiTestPreset('getRecord')">
+                            <i class="ph ph-file"></i> Get Single Record
+                        </button>
+                        <button class="api-test-preset-btn" onclick="setApiTestPreset('search')">
+                            <i class="ph ph-magnifying-glass"></i> Search
+                        </button>
+                        <button class="api-test-preset-btn" onclick="setApiTestPreset('getRecordWithParents')">
+                            <i class="ph ph-tree-structure"></i> Get with Parents
+                        </button>
+                        <button class="api-test-preset-btn" onclick="setApiTestPreset('custom')">
+                            <i class="ph ph-code"></i> Custom
+                        </button>
+                    </div>
+                    <div class="api-test-actions-group">
+                        <select class="api-test-action-select" id="apiTestTable">
+                            <option value="tbl0uHmtLkGyDnSP9">Clients</option>
+                            <option value="tblgynOzESGvAXAsK">Cases</option>
+                            <option value="tbl1GpkHMkjxZ1n7E">Events</option>
+                            <option value="tbl6XtHs9g5iwd7qi">Applications</option>
+                            <option value="tblIrtFCfeYdDCVgE">Users</option>
+                        </select>
+                        <button class="api-test-send-btn" onclick="sendApiTestRequest()" id="apiTestSendBtn">
+                            <i class="ph ph-paper-plane-tilt"></i>
+                            Send Request
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Request/Response Panels -->
+                <div class="api-test-panels">
+                    <!-- Request Panel -->
+                    <div class="api-test-panel">
+                        <div class="api-test-panel-header">
+                            <span><i class="ph ph-arrow-up"></i> Request Body</span>
+                            <button class="api-test-preset-btn" onclick="formatApiTestJson('request')" style="padding: 0.25rem 0.5rem; font-size: 0.7rem;">
+                                <i class="ph ph-text-aa"></i> Format
+                            </button>
+                        </div>
+                        <div class="api-test-panel-content">
+                            <textarea class="api-test-textarea" id="apiTestRequestBody" placeholder="Enter JSON request body...">{
+  "action": "getRecords",
+  "table": "tbl0uHmtLkGyDnSP9",
+  "fields": ["Client Name"],
+  "maxRecords": 10
+}</textarea>
+                        </div>
+                    </div>
+
+                    <!-- Response Panel -->
+                    <div class="api-test-panel">
+                        <div class="api-test-panel-header">
+                            <span><i class="ph ph-arrow-down"></i> Response</span>
+                            <div class="api-test-status" id="apiTestStatus">
+                                <span class="api-test-status-badge pending">Ready</span>
+                            </div>
+                        </div>
+                        <div class="api-test-panel-content">
+                            <div class="api-test-response-display" id="apiTestResponse">
+// Response will appear here after sending a request
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Request History -->
+                <div class="api-test-section">
+                    <div class="api-test-section-title">
+                        <i class="ph ph-clock-counter-clockwise"></i> Recent Requests
+                    </div>
+                    <div class="api-test-history" id="apiTestHistory">
+                        <div class="api-test-empty-history">
+                            <i class="ph ph-hourglass"></i> No requests yet
+                        </div>
+                    </div>
+                </div>
             </div>
         </div>
     </div>
@@ -35306,6 +35818,307 @@ Cmd/Ctrl + K - Command palette
 
             input.click();
         }
+
+        // ==========================================
+        // API TEST INTERFACE FUNCTIONALITY
+        // ==========================================
+
+        // State for API test interface
+        let apiTestState = {
+            isLoading: false,
+            history: [],
+            currentPreset: 'getRecords'
+        };
+
+        // Preset request bodies for different actions
+        const apiTestPresets = {
+            getRecords: {
+                action: 'getRecords',
+                table: 'tbl0uHmtLkGyDnSP9',
+                fields: ['Client Name'],
+                maxRecords: 10
+            },
+            getRecord: {
+                action: 'getRecord',
+                table: 'tbl0uHmtLkGyDnSP9',
+                recordId: 'ENTER_RECORD_ID_HERE'
+            },
+            search: {
+                action: 'search',
+                table: 'tbl0uHmtLkGyDnSP9',
+                query: 'search term',
+                searchField: 'Client Name'
+            },
+            getRecordWithParents: {
+                action: 'getRecordWithParents',
+                table: 'tblgynOzESGvAXAsK',
+                recordId: 'ENTER_RECORD_ID_HERE'
+            },
+            custom: {
+                action: 'custom',
+                data: {}
+            }
+        };
+
+        // Open the API test modal
+        function openApiTestModal() {
+            document.getElementById('apiTestModal').classList.add('open');
+            closeActionsMenu();
+        }
+
+        // Close the API test modal
+        function closeApiTestModal() {
+            document.getElementById('apiTestModal').classList.remove('open');
+        }
+
+        // Set a preset request body
+        function setApiTestPreset(presetName) {
+            apiTestState.currentPreset = presetName;
+
+            // Update active button
+            document.querySelectorAll('#apiTestPresets .api-test-preset-btn').forEach(btn => {
+                btn.classList.remove('active');
+            });
+            event.target.closest('.api-test-preset-btn').classList.add('active');
+
+            // Get the selected table
+            const tableId = document.getElementById('apiTestTable').value;
+
+            // Create preset with selected table
+            const preset = JSON.parse(JSON.stringify(apiTestPresets[presetName]));
+            preset.table = tableId;
+
+            // Update the request body
+            document.getElementById('apiTestRequestBody').value = JSON.stringify(preset, null, 2);
+        }
+
+        // Format JSON in the request or response panel
+        function formatApiTestJson(panel) {
+            const textarea = panel === 'request'
+                ? document.getElementById('apiTestRequestBody')
+                : document.getElementById('apiTestResponse');
+
+            try {
+                const json = JSON.parse(textarea.value || textarea.textContent);
+                const formatted = JSON.stringify(json, null, 2);
+                if (panel === 'request') {
+                    textarea.value = formatted;
+                } else {
+                    textarea.textContent = formatted;
+                }
+            } catch (e) {
+                console.warn('Invalid JSON, cannot format');
+            }
+        }
+
+        // Send an API test request
+        async function sendApiTestRequest() {
+            const sendBtn = document.getElementById('apiTestSendBtn');
+            const statusEl = document.getElementById('apiTestStatus');
+            const responseEl = document.getElementById('apiTestResponse');
+
+            const url = document.getElementById('apiTestUrl').value;
+            const method = document.getElementById('apiTestMethod').value;
+            const requestBody = document.getElementById('apiTestRequestBody').value;
+
+            // Validate inputs
+            if (!url) {
+                responseEl.textContent = 'Error: Please enter a URL';
+                responseEl.className = 'api-test-response-display error';
+                return;
+            }
+
+            // Parse request body for POST/PUT
+            let body = null;
+            if (method === 'POST' || method === 'PUT') {
+                try {
+                    body = JSON.parse(requestBody);
+                } catch (e) {
+                    responseEl.textContent = 'Error: Invalid JSON in request body\n' + e.message;
+                    responseEl.className = 'api-test-response-display error';
+                    return;
+                }
+            }
+
+            // Set loading state
+            apiTestState.isLoading = true;
+            sendBtn.disabled = true;
+            sendBtn.classList.add('loading');
+            sendBtn.innerHTML = '<i class="ph ph-spinner"></i> Sending...';
+            statusEl.innerHTML = '<span class="api-test-status-badge pending">Sending...</span>';
+            responseEl.textContent = '// Waiting for response...';
+            responseEl.className = 'api-test-response-display';
+
+            const startTime = performance.now();
+
+            try {
+                const fetchOptions = {
+                    method: method,
+                    headers: {
+                        'Content-Type': 'application/json'
+                    }
+                };
+
+                if (body) {
+                    fetchOptions.body = JSON.stringify(body);
+                }
+
+                const response = await fetch(url, fetchOptions);
+                const endTime = performance.now();
+                const duration = Math.round(endTime - startTime);
+
+                let responseData;
+                const contentType = response.headers.get('content-type');
+
+                if (contentType && contentType.includes('application/json')) {
+                    responseData = await response.json();
+                } else {
+                    responseData = await response.text();
+                }
+
+                // Format the response
+                const formattedResponse = typeof responseData === 'object'
+                    ? JSON.stringify(responseData, null, 2)
+                    : responseData;
+
+                responseEl.textContent = formattedResponse;
+
+                if (response.ok) {
+                    responseEl.className = 'api-test-response-display success';
+                    statusEl.innerHTML = `
+                        <span class="api-test-status-badge success">${response.status} OK</span>
+                        <span class="api-test-time">${duration}ms</span>
+                    `;
+                } else {
+                    responseEl.className = 'api-test-response-display error';
+                    statusEl.innerHTML = `
+                        <span class="api-test-status-badge error">${response.status} Error</span>
+                        <span class="api-test-time">${duration}ms</span>
+                    `;
+                }
+
+                // Add to history
+                addApiTestToHistory({
+                    action: body?.action || method,
+                    table: body?.table || url,
+                    status: response.ok ? 'success' : 'error',
+                    statusCode: response.status,
+                    duration: duration,
+                    request: body,
+                    response: responseData,
+                    timestamp: new Date().toISOString()
+                });
+
+            } catch (error) {
+                const endTime = performance.now();
+                const duration = Math.round(endTime - startTime);
+
+                responseEl.textContent = `Error: ${error.message}\n\nThis could be due to:\n- CORS restrictions\n- Network issues\n- Invalid URL`;
+                responseEl.className = 'api-test-response-display error';
+                statusEl.innerHTML = `
+                    <span class="api-test-status-badge error">Network Error</span>
+                    <span class="api-test-time">${duration}ms</span>
+                `;
+
+                // Add to history
+                addApiTestToHistory({
+                    action: body?.action || method,
+                    table: body?.table || url,
+                    status: 'error',
+                    statusCode: 0,
+                    duration: duration,
+                    request: body,
+                    response: { error: error.message },
+                    timestamp: new Date().toISOString()
+                });
+            }
+
+            // Reset button state
+            apiTestState.isLoading = false;
+            sendBtn.disabled = false;
+            sendBtn.classList.remove('loading');
+            sendBtn.innerHTML = '<i class="ph ph-paper-plane-tilt"></i> Send Request';
+        }
+
+        // Add a request to the history
+        function addApiTestToHistory(item) {
+            apiTestState.history.unshift(item);
+
+            // Keep only last 10 items
+            if (apiTestState.history.length > 10) {
+                apiTestState.history.pop();
+            }
+
+            renderApiTestHistory();
+        }
+
+        // Render the request history
+        function renderApiTestHistory() {
+            const historyEl = document.getElementById('apiTestHistory');
+
+            if (apiTestState.history.length === 0) {
+                historyEl.innerHTML = `
+                    <div class="api-test-empty-history">
+                        <i class="ph ph-hourglass"></i> No requests yet
+                    </div>
+                `;
+                return;
+            }
+
+            historyEl.innerHTML = apiTestState.history.map((item, index) => `
+                <div class="api-test-history-item" onclick="loadApiTestFromHistory(${index})">
+                    <div>
+                        <span class="api-test-history-action">${item.action}</span>
+                        <span style="color: #8B6F47; margin-left: 0.5rem;">${item.duration}ms</span>
+                    </div>
+                    <span class="api-test-history-status ${item.status}">
+                        ${item.status === 'success' ? '✓' : '✗'} ${item.statusCode || 'Error'}
+                    </span>
+                </div>
+            `).join('');
+        }
+
+        // Load a previous request from history
+        function loadApiTestFromHistory(index) {
+            const item = apiTestState.history[index];
+            if (!item) return;
+
+            // Populate the request body
+            if (item.request) {
+                document.getElementById('apiTestRequestBody').value = JSON.stringify(item.request, null, 2);
+            }
+
+            // Populate the response
+            if (item.response) {
+                const responseEl = document.getElementById('apiTestResponse');
+                responseEl.textContent = typeof item.response === 'object'
+                    ? JSON.stringify(item.response, null, 2)
+                    : item.response;
+                responseEl.className = `api-test-response-display ${item.status}`;
+            }
+
+            // Update status
+            const statusEl = document.getElementById('apiTestStatus');
+            statusEl.innerHTML = `
+                <span class="api-test-status-badge ${item.status}">${item.statusCode || 'Error'}</span>
+                <span class="api-test-time">${item.duration}ms</span>
+            `;
+        }
+
+        // Update preset when table selection changes
+        document.addEventListener('DOMContentLoaded', () => {
+            const tableSelect = document.getElementById('apiTestTable');
+            if (tableSelect) {
+                tableSelect.addEventListener('change', () => {
+                    if (apiTestState.currentPreset !== 'custom') {
+                        const presetBtn = document.querySelector(`#apiTestPresets .api-test-preset-btn.active`);
+                        if (presetBtn) {
+                            presetBtn.click();
+                        }
+                    }
+                });
+            }
+        });
 
         // ==========================================
         // BULK IMPORT FUNCTIONALITY
