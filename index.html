@@ -18605,27 +18605,32 @@
             border-radius: 6px;
         }
 
-        .airtable-picker-item.type-client .item-icon {
+        .airtable-picker-item.type-client .item-icon,
+        .airtable-picker-item.type-clients .item-icon {
             background: #EFF6FF;
             color: #1D4ED8;
         }
 
-        .airtable-picker-item.type-case .item-icon {
+        .airtable-picker-item.type-case .item-icon,
+        .airtable-picker-item.type-cases .item-icon {
             background: #F5F3FF;
             color: #6D28D9;
         }
 
-        .airtable-picker-item.type-event .item-icon {
+        .airtable-picker-item.type-event .item-icon,
+        .airtable-picker-item.type-events .item-icon {
             background: #FFF7ED;
             color: #C2410C;
         }
 
-        .airtable-picker-item.type-application .item-icon {
+        .airtable-picker-item.type-application .item-icon,
+        .airtable-picker-item.type-applications .item-icon {
             background: #F0FDF4;
             color: #15803D;
         }
 
-        .airtable-picker-item.type-user .item-icon {
+        .airtable-picker-item.type-user .item-icon,
+        .airtable-picker-item.type-users .item-icon {
             background: #F0FDFA;
             color: #0F766E;
         }
@@ -22739,6 +22744,73 @@ John Doe,Engineering,john@example.com"
                     .sort((a, b) => b.score - a.score)
                     .map(item => item.record)
                     .slice(0, 100);  // Limit results
+            },
+
+            // Search across ALL categories at once
+            searchAllRecordsLocal(query) {
+                const allResults = [];
+                const categories = Object.keys(this.tables);
+
+                for (const category of categories) {
+                    const cache = this.recordsCache[category];
+                    if (!cache || !cache.records) continue;
+
+                    const records = cache.records;
+                    const config = this.tables[category];
+
+                    if (!query || query.trim().length === 0) {
+                        // Return first 10 from each category if no query
+                        records.slice(0, 10).forEach(record => {
+                            allResults.push({ ...record, _category: category });
+                        });
+                        continue;
+                    }
+
+                    const searchTerms = query.toLowerCase().trim().split(/\s+/);
+
+                    records.forEach(record => {
+                        const displayName = (record.fields?.[config.displayField] || '').toLowerCase();
+                        const searchField = config.searchField ? (record.fields?.[config.searchField] || '').toLowerCase() : '';
+                        const secondaryField = config.secondaryField ? (record.fields?.[config.secondaryField] || '').toLowerCase() : '';
+
+                        let score = 0;
+                        let matchedTerms = 0;
+
+                        for (const term of searchTerms) {
+                            if (displayName.includes(term)) {
+                                score += 100;
+                                matchedTerms++;
+                            } else if (searchField.includes(term)) {
+                                score += 50;
+                                matchedTerms++;
+                            } else if (secondaryField.includes(term)) {
+                                score += 40;
+                                matchedTerms++;
+                            }
+                        }
+
+                        if (matchedTerms === searchTerms.length) {
+                            score += 25 * matchedTerms;
+                        }
+
+                        if (displayName.startsWith(searchTerms[0])) {
+                            score += 50;
+                        }
+
+                        if (score > 0) {
+                            allResults.push({ ...record, _category: category, _score: score });
+                        }
+                    });
+                }
+
+                // Sort by score and limit results
+                if (query && query.trim().length > 0) {
+                    return allResults
+                        .sort((a, b) => b._score - a._score)
+                        .slice(0, 100);
+                }
+
+                return allResults.slice(0, 50);
             },
 
             // Get cached records for a category (or load if not cached)
@@ -39114,7 +39186,7 @@ Cmd/Ctrl + K - Command palette
             airtablePickerState = {
                 isOpen: true,
                 taskId: taskId,
-                selectedCategory: null,
+                selectedCategory: 'all',
                 searchQuery: '',
                 isLoading: false,
                 results: []
@@ -39129,20 +39201,19 @@ Cmd/Ctrl + K - Command palette
 
             // Reset UI state
             document.getElementById('airtablePickerSearch').value = '';
-            document.getElementById('airtablePickerResults').innerHTML = `
-                <div class="airtable-picker-empty">
-                    <i class="ph ph-hand-pointing" style="font-size: 32px; margin-bottom: 8px;"></i>
-                    <div>Select a category above to browse records</div>
-                </div>
-            `;
 
-            // Clear active category buttons
+            // Set "All" button as active
             document.querySelectorAll('.airtable-picker-category-btn').forEach(btn => {
                 btn.classList.remove('active');
             });
+            const allBtn = document.querySelector('.airtable-picker-category-btn[onclick*="\'all\'"]');
+            if (allBtn) allBtn.classList.add('active');
 
             // Show overlay
             overlay.classList.add('show');
+
+            // Load all records immediately
+            loadAirtableRecords('all');
         }
 
         // Close the tag picker
@@ -39173,8 +39244,12 @@ Cmd/Ctrl + K - Command palette
                     </div>
 
                     <div class="airtable-picker-categories">
-                        <div class="airtable-picker-categories-label">Select Category</div>
+                        <div class="airtable-picker-categories-label">Filter by Type</div>
                         <div class="airtable-picker-category-grid">
+                            <button class="airtable-picker-category-btn active" onclick="selectAirtableCategory('all')">
+                                <i class="ph ph-magnifying-glass cat-icon"></i>
+                                <span class="cat-label">All</span>
+                            </button>
                             <button class="airtable-picker-category-btn" onclick="selectAirtableCategory('clients')">
                                 <i class="ph ph-user cat-icon"></i>
                                 <span class="cat-label">Client</span>
@@ -39253,19 +39328,41 @@ Cmd/Ctrl + K - Command palette
             // Update cache status display
             updateAirtableCacheStatus(category);
 
-            // Show loading only if cache is empty
-            const cache = AirtableAPI.recordsCache[category];
-            if (!cache || !cache.records) {
-                resultsContainer.innerHTML = `
-                    <div class="airtable-picker-loading">
-                        <i class="ph ph-spinner"></i> Loading records...
-                    </div>
-                `;
+            // For 'all' mode, check if any cache is empty
+            if (category === 'all') {
+                const categories = Object.keys(AirtableAPI.tables);
+                const anyEmpty = categories.some(cat => {
+                    const cache = AirtableAPI.recordsCache[cat];
+                    return !cache || !cache.records;
+                });
+                if (anyEmpty) {
+                    resultsContainer.innerHTML = `
+                        <div class="airtable-picker-loading">
+                            <i class="ph ph-spinner"></i> Loading records...
+                        </div>
+                    `;
+                }
+            } else {
+                // Show loading only if cache is empty
+                const cache = AirtableAPI.recordsCache[category];
+                if (!cache || !cache.records) {
+                    resultsContainer.innerHTML = `
+                        <div class="airtable-picker-loading">
+                            <i class="ph ph-spinner"></i> Loading records...
+                        </div>
+                    `;
+                }
             }
 
             try {
-                // Use cached data with local search for all categories
-                const records = await AirtableAPI.getCachedRecords(category, searchQuery);
+                let records;
+                if (category === 'all') {
+                    // Search across all categories
+                    records = AirtableAPI.searchAllRecordsLocal(searchQuery);
+                } else {
+                    // Use cached data with local search for specific category
+                    records = await AirtableAPI.getCachedRecords(category, searchQuery);
+                }
 
                 airtablePickerState.results = records;
                 renderAirtablePickerResults();
@@ -39359,6 +39456,43 @@ Cmd/Ctrl + K - Command palette
                 return;
             }
 
+            // Handle 'all' mode - show total count across all categories
+            if (category === 'all') {
+                const categories = Object.keys(AirtableAPI.tables);
+                let totalCount = 0;
+                let oldestFetch = null;
+
+                for (const cat of categories) {
+                    const cache = AirtableAPI.recordsCache[cat];
+                    if (cache && cache.records) {
+                        totalCount += cache.records.length;
+                        if (!oldestFetch || (cache.lastFetch && cache.lastFetch < oldestFetch)) {
+                            oldestFetch = cache.lastFetch;
+                        }
+                    }
+                }
+
+                const ageMinutes = oldestFetch ? Math.floor((Date.now() - oldestFetch) / 60000) : null;
+                let ageText = '';
+                if (ageMinutes !== null) {
+                    if (ageMinutes < 1) {
+                        ageText = 'just now';
+                    } else if (ageMinutes === 1) {
+                        ageText = '1 min ago';
+                    } else {
+                        ageText = `${ageMinutes} mins ago`;
+                    }
+                }
+
+                statusEl.innerHTML = `
+                    <span class="cache-status-info">
+                        ${totalCount} records cached ${ageText ? `(${ageText})` : ''}
+                    </span>
+                    <span class="cache-status-hint">Don't see what you're looking for? Click refresh</span>
+                `;
+                return;
+            }
+
             const cache = AirtableAPI.recordsCache[category];
             if (!cache || !cache.records) {
                 statusEl.innerHTML = `<span class="cache-status-loading">Loading ${category}...</span>`;
@@ -39393,7 +39527,7 @@ Cmd/Ctrl + K - Command palette
             const resultsContainer = document.getElementById('airtablePickerResults');
             const results = airtablePickerState.results;
             const category = airtablePickerState.selectedCategory;
-            const config = AirtableAPI.getTableConfig(category);
+            const isAllMode = category === 'all';
 
             if (!results || results.length === 0) {
                 resultsContainer.innerHTML = `
@@ -39412,17 +39546,20 @@ Cmd/Ctrl + K - Command palette
                             isQuickAddMode ? 'selectAirtableRecordForQuickAdd' : 'selectAirtableRecord';
 
             resultsContainer.innerHTML = results.map(record => {
+                // Get config per-record when in 'all' mode
+                const recordCategory = record._category || category;
+                const config = AirtableAPI.getTableConfig(recordCategory);
                 const displayField = config?.displayField || 'Name';
                 const name = record.fields?.[displayField] || record.label || 'Unnamed';
 
                 return `
-                    <div class="airtable-picker-item type-${category}" onclick="${selectFn}('${record.id}', '${escapeHtml(name)}')">
-                        <div class="item-icon">
+                    <div class="airtable-picker-item type-${recordCategory}" onclick="${selectFn}('${record.id}', '${escapeHtml(name)}', '${recordCategory}')">
+                        <div class="item-icon" style="background: ${config?.color || '#6B7280'}20; color: ${config?.color || '#6B7280'};">
                             <i class="ph ${config?.icon || 'ph-tag'}"></i>
                         </div>
                         <div class="item-info">
                             <div class="item-name">${escapeHtml(name)}</div>
-                            <div class="item-type">${config?.label || category}</div>
+                            <div class="item-type" style="color: ${config?.color || '#6B7280'};">${config?.label || recordCategory}</div>
                         </div>
                     </div>
                 `;
@@ -39440,6 +39577,15 @@ Cmd/Ctrl + K - Command palette
             }
 
             const category = airtablePickerState.selectedCategory;
+
+            // Handle 'all' mode - search across all categories
+            if (category === 'all') {
+                const results = AirtableAPI.searchAllRecordsLocal(query);
+                airtablePickerState.results = results;
+                renderAirtablePickerResults();
+                return;
+            }
+
             const cache = AirtableAPI.recordsCache[category];
 
             // If cache is available, search instantly (no debounce needed for local search)
@@ -39456,13 +39602,14 @@ Cmd/Ctrl + K - Command palette
         }
 
         // Select a record and add it as a tag
-        async function selectAirtableRecord(recordId, label) {
+        async function selectAirtableRecord(recordId, label, recordCategory = null) {
             const taskId = airtablePickerState.taskId;
-            const category = airtablePickerState.selectedCategory;
+            // Use passed category (from 'all' mode) or fall back to selected category
+            const category = recordCategory || airtablePickerState.selectedCategory;
             const config = AirtableAPI.getTableConfig(category);
 
-            if (!taskId || !category) {
-                console.error('Invalid picker state');
+            if (!taskId || !category || category === 'all') {
+                console.error('Invalid picker state - category required');
                 return;
             }
 
@@ -41084,11 +41231,12 @@ Options:
         }
 
         // Select a record for quick add mode
-        async function selectAirtableRecordForQuickAdd(recordId, label) {
-            const category = airtablePickerState.selectedCategory;
+        async function selectAirtableRecordForQuickAdd(recordId, label, recordCategory = null) {
+            // Use passed category (from 'all' mode) or fall back to selected category
+            const category = recordCategory || airtablePickerState.selectedCategory;
             const config = AirtableAPI.getTableConfig(category);
 
-            if (!category) {
+            if (!category || category === 'all') {
                 console.error('No category selected');
                 return;
             }
@@ -41835,11 +41983,12 @@ Options:
         }
 
         // Select a record for create mode (adds to heroAirtableTags)
-        async function selectAirtableRecordForCreate(recordId, label) {
-            const category = airtablePickerState.selectedCategory;
+        async function selectAirtableRecordForCreate(recordId, label, recordCategory = null) {
+            // Use passed category (from 'all' mode) or fall back to selected category
+            const category = recordCategory || airtablePickerState.selectedCategory;
             const config = AirtableAPI.getTableConfig(category);
 
-            if (!category) {
+            if (!category || category === 'all') {
                 console.error('No category selected');
                 return;
             }
