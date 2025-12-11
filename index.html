@@ -9983,6 +9983,12 @@
             border-radius: 4px;
         }
 
+        /* Show "/" hint when unfocused, "⏎" hint when focused */
+        .quick-add-bar .slash-hint { display: inline; }
+        .quick-add-bar .enter-hint { display: none; }
+        .quick-add-bar.focused .slash-hint { display: none; }
+        .quick-add-bar.focused .enter-hint { display: inline; }
+
         /* Inline Suggestions */
         .inline-suggestions {
             position: absolute;
@@ -15794,7 +15800,8 @@
                             <div class="priority-dot high" data-priority="high" onclick="selectQuickAddPriority('high')" title="High priority"></div>
                             <div class="priority-dot urgent" data-priority="urgent" onclick="selectQuickAddPriority('urgent')" title="Urgent"></div>
                         </div>
-                        <span class="keyboard-hint">⏎</span>
+                        <span class="keyboard-hint slash-hint">/</span>
+                        <span class="keyboard-hint enter-hint">⏎</span>
                         <div class="inline-suggestions" id="quickAddSuggestions">
                             <div class="suggestion-item"><strong>!</strong> <strong>!!</strong> <strong>!!!</strong> — Set priority (low/high/urgent)</div>
                             <div class="suggestion-item"><strong>@today</strong> <strong>@tomorrow</strong> <strong>@friday</strong> — Set due date</div>
@@ -19435,6 +19442,14 @@ John Doe,Engineering,john@example.com"
                     e.preventDefault();
                     showKeyboardShortcuts();
                     break;
+                case '/':
+                    e.preventDefault();
+                    const quickAddInput = document.getElementById('quickAddInput');
+                    if (quickAddInput) {
+                        quickAddInput.focus();
+                        quickAddInput.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+                    }
+                    break;
             }
         });
 
@@ -19442,6 +19457,7 @@ John Doe,Engineering,john@example.com"
         function showKeyboardShortcuts() {
             alert(`Keyboard Shortcuts:
 
+/ - Focus task input
 T - Create new task
 R - Create new role
 P - Create new person
