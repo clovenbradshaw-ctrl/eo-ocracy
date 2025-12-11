@@ -40738,17 +40738,7 @@ Options:
                 return;
             }
 
-            // Require explicit role selection
-            if (!quickAddModalState.roleId) {
-                showToast('Please select a role to assign this task', 'error');
-                // Highlight the role chip to draw attention
-                const roleChip = document.getElementById('quickAddRoleChip');
-                roleChip.classList.add('error');
-                setTimeout(() => roleChip.classList.remove('error'), 2000);
-                toggleQuickAddRolePicker();
-                return;
-            }
-
+            // Role is optional - users can assign later
             const roleId = quickAddModalState.roleId;
 
             // Create the task
@@ -40776,16 +40766,33 @@ Options:
             };
             entities.task.push(taskObject);
 
-            // Connect role to task (Role CON Task)
-            const roleTaskRelId = 'rel' + (Date.now() + 1);
-            const roleTaskRel = {
-                id: roleTaskRelId,
-                subject: roleId,
-                predicate: 'CON',
-                object: taskId,
-                description: ''
-            };
-            relationships.push(roleTaskRel);
+            // Connect role to task (Role CON Task) - only if role is selected
+            if (roleId) {
+                const roleTaskRelId = 'rel' + (Date.now() + 1);
+                const roleTaskRel = {
+                    id: roleTaskRelId,
+                    subject: roleId,
+                    predicate: 'CON',
+                    object: taskId,
+                    description: ''
+                };
+                relationships.push(roleTaskRel);
+
+                // Log role-task relationship
+                const role = entities.role.find(r => r.id === roleId);
+                logActivityToXano({
+                    event_verb: 'Link Connection',
+                    eo_operator: 'CON',
+                    object_type: 'relationship',
+                    object_id: roleTaskRelId,
+                    object_label: `${role?.name || 'Role'} → ${taskName}`,
+                    data_json: {
+                        subject_id: roleId,
+                        predicate: 'CON',
+                        target_id: taskId
+                    }
+                });
+            }
 
             // Log task creation activity
             logActivityToXano({
@@ -40804,21 +40811,6 @@ Options:
                     visibility: quickAddModalState.visibility,
                     visibilityTeamId: quickAddModalState.visibilityTeamId,
                     createdBy: currentUserId
-                }
-            });
-
-            // Log role-task relationship
-            const role = entities.role.find(r => r.id === roleId);
-            logActivityToXano({
-                event_verb: 'Link Connection',
-                eo_operator: 'CON',
-                object_type: 'relationship',
-                object_id: roleTaskRelId,
-                object_label: `${role?.name || 'Role'} → ${taskName}`,
-                data_json: {
-                    subject_id: roleId,
-                    predicate: 'CON',
-                    target_id: taskId
                 }
             });
 
@@ -43653,12 +43645,7 @@ Options:
                 return;
             }
 
-            // Role is required (EO holonic model - tasks must be assigned to roles)
-            if (!roleId) {
-                showToast('Please assign this task to a role', 'error');
-                document.getElementById('roleRequiredNotice').style.display = 'flex';
-                return;
-            }
+            // Role is optional - users can assign later
 
             let taskId = null;
 
@@ -46583,10 +46570,10 @@ Options:
                     </div>
                 </div>
 
-                <!-- Role Assignment (Required for EO integration) -->
+                <!-- Role Assignment (Optional) -->
                 <div class="hero-task-input-group" style="margin-top: 1rem;">
                     <label class="hero-task-label">
-                        <i class="ph ph-briefcase"></i> Assign to Role<span class="required-indicator">*</span>
+                        <i class="ph ph-briefcase"></i> Assign to Role
                     </label>
                     <div class="hero-dropdown-container" id="heroRoleDropdownContainer">
                         <input type="hidden" id="heroTaskRoleMain" value="">
