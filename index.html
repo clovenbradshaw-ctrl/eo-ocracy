@@ -14944,6 +14944,31 @@
             color: #C88F4A;
         }
 
+        /* Inactive person styling */
+        .role-person-chip-with-remove.inactive-person {
+            background: #F5F5F5;
+            border-color: #D1D5DB;
+            opacity: 0.8;
+        }
+
+        .role-person-chip-with-remove.inactive-person .role-person-chip-content i {
+            color: #9CA3AF;
+        }
+
+        .inactive-badge {
+            display: inline-flex;
+            align-items: center;
+            padding: 0.125rem 0.375rem;
+            margin-left: 0.25rem;
+            background: #FEF3C7;
+            color: #92400E;
+            font-size: 0.65rem;
+            font-weight: 600;
+            border-radius: 4px;
+            text-transform: uppercase;
+            letter-spacing: 0.025em;
+        }
+
         .role-person-remove-btn {
             display: flex;
             align-items: center;
@@ -15030,6 +15055,394 @@
 
         .role-assign-person-btn i {
             font-size: 0.875rem;
+        }
+
+        /* Role Parent Team/Unit Assignment */
+        .role-parent-display {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .role-parent-chip {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            padding: 0.5rem 0.75rem;
+            background: white;
+            border: 1px solid #E5DDD1;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: all 0.15s;
+            flex: 1;
+        }
+
+        .role-parent-chip:hover {
+            border-color: #2563EB;
+            background: #F5F9FF;
+        }
+
+        .role-parent-chip i {
+            color: #2563EB;
+        }
+
+        .parent-type-badge {
+            display: inline-flex;
+            padding: 0.125rem 0.375rem;
+            margin-left: auto;
+            background: #E0E7FF;
+            color: #3730A3;
+            font-size: 0.65rem;
+            font-weight: 600;
+            border-radius: 4px;
+            text-transform: uppercase;
+        }
+
+        .role-parent-remove-btn {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            width: 28px;
+            height: 28px;
+            border: none;
+            background: transparent;
+            color: #A89984;
+            cursor: pointer;
+            border-radius: 50%;
+            transition: all 0.15s;
+        }
+
+        .role-parent-remove-btn:hover {
+            background: #FEE2E2;
+            color: #DC2626;
+        }
+
+        .role-assign-parent-section {
+            margin-top: 0.75rem;
+            padding-top: 0.75rem;
+            border-top: 1px solid #E5DDD1;
+        }
+
+        .role-assign-parent-row {
+            display: flex;
+            gap: 0.5rem;
+            align-items: center;
+        }
+
+        .role-assign-parent-select {
+            flex: 1;
+            padding: 0.5rem 0.75rem;
+            border: 1px solid #E5DDD1;
+            border-radius: 8px;
+            background: white;
+            font-size: 0.875rem;
+            color: #3D2E1F;
+            cursor: pointer;
+            transition: all 0.15s;
+        }
+
+        .role-assign-parent-select:hover {
+            border-color: #2563EB;
+        }
+
+        .role-assign-parent-select:focus {
+            outline: none;
+            border-color: #2563EB;
+            box-shadow: 0 0 0 2px rgba(37, 99, 235, 0.15);
+        }
+
+        .role-assign-parent-btn {
+            display: flex;
+            align-items: center;
+            gap: 0.375rem;
+            padding: 0.5rem 0.875rem;
+            background: #2563EB;
+            color: white;
+            border: none;
+            border-radius: 8px;
+            font-size: 0.875rem;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.15s;
+            white-space: nowrap;
+        }
+
+        .role-assign-parent-btn:hover {
+            background: #1D4ED8;
+        }
+
+        .role-assign-parent-btn:disabled {
+            background: #E5DDD1;
+            color: #A89984;
+            cursor: not-allowed;
+        }
+
+        /* Team Work Dashboard Styles */
+        .team-work-dashboard {
+            display: flex;
+            flex-direction: column;
+            gap: 1rem;
+        }
+
+        .team-work-section {
+            background: #FAFBFC;
+            border-radius: 12px;
+            padding: 1rem;
+            border: 1px solid #E5DDD1;
+        }
+
+        .team-work-section-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-bottom: 0.75rem;
+        }
+
+        .team-work-section-title {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            font-size: 0.9rem;
+            font-weight: 600;
+            color: #3D2E1F;
+        }
+
+        .team-work-section-title i {
+            color: #16A34A;
+            font-size: 1rem;
+        }
+
+        .team-work-count {
+            background: #16A34A;
+            color: white;
+            padding: 0.125rem 0.5rem;
+            border-radius: 10px;
+            font-size: 0.75rem;
+            font-weight: 600;
+        }
+
+        .team-empty-state {
+            color: #A89984;
+            font-size: 0.875rem;
+            font-style: italic;
+            padding: 0.5rem 0;
+        }
+
+        /* Team Parent Unit */
+        .team-parent-display {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .team-parent-chip {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            padding: 0.5rem 0.75rem;
+            background: white;
+            border: 1px solid #E5DDD1;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: all 0.15s;
+            flex: 1;
+        }
+
+        .team-parent-chip:hover {
+            border-color: #16A34A;
+            background: #F0FDF4;
+        }
+
+        .team-parent-chip i {
+            color: #16A34A;
+        }
+
+        .team-parent-remove-btn {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            width: 28px;
+            height: 28px;
+            border: none;
+            background: transparent;
+            color: #A89984;
+            cursor: pointer;
+            border-radius: 50%;
+            transition: all 0.15s;
+        }
+
+        .team-parent-remove-btn:hover {
+            background: #FEE2E2;
+            color: #DC2626;
+        }
+
+        .team-assign-parent-section {
+            margin-top: 0.75rem;
+            padding-top: 0.75rem;
+            border-top: 1px solid #E5DDD1;
+        }
+
+        .team-assign-parent-row {
+            display: flex;
+            gap: 0.5rem;
+            align-items: center;
+        }
+
+        .team-assign-parent-select {
+            flex: 1;
+            padding: 0.5rem 0.75rem;
+            border: 1px solid #E5DDD1;
+            border-radius: 8px;
+            background: white;
+            font-size: 0.875rem;
+            color: #3D2E1F;
+            cursor: pointer;
+            transition: all 0.15s;
+        }
+
+        .team-assign-parent-select:hover {
+            border-color: #16A34A;
+        }
+
+        .team-assign-parent-select:focus {
+            outline: none;
+            border-color: #16A34A;
+            box-shadow: 0 0 0 2px rgba(22, 163, 74, 0.15);
+        }
+
+        .team-assign-parent-btn {
+            display: flex;
+            align-items: center;
+            gap: 0.375rem;
+            padding: 0.5rem 0.875rem;
+            background: #16A34A;
+            color: white;
+            border: none;
+            border-radius: 8px;
+            font-size: 0.875rem;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.15s;
+            white-space: nowrap;
+        }
+
+        .team-assign-parent-btn:hover {
+            background: #15803D;
+        }
+
+        .team-assign-parent-btn:disabled {
+            background: #E5DDD1;
+            color: #A89984;
+            cursor: not-allowed;
+        }
+
+        /* Team Roles List */
+        .team-roles-list {
+            display: flex;
+            flex-direction: column;
+            gap: 0.5rem;
+        }
+
+        .team-role-item {
+            display: flex;
+            align-items: center;
+            padding: 0.625rem 0.75rem;
+            background: white;
+            border-radius: 8px;
+            border: 1px solid #E5DDD1;
+            cursor: pointer;
+            transition: all 0.15s;
+        }
+
+        .team-role-item:hover {
+            border-color: #C88F4A;
+            background: #FFFBF7;
+        }
+
+        .team-role-info {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            flex: 1;
+        }
+
+        .team-role-info i {
+            color: #C88F4A;
+        }
+
+        .team-role-name {
+            font-size: 0.875rem;
+            font-weight: 500;
+            color: #3D2E1F;
+        }
+
+        .team-role-people-count {
+            font-size: 0.75rem;
+            color: #A89984;
+            margin-left: auto;
+            background: #F5F0EB;
+            padding: 0.125rem 0.5rem;
+            border-radius: 10px;
+        }
+
+        .team-add-role-section {
+            margin-top: 0.75rem;
+            padding-top: 0.75rem;
+            border-top: 1px solid #E5DDD1;
+        }
+
+        .team-add-role-row {
+            display: flex;
+            gap: 0.5rem;
+            align-items: center;
+        }
+
+        .team-add-role-select {
+            flex: 1;
+            padding: 0.5rem 0.75rem;
+            border: 1px solid #E5DDD1;
+            border-radius: 8px;
+            background: white;
+            font-size: 0.875rem;
+            color: #3D2E1F;
+            cursor: pointer;
+            transition: all 0.15s;
+        }
+
+        .team-add-role-select:hover {
+            border-color: #C88F4A;
+        }
+
+        .team-add-role-select:focus {
+            outline: none;
+            border-color: #C88F4A;
+            box-shadow: 0 0 0 2px rgba(200, 143, 74, 0.15);
+        }
+
+        .team-add-role-btn {
+            display: flex;
+            align-items: center;
+            gap: 0.375rem;
+            padding: 0.5rem 0.875rem;
+            background: #C88F4A;
+            color: white;
+            border: none;
+            border-radius: 8px;
+            font-size: 0.875rem;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.15s;
+            white-space: nowrap;
+        }
+
+        .team-add-role-btn:hover {
+            background: #B07E3E;
+        }
+
+        .team-add-role-btn:disabled {
+            background: #E5DDD1;
+            color: #A89984;
+            cursor: not-allowed;
         }
 
         /* Role Tasks */
@@ -22910,7 +23323,7 @@ John Doe,Engineering,john@example.com"
             console.log('📡 Loading users from Airtable API...');
             try {
                 const result = await AirtableAPI.getRecords('users', {
-                    fields: ['User Name', 'Email'],
+                    fields: ['User Name', 'Email', 'Activity Status'],
                     maxRecords: 100
                 });
 
@@ -22925,6 +23338,7 @@ John Doe,Engineering,john@example.com"
                     const fields = record.fields || {};
                     const userName = fields['User Name'] || fields['Name'] || 'Unknown User';
                     const email = fields['Email'] || '';
+                    const activityStatus = fields['Activity Status'] || 'Active'; // Default to Active if not set
 
                     // Create a unique ID using the Airtable record ID or generate one
                     const personId = record.id || `person_${Date.now()}_${index}`;
@@ -22935,6 +23349,7 @@ John Doe,Engineering,john@example.com"
                         type: 'person',
                         description: email ? `Email: ${email}` : '',
                         email: email,
+                        activityStatus: activityStatus, // Store activity status for filtering
                         airtableId: record.id,
                         createdAt: new Date().toISOString()
                     });
@@ -26025,11 +26440,15 @@ Cmd/Ctrl + K - Command palette
 
             // Persons cannot have activities - hide the section entirely
             const isRole = entityType === 'role';
+            const isTeam = entityType === 'team';
             if (isPerson) {
                 activitiesEl.innerHTML = '';
             } else if (isRole) {
                 // Roles: show work-focused dashboard with people, tasks, and workflows
                 activitiesEl.innerHTML = renderRoleWorkContent(entityId);
+            } else if (isTeam) {
+                // Teams: show parent unit and nested roles dashboard
+                activitiesEl.innerHTML = renderTeamWorkContent(entityId);
             } else if (isTask) {
                 // Tasks: show simplified connected entities view
                 const connectedRoles = activityEntities.filter(e => e.type === 'role');
@@ -28742,6 +29161,400 @@ Cmd/Ctrl + K - Command palette
             if (currentModalEntity && currentModalEntityType === 'role') {
                 openEntityModal(currentModalEntity.id, currentModalEntityType);
             }
+
+            // Refresh views
+            if (currentView === 'graph') {
+                updateGraph();
+            } else if (currentView === 'tree') {
+                renderTreeView();
+            } else if (currentView === 'card') {
+                renderCardView();
+            } else if (currentView === 'orgchart') {
+                renderOrgChartView();
+            }
+
+            renderActivityList();
+        }
+
+        // Assign role to team/unit from role modal (creates DES relationship)
+        function assignRoleToTeamFromModal(roleId) {
+            const select = document.getElementById('roleModalParentSelect');
+            const parentId = select?.value;
+
+            if (!parentId) {
+                alert('Please select a team or unit to assign this role to');
+                return;
+            }
+
+            const role = findEntity(roleId);
+            const parentEntity = findEntity(parentId);
+
+            if (!role || !parentEntity) {
+                alert('Role or parent entity not found');
+                return;
+            }
+
+            // Remove any existing parent relationship for this role
+            const existingParentRel = relationships.find(r =>
+                r.predicate === 'DES' && r.object === roleId
+            );
+            if (existingParentRel) {
+                const index = relationships.findIndex(r => r.id === existingParentRel.id);
+                if (index !== -1) {
+                    relationships.splice(index, 1);
+                }
+            }
+
+            // Create the DES relationship (parent contains role)
+            const relId = 'rel' + Date.now();
+            const relationship = {
+                id: relId,
+                subject: parentId,
+                predicate: 'DES',
+                object: roleId,
+                description: ''
+            };
+
+            relationships.push(relationship);
+
+            // Track in undo history
+            pushToUndoHistory({
+                type: 'create_relationship',
+                data: JSON.parse(JSON.stringify(relationship)),
+                description: `Assigned role: ${role.name} → ${parentEntity.name}`
+            });
+
+            // Log to Xano
+            logActivityToXano({
+                event_verb: 'Assign Role to ' + (parentEntity.type === 'team' ? 'Team' : 'Unit'),
+                eo_operator: 'DES',
+                object_type: 'relationship',
+                object_id: relId,
+                object_label: `${role.name} assigned to ${parentEntity.name}`,
+                data_json: {
+                    subject_id: parentId,
+                    subject_type: parentEntity.type,
+                    subject_name: parentEntity.name,
+                    predicate: 'DES',
+                    predicate_label: 'Contains',
+                    object_id: roleId,
+                    object_type: 'role',
+                    object_name: role.name,
+                    connection_type: 'role_team_assignment'
+                }
+            });
+
+            // Save and refresh
+            saveToLocalStorage();
+
+            // Refresh the modal to show new assignment
+            openEntityModal(roleId, 'role');
+
+            // Refresh views
+            if (currentView === 'graph') {
+                updateGraph();
+            } else if (currentView === 'tree') {
+                renderTreeView();
+            } else if (currentView === 'card') {
+                renderCardView();
+            } else if (currentView === 'orgchart') {
+                renderOrgChartView();
+            }
+
+            renderActivityList();
+        }
+
+        // Remove role from its parent team/unit
+        function removeRoleFromParent(roleId, relationshipId, event) {
+            if (event) {
+                event.stopPropagation();
+            }
+
+            const relationship = relationships.find(r => r.id === relationshipId);
+            if (!relationship) return;
+
+            const role = findEntity(roleId);
+            const parent = findEntity(relationship.subject);
+
+            // Remove the relationship
+            const index = relationships.findIndex(r => r.id === relationshipId);
+            if (index !== -1) {
+                relationships.splice(index, 1);
+            }
+
+            // Track in undo history
+            pushToUndoHistory({
+                type: 'delete_relationship',
+                data: JSON.parse(JSON.stringify(relationship)),
+                description: `Removed role: ${role?.name || 'Role'} from ${parent?.name || 'Parent'}`
+            });
+
+            // Log to Xano
+            logActivityToXano({
+                event_verb: 'Remove Role from ' + (parent?.type === 'team' ? 'Team' : 'Unit'),
+                eo_operator: 'NUL',
+                object_type: 'relationship',
+                object_id: relationshipId,
+                object_label: `${role?.name || 'Role'} removed from ${parent?.name || 'Parent'}`,
+                data_json: {
+                    subject_id: relationship.subject,
+                    subject_type: parent?.type,
+                    subject_name: parent?.name,
+                    predicate: 'DES',
+                    predicate_label: 'Contains',
+                    object_id: roleId,
+                    object_type: 'role',
+                    object_name: role?.name,
+                    connection_type: 'role_team_assignment_removal'
+                }
+            });
+
+            // Save and refresh
+            saveToLocalStorage();
+
+            // Refresh the modal if still open
+            openEntityModal(roleId, 'role');
+
+            // Refresh views
+            if (currentView === 'graph') {
+                updateGraph();
+            } else if (currentView === 'tree') {
+                renderTreeView();
+            } else if (currentView === 'card') {
+                renderCardView();
+            } else if (currentView === 'orgchart') {
+                renderOrgChartView();
+            }
+
+            renderActivityList();
+        }
+
+        // Assign team to unit from team modal (creates DES relationship)
+        function assignTeamToUnitFromModal(teamId) {
+            const select = document.getElementById('teamModalParentSelect');
+            const parentId = select?.value;
+
+            if (!parentId) {
+                alert('Please select a unit or team to assign this team to');
+                return;
+            }
+
+            const team = findEntity(teamId);
+            const parentEntity = findEntity(parentId);
+
+            if (!team || !parentEntity) {
+                alert('Team or parent entity not found');
+                return;
+            }
+
+            // Remove any existing parent relationship for this team
+            const existingParentRel = relationships.find(r =>
+                r.predicate === 'DES' && r.object === teamId
+            );
+            if (existingParentRel) {
+                const index = relationships.findIndex(r => r.id === existingParentRel.id);
+                if (index !== -1) {
+                    relationships.splice(index, 1);
+                }
+            }
+
+            // Create the DES relationship (parent contains team)
+            const relId = 'rel' + Date.now();
+            const relationship = {
+                id: relId,
+                subject: parentId,
+                predicate: 'DES',
+                object: teamId,
+                description: ''
+            };
+
+            relationships.push(relationship);
+
+            // Track in undo history
+            pushToUndoHistory({
+                type: 'create_relationship',
+                data: JSON.parse(JSON.stringify(relationship)),
+                description: `Assigned team: ${team.name} → ${parentEntity.name}`
+            });
+
+            // Log to Xano
+            logActivityToXano({
+                event_verb: 'Assign Team to ' + (parentEntity.type === 'unit' ? 'Unit' : 'Team'),
+                eo_operator: 'DES',
+                object_type: 'relationship',
+                object_id: relId,
+                object_label: `${team.name} assigned to ${parentEntity.name}`,
+                data_json: {
+                    subject_id: parentId,
+                    subject_type: parentEntity.type,
+                    subject_name: parentEntity.name,
+                    predicate: 'DES',
+                    predicate_label: 'Contains',
+                    object_id: teamId,
+                    object_type: 'team',
+                    object_name: team.name,
+                    connection_type: 'team_unit_assignment'
+                }
+            });
+
+            // Save and refresh
+            saveToLocalStorage();
+
+            // Refresh the modal to show new assignment
+            openEntityModal(teamId, 'team');
+
+            // Refresh views
+            if (currentView === 'graph') {
+                updateGraph();
+            } else if (currentView === 'tree') {
+                renderTreeView();
+            } else if (currentView === 'card') {
+                renderCardView();
+            } else if (currentView === 'orgchart') {
+                renderOrgChartView();
+            }
+
+            renderActivityList();
+        }
+
+        // Remove team from its parent unit
+        function removeTeamFromParent(teamId, relationshipId, event) {
+            if (event) {
+                event.stopPropagation();
+            }
+
+            const relationship = relationships.find(r => r.id === relationshipId);
+            if (!relationship) return;
+
+            const team = findEntity(teamId);
+            const parent = findEntity(relationship.subject);
+
+            // Remove the relationship
+            const index = relationships.findIndex(r => r.id === relationshipId);
+            if (index !== -1) {
+                relationships.splice(index, 1);
+            }
+
+            // Track in undo history
+            pushToUndoHistory({
+                type: 'delete_relationship',
+                data: JSON.parse(JSON.stringify(relationship)),
+                description: `Removed team: ${team?.name || 'Team'} from ${parent?.name || 'Parent'}`
+            });
+
+            // Log to Xano
+            logActivityToXano({
+                event_verb: 'Remove Team from ' + (parent?.type === 'unit' ? 'Unit' : 'Team'),
+                eo_operator: 'NUL',
+                object_type: 'relationship',
+                object_id: relationshipId,
+                object_label: `${team?.name || 'Team'} removed from ${parent?.name || 'Parent'}`,
+                data_json: {
+                    subject_id: relationship.subject,
+                    subject_type: parent?.type,
+                    subject_name: parent?.name,
+                    predicate: 'DES',
+                    predicate_label: 'Contains',
+                    object_id: teamId,
+                    object_type: 'team',
+                    object_name: team?.name,
+                    connection_type: 'team_unit_assignment_removal'
+                }
+            });
+
+            // Save and refresh
+            saveToLocalStorage();
+
+            // Refresh the modal if still open
+            openEntityModal(teamId, 'team');
+
+            // Refresh views
+            if (currentView === 'graph') {
+                updateGraph();
+            } else if (currentView === 'tree') {
+                renderTreeView();
+            } else if (currentView === 'card') {
+                renderCardView();
+            } else if (currentView === 'orgchart') {
+                renderOrgChartView();
+            }
+
+            renderActivityList();
+        }
+
+        // Add role to team from team modal (creates DES relationship)
+        function addRoleToTeamFromModal(teamId) {
+            const select = document.getElementById('teamModalRoleSelect');
+            const roleId = select?.value;
+
+            if (!roleId) {
+                alert('Please select a role to add to this team');
+                return;
+            }
+
+            const team = findEntity(teamId);
+            const role = findEntity(roleId);
+
+            if (!team || !role) {
+                alert('Team or role not found');
+                return;
+            }
+
+            // Remove any existing parent relationship for this role
+            const existingParentRel = relationships.find(r =>
+                r.predicate === 'DES' && r.object === roleId
+            );
+            if (existingParentRel) {
+                const index = relationships.findIndex(r => r.id === existingParentRel.id);
+                if (index !== -1) {
+                    relationships.splice(index, 1);
+                }
+            }
+
+            // Create the DES relationship (team contains role)
+            const relId = 'rel' + Date.now();
+            const relationship = {
+                id: relId,
+                subject: teamId,
+                predicate: 'DES',
+                object: roleId,
+                description: ''
+            };
+
+            relationships.push(relationship);
+
+            // Track in undo history
+            pushToUndoHistory({
+                type: 'create_relationship',
+                data: JSON.parse(JSON.stringify(relationship)),
+                description: `Added role: ${role.name} → ${team.name}`
+            });
+
+            // Log to Xano
+            logActivityToXano({
+                event_verb: 'Add Role to Team',
+                eo_operator: 'DES',
+                object_type: 'relationship',
+                object_id: relId,
+                object_label: `${role.name} added to ${team.name}`,
+                data_json: {
+                    subject_id: teamId,
+                    subject_type: 'team',
+                    subject_name: team.name,
+                    predicate: 'DES',
+                    predicate_label: 'Contains',
+                    object_id: roleId,
+                    object_type: 'role',
+                    object_name: role.name,
+                    connection_type: 'role_team_assignment'
+                }
+            });
+
+            // Save and refresh
+            saveToLocalStorage();
+
+            // Refresh the modal to show new role
+            openEntityModal(teamId, 'team');
 
             // Refresh views
             if (currentView === 'graph') {
@@ -40010,8 +40823,20 @@ Options:
             const assignedPeople = assignedPeopleWithRels.map(item => item.person);
             const assignedPersonIds = assignedPeople.map(p => p.id);
 
-            // Get unassigned people for the dropdown
-            const unassignedPeople = entities.person.filter(p => !assignedPersonIds.includes(p.id));
+            // Get unassigned people for the dropdown - only show Active people for new assignments
+            const unassignedPeople = entities.person.filter(p =>
+                !assignedPersonIds.includes(p.id) && p.activityStatus === 'Active'
+            );
+
+            // Get current parent team/unit (DES relationship where role is the object)
+            const parentRelationship = relationships.find(r =>
+                r.predicate === 'DES' && r.object === roleId
+            );
+            const parentEntity = parentRelationship ? findEntity(parentRelationship.subject) : null;
+
+            // Get available teams and units to assign this role to
+            const availableTeams = entities.team.filter(t => !parentEntity || t.id !== parentEntity.id);
+            const availableUnits = entities.unit.filter(u => !parentEntity || u.id !== parentEntity.id);
 
             // Get connected tasks (CON relationships)
             const connectedTasks = relationships
@@ -40061,17 +40886,21 @@ Options:
                         </div>
                         ${assignedPeopleWithRels.length > 0 ? `
                             <div class="role-people-list">
-                                ${assignedPeopleWithRels.map(item => `
-                                    <div class="role-person-chip-with-remove">
+                                ${assignedPeopleWithRels.map(item => {
+                                    const isInactive = item.person.activityStatus && item.person.activityStatus !== 'Active';
+                                    return `
+                                    <div class="role-person-chip-with-remove ${isInactive ? 'inactive-person' : ''}">
                                         <div class="role-person-chip-content" onclick="openEntityModal('${item.person.id}', 'person')">
                                             <i class="ph ph-user"></i>
                                             ${item.person.name}
+                                            ${isInactive ? '<span class="inactive-badge">Inactive</span>' : ''}
                                         </div>
                                         <button class="role-person-remove-btn" onclick="removePersonFromRole('${item.relationshipId}', event)" title="Remove from role">
                                             <i class="ph ph-x"></i>
                                         </button>
                                     </div>
-                                `).join('')}
+                                    `;
+                                }).join('')}
                             </div>
                         ` : `
                             <div class="role-empty-state">No one assigned to this role</div>
@@ -40084,6 +40913,46 @@ Options:
                                     ${unassignedPeople.map(person => `<option value="${person.id}">${person.name}</option>`).join('')}
                                 </select>
                                 <button class="role-assign-person-btn" onclick="assignPersonToRoleFromRoleModal()" ${unassignedPeople.length === 0 ? 'disabled' : ''}>
+                                    <i class="ph ph-plus"></i> Assign
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Parent Team/Unit Section -->
+                    <div class="role-work-section">
+                        <div class="role-work-section-header">
+                            <div class="role-work-section-title">
+                                <i class="ph ph-tree-structure"></i> Parent Team/Unit
+                            </div>
+                        </div>
+                        ${parentEntity ? `
+                            <div class="role-parent-display">
+                                <div class="role-parent-chip" onclick="openEntityModal('${parentEntity.id}', '${parentEntity.type}')">
+                                    <i class="ph ${parentEntity.type === 'team' ? 'ph-users-three' : 'ph-buildings'}"></i>
+                                    <span>${parentEntity.name}</span>
+                                    <span class="parent-type-badge">${parentEntity.type}</span>
+                                </div>
+                                <button class="role-parent-remove-btn" onclick="removeRoleFromParent('${roleId}', '${parentRelationship.id}', event)" title="Remove from ${parentEntity.type}">
+                                    <i class="ph ph-x"></i>
+                                </button>
+                            </div>
+                        ` : `
+                            <div class="role-empty-state">Not assigned to any team or unit</div>
+                        `}
+                        <!-- Assign to Team/Unit UI -->
+                        <div class="role-assign-parent-section">
+                            <div class="role-assign-parent-row">
+                                <select id="roleModalParentSelect" class="role-assign-parent-select">
+                                    <option value="">Select team or unit...</option>
+                                    ${availableTeams.length > 0 ? `<optgroup label="Teams">
+                                        ${availableTeams.map(team => `<option value="${team.id}" data-type="team">${team.name}</option>`).join('')}
+                                    </optgroup>` : ''}
+                                    ${availableUnits.length > 0 ? `<optgroup label="Units">
+                                        ${availableUnits.map(unit => `<option value="${unit.id}" data-type="unit">${unit.name}</option>`).join('')}
+                                    </optgroup>` : ''}
+                                </select>
+                                <button class="role-assign-parent-btn" onclick="assignRoleToTeamFromModal('${roleId}')" ${availableTeams.length === 0 && availableUnits.length === 0 ? 'disabled' : ''}>
                                     <i class="ph ph-plus"></i> Assign
                                 </button>
                             </div>
@@ -40169,6 +41038,123 @@ Options:
                         ` : `
                             <div class="role-empty-state">No workflows connected</div>
                         `}
+                    </div>
+                </div>
+            `;
+        }
+
+        // Render team work dashboard content - shows parent unit and nested roles
+        function renderTeamWorkContent(teamId) {
+            const team = entities.team.find(t => t.id === teamId);
+            if (!team) return '';
+
+            // Get current parent unit/team (DES relationship where team is the object)
+            const parentRelationship = relationships.find(r =>
+                r.predicate === 'DES' && r.object === teamId
+            );
+            const parentEntity = parentRelationship ? findEntity(parentRelationship.subject) : null;
+
+            // Get available units to assign this team to
+            const availableUnits = entities.unit.filter(u => !parentEntity || u.id !== parentEntity.id);
+            // Get other teams (for nesting under another team)
+            const availableTeams = entities.team.filter(t => t.id !== teamId && (!parentEntity || t.id !== parentEntity.id));
+
+            // Get nested roles under this team (DES relationships where team is the subject)
+            const nestedRoles = relationships
+                .filter(r => r.predicate === 'DES' && r.subject === teamId)
+                .map(r => findEntity(r.object))
+                .filter(e => e && e.type === 'role');
+
+            // Get available roles to add to this team
+            const nestedRoleIds = nestedRoles.map(r => r.id);
+            const availableRoles = entities.role.filter(r => !nestedRoleIds.includes(r.id));
+
+            return `
+                <div class="team-work-dashboard">
+                    <!-- Parent Unit Section -->
+                    <div class="team-work-section">
+                        <div class="team-work-section-header">
+                            <div class="team-work-section-title">
+                                <i class="ph ph-buildings"></i> Parent Unit
+                            </div>
+                        </div>
+                        ${parentEntity ? `
+                            <div class="team-parent-display">
+                                <div class="team-parent-chip" onclick="openEntityModal('${parentEntity.id}', '${parentEntity.type}')">
+                                    <i class="ph ${parentEntity.type === 'unit' ? 'ph-buildings' : 'ph-users-three'}"></i>
+                                    <span>${parentEntity.name}</span>
+                                    <span class="parent-type-badge">${parentEntity.type}</span>
+                                </div>
+                                <button class="team-parent-remove-btn" onclick="removeTeamFromParent('${teamId}', '${parentRelationship.id}', event)" title="Remove from ${parentEntity.type}">
+                                    <i class="ph ph-x"></i>
+                                </button>
+                            </div>
+                        ` : `
+                            <div class="team-empty-state">Not assigned to any unit</div>
+                        `}
+                        <!-- Assign to Unit UI -->
+                        <div class="team-assign-parent-section">
+                            <div class="team-assign-parent-row">
+                                <select id="teamModalParentSelect" class="team-assign-parent-select">
+                                    <option value="">Select unit or team...</option>
+                                    ${availableUnits.length > 0 ? `<optgroup label="Units">
+                                        ${availableUnits.map(unit => `<option value="${unit.id}" data-type="unit">${unit.name}</option>`).join('')}
+                                    </optgroup>` : ''}
+                                    ${availableTeams.length > 0 ? `<optgroup label="Teams">
+                                        ${availableTeams.map(t => `<option value="${t.id}" data-type="team">${t.name}</option>`).join('')}
+                                    </optgroup>` : ''}
+                                </select>
+                                <button class="team-assign-parent-btn" onclick="assignTeamToUnitFromModal('${teamId}')" ${availableUnits.length === 0 && availableTeams.length === 0 ? 'disabled' : ''}>
+                                    <i class="ph ph-plus"></i> Assign
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Nested Roles Section -->
+                    <div class="team-work-section">
+                        <div class="team-work-section-header">
+                            <div class="team-work-section-title">
+                                <i class="ph ph-briefcase"></i> Roles
+                            </div>
+                            <span class="team-work-count">${nestedRoles.length}</span>
+                        </div>
+                        ${nestedRoles.length > 0 ? `
+                            <div class="team-roles-list">
+                                ${nestedRoles.map(role => {
+                                    // Get people in this role
+                                    const peopleInRole = relationships
+                                        .filter(r => r.predicate === 'INS' && r.object === role.id)
+                                        .map(r => findEntity(r.subject))
+                                        .filter(p => p && p.type === 'person');
+                                    return `
+                                    <div class="team-role-item" onclick="openEntityModal('${role.id}', 'role')">
+                                        <div class="team-role-info">
+                                            <i class="ph ph-briefcase"></i>
+                                            <span class="team-role-name">${role.name}</span>
+                                            ${peopleInRole.length > 0 ? `
+                                                <span class="team-role-people-count">${peopleInRole.length} ${peopleInRole.length === 1 ? 'person' : 'people'}</span>
+                                            ` : ''}
+                                        </div>
+                                    </div>
+                                    `;
+                                }).join('')}
+                            </div>
+                        ` : `
+                            <div class="team-empty-state">No roles in this team</div>
+                        `}
+                        <!-- Add Role UI -->
+                        <div class="team-add-role-section">
+                            <div class="team-add-role-row">
+                                <select id="teamModalRoleSelect" class="team-add-role-select">
+                                    <option value="">Select role to add...</option>
+                                    ${availableRoles.map(role => `<option value="${role.id}">${role.name}</option>`).join('')}
+                                </select>
+                                <button class="team-add-role-btn" onclick="addRoleToTeamFromModal('${teamId}')" ${availableRoles.length === 0 ? 'disabled' : ''}>
+                                    <i class="ph ph-plus"></i> Add
+                                </button>
+                            </div>
+                        </div>
                     </div>
                 </div>
             `;
