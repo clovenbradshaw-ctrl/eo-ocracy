@@ -1997,6 +1997,14 @@
             background: #6B5642;
         }
 
+        .btn-danger {
+            background: #DC2626;
+        }
+
+        .btn-danger:hover {
+            background: #B91C1C;
+        }
+
         .work-primary-btn {
             background: linear-gradient(135deg, #C88F4A 0%, #B87B5B 100%);
             font-weight: 600;
@@ -16747,6 +16755,392 @@
             display: flex;
             gap: 0.75rem;
             justify-content: flex-end;
+        }
+
+        /* Create/Edit Workflow Modal */
+        .create-workflow-modal {
+            background: white;
+            border-radius: 12px;
+            max-width: 650px;
+            width: 95%;
+            max-height: 90vh;
+            overflow: hidden;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .create-workflow-header {
+            padding: 1.25rem 1.5rem;
+            background: linear-gradient(135deg, #C88F4A 0%, #B87B5B 100%);
+            color: white;
+        }
+
+        .create-workflow-header h3 {
+            font-size: 1.1rem;
+            font-weight: 600;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .create-workflow-header p {
+            font-size: 0.85rem;
+            margin-top: 0.25rem;
+            opacity: 0.9;
+        }
+
+        .create-workflow-body {
+            padding: 1.5rem;
+            overflow-y: auto;
+            flex: 1;
+        }
+
+        .create-workflow-section {
+            margin-bottom: 1.5rem;
+        }
+
+        .create-workflow-section:last-child {
+            margin-bottom: 0;
+        }
+
+        .create-workflow-section-title {
+            font-size: 0.9rem;
+            font-weight: 600;
+            color: #3D2E1F;
+            margin-bottom: 0.75rem;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .create-workflow-field {
+            margin-bottom: 1rem;
+        }
+
+        .create-workflow-field:last-child {
+            margin-bottom: 0;
+        }
+
+        .create-workflow-field label {
+            display: block;
+            font-size: 0.85rem;
+            font-weight: 600;
+            color: #3D2E1F;
+            margin-bottom: 0.5rem;
+        }
+
+        .create-workflow-field label span {
+            font-weight: 400;
+            color: #8B6F47;
+        }
+
+        .create-workflow-field input[type="text"],
+        .create-workflow-field input[type="number"],
+        .create-workflow-field textarea,
+        .create-workflow-field select {
+            width: 100%;
+            padding: 0.625rem 0.875rem;
+            border: 1px solid #E5DDD1;
+            border-radius: 6px;
+            font-size: 0.9rem;
+            color: #3D2E1F;
+            font-family: inherit;
+        }
+
+        .create-workflow-field textarea {
+            resize: vertical;
+            min-height: 60px;
+        }
+
+        .create-workflow-field input:focus,
+        .create-workflow-field textarea:focus,
+        .create-workflow-field select:focus {
+            outline: none;
+            border-color: #C88F4A;
+        }
+
+        .create-workflow-row {
+            display: flex;
+            gap: 1rem;
+        }
+
+        .create-workflow-row .create-workflow-field {
+            flex: 1;
+        }
+
+        .create-workflow-row .create-workflow-field.small {
+            flex: 0 0 120px;
+        }
+
+        /* Icon picker */
+        .workflow-icon-picker {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 0.5rem;
+        }
+
+        .workflow-icon-option {
+            width: 40px;
+            height: 40px;
+            border: 2px solid #E5DDD1;
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            transition: all 0.2s;
+            background: white;
+        }
+
+        .workflow-icon-option:hover {
+            border-color: #C88F4A;
+            background: #FAF7F5;
+        }
+
+        .workflow-icon-option.selected {
+            border-color: #C88F4A;
+            background: #C88F4A;
+            color: white;
+        }
+
+        .workflow-icon-option i {
+            font-size: 1.25rem;
+        }
+
+        /* Task list builder */
+        .workflow-tasks-builder {
+            border: 1px solid #E5DDD1;
+            border-radius: 8px;
+            background: #FAF7F5;
+            overflow: hidden;
+        }
+
+        .workflow-tasks-header {
+            padding: 0.75rem 1rem;
+            background: white;
+            border-bottom: 1px solid #E5DDD1;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+
+        .workflow-tasks-header h4 {
+            font-size: 0.85rem;
+            font-weight: 600;
+            color: #3D2E1F;
+        }
+
+        .workflow-tasks-list {
+            padding: 0.75rem;
+            display: flex;
+            flex-direction: column;
+            gap: 0.5rem;
+            max-height: 300px;
+            overflow-y: auto;
+        }
+
+        .workflow-task-item {
+            background: white;
+            border: 1px solid #E5DDD1;
+            border-radius: 8px;
+            padding: 0.75rem;
+            display: flex;
+            flex-direction: column;
+            gap: 0.5rem;
+        }
+
+        .workflow-task-item-header {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .workflow-task-number {
+            font-size: 0.75rem;
+            color: white;
+            background: #C88F4A;
+            min-width: 22px;
+            height: 22px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 600;
+        }
+
+        .workflow-task-item-header input {
+            flex: 1;
+            padding: 0.5rem 0.75rem;
+            border: 1px solid #E5DDD1;
+            border-radius: 4px;
+            font-size: 0.85rem;
+        }
+
+        .workflow-task-item-header input:focus {
+            outline: none;
+            border-color: #C88F4A;
+        }
+
+        .workflow-task-day-offset {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            font-size: 0.75rem;
+            color: #8B6F47;
+        }
+
+        .workflow-task-day-offset input {
+            width: 50px;
+            padding: 0.25rem 0.5rem;
+            border: 1px solid #E5DDD1;
+            border-radius: 4px;
+            font-size: 0.8rem;
+            text-align: center;
+        }
+
+        .workflow-task-item-actions {
+            display: flex;
+            gap: 0.25rem;
+            margin-left: auto;
+        }
+
+        .workflow-task-item-actions button {
+            padding: 0.25rem 0.5rem;
+            border: none;
+            background: transparent;
+            color: #8B6F47;
+            cursor: pointer;
+            border-radius: 4px;
+            font-size: 0.8rem;
+        }
+
+        .workflow-task-item-actions button:hover {
+            background: #FAF7F5;
+            color: #3D2E1F;
+        }
+
+        .workflow-task-item-actions button.delete:hover {
+            background: #FEE2E2;
+            color: #DC2626;
+        }
+
+        .workflow-task-description {
+            padding-left: 30px;
+        }
+
+        .workflow-task-description input {
+            width: 100%;
+            padding: 0.375rem 0.75rem;
+            border: 1px solid #E5DDD1;
+            border-radius: 4px;
+            font-size: 0.8rem;
+            color: #8B6F47;
+        }
+
+        .workflow-task-description input:focus {
+            outline: none;
+            border-color: #C88F4A;
+        }
+
+        .workflow-task-description input::placeholder {
+            color: #B8A690;
+        }
+
+        .workflow-add-task-btn {
+            width: 100%;
+            padding: 0.75rem;
+            border: 2px dashed #D4C8B8;
+            background: transparent;
+            border-radius: 6px;
+            color: #8B6F47;
+            font-size: 0.85rem;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 0.5rem;
+            transition: all 0.2s;
+        }
+
+        .workflow-add-task-btn:hover {
+            border-color: #C88F4A;
+            color: #C88F4A;
+            background: white;
+        }
+
+        .workflow-tasks-empty {
+            padding: 2rem 1rem;
+            text-align: center;
+            color: #8B6F47;
+        }
+
+        .workflow-tasks-empty i {
+            font-size: 2rem;
+            opacity: 0.5;
+            margin-bottom: 0.5rem;
+        }
+
+        .workflow-tasks-empty p {
+            font-size: 0.85rem;
+        }
+
+        .create-workflow-actions {
+            padding: 1rem 1.5rem;
+            background: #FAF7F5;
+            border-top: 1px solid #E5DDD1;
+            display: flex;
+            gap: 0.75rem;
+            justify-content: space-between;
+        }
+
+        .create-workflow-actions .left-actions {
+            display: flex;
+            gap: 0.5rem;
+        }
+
+        .create-workflow-actions .right-actions {
+            display: flex;
+            gap: 0.75rem;
+        }
+
+        /* Workflow card actions (edit/delete) */
+        .workflow-template-card-actions {
+            position: absolute;
+            top: 0.75rem;
+            right: 0.75rem;
+            display: flex;
+            gap: 0.25rem;
+            opacity: 0;
+            transition: opacity 0.2s;
+        }
+
+        .workflow-template-card:hover .workflow-template-card-actions {
+            opacity: 1;
+        }
+
+        .workflow-template-card-actions button {
+            padding: 0.375rem;
+            border: none;
+            background: white;
+            color: #8B6F47;
+            cursor: pointer;
+            border-radius: 4px;
+            font-size: 0.8rem;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+        }
+
+        .workflow-template-card-actions button:hover {
+            background: #FAF7F5;
+            color: #3D2E1F;
+        }
+
+        .workflow-template-card-actions button.delete:hover {
+            background: #FEE2E2;
+            color: #DC2626;
+        }
+
+        .workflow-template-card {
+            position: relative;
         }
 
         /* ============================================
@@ -47396,8 +47790,30 @@ Options:
                 const previewTasks = (template.tasks || []).slice(0, 3);
                 const moreTasks = taskCount - 3;
 
+                // Card action buttons (edit, duplicate, delete for custom workflows)
+                const cardActions = template.isDefault ? `
+                    <div class="workflow-template-card-actions">
+                        <button onclick="event.stopPropagation(); duplicateWorkflowTemplate('${template.id}')" title="Duplicate workflow">
+                            <i class="ph ph-copy"></i>
+                        </button>
+                    </div>
+                ` : `
+                    <div class="workflow-template-card-actions">
+                        <button onclick="event.stopPropagation(); editWorkflowTemplate('${template.id}')" title="Edit workflow">
+                            <i class="ph ph-pencil"></i>
+                        </button>
+                        <button onclick="event.stopPropagation(); duplicateWorkflowTemplate('${template.id}')" title="Duplicate workflow">
+                            <i class="ph ph-copy"></i>
+                        </button>
+                        <button class="delete" onclick="event.stopPropagation(); deleteWorkflowTemplate('${template.id}')" title="Delete workflow">
+                            <i class="ph ph-trash"></i>
+                        </button>
+                    </div>
+                `;
+
                 html += `
                     <div class="workflow-template-card ${template.isDefault ? 'default' : ''}">
+                        ${cardActions}
                         <div class="workflow-template-header">
                             <div class="workflow-template-title">
                                 <i class="ph ${icon}"></i>
@@ -47690,9 +48106,376 @@ Options:
             switchView('kanban');
         }
 
-        // Create new custom workflow template (placeholder for future)
-        function openCreateWorkflowModal() {
-            showToast('Custom workflow creation coming soon! Use the default templates for now.', 'info');
+        // State for workflow builder
+        let workflowBuilderTasks = [];
+        let workflowBuilderSelectedIcon = 'ph-git-branch';
+        let editingWorkflowId = null;
+
+        // Available icons for workflow templates
+        const workflowIconOptions = [
+            'ph-git-branch', 'ph-rocket-launch', 'ph-calendar-check', 'ph-handshake',
+            'ph-users', 'ph-lightbulb', 'ph-chart-line', 'ph-clipboard-text',
+            'ph-star', 'ph-flag', 'ph-megaphone', 'ph-package',
+            'ph-gear', 'ph-wrench', 'ph-check-circle', 'ph-briefcase'
+        ];
+
+        // Create new custom workflow template
+        function openCreateWorkflowModal(templateId = null) {
+            // Reset state
+            workflowBuilderTasks = [];
+            workflowBuilderSelectedIcon = 'ph-git-branch';
+            editingWorkflowId = null;
+
+            let workflowName = '';
+            let workflowDescription = '';
+            let isEditing = false;
+
+            // If editing existing workflow
+            if (templateId) {
+                const template = workflowTemplates.find(t => t.id === templateId);
+                if (template) {
+                    isEditing = true;
+                    editingWorkflowId = templateId;
+                    workflowName = template.name;
+                    workflowDescription = template.description || '';
+                    workflowBuilderSelectedIcon = template.icon || 'ph-git-branch';
+                    workflowBuilderTasks = JSON.parse(JSON.stringify(template.tasks || []));
+                }
+            }
+
+            const modalTitle = isEditing ? 'Edit Workflow' : 'Create Workflow';
+            const modalSubtitle = isEditing ? 'Modify this workflow template' : 'Build a reusable workflow template';
+            const saveButtonText = isEditing ? 'Save Changes' : 'Create Workflow';
+
+            // Build icon picker HTML
+            const iconPickerHtml = workflowIconOptions.map(icon => `
+                <div class="workflow-icon-option ${icon === workflowBuilderSelectedIcon ? 'selected' : ''}"
+                     onclick="selectWorkflowIcon('${icon}')" data-icon="${icon}">
+                    <i class="ph ${icon}"></i>
+                </div>
+            `).join('');
+
+            let modalHtml = `
+                <div id="createWorkflowModal" class="modal-overlay" onclick="if(event.target === this) closeCreateWorkflowModal()">
+                    <div class="create-workflow-modal">
+                        <div class="create-workflow-header">
+                            <h3><i class="ph ph-plus-circle"></i> ${modalTitle}</h3>
+                            <p>${modalSubtitle}</p>
+                        </div>
+                        <div class="create-workflow-body">
+                            <div class="create-workflow-section">
+                                <div class="create-workflow-field">
+                                    <label>Workflow Name</label>
+                                    <input type="text" id="workflowBuilderName" placeholder="e.g., Client Onboarding" value="${workflowName}">
+                                </div>
+                                <div class="create-workflow-field">
+                                    <label>Description <span>(optional)</span></label>
+                                    <textarea id="workflowBuilderDescription" placeholder="Describe what this workflow is for...">${workflowDescription}</textarea>
+                                </div>
+                                <div class="create-workflow-field">
+                                    <label>Icon</label>
+                                    <div class="workflow-icon-picker">
+                                        ${iconPickerHtml}
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="create-workflow-section">
+                                <div class="create-workflow-section-title">
+                                    <i class="ph ph-list-checks"></i>
+                                    Tasks in this workflow
+                                </div>
+                                <div class="workflow-tasks-builder">
+                                    <div class="workflow-tasks-header">
+                                        <h4><span id="workflowTaskCount">${workflowBuilderTasks.length}</span> task${workflowBuilderTasks.length !== 1 ? 's' : ''}</h4>
+                                    </div>
+                                    <div class="workflow-tasks-list" id="workflowTasksList">
+                                        ${renderWorkflowBuilderTasks()}
+                                    </div>
+                                    <div style="padding: 0.75rem;">
+                                        <button class="workflow-add-task-btn" onclick="addWorkflowBuilderTask()">
+                                            <i class="ph ph-plus"></i> Add Task
+                                        </button>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="create-workflow-actions">
+                            <div class="left-actions">
+                                ${isEditing && !workflowTemplates.find(t => t.id === templateId)?.isDefault ? `
+                                    <button class="btn btn-danger" onclick="deleteWorkflowTemplate('${templateId}')">
+                                        <i class="ph ph-trash"></i> Delete
+                                    </button>
+                                ` : ''}
+                            </div>
+                            <div class="right-actions">
+                                <button class="btn" onclick="closeCreateWorkflowModal()">Cancel</button>
+                                <button class="btn btn-primary" onclick="saveWorkflowTemplate()">
+                                    <i class="ph ph-check"></i> ${saveButtonText}
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            `;
+
+            // Remove existing modal if any
+            const existingModal = document.getElementById('createWorkflowModal');
+            if (existingModal) existingModal.remove();
+
+            // Add modal to document
+            document.body.insertAdjacentHTML('beforeend', modalHtml);
+
+            // Focus on name input
+            setTimeout(() => {
+                document.getElementById('workflowBuilderName')?.focus();
+            }, 100);
+        }
+
+        function closeCreateWorkflowModal() {
+            const modal = document.getElementById('createWorkflowModal');
+            if (modal) modal.remove();
+            workflowBuilderTasks = [];
+            editingWorkflowId = null;
+        }
+
+        // Select icon for workflow
+        function selectWorkflowIcon(icon) {
+            workflowBuilderSelectedIcon = icon;
+            // Update UI
+            document.querySelectorAll('.workflow-icon-option').forEach(el => {
+                el.classList.toggle('selected', el.dataset.icon === icon);
+            });
+        }
+
+        // Render tasks in the workflow builder
+        function renderWorkflowBuilderTasks() {
+            if (workflowBuilderTasks.length === 0) {
+                return `
+                    <div class="workflow-tasks-empty">
+                        <i class="ph ph-list-dashes"></i>
+                        <p>No tasks yet. Add tasks to build your workflow.</p>
+                    </div>
+                `;
+            }
+
+            return workflowBuilderTasks.map((task, idx) => `
+                <div class="workflow-task-item" data-index="${idx}">
+                    <div class="workflow-task-item-header">
+                        <span class="workflow-task-number">${idx + 1}</span>
+                        <input type="text" value="${task.name || ''}"
+                               placeholder="Task name"
+                               onchange="updateWorkflowBuilderTask(${idx}, 'name', this.value)"
+                               onkeydown="handleWorkflowTaskKeydown(event, ${idx})">
+                        <div class="workflow-task-day-offset">
+                            <span>Day +</span>
+                            <input type="number" value="${task.dayOffset || 0}" min="0"
+                                   onchange="updateWorkflowBuilderTask(${idx}, 'dayOffset', parseInt(this.value) || 0)">
+                        </div>
+                        <div class="workflow-task-item-actions">
+                            ${idx > 0 ? `<button onclick="moveWorkflowBuilderTask(${idx}, -1)" title="Move up"><i class="ph ph-arrow-up"></i></button>` : ''}
+                            ${idx < workflowBuilderTasks.length - 1 ? `<button onclick="moveWorkflowBuilderTask(${idx}, 1)" title="Move down"><i class="ph ph-arrow-down"></i></button>` : ''}
+                            <button class="delete" onclick="removeWorkflowBuilderTask(${idx})" title="Remove task"><i class="ph ph-trash"></i></button>
+                        </div>
+                    </div>
+                    <div class="workflow-task-description">
+                        <input type="text" value="${task.description || ''}"
+                               placeholder="Optional description"
+                               onchange="updateWorkflowBuilderTask(${idx}, 'description', this.value)">
+                    </div>
+                </div>
+            `).join('');
+        }
+
+        // Update the tasks list UI
+        function refreshWorkflowBuilderTasksUI() {
+            const tasksList = document.getElementById('workflowTasksList');
+            const taskCount = document.getElementById('workflowTaskCount');
+            if (tasksList) {
+                tasksList.innerHTML = renderWorkflowBuilderTasks();
+            }
+            if (taskCount) {
+                taskCount.textContent = workflowBuilderTasks.length;
+                taskCount.parentElement.innerHTML = `<span id="workflowTaskCount">${workflowBuilderTasks.length}</span> task${workflowBuilderTasks.length !== 1 ? 's' : ''}`;
+            }
+        }
+
+        // Add a new task to workflow builder
+        function addWorkflowBuilderTask() {
+            const lastTask = workflowBuilderTasks[workflowBuilderTasks.length - 1];
+            const newDayOffset = lastTask ? (lastTask.dayOffset || 0) + 1 : 0;
+
+            workflowBuilderTasks.push({
+                name: '',
+                description: '',
+                dayOffset: newDayOffset
+            });
+
+            refreshWorkflowBuilderTasksUI();
+
+            // Focus on the new task's name input
+            setTimeout(() => {
+                const inputs = document.querySelectorAll('.workflow-task-item-header input[type="text"]');
+                if (inputs.length > 0) {
+                    inputs[inputs.length - 1].focus();
+                }
+            }, 50);
+        }
+
+        // Update a task in workflow builder
+        function updateWorkflowBuilderTask(index, field, value) {
+            if (workflowBuilderTasks[index]) {
+                workflowBuilderTasks[index][field] = value;
+            }
+        }
+
+        // Remove a task from workflow builder
+        function removeWorkflowBuilderTask(index) {
+            workflowBuilderTasks.splice(index, 1);
+            refreshWorkflowBuilderTasksUI();
+        }
+
+        // Move task up or down
+        function moveWorkflowBuilderTask(index, direction) {
+            const newIndex = index + direction;
+            if (newIndex < 0 || newIndex >= workflowBuilderTasks.length) return;
+
+            const temp = workflowBuilderTasks[index];
+            workflowBuilderTasks[index] = workflowBuilderTasks[newIndex];
+            workflowBuilderTasks[newIndex] = temp;
+
+            refreshWorkflowBuilderTasksUI();
+        }
+
+        // Handle keyboard navigation in task list
+        function handleWorkflowTaskKeydown(event, index) {
+            if (event.key === 'Enter') {
+                event.preventDefault();
+                // If last task and pressing enter, add new task
+                if (index === workflowBuilderTasks.length - 1) {
+                    addWorkflowBuilderTask();
+                } else {
+                    // Move to next task
+                    const inputs = document.querySelectorAll('.workflow-task-item-header input[type="text"]');
+                    if (inputs[index + 1]) {
+                        inputs[index + 1].focus();
+                    }
+                }
+            }
+        }
+
+        // Save the workflow template
+        function saveWorkflowTemplate() {
+            const name = document.getElementById('workflowBuilderName')?.value.trim();
+            const description = document.getElementById('workflowBuilderDescription')?.value.trim();
+
+            if (!name) {
+                showToast('Please enter a workflow name', 'error');
+                document.getElementById('workflowBuilderName')?.focus();
+                return;
+            }
+
+            // Filter out empty tasks
+            const validTasks = workflowBuilderTasks.filter(t => t.name && t.name.trim());
+
+            if (validTasks.length === 0) {
+                showToast('Please add at least one task to the workflow', 'error');
+                return;
+            }
+
+            // Clean up tasks
+            const cleanedTasks = validTasks.map(t => ({
+                name: t.name.trim(),
+                description: (t.description || '').trim(),
+                dayOffset: t.dayOffset || 0
+            }));
+
+            if (editingWorkflowId) {
+                // Update existing workflow
+                const idx = workflowTemplates.findIndex(t => t.id === editingWorkflowId);
+                if (idx !== -1) {
+                    workflowTemplates[idx] = {
+                        ...workflowTemplates[idx],
+                        name,
+                        description,
+                        icon: workflowBuilderSelectedIcon,
+                        tasks: cleanedTasks,
+                        updatedAt: new Date().toISOString()
+                    };
+                    showToast(`Workflow "${name}" updated`, 'success');
+                }
+            } else {
+                // Create new workflow
+                const newWorkflow = {
+                    id: 'wf_custom_' + Date.now(),
+                    name,
+                    description,
+                    icon: workflowBuilderSelectedIcon,
+                    isDefault: false,
+                    tasks: cleanedTasks,
+                    createdAt: new Date().toISOString(),
+                    createdBy: SoftrIdentity.getUser()?.id || 'anonymous'
+                };
+
+                workflowTemplates.push(newWorkflow);
+                showToast(`Workflow "${name}" created`, 'success');
+            }
+
+            // Save to localStorage
+            saveWorkspaces();
+
+            // Close modal and refresh view
+            closeCreateWorkflowModal();
+            renderWorkflowsView();
+        }
+
+        // Edit an existing workflow
+        function editWorkflowTemplate(templateId) {
+            openCreateWorkflowModal(templateId);
+        }
+
+        // Delete a workflow template
+        function deleteWorkflowTemplate(templateId) {
+            const template = workflowTemplates.find(t => t.id === templateId);
+            if (!template) return;
+
+            if (template.isDefault) {
+                showToast('Cannot delete default workflow templates', 'error');
+                return;
+            }
+
+            if (!confirm(`Are you sure you want to delete the "${template.name}" workflow?`)) {
+                return;
+            }
+
+            const idx = workflowTemplates.findIndex(t => t.id === templateId);
+            if (idx !== -1) {
+                workflowTemplates.splice(idx, 1);
+                saveWorkspaces();
+                showToast(`Workflow "${template.name}" deleted`, 'success');
+                closeCreateWorkflowModal();
+                renderWorkflowsView();
+            }
+        }
+
+        // Duplicate a workflow template
+        function duplicateWorkflowTemplate(templateId) {
+            const template = workflowTemplates.find(t => t.id === templateId);
+            if (!template) return;
+
+            const newWorkflow = {
+                ...JSON.parse(JSON.stringify(template)),
+                id: 'wf_custom_' + Date.now(),
+                name: template.name + ' (Copy)',
+                isDefault: false,
+                createdAt: new Date().toISOString(),
+                createdBy: SoftrIdentity.getUser()?.id || 'anonymous'
+            };
+
+            workflowTemplates.push(newWorkflow);
+            saveWorkspaces();
+            showToast(`Workflow "${newWorkflow.name}" created`, 'success');
+            renderWorkflowsView();
         }
 
         // ============================================
