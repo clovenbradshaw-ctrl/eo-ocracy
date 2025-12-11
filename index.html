@@ -7192,6 +7192,78 @@
         }
 
         /* ========================================== */
+        /* Task Movement Confirmation Modal */
+        /* ========================================== */
+
+        .task-confirm-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(61, 46, 31, 0.7);
+            display: none;
+            align-items: center;
+            justify-content: center;
+            z-index: 2000;
+        }
+
+        .task-confirm-overlay.active {
+            display: flex;
+        }
+
+        .task-confirm-modal {
+            background: white;
+            border-radius: 16px;
+            width: 100%;
+            max-width: 440px;
+            box-shadow: 0 8px 40px rgba(61, 46, 31, 0.3);
+            overflow: hidden;
+            text-align: center;
+        }
+
+        .task-confirm-icon {
+            padding: 2rem 2rem 1rem;
+            font-size: 3rem;
+            color: #f59e0b;
+        }
+
+        .task-confirm-content {
+            padding: 0 2rem 1.5rem;
+        }
+
+        .task-confirm-content h3 {
+            margin: 0 0 0.75rem;
+            color: #3D2E1F;
+            font-size: 1.25rem;
+        }
+
+        .task-confirm-content p {
+            margin: 0;
+            color: #6B5642;
+            font-size: 0.9rem;
+            line-height: 1.5;
+        }
+
+        .task-confirm-actions {
+            display: flex;
+            gap: 0.75rem;
+            justify-content: center;
+            padding: 1.25rem 1.5rem;
+            background: #FAF7F5;
+            border-top: 1px solid #E5DDD1;
+        }
+
+        .task-confirm-actions .modal-action-btn.warning {
+            background: #f59e0b;
+            color: white;
+        }
+
+        .task-confirm-actions .modal-action-btn.warning:hover {
+            background: #d97706;
+        }
+
+        /* ========================================== */
         /* Bulk Import Modal Styles */
         /* ========================================== */
 
@@ -10938,26 +11010,26 @@
             }
         }
 
-        /* Drop zone blocked indicator */
-        .kanban-column-content.drop-blocked {
+        /* Drop zone warning indicator (soft hint, not blocking) */
+        .kanban-column-content.drop-warning {
             background: repeating-linear-gradient(
                 -45deg,
-                rgba(198, 40, 40, 0.05),
-                rgba(198, 40, 40, 0.05) 10px,
-                rgba(198, 40, 40, 0.1) 10px,
-                rgba(198, 40, 40, 0.1) 20px
+                rgba(245, 158, 11, 0.05),
+                rgba(245, 158, 11, 0.05) 10px,
+                rgba(245, 158, 11, 0.1) 10px,
+                rgba(245, 158, 11, 0.1) 20px
             ) !important;
-            border: 2px dashed #C62828;
+            border: 2px dashed #f59e0b;
             position: relative;
         }
 
-        .kanban-column-content.drop-blocked::before {
-            content: attr(data-block-reason);
+        .kanban-column-content.drop-warning::before {
+            content: attr(data-warning-reason);
             position: absolute;
             top: 50%;
             left: 50%;
             transform: translate(-50%, -50%);
-            background: linear-gradient(135deg, #DC2626, #B91C1C);
+            background: linear-gradient(135deg, #f59e0b, #d97706);
             color: white;
             padding: 0.75rem 1.25rem;
             border-radius: 8px;
@@ -10968,21 +11040,14 @@
             max-width: 85%;
             line-height: 1.4;
             z-index: 100;
-            box-shadow: 0 4px 12px rgba(185, 28, 28, 0.3);
-            animation: shake-blocked 0.5s ease-in-out;
+            box-shadow: 0 4px 12px rgba(245, 158, 11, 0.3);
         }
 
-        @keyframes shake-blocked {
-            0%, 100% { transform: translate(-50%, -50%) rotate(0deg); }
-            25% { transform: translate(-50%, -50%) rotate(-2deg); }
-            75% { transform: translate(-50%, -50%) rotate(2deg); }
-        }
-
-        .kanban-column-content.drop-blocked::after {
+        .kanban-column-content.drop-warning::after {
             content: '';
             position: absolute;
             inset: 0;
-            background: rgba(198, 40, 40, 0.05);
+            background: rgba(245, 158, 11, 0.05);
             pointer-events: none;
         }
 
@@ -16031,6 +16096,26 @@
                 <button class="modal-action-btn danger" onclick="confirmDelete()">
                     <i class="ph ph-trash"></i>
                     Delete
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Task Movement Confirmation Modal -->
+    <div id="taskConfirmModal" class="task-confirm-overlay" onclick="if(event.target === this) closeTaskConfirmModal()">
+        <div class="task-confirm-modal">
+            <div class="task-confirm-icon">
+                <i class="ph ph-warning"></i>
+            </div>
+            <div class="task-confirm-content">
+                <h3 id="taskConfirmTitle">Move Task?</h3>
+                <p id="taskConfirmText">Are you sure you want to move this task?</p>
+            </div>
+            <div class="task-confirm-actions">
+                <button class="modal-action-btn secondary" onclick="closeTaskConfirmModal()">Cancel</button>
+                <button class="modal-action-btn warning" id="taskConfirmBtn" onclick="confirmTaskMove()">
+                    <i class="ph ph-arrow-right"></i>
+                    Move Anyway
                 </button>
             </div>
         </div>
@@ -31722,8 +31807,80 @@ Options:
             }
         }
 
-        // Update task status
-        function updateTaskStatus(taskId, newStatus) {
+        // ========================================
+        // Task Movement Confirmation System
+        // ========================================
+
+        let pendingTaskMove = null; // Stores pending move info: { taskId, newStatus, callback }
+
+        function getStatusLabel(status) {
+            return status === 'completed' ? 'Done' : (status === 'in_progress' ? 'In Progress' : 'To Do');
+        }
+
+        function getStatusOrder(status) {
+            const order = { 'pending': 0, 'in_progress': 1, 'completed': 2 };
+            return order[status] ?? 0;
+        }
+
+        // Check if task movement needs confirmation and return warning info
+        function checkTaskMoveWarning(taskId, newStatus) {
+            const task = entities.task.find(t => t.id === taskId);
+            if (!task) return null;
+
+            const newStatusOrder = getStatusOrder(newStatus);
+            const warnings = [];
+
+            // Check 1: Subtask moving beyond parent's status
+            if (task.predecessorId) {
+                const parent = entities.task.find(t => t.id === task.predecessorId);
+                if (parent) {
+                    const parentStatusOrder = getStatusOrder(parent.status);
+                    if (newStatusOrder > parentStatusOrder) {
+                        warnings.push({
+                            type: 'subtask_ahead',
+                            message: `Parent task "${parent.name}" is still "${getStatusLabel(parent.status)}".`
+                        });
+                    }
+                }
+            }
+
+            // Check 2: Parent moving to Done with incomplete subtasks
+            const subtasks = entities.task.filter(t => t.predecessorId === taskId);
+            if (subtasks.length > 0 && newStatus === 'completed') {
+                const incompleteSubtasks = subtasks.filter(t => t.status !== 'completed');
+                if (incompleteSubtasks.length > 0) {
+                    warnings.push({
+                        type: 'incomplete_subtasks',
+                        count: incompleteSubtasks.length,
+                        message: `This task has ${incompleteSubtasks.length} incomplete subtask${incompleteSubtasks.length > 1 ? 's' : ''}.`
+                    });
+                }
+            }
+
+            return warnings.length > 0 ? warnings : null;
+        }
+
+        function showTaskConfirmModal(title, message, callback) {
+            document.getElementById('taskConfirmTitle').textContent = title;
+            document.getElementById('taskConfirmText').innerHTML = message;
+            document.getElementById('taskConfirmModal').classList.add('active');
+            pendingTaskMove = { callback };
+        }
+
+        function closeTaskConfirmModal() {
+            document.getElementById('taskConfirmModal').classList.remove('active');
+            pendingTaskMove = null;
+        }
+
+        function confirmTaskMove() {
+            if (pendingTaskMove && pendingTaskMove.callback) {
+                pendingTaskMove.callback();
+            }
+            closeTaskConfirmModal();
+        }
+
+        // Actually perform the task status update (no confirmation)
+        function executeTaskStatusUpdate(taskId, newStatus, refreshModal = true) {
             const task = entities.task.find(t => t.id === taskId);
             if (!task) return;
 
@@ -31738,11 +31895,31 @@ Options:
             });
 
             // Re-render the modal to update the UI
-            openEntityModal(taskId, 'task');
+            if (refreshModal) {
+                openEntityModal(taskId, 'task');
+            }
 
             // Update task board if visible
             if (document.getElementById('taskBoardView')?.classList.contains('active')) {
                 renderTaskBoard();
+            }
+        }
+
+        // Update task status (with confirmation if needed)
+        function updateTaskStatus(taskId, newStatus) {
+            const task = entities.task.find(t => t.id === taskId);
+            if (!task) return;
+
+            const warnings = checkTaskMoveWarning(taskId, newStatus);
+
+            if (warnings) {
+                const warningMessages = warnings.map(w => w.message).join('<br><br>');
+                const title = `Move to "${getStatusLabel(newStatus)}"?`;
+                showTaskConfirmModal(title, warningMessages, () => {
+                    executeTaskStatusUpdate(taskId, newStatus);
+                });
+            } else {
+                executeTaskStatusUpdate(taskId, newStatus);
             }
         }
 
@@ -34379,8 +34556,13 @@ Options:
 
         function toggleSubtaskStatus(subtaskId, parentTaskId) {
             const subtask = entities.task?.find(t => t.id === subtaskId);
-            if (subtask) {
-                subtask.status = subtask.status === 'completed' ? 'pending' : 'completed';
+            if (!subtask) return;
+
+            const newStatus = subtask.status === 'completed' ? 'pending' : 'completed';
+            const warnings = checkTaskMoveWarning(subtaskId, newStatus);
+
+            const executeToggle = () => {
+                subtask.status = newStatus;
                 saveToLocalStorage();
 
                 // Execute automation rules
@@ -34390,6 +34572,14 @@ Options:
 
                 // Refresh the task modal
                 openEntityModal(parentTaskId, 'task');
+            };
+
+            if (warnings) {
+                const warningMessages = warnings.map(w => w.message).join('<br><br>');
+                const title = `Mark as "${getStatusLabel(newStatus)}"?`;
+                showTaskConfirmModal(title, warningMessages, executeToggle);
+            } else {
+                executeToggle();
             }
         }
 
@@ -35246,32 +35436,6 @@ Options:
                 });
         }
 
-        // Get the status order for comparison
-        function getStatusOrder(status) {
-            const order = { 'pending': 0, 'in_progress': 1, 'completed': 2 };
-            return order[status] ?? 0;
-        }
-
-        // Check if parent can move to target status (parents can always move - they're the prerequisite)
-        function canParentMoveToStatus(parentTaskId, targetStatus) {
-            return true; // Parents can always advance - children depend on them, not vice versa
-        }
-
-        // Check if a subtask can move to target status (predecessor must be at or beyond target)
-        function canSubtaskMoveToStatus(taskId, targetStatus) {
-            const task = entities.task.find(t => t.id === taskId);
-            if (!task || !task.predecessorId) return true; // No predecessor, can move freely
-
-            const predecessor = entities.task.find(t => t.id === task.predecessorId);
-            if (!predecessor) return true; // Predecessor not found, allow move
-
-            const targetOrder = getStatusOrder(targetStatus);
-            const predecessorOrder = getStatusOrder(predecessor.status);
-
-            // Subtask can only advance if predecessor is at or beyond target status
-            return predecessorOrder >= targetOrder;
-        }
-
         // Get all related task IDs (parent and all its subtasks)
         function getRelatedTaskIds(taskId) {
             const task = entities.task.find(t => t.id === taskId);
@@ -35503,26 +35667,23 @@ Options:
                 drawSubtaskConnections(draggedTaskId, relatedIds);
             }
 
-            // Mark columns that are blocked for subtasks (predecessor must be at/beyond target)
+            // Show warning hint on columns where movement will need confirmation
             const task = entities.task.find(t => t.id === draggedTaskId);
             if (task && task.predecessorId) {
                 const predecessor = entities.task.find(t => t.id === task.predecessorId);
                 if (predecessor) {
-                    const predecessorStatus = getStatusOrder(predecessor.status);
+                    const predecessorStatusOrder = getStatusOrder(predecessor.status);
 
                     document.querySelectorAll('.kanban-column').forEach(column => {
                         const targetStatus = column.dataset.status;
                         const targetOrder = getStatusOrder(targetStatus);
                         const columnContent = column.querySelector('.kanban-column-content');
 
-                        // Subtask can't advance beyond predecessor's status
-                        if (targetOrder > predecessorStatus) {
-                            columnContent.classList.add('drop-blocked');
-
-                            // Set specific block reason
-                            const predecessorStatusLabel = predecessor.status === 'completed' ? 'Done' : (predecessor.status === 'in_progress' ? 'In Progress' : 'To Do');
+                        // Show warning hint if subtask would move beyond predecessor's status
+                        if (targetOrder > predecessorStatusOrder) {
+                            columnContent.classList.add('drop-warning');
                             const targetStatusLabel = targetStatus === 'completed' ? 'Done' : (targetStatus === 'in_progress' ? 'In Progress' : 'To Do');
-                            columnContent.dataset.blockReason = `✗ "${predecessor.name}" must be "${targetStatusLabel}" first`;
+                            columnContent.dataset.warningReason = `⚠ "${predecessor.name}" is not "${targetStatusLabel}" yet`;
                         }
                     });
                 }
@@ -35536,8 +35697,8 @@ Options:
             // Remove all visual states
             document.querySelectorAll('.kanban-column-content').forEach(col => {
                 col.classList.remove('drag-over');
-                col.classList.remove('drop-blocked');
-                delete col.dataset.blockReason;
+                col.classList.remove('drop-warning');
+                delete col.dataset.warningReason;
             });
 
             // Remove highlight/fade from all cards
@@ -35552,15 +35713,7 @@ Options:
 
         function handleKanbanDragOver(event) {
             event.preventDefault();
-
             const columnContent = event.currentTarget;
-
-            // If this column is blocked, don't show drag-over effect
-            if (columnContent.classList.contains('drop-blocked')) {
-                event.dataTransfer.dropEffect = 'none';
-                return;
-            }
-
             columnContent.classList.add('drag-over');
         }
 
@@ -35576,30 +35729,35 @@ Options:
 
             const newStatus = event.currentTarget.parentElement.dataset.status;
             const task = entities.task.find(t => t.id === draggedTaskId);
+            const taskId = draggedTaskId; // Capture for closure
 
             if (!task || task.status === newStatus) return;
 
-            // Check if this is a subtask - it can only advance if predecessor is at/beyond target
-            if (task.predecessorId) {
-                if (!canSubtaskMoveToStatus(draggedTaskId, newStatus)) {
-                    const predecessor = entities.task.find(t => t.id === task.predecessorId);
-                    const predecessorName = predecessor ? predecessor.name : 'predecessor task';
-                    const targetStatusLabel = newStatus === 'completed' ? 'Done' : (newStatus === 'in_progress' ? 'In Progress' : 'To Do');
-                    showToast(`Cannot advance: "${predecessorName}" must be moved to "${targetStatusLabel}" first`, 'warning');
-                    return;
-                }
+            const warnings = checkTaskMoveWarning(taskId, newStatus);
+
+            const executeMove = () => {
+                const t = entities.task.find(t => t.id === taskId);
+                if (!t) return;
+
+                t.status = newStatus;
+                saveToLocalStorage();
+
+                logActivityToXano({
+                    event_verb: 'Update Status',
+                    object_type: 'task',
+                    object_label: `${t.name} → ${newStatus}`
+                });
+
+                renderKanbanBoard();
+            };
+
+            if (warnings) {
+                const warningMessages = warnings.map(w => w.message).join('<br><br>');
+                const title = `Move to "${getStatusLabel(newStatus)}"?`;
+                showTaskConfirmModal(title, warningMessages, executeMove);
+            } else {
+                executeMove();
             }
-
-            task.status = newStatus;
-            saveToLocalStorage();
-
-            logActivityToXano({
-                event_verb: 'Update Status',
-                object_type: 'task',
-                object_label: `${task.name} → ${newStatus}`
-            });
-
-            renderKanbanBoard();
         }
 
         // Draw SVG lines connecting parent to subtasks
