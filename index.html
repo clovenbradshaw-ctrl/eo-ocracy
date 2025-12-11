@@ -10867,6 +10867,35 @@
             box-shadow: 0 4px 12px rgba(156, 39, 176, 0.3);
         }
 
+        /* Airtable linked chip */
+        .quick-add-meta-chip.has-airtable-tags {
+            background: linear-gradient(135deg, #F59E0B 0%, #D97706 100%);
+            color: white;
+            border: 1px solid #F59E0B;
+            border-style: solid;
+        }
+
+        .quick-add-meta-chip.has-airtable-tags:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(245, 158, 11, 0.3);
+        }
+
+        /* Quick add airtable tags container */
+        .quick-add-airtable-tags {
+            padding: 12px 24px;
+            border-bottom: 1px solid #f0f0f0;
+        }
+
+        .quick-add-airtable-tags-list {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 8px;
+        }
+
+        .quick-add-airtable-tags-list .airtable-tag {
+            margin: 0;
+        }
+
         /* Visibility dropdown with team selector */
         .quick-add-visibility-dropdown {
             position: absolute;
@@ -17962,6 +17991,62 @@
             border-color: #C88F4A;
             color: #C88F4A;
             background: #FDF8F3;
+        }
+
+        /* Hero Task Modal - Airtable Linked Records */
+        .hero-airtable-tags-container {
+            background: #FAFAFA;
+            border: 1px solid #E5E7EB;
+            border-radius: 8px;
+            padding: 12px;
+        }
+
+        .hero-airtable-tags-list {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 8px;
+            margin-bottom: 8px;
+        }
+
+        .hero-airtable-tags-list:empty {
+            margin-bottom: 0;
+        }
+
+        .hero-airtable-tags-list .airtable-tag {
+            margin: 0;
+        }
+
+        .hero-airtable-add-btn {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            padding: 8px 14px;
+            border: 1px dashed #C88F4A;
+            border-radius: 6px;
+            background: transparent;
+            color: #C88F4A;
+            font-size: 13px;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .hero-airtable-add-btn:hover {
+            background: #FDF8F3;
+            border-style: solid;
+        }
+
+        .hero-airtable-hint {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            margin-top: 8px;
+            font-size: 12px;
+            color: #9CA3AF;
+        }
+
+        .hero-airtable-hint i {
+            font-size: 14px;
         }
 
         /* Airtable Tag Picker Modal */
@@ -36386,6 +36471,13 @@ Cmd/Ctrl + K - Command palette
                 tagsContainer.querySelectorAll('.task-tag').forEach(el => el.remove());
             }
 
+            // Reset Airtable linked records
+            heroAirtableTags = [];
+            const airtableTagsList = document.getElementById('heroAirtableTagsList');
+            if (airtableTagsList) {
+                airtableTagsList.innerHTML = '';
+            }
+
             // Reset collaborators
             heroCollaborators = [];
             renderCollaboratorAvatars();
@@ -37306,12 +37398,18 @@ Cmd/Ctrl + K - Command palette
                 return;
             }
 
+            // Check which mode we're in (create, quick add, or edit)
+            const isCreateMode = airtablePickerState.taskId === '__CREATE_MODE__';
+            const isQuickAddMode = airtablePickerState.taskId === '__QUICK_ADD_MODE__';
+            const selectFn = isCreateMode ? 'selectAirtableRecordForCreate' :
+                            isQuickAddMode ? 'selectAirtableRecordForQuickAdd' : 'selectAirtableRecord';
+
             resultsContainer.innerHTML = results.map(record => {
                 const displayField = config?.displayField || 'Name';
                 const name = record.fields?.[displayField] || record.label || 'Unnamed';
 
                 return `
-                    <div class="airtable-picker-item type-${category}" onclick="selectAirtableRecord('${record.id}', '${escapeHtml(name)}')">
+                    <div class="airtable-picker-item type-${category}" onclick="${selectFn}('${record.id}', '${escapeHtml(name)}')">
                         <div class="item-icon">
                             <i class="ph ${config?.icon || 'ph-tag'}"></i>
                         </div>
@@ -38349,6 +38447,7 @@ Options:
             roleId: null,
             description: '',
             tags: [],
+            airtableTags: [],          // Airtable linked records
             visibility: 'public',      // 'public', 'team', or 'private'
             visibilityTeamId: null     // Team ID when visibility is 'team'
         };
@@ -38400,6 +38499,7 @@ Options:
                 roleId: null,
                 description: '',
                 tags: tags,
+                airtableTags: [],
                 visibility: 'public',
                 visibilityTeamId: null
             };
@@ -38436,6 +38536,14 @@ Options:
 
             // Reset quick add priority dots to medium
             selectQuickAddPriority('medium');
+
+            // Reset airtable tags UI
+            const airtableContainer = document.getElementById('quickAddAirtableTags');
+            const airtableChip = document.getElementById('quickAddAirtableChip');
+            const airtableLabel = document.getElementById('quickAddAirtableLabel');
+            if (airtableContainer) airtableContainer.style.display = 'none';
+            if (airtableChip) airtableChip.classList.remove('has-airtable-tags');
+            if (airtableLabel) airtableLabel.textContent = 'Link record';
         }
 
         function closeQuickAddModalOnBackdrop(event) {
@@ -38495,7 +38603,7 @@ Options:
                 recurring: null,
                 producesProductId: null,
                 followsWorkflowId: null,
-                airtableTags: [],  // Airtable record tags (clients, cases, events, apps)
+                airtableTags: [...quickAddModalState.airtableTags],  // Airtable record tags (clients, cases, events, apps)
                 createdAt: new Date().toISOString(),
                 createdBy: currentUserId,
                 visibility: quickAddModalState.visibility,
@@ -38915,6 +39023,155 @@ Options:
                 hideAllQuickAddDropdowns();
             }
             updateQuickAddModalChips();
+        }
+
+        // ============================================
+        // QUICK ADD AIRTABLE LINKING
+        // ============================================
+
+        // Open Airtable picker for quick add modal
+        function openQuickAddAirtablePicker() {
+            airtablePickerState = {
+                isOpen: true,
+                taskId: '__QUICK_ADD_MODE__', // Special marker for quick add mode
+                selectedCategory: null,
+                searchQuery: '',
+                isLoading: false,
+                results: []
+            };
+
+            // Create or show the picker modal
+            let overlay = document.getElementById('airtablePickerOverlay');
+            if (!overlay) {
+                createAirtablePickerModal();
+                overlay = document.getElementById('airtablePickerOverlay');
+            }
+
+            // Reset UI state
+            document.getElementById('airtablePickerSearch').value = '';
+            document.getElementById('airtablePickerResults').innerHTML = `
+                <div class="airtable-picker-empty">
+                    <i class="ph ph-hand-pointing" style="font-size: 32px; margin-bottom: 8px;"></i>
+                    <div>Select a category above to browse records</div>
+                </div>
+            `;
+
+            // Clear active category buttons
+            document.querySelectorAll('.airtable-picker-category-btn').forEach(btn => {
+                btn.classList.remove('active');
+            });
+
+            // Show overlay
+            overlay.classList.add('show');
+        }
+
+        // Select a record for quick add mode
+        async function selectAirtableRecordForQuickAdd(recordId, label) {
+            const category = airtablePickerState.selectedCategory;
+            const config = AirtableAPI.getTableConfig(category);
+
+            if (!category) {
+                console.error('No category selected');
+                return;
+            }
+
+            // Check if already tagged
+            if (quickAddModalState.airtableTags.some(t => t.id === recordId)) {
+                showToast('Record already linked', 'info');
+                closeAirtableTagPicker();
+                return;
+            }
+
+            // Create the tag object
+            const tag = {
+                id: recordId,
+                type: category,
+                table: config.tableId,
+                label: label,
+                clientId: null
+            };
+
+            // For cases and applications, resolve the parent client ID
+            if (category === 'cases' || category === 'applications') {
+                try {
+                    const result = await AirtableAPI.getRecordWithParents(category, recordId);
+                    if (result.clientId) {
+                        tag.clientId = result.clientId;
+                    } else if (result.parents?.client?.id) {
+                        tag.clientId = result.parents.client.id;
+                    }
+                } catch (e) {
+                    console.warn('Could not resolve parent client:', e);
+                }
+            }
+
+            // For clients, clientId is the record itself
+            if (category === 'clients') {
+                tag.clientId = recordId;
+            }
+
+            // Add the tag to quick add state
+            quickAddModalState.airtableTags.push(tag);
+
+            // Update UI
+            closeAirtableTagPicker();
+            renderQuickAddAirtableTags();
+            updateQuickAddAirtableChip();
+            showToast(`Linked ${label}`, 'success');
+        }
+
+        // Render Airtable tags in the quick add modal
+        function renderQuickAddAirtableTags() {
+            const container = document.getElementById('quickAddAirtableTags');
+            const list = document.getElementById('quickAddAirtableTagsList');
+
+            if (!container || !list) return;
+
+            if (quickAddModalState.airtableTags.length === 0) {
+                container.style.display = 'none';
+                return;
+            }
+
+            container.style.display = 'block';
+            list.innerHTML = quickAddModalState.airtableTags.map(tag => {
+                const config = AirtableAPI.getTableConfig(tag.type);
+                const icon = config?.icon || 'ph-tag';
+                const typeLabel = config?.label || tag.type.toUpperCase();
+
+                return `
+                    <div class="airtable-tag tag-${tag.type}">
+                        <i class="ph ${icon} tag-icon"></i>
+                        <span class="tag-label">${escapeHtml(tag.label)}</span>
+                        <span class="tag-type">${typeLabel}</span>
+                        <span class="tag-remove" onclick="event.stopPropagation(); removeQuickAddAirtableTag('${tag.id}')" title="Remove">
+                            <i class="ph ph-x"></i>
+                        </span>
+                    </div>
+                `;
+            }).join('');
+        }
+
+        // Remove an Airtable tag from quick add state
+        function removeQuickAddAirtableTag(tagId) {
+            quickAddModalState.airtableTags = quickAddModalState.airtableTags.filter(t => t.id !== tagId);
+            renderQuickAddAirtableTags();
+            updateQuickAddAirtableChip();
+        }
+
+        // Update the Airtable chip appearance
+        function updateQuickAddAirtableChip() {
+            const chip = document.getElementById('quickAddAirtableChip');
+            const label = document.getElementById('quickAddAirtableLabel');
+            if (!chip || !label) return;
+
+            const count = quickAddModalState.airtableTags.length;
+            if (count > 0) {
+                chip.classList.add('has-airtable-tags');
+                label.textContent = `${count} linked`;
+            } else {
+                chip.classList.remove('has-airtable-tags');
+                label.textContent = 'Link record';
+            }
         }
 
         function updateVisibilityChip() {
@@ -39477,6 +39734,7 @@ Options:
         // TAGS SYSTEM
         // ============================================
         let heroTaskTags = [];
+        let heroAirtableTags = []; // Airtable linked records for task creation
         const tagColors = ['blue', 'green', 'yellow', 'red', 'purple', 'pink', 'orange'];
 
         function handleTagInput(event) {
@@ -39516,6 +39774,134 @@ Options:
         function removeHeroTag(tag) {
             heroTaskTags = heroTaskTags.filter(t => t !== tag);
             renderHeroTags();
+        }
+
+        // ============================================
+        // AIRTABLE LINKED RECORDS FOR TASK CREATION
+        // ============================================
+
+        // Open Airtable picker for task creation mode
+        function openAirtableTagPickerForCreate() {
+            airtablePickerState = {
+                isOpen: true,
+                taskId: '__CREATE_MODE__', // Special marker for create mode
+                selectedCategory: null,
+                searchQuery: '',
+                isLoading: false,
+                results: []
+            };
+
+            // Create or show the picker modal
+            let overlay = document.getElementById('airtablePickerOverlay');
+            if (!overlay) {
+                createAirtablePickerModal();
+                overlay = document.getElementById('airtablePickerOverlay');
+            }
+
+            // Reset UI state
+            document.getElementById('airtablePickerSearch').value = '';
+            document.getElementById('airtablePickerResults').innerHTML = `
+                <div class="airtable-picker-empty">
+                    <i class="ph ph-hand-pointing" style="font-size: 32px; margin-bottom: 8px;"></i>
+                    <div>Select a category above to browse records</div>
+                </div>
+            `;
+
+            // Clear active category buttons
+            document.querySelectorAll('.airtable-picker-category-btn').forEach(btn => {
+                btn.classList.remove('active');
+            });
+
+            // Show overlay
+            overlay.classList.add('show');
+        }
+
+        // Select a record for create mode (adds to heroAirtableTags)
+        async function selectAirtableRecordForCreate(recordId, label) {
+            const category = airtablePickerState.selectedCategory;
+            const config = AirtableAPI.getTableConfig(category);
+
+            if (!category) {
+                console.error('No category selected');
+                return;
+            }
+
+            // Check if already tagged
+            if (heroAirtableTags.some(t => t.id === recordId)) {
+                showToast('Record already linked', 'info');
+                closeAirtableTagPicker();
+                return;
+            }
+
+            // Create the tag object
+            const tag = {
+                id: recordId,
+                type: category,
+                table: config.tableId,
+                label: label,
+                clientId: null
+            };
+
+            // For cases and applications, resolve the parent client ID
+            if (category === 'cases' || category === 'applications') {
+                try {
+                    const result = await AirtableAPI.getRecordWithParents(category, recordId);
+                    if (result.clientId) {
+                        tag.clientId = result.clientId;
+                    } else if (result.parents?.client?.id) {
+                        tag.clientId = result.parents.client.id;
+                    }
+                } catch (e) {
+                    console.warn('Could not resolve parent client:', e);
+                }
+            }
+
+            // For clients, clientId is the record itself
+            if (category === 'clients') {
+                tag.clientId = recordId;
+            }
+
+            // Add the tag to hero state
+            heroAirtableTags.push(tag);
+
+            // Update UI
+            closeAirtableTagPicker();
+            renderHeroAirtableTags();
+            showToast(`Linked ${label}`, 'success');
+        }
+
+        // Render Airtable tags in the hero task modal
+        function renderHeroAirtableTags() {
+            const container = document.getElementById('heroAirtableTagsList');
+            if (!container) return;
+
+            if (heroAirtableTags.length === 0) {
+                container.innerHTML = '';
+                return;
+            }
+
+            container.innerHTML = heroAirtableTags.map(tag => {
+                const config = AirtableAPI.getTableConfig(tag.type);
+                const icon = config?.icon || 'ph-tag';
+                const typeLabel = config?.label || tag.type.toUpperCase();
+
+                return `
+                    <div class="airtable-tag tag-${tag.type}">
+                        <i class="ph ${icon} tag-icon"></i>
+                        <span class="tag-label">${escapeHtml(tag.label)}</span>
+                        <span class="tag-type">${typeLabel}</span>
+                        <span class="tag-remove" onclick="event.stopPropagation(); removeHeroAirtableTag('${tag.id}')" title="Remove">
+                            <i class="ph ph-x"></i>
+                        </span>
+                    </div>
+                `;
+            }).join('');
+        }
+
+        // Remove an Airtable tag from hero state
+        function removeHeroAirtableTag(tagId) {
+            heroAirtableTags = heroAirtableTags.filter(t => t.id !== tagId);
+            renderHeroAirtableTags();
         }
 
         // ============================================
@@ -41135,7 +41521,7 @@ Options:
                     recurring: recurringValue || null,
                     producesProductId: null,
                     followsWorkflowId: workflowId || null,
-                    airtableTags: [],  // Airtable record tags (clients, cases, events, apps)
+                    airtableTags: [...heroAirtableTags],  // Airtable record tags (clients, cases, events, apps)
                     createdAt: new Date().toISOString(),
                     createdBy: currentUserId,
                     visibility: heroVisibility || 'public',
@@ -43941,6 +44327,22 @@ Options:
                     </div>
                 </div>
 
+                <!-- Airtable Linked Records -->
+                <div class="hero-task-input-group" style="margin-top: 1rem;">
+                    <label class="hero-task-label"><i class="ph ph-database"></i> Linked Records (Optional)</label>
+                    <div class="hero-airtable-tags-container" id="heroAirtableTagsContainer">
+                        <div class="hero-airtable-tags-list" id="heroAirtableTagsList">
+                            <!-- Airtable tags will be rendered here -->
+                        </div>
+                        <button type="button" class="hero-airtable-add-btn" onclick="openAirtableTagPickerForCreate()">
+                            <i class="ph ph-plus"></i> Link Client, Case, Event...
+                        </button>
+                    </div>
+                    <div class="hero-airtable-hint">
+                        <i class="ph ph-info"></i> Link this task to Airtable records for easy filtering and navigation
+                    </div>
+                </div>
+
                 <!-- Visibility Setting -->
                 <div class="hero-task-input-group" style="margin-top: 1rem;">
                     <label class="hero-task-label"><i class="ph ph-eye"></i> Visibility</label>
@@ -44184,6 +44586,17 @@ Options:
                 <div class="quick-add-meta-chip visibility-public" id="quickAddVisibilityChip" onclick="toggleQuickAddVisibilityPicker()">
                     <i class="ph ph-globe" id="quickAddVisibilityIcon"></i>
                     <span id="quickAddVisibilityLabel">Public</span>
+                </div>
+                <div class="quick-add-meta-chip" id="quickAddAirtableChip" onclick="openQuickAddAirtablePicker()">
+                    <i class="ph ph-database"></i>
+                    <span id="quickAddAirtableLabel">Link record</span>
+                </div>
+            </div>
+
+            <!-- Airtable Linked Records Container -->
+            <div class="quick-add-airtable-tags" id="quickAddAirtableTags" style="display: none;">
+                <div class="quick-add-airtable-tags-list" id="quickAddAirtableTagsList">
+                    <!-- Airtable tags will be rendered here -->
                 </div>
             </div>
 
