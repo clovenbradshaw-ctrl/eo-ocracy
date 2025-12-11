@@ -17287,6 +17287,118 @@
             margin-left: 0.5rem;
         }
 
+        /* Elevated Comments Section - Always Visible */
+        .elevated-comments-section {
+            margin-top: 16px;
+            background: linear-gradient(135deg, #FFFBF5 0%, #FFF8F0 100%);
+            border: 1px solid #E8DED0;
+            border-radius: 12px;
+            padding: 16px;
+            position: relative;
+        }
+
+        .elevated-comments-section::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 3px;
+            background: linear-gradient(90deg, #C88F4A 0%, #E5B87A 100%);
+            border-radius: 12px 12px 0 0;
+        }
+
+        .elevated-comments-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-bottom: 12px;
+        }
+
+        .elevated-comments-title {
+            font-size: 15px;
+            font-weight: 600;
+            color: #5B4636;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .elevated-comments-title i {
+            font-size: 18px;
+            color: #C88F4A;
+        }
+
+        .elevated-comments-count {
+            background: #C88F4A;
+            color: white;
+            padding: 2px 8px;
+            border-radius: 10px;
+            font-size: 11px;
+            font-weight: 600;
+        }
+
+        .elevated-comments-section .task-comments {
+            margin-top: 0;
+            border-top: none;
+            padding-top: 0;
+        }
+
+        .elevated-comments-section .task-comments-header {
+            display: none;
+        }
+
+        .elevated-comments-section .comment-input-container {
+            background: white;
+            border: 1px solid #E5DDD1;
+            box-shadow: 0 2px 8px rgba(200, 143, 74, 0.08);
+        }
+
+        .elevated-comments-section .comment-input-container:focus-within {
+            border-color: #C88F4A;
+            box-shadow: 0 2px 12px rgba(200, 143, 74, 0.15);
+        }
+
+        /* More Details Collapsible Section */
+        .more-details-section {
+            margin-top: 12px;
+            border-top: 1px solid #f0f0f0;
+            padding-top: 8px;
+        }
+
+        .more-details-toggle {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 10px 4px;
+            color: #888;
+            font-size: 13px;
+            cursor: pointer;
+            transition: all 0.2s;
+            user-select: none;
+        }
+
+        .more-details-toggle:hover {
+            color: #666;
+        }
+
+        .more-details-toggle i {
+            transition: transform 0.2s;
+        }
+
+        .more-details-toggle.expanded i {
+            transform: rotate(90deg);
+        }
+
+        .more-details-content {
+            display: none;
+            padding-top: 8px;
+        }
+
+        .more-details-content.show {
+            display: block;
+        }
+
         /* Collapsible Section Styles */
         .collapsible-section {
             margin-top: 1rem;
@@ -39771,105 +39883,123 @@ Cmd/Ctrl + K - Command palette
                     <!-- Airtable Linked Records - Always Visible -->
                     ${renderAirtableTags(task)}
 
-                    <!-- Option Links for Additional Features -->
-                    <div class="simple-task-options">
-                        <!-- Subtasks Link -->
-                        <div class="simple-task-option-link" onclick="toggleSimpleTaskSection('subtasks_${task.id}')">
-                            <div class="simple-task-option-text">
-                                <i class="ph ph-list-checks"></i>
-                                <span>Subtasks</span>
-                                ${subtasks.length > 0 ? `<span class="simple-task-option-badge">${completedSubtasks}/${subtasks.length}</span>` : ''}
+                    <!-- ELEVATED COMMENTS SECTION - Always Visible -->
+                    <div class="elevated-comments-section">
+                        <div class="elevated-comments-header">
+                            <div class="elevated-comments-title">
+                                <i class="ph ph-chat-circle-text"></i>
+                                <span>Discussion</span>
+                                ${comments.length > 0 ? `<span class="elevated-comments-count">${comments.length}</span>` : ''}
                             </div>
-                            <span class="simple-task-option-arrow"><i class="ph ph-caret-right"></i></span>
                         </div>
-                        <div class="simple-task-expanded-section" id="subtasks_${task.id}" style="display: none;">
-                            ${renderSubtasksSection(task.id)}
-                        </div>
+                        ${renderTaskComments(task.id)}
+                    </div>
 
-                        <!-- Dependencies Link -->
-                        <div class="simple-task-option-link" onclick="toggleSimpleTaskSection('deps_${task.id}')">
-                            <div class="simple-task-option-text">
-                                <i class="ph ph-git-branch"></i>
-                                <span>Dependencies</span>
-                                ${dependencyCount > 0 ? `<span class="simple-task-option-badge">${dependencyCount}</span>` : ''}
-                            </div>
-                            <span class="simple-task-option-arrow"><i class="ph ph-caret-right"></i></span>
-                        </div>
-                        <div class="simple-task-expanded-section" id="deps_${task.id}" style="display: none;">
-                            ${predecessor || dependents.length > 0 ? `
-                                ${predecessor ? `
-                                <div style="margin-bottom: 12px;">
-                                    <div style="font-size: 11px; color: #888; text-transform: uppercase; margin-bottom: 6px;">Blocked by</div>
-                                    <div class="task-dep-item ${predecessor.status === 'completed' ? 'completed' : ''}" onclick="openEntityModal('${predecessor.id}', 'task')">
-                                        <div class="dep-checkbox ${predecessor.status === 'completed' ? 'completed' : ''}">
-                                            ${predecessor.status === 'completed' ? '<i class="ph ph-check"></i>' : ''}
-                                        </div>
-                                        <span class="dep-name">${predecessor.name}</span>
-                                    </div>
-                                </div>
+                    <!-- More Details Section - Collapsible -->
+                    <div class="more-details-section">
+                        <div class="more-details-toggle" onclick="toggleMoreDetails('${task.id}')">
+                            <span style="display: flex; align-items: center; gap: 6px;">
+                                <i class="ph ph-caret-right"></i>
+                                <span>More details</span>
+                                ${(subtasks.length > 0 || dependencyCount > 0 || linkedTasksData.length > 0) ? `
+                                    <span style="color: #aaa; font-size: 12px;">
+                                        ${[
+                                            subtasks.length > 0 ? `${completedSubtasks}/${subtasks.length} subtasks` : '',
+                                            dependencyCount > 0 ? `${dependencyCount} dep` : '',
+                                            linkedTasksData.length > 0 ? `${linkedTasksData.length} related` : ''
+                                        ].filter(Boolean).join(' · ')}
+                                    </span>
                                 ` : ''}
-                                ${dependents.length > 0 ? `
-                                <div>
-                                    <div style="font-size: 11px; color: #888; text-transform: uppercase; margin-bottom: 6px;">Blocking (${dependents.length})</div>
-                                    ${dependents.map(dep => `
-                                        <div class="task-dep-item ${dep.status === 'completed' ? 'completed' : ''}" onclick="openEntityModal('${dep.id}', 'task')" style="margin-bottom: 6px;">
-                                            <div class="dep-checkbox ${dep.status === 'completed' ? 'completed' : ''}">
-                                                ${dep.status === 'completed' ? '<i class="ph ph-check"></i>' : ''}
+                            </span>
+                        </div>
+                        <div class="more-details-content" id="moreDetails_${task.id}">
+                            <div class="simple-task-options" style="border-top: none; margin-top: 0;">
+                                <!-- Subtasks Link -->
+                                <div class="simple-task-option-link" onclick="toggleSimpleTaskSection('subtasks_${task.id}')">
+                                    <div class="simple-task-option-text">
+                                        <i class="ph ph-list-checks"></i>
+                                        <span>Subtasks</span>
+                                        ${subtasks.length > 0 ? `<span class="simple-task-option-badge">${completedSubtasks}/${subtasks.length}</span>` : ''}
+                                    </div>
+                                    <span class="simple-task-option-arrow"><i class="ph ph-caret-right"></i></span>
+                                </div>
+                                <div class="simple-task-expanded-section" id="subtasks_${task.id}" style="display: none;">
+                                    ${renderSubtasksSection(task.id)}
+                                </div>
+
+                                <!-- Dependencies Link -->
+                                <div class="simple-task-option-link" onclick="toggleSimpleTaskSection('deps_${task.id}')">
+                                    <div class="simple-task-option-text">
+                                        <i class="ph ph-git-branch"></i>
+                                        <span>Dependencies</span>
+                                        ${dependencyCount > 0 ? `<span class="simple-task-option-badge">${dependencyCount}</span>` : ''}
+                                    </div>
+                                    <span class="simple-task-option-arrow"><i class="ph ph-caret-right"></i></span>
+                                </div>
+                                <div class="simple-task-expanded-section" id="deps_${task.id}" style="display: none;">
+                                    ${predecessor || dependents.length > 0 ? `
+                                        ${predecessor ? `
+                                        <div style="margin-bottom: 12px;">
+                                            <div style="font-size: 11px; color: #888; text-transform: uppercase; margin-bottom: 6px;">Blocked by</div>
+                                            <div class="task-dep-item ${predecessor.status === 'completed' ? 'completed' : ''}" onclick="openEntityModal('${predecessor.id}', 'task')">
+                                                <div class="dep-checkbox ${predecessor.status === 'completed' ? 'completed' : ''}">
+                                                    ${predecessor.status === 'completed' ? '<i class="ph ph-check"></i>' : ''}
+                                                </div>
+                                                <span class="dep-name">${predecessor.name}</span>
                                             </div>
-                                            <span class="dep-name">${dep.name}</span>
                                         </div>
-                                    `).join('')}
-                                </div>
-                                ` : ''}
-                            ` : `
-                            <div style="text-align: center; color: #888; font-size: 13px; padding: 8px;">
-                                No dependencies set
-                            </div>
-                            `}
-                        </div>
-
-                        <!-- Related Tasks Link -->
-                        <div class="simple-task-option-link" onclick="toggleSimpleTaskSection('related_${task.id}')">
-                            <div class="simple-task-option-text">
-                                <i class="ph ph-link"></i>
-                                <span>Related tasks</span>
-                                ${linkedTasksData.length > 0 ? `<span class="simple-task-option-badge">${linkedTasksData.length}</span>` : ''}
-                            </div>
-                            <span class="simple-task-option-arrow"><i class="ph ph-caret-right"></i></span>
-                        </div>
-                        <div class="simple-task-expanded-section" id="related_${task.id}" style="display: none;">
-                            ${linkedTasksData.length > 0 ? `
-                                ${linkedTasksData.map(({ task: lt, link }) => `
-                                    <div class="task-dep-item ${lt.status === 'completed' ? 'completed' : ''}" onclick="openEntityModal('${lt.id}', 'task')" style="margin-bottom: 6px;">
-                                        <div class="dep-checkbox ${lt.status === 'completed' ? 'completed' : ''}">
-                                            ${lt.status === 'completed' ? '<i class="ph ph-check"></i>' : ''}
+                                        ` : ''}
+                                        ${dependents.length > 0 ? `
+                                        <div>
+                                            <div style="font-size: 11px; color: #888; text-transform: uppercase; margin-bottom: 6px;">Blocking (${dependents.length})</div>
+                                            ${dependents.map(dep => `
+                                                <div class="task-dep-item ${dep.status === 'completed' ? 'completed' : ''}" onclick="openEntityModal('${dep.id}', 'task')" style="margin-bottom: 6px;">
+                                                    <div class="dep-checkbox ${dep.status === 'completed' ? 'completed' : ''}">
+                                                        ${dep.status === 'completed' ? '<i class="ph ph-check"></i>' : ''}
+                                                    </div>
+                                                    <span class="dep-name">${dep.name}</span>
+                                                </div>
+                                            `).join('')}
                                         </div>
-                                        <span class="dep-name">${lt.name}</span>
+                                        ` : ''}
+                                    ` : `
+                                    <div style="text-align: center; color: #888; font-size: 13px; padding: 8px;">
+                                        No dependencies set
                                     </div>
-                                `).join('')}
-                                <button onclick="event.stopPropagation(); openTaskLinkModal('${task.id}')" style="background: #f5f5f5; color: #666; border: 1px dashed #ddd; padding: 8px 12px; border-radius: 6px; font-size: 13px; cursor: pointer; width: 100%; margin-top: 8px;">
-                                    <i class="ph ph-plus"></i> Link another task
-                                </button>
-                            ` : `
-                            <div style="text-align: center; padding: 8px;">
-                                <button onclick="event.stopPropagation(); openTaskLinkModal('${task.id}')" style="background: #f5f5f5; color: #666; border: 1px dashed #ddd; padding: 8px 16px; border-radius: 6px; font-size: 13px; cursor: pointer;">
-                                    <i class="ph ph-plus"></i> Link a task
-                                </button>
-                            </div>
-                            `}
-                        </div>
+                                    `}
+                                </div>
 
-                        <!-- Comments Link -->
-                        <div class="simple-task-option-link" onclick="toggleSimpleTaskSection('comments_${task.id}')">
-                            <div class="simple-task-option-text">
-                                <i class="ph ph-chat-circle"></i>
-                                <span>Comments</span>
-                                ${comments.length > 0 ? `<span class="simple-task-option-badge">${comments.length}</span>` : ''}
+                                <!-- Related Tasks Link -->
+                                <div class="simple-task-option-link" onclick="toggleSimpleTaskSection('related_${task.id}')">
+                                    <div class="simple-task-option-text">
+                                        <i class="ph ph-link"></i>
+                                        <span>Related tasks</span>
+                                        ${linkedTasksData.length > 0 ? `<span class="simple-task-option-badge">${linkedTasksData.length}</span>` : ''}
+                                    </div>
+                                    <span class="simple-task-option-arrow"><i class="ph ph-caret-right"></i></span>
+                                </div>
+                                <div class="simple-task-expanded-section" id="related_${task.id}" style="display: none;">
+                                    ${linkedTasksData.length > 0 ? `
+                                        ${linkedTasksData.map(({ task: lt, link }) => `
+                                            <div class="task-dep-item ${lt.status === 'completed' ? 'completed' : ''}" onclick="openEntityModal('${lt.id}', 'task')" style="margin-bottom: 6px;">
+                                                <div class="dep-checkbox ${lt.status === 'completed' ? 'completed' : ''}">
+                                                    ${lt.status === 'completed' ? '<i class="ph ph-check"></i>' : ''}
+                                                </div>
+                                                <span class="dep-name">${lt.name}</span>
+                                            </div>
+                                        `).join('')}
+                                        <button onclick="event.stopPropagation(); openTaskLinkModal('${task.id}')" style="background: #f5f5f5; color: #666; border: 1px dashed #ddd; padding: 8px 12px; border-radius: 6px; font-size: 13px; cursor: pointer; width: 100%; margin-top: 8px;">
+                                            <i class="ph ph-plus"></i> Link another task
+                                        </button>
+                                    ` : `
+                                    <div style="text-align: center; padding: 8px;">
+                                        <button onclick="event.stopPropagation(); openTaskLinkModal('${task.id}')" style="background: #f5f5f5; color: #666; border: 1px dashed #ddd; padding: 8px 16px; border-radius: 6px; font-size: 13px; cursor: pointer;">
+                                            <i class="ph ph-plus"></i> Link a task
+                                        </button>
+                                    </div>
+                                    `}
+                                </div>
                             </div>
-                            <span class="simple-task-option-arrow"><i class="ph ph-caret-right"></i></span>
-                        </div>
-                        <div class="simple-task-expanded-section" id="comments_${task.id}" style="display: none;">
-                            ${renderTaskComments(task.id)}
                         </div>
                     </div>
                 </div>
@@ -40422,6 +40552,22 @@ Cmd/Ctrl + K - Command palette
                     if (arrow) {
                         arrow.className = isHidden ? 'ph ph-caret-down' : 'ph ph-caret-right';
                     }
+                }
+            }
+        }
+
+        // Toggle more details section visibility
+        function toggleMoreDetails(taskId) {
+            const content = document.getElementById(`moreDetails_${taskId}`);
+            const toggle = content?.previousElementSibling;
+            if (content && toggle) {
+                const isShowing = content.classList.contains('show');
+                content.classList.toggle('show');
+                toggle.classList.toggle('expanded');
+                // Update arrow
+                const arrow = toggle.querySelector('i.ph-caret-right, i.ph-caret-down');
+                if (arrow) {
+                    arrow.className = isShowing ? 'ph ph-caret-right' : 'ph ph-caret-down';
                 }
             }
         }
