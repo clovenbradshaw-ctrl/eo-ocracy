@@ -17582,6 +17582,389 @@
         .user-menu-item.danger:hover {
             background: #FEF2F2;
         }
+
+        /* ==========================================
+           AIRTABLE TAG SYSTEM STYLES
+           ========================================== */
+
+        .airtable-tags-section {
+            margin-top: 8px;
+        }
+
+        .airtable-tags-container {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 8px;
+            margin-top: 8px;
+        }
+
+        .airtable-tag {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            padding: 6px 10px;
+            border-radius: 6px;
+            font-size: 12px;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.2s;
+            border: 1px solid transparent;
+            text-decoration: none;
+        }
+
+        .airtable-tag:hover {
+            transform: translateY(-1px);
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+        }
+
+        .airtable-tag .tag-icon {
+            font-size: 14px;
+        }
+
+        .airtable-tag .tag-label {
+            max-width: 150px;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            white-space: nowrap;
+        }
+
+        .airtable-tag .tag-type {
+            font-size: 9px;
+            text-transform: uppercase;
+            opacity: 0.7;
+            letter-spacing: 0.5px;
+        }
+
+        .airtable-tag .tag-remove {
+            margin-left: 4px;
+            opacity: 0.6;
+            cursor: pointer;
+            font-size: 12px;
+        }
+
+        .airtable-tag .tag-remove:hover {
+            opacity: 1;
+        }
+
+        /* Tag type colors */
+        .airtable-tag.tag-client {
+            background: #EFF6FF;
+            color: #1D4ED8;
+            border-color: #BFDBFE;
+        }
+
+        .airtable-tag.tag-case {
+            background: #F5F3FF;
+            color: #6D28D9;
+            border-color: #DDD6FE;
+        }
+
+        .airtable-tag.tag-event {
+            background: #FFF7ED;
+            color: #C2410C;
+            border-color: #FED7AA;
+        }
+
+        .airtable-tag.tag-application {
+            background: #F0FDF4;
+            color: #15803D;
+            border-color: #BBF7D0;
+        }
+
+        .airtable-tag.tag-user {
+            background: #F0FDFA;
+            color: #0F766E;
+            border-color: #99F6E4;
+        }
+
+        .airtable-tag.tag-custom {
+            background: #F9FAFB;
+            color: #4B5563;
+            border-color: #E5E7EB;
+        }
+
+        /* Add tag button */
+        .airtable-tag-add-btn {
+            display: inline-flex;
+            align-items: center;
+            gap: 4px;
+            padding: 6px 12px;
+            border: 1px dashed #D1D5DB;
+            border-radius: 6px;
+            background: transparent;
+            color: #6B7280;
+            font-size: 12px;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .airtable-tag-add-btn:hover {
+            border-color: #C88F4A;
+            color: #C88F4A;
+            background: #FDF8F3;
+        }
+
+        /* Airtable Tag Picker Modal */
+        .airtable-picker-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(0,0,0,0.5);
+            z-index: 10000;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            opacity: 0;
+            visibility: hidden;
+            transition: all 0.2s;
+        }
+
+        .airtable-picker-overlay.show {
+            opacity: 1;
+            visibility: visible;
+        }
+
+        .airtable-picker-modal {
+            background: white;
+            border-radius: 12px;
+            width: 400px;
+            max-width: 90vw;
+            max-height: 80vh;
+            display: flex;
+            flex-direction: column;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+            transform: translateY(20px);
+            transition: transform 0.2s;
+        }
+
+        .airtable-picker-overlay.show .airtable-picker-modal {
+            transform: translateY(0);
+        }
+
+        .airtable-picker-header {
+            padding: 16px 20px;
+            border-bottom: 1px solid #E5E7EB;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+
+        .airtable-picker-header h3 {
+            font-size: 16px;
+            font-weight: 600;
+            color: #111827;
+            margin: 0;
+        }
+
+        .airtable-picker-close {
+            background: none;
+            border: none;
+            font-size: 20px;
+            color: #6B7280;
+            cursor: pointer;
+            padding: 4px;
+            line-height: 1;
+        }
+
+        .airtable-picker-close:hover {
+            color: #111827;
+        }
+
+        .airtable-picker-categories {
+            padding: 16px 20px;
+            border-bottom: 1px solid #E5E7EB;
+        }
+
+        .airtable-picker-categories-label {
+            font-size: 11px;
+            text-transform: uppercase;
+            color: #6B7280;
+            margin-bottom: 10px;
+            font-weight: 600;
+            letter-spacing: 0.5px;
+        }
+
+        .airtable-picker-category-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 8px;
+        }
+
+        .airtable-picker-category-btn {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 4px;
+            padding: 12px 8px;
+            border: 1px solid #E5E7EB;
+            border-radius: 8px;
+            background: white;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .airtable-picker-category-btn:hover {
+            border-color: #C88F4A;
+            background: #FDF8F3;
+        }
+
+        .airtable-picker-category-btn.active {
+            border-color: #C88F4A;
+            background: #C88F4A;
+            color: white;
+        }
+
+        .airtable-picker-category-btn .cat-icon {
+            font-size: 20px;
+        }
+
+        .airtable-picker-category-btn .cat-label {
+            font-size: 11px;
+            font-weight: 500;
+        }
+
+        .airtable-picker-search {
+            padding: 12px 20px;
+            border-bottom: 1px solid #E5E7EB;
+        }
+
+        .airtable-picker-search input {
+            width: 100%;
+            padding: 10px 12px;
+            border: 1px solid #E5E7EB;
+            border-radius: 6px;
+            font-size: 14px;
+            outline: none;
+            transition: border-color 0.2s;
+        }
+
+        .airtable-picker-search input:focus {
+            border-color: #C88F4A;
+        }
+
+        .airtable-picker-results {
+            flex: 1;
+            overflow-y: auto;
+            padding: 8px;
+            min-height: 200px;
+            max-height: 300px;
+        }
+
+        .airtable-picker-loading {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 40px;
+            color: #6B7280;
+        }
+
+        .airtable-picker-loading i {
+            animation: spin 1s linear infinite;
+            margin-right: 8px;
+        }
+
+        @keyframes spin {
+            from { transform: rotate(0deg); }
+            to { transform: rotate(360deg); }
+        }
+
+        .airtable-picker-empty {
+            text-align: center;
+            padding: 40px;
+            color: #9CA3AF;
+        }
+
+        .airtable-picker-item {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            padding: 10px 12px;
+            border-radius: 6px;
+            cursor: pointer;
+            transition: background 0.15s;
+        }
+
+        .airtable-picker-item:hover {
+            background: #F3F4F6;
+        }
+
+        .airtable-picker-item .item-icon {
+            font-size: 18px;
+            width: 32px;
+            height: 32px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 6px;
+        }
+
+        .airtable-picker-item.type-client .item-icon {
+            background: #EFF6FF;
+            color: #1D4ED8;
+        }
+
+        .airtable-picker-item.type-case .item-icon {
+            background: #F5F3FF;
+            color: #6D28D9;
+        }
+
+        .airtable-picker-item.type-event .item-icon {
+            background: #FFF7ED;
+            color: #C2410C;
+        }
+
+        .airtable-picker-item.type-application .item-icon {
+            background: #F0FDF4;
+            color: #15803D;
+        }
+
+        .airtable-picker-item.type-user .item-icon {
+            background: #F0FDFA;
+            color: #0F766E;
+        }
+
+        .airtable-picker-item .item-info {
+            flex: 1;
+            min-width: 0;
+        }
+
+        .airtable-picker-item .item-name {
+            font-size: 14px;
+            font-weight: 500;
+            color: #111827;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+
+        .airtable-picker-item .item-type {
+            font-size: 11px;
+            color: #6B7280;
+            text-transform: uppercase;
+        }
+
+        .airtable-picker-footer {
+            padding: 12px 20px;
+            border-top: 1px solid #E5E7EB;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .airtable-picker-footer-link {
+            font-size: 12px;
+            color: #6B7280;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            gap: 4px;
+        }
+
+        .airtable-picker-footer-link:hover {
+            color: #C88F4A;
+        }
     </style>
 
     <!-- Login Overlay - gates app until authenticated -->
@@ -20642,6 +21025,198 @@ John Doe,Engineering,john@example.com"
         // Xano configuration
         const XANO_BASE_URL = 'https://xvkq-pq7i-idtl.n7d.xano.io/api:nrIL-Oi-';
         const APP_ID = 'holonic-org-graph'; // Your app identifier
+
+        // ==========================================
+        // AIRTABLE API CONFIGURATION & SERVICE
+        // ==========================================
+
+        const AirtableAPI = {
+            // n8n webhook endpoint for Airtable operations
+            webhookUrl: 'https://n8n.intelechia.com/webhook-test/b04bd460-fd56-4d55-8a01-6c47581789b9',
+
+            // Softr base URL for generating links
+            softrBaseUrl: 'https://rklacylaw.softr.app',
+
+            // Airtable base ID
+            baseId: 'app1tsUyKa7F3sy0D',
+
+            // Table configurations with display fields and Softr paths
+            tables: {
+                clients: {
+                    tableId: 'tbl0uHmtLkGyDnSP9',
+                    displayField: 'Client Name',
+                    softrPath: '/client-info',
+                    icon: 'ph-user',
+                    color: '#1D4ED8',
+                    label: 'CLIENT'
+                },
+                cases: {
+                    tableId: 'tblgynOzESGvAXAsK',
+                    displayField: 'Client Name',
+                    parentField: 'Edit Client Info',  // Links to clients
+                    softrPath: '/client-info',  // Opens client page
+                    icon: 'ph-folder-open',
+                    color: '#6D28D9',
+                    label: 'CASE'
+                },
+                events: {
+                    tableId: 'tbl1GpkHMkjxZ1n7E',
+                    displayField: 'Event Title',
+                    softrPath: '/events-details',
+                    icon: 'ph-calendar',
+                    color: '#C2410C',
+                    label: 'EVENT'
+                },
+                applications: {
+                    tableId: 'tbl6XtHs9g5iwd7qi',
+                    displayField: 'Name',
+                    parentField: 'case master recordId',  // Links to cases
+                    softrPath: '/client-info',  // Opens client page (via case -> client)
+                    icon: 'ph-file-text',
+                    color: '#15803D',
+                    label: 'APP'
+                },
+                users: {
+                    tableId: 'tblIrtFCfeYdDCVgE',
+                    displayField: 'User Name',
+                    secondaryField: 'Email',
+                    softrPath: null,  // No Softr page for users
+                    icon: 'ph-user-circle',
+                    color: '#0F766E',
+                    label: 'USER'
+                }
+            },
+
+            // Cache for loaded records (reduces API calls)
+            cache: {
+                records: {},
+                lastFetch: {}
+            },
+
+            // Get table config by type name or table ID
+            getTableConfig(typeOrTableId) {
+                // Check if it's a type name
+                if (this.tables[typeOrTableId]) {
+                    return { type: typeOrTableId, ...this.tables[typeOrTableId] };
+                }
+                // Check if it's a table ID
+                for (const [type, config] of Object.entries(this.tables)) {
+                    if (config.tableId === typeOrTableId) {
+                        return { type, ...config };
+                    }
+                }
+                return null;
+            },
+
+            // Make API request to n8n webhook
+            async request(action, params = {}) {
+                try {
+                    const response = await fetch(this.webhookUrl, {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json'
+                        },
+                        body: JSON.stringify({
+                            action,
+                            ...params
+                        })
+                    });
+
+                    if (!response.ok) {
+                        throw new Error(`API request failed: ${response.status}`);
+                    }
+
+                    return await response.json();
+                } catch (error) {
+                    console.error('AirtableAPI error:', error);
+                    throw error;
+                }
+            },
+
+            // Get records from a table
+            async getRecords(tableType, options = {}) {
+                const config = this.getTableConfig(tableType);
+                if (!config) throw new Error(`Unknown table type: ${tableType}`);
+
+                const result = await this.request('getRecords', {
+                    table: config.tableId,
+                    fields: options.fields || [config.displayField],
+                    filterFormula: options.filterFormula || null,
+                    maxRecords: options.maxRecords || 50
+                });
+
+                return result;
+            },
+
+            // Get a single record by ID
+            async getRecord(tableType, recordId) {
+                const config = this.getTableConfig(tableType);
+                if (!config) throw new Error(`Unknown table type: ${tableType}`);
+
+                const result = await this.request('getRecord', {
+                    table: config.tableId,
+                    recordId
+                });
+
+                return result;
+            },
+
+            // Get record with parent chain resolved (for cases/applications)
+            async getRecordWithParents(tableType, recordId) {
+                const config = this.getTableConfig(tableType);
+                if (!config) throw new Error(`Unknown table type: ${tableType}`);
+
+                const result = await this.request('getRecordWithParents', {
+                    table: config.tableId,
+                    recordId
+                });
+
+                return result;
+            },
+
+            // Search records in a table
+            async search(tableType, query) {
+                const config = this.getTableConfig(tableType);
+                if (!config) throw new Error(`Unknown table type: ${tableType}`);
+
+                const result = await this.request('search', {
+                    table: config.tableId,
+                    query,
+                    searchField: config.displayField
+                });
+
+                return result;
+            },
+
+            // Get Softr URL for a tag
+            getSoftrUrl(tag) {
+                const config = this.getTableConfig(tag.type);
+                if (!config || !config.softrPath) {
+                    // Fallback to Airtable direct link
+                    return `https://airtable.com/${this.baseId}/${tag.table}/${tag.id}`;
+                }
+
+                // For cases and applications, use the clientId for navigation
+                const recordId = tag.clientId || tag.id;
+                return `${this.softrBaseUrl}${config.softrPath}?recordId=${recordId}`;
+            },
+
+            // Open tag in Softr (new tab)
+            openInSoftr(tag) {
+                const url = this.getSoftrUrl(tag);
+                window.open(url, '_blank');
+            }
+        };
+
+        // Current state for the Airtable tag picker
+        let airtablePickerState = {
+            isOpen: false,
+            taskId: null,
+            selectedCategory: null,
+            searchQuery: '',
+            isLoading: false,
+            results: []
+        };
 
         // ==========================================
         // EMERGENT WORKFLOW SYSTEM
@@ -36057,6 +36632,9 @@ Cmd/Ctrl + K - Command palette
                             `}
                         </div>
 
+                        <!-- Airtable Linked Records -->
+                        ${renderAirtableTags(task)}
+
                         <!-- Comments Link -->
                         <div class="simple-task-option-link" onclick="toggleSimpleTaskSection('comments_${task.id}')">
                             <div class="simple-task-option-text">
@@ -36072,6 +36650,433 @@ Cmd/Ctrl + K - Command palette
                     </div>
                 </div>
             `;
+        }
+
+        // ==========================================
+        // AIRTABLE TAG PICKER FUNCTIONS
+        // ==========================================
+
+        // Render Airtable tags for a task
+        function renderAirtableTags(task) {
+            const tags = task.airtableTags || [];
+            const tagCount = tags.length;
+
+            return `
+                <!-- Airtable Tags Link -->
+                <div class="simple-task-option-link" onclick="toggleSimpleTaskSection('airtable_tags_${task.id}')">
+                    <div class="simple-task-option-text">
+                        <i class="ph ph-database"></i>
+                        <span>Linked Records</span>
+                        ${tagCount > 0 ? `<span class="simple-task-option-badge">${tagCount}</span>` : ''}
+                    </div>
+                    <span class="simple-task-option-arrow"><i class="ph ph-caret-right"></i></span>
+                </div>
+                <div class="simple-task-expanded-section" id="airtable_tags_${task.id}" style="display: none;">
+                    <div class="airtable-tags-container">
+                        ${tags.map(tag => renderAirtableTag(tag, task.id)).join('')}
+                        <button class="airtable-tag-add-btn" onclick="event.stopPropagation(); openAirtableTagPicker('${task.id}')">
+                            <i class="ph ph-plus"></i> Link Record
+                        </button>
+                    </div>
+                </div>
+            `;
+        }
+
+        // Render a single Airtable tag chip
+        function renderAirtableTag(tag, taskId) {
+            const config = AirtableAPI.getTableConfig(tag.type);
+            const icon = config?.icon || 'ph-tag';
+            const label = config?.label || tag.type.toUpperCase();
+
+            return `
+                <div class="airtable-tag tag-${tag.type}" onclick="event.stopPropagation(); openAirtableTagInSoftr('${encodeURIComponent(JSON.stringify(tag))}')">
+                    <i class="ph ${icon} tag-icon"></i>
+                    <span class="tag-label">${tag.label}</span>
+                    <span class="tag-type">${label}</span>
+                    <span class="tag-remove" onclick="event.stopPropagation(); removeAirtableTag('${taskId}', '${tag.id}')" title="Remove">
+                        <i class="ph ph-x"></i>
+                    </span>
+                </div>
+            `;
+        }
+
+        // Open tag in Softr (new tab)
+        function openAirtableTagInSoftr(tagJson) {
+            try {
+                const tag = JSON.parse(decodeURIComponent(tagJson));
+                AirtableAPI.openInSoftr(tag);
+            } catch (e) {
+                console.error('Error opening tag:', e);
+            }
+        }
+
+        // Open the Airtable tag picker modal
+        function openAirtableTagPicker(taskId) {
+            airtablePickerState = {
+                isOpen: true,
+                taskId: taskId,
+                selectedCategory: null,
+                searchQuery: '',
+                isLoading: false,
+                results: []
+            };
+
+            // Create or show the picker modal
+            let overlay = document.getElementById('airtablePickerOverlay');
+            if (!overlay) {
+                createAirtablePickerModal();
+                overlay = document.getElementById('airtablePickerOverlay');
+            }
+
+            // Reset UI state
+            document.getElementById('airtablePickerSearch').value = '';
+            document.getElementById('airtablePickerResults').innerHTML = `
+                <div class="airtable-picker-empty">
+                    <i class="ph ph-hand-pointing" style="font-size: 32px; margin-bottom: 8px;"></i>
+                    <div>Select a category above to browse records</div>
+                </div>
+            `;
+
+            // Clear active category buttons
+            document.querySelectorAll('.airtable-picker-category-btn').forEach(btn => {
+                btn.classList.remove('active');
+            });
+
+            // Show overlay
+            overlay.classList.add('show');
+        }
+
+        // Close the tag picker
+        function closeAirtableTagPicker() {
+            const overlay = document.getElementById('airtablePickerOverlay');
+            if (overlay) {
+                overlay.classList.remove('show');
+            }
+            airtablePickerState.isOpen = false;
+        }
+
+        // Create the picker modal DOM
+        function createAirtablePickerModal() {
+            const modal = document.createElement('div');
+            modal.id = 'airtablePickerOverlay';
+            modal.className = 'airtable-picker-overlay';
+            modal.onclick = (e) => {
+                if (e.target === modal) closeAirtableTagPicker();
+            };
+
+            modal.innerHTML = `
+                <div class="airtable-picker-modal">
+                    <div class="airtable-picker-header">
+                        <h3>Link Airtable Record</h3>
+                        <button class="airtable-picker-close" onclick="closeAirtableTagPicker()">
+                            <i class="ph ph-x"></i>
+                        </button>
+                    </div>
+
+                    <div class="airtable-picker-categories">
+                        <div class="airtable-picker-categories-label">Select Category</div>
+                        <div class="airtable-picker-category-grid">
+                            <button class="airtable-picker-category-btn" onclick="selectAirtableCategory('clients')">
+                                <i class="ph ph-user cat-icon"></i>
+                                <span class="cat-label">Client</span>
+                            </button>
+                            <button class="airtable-picker-category-btn" onclick="selectAirtableCategory('cases')">
+                                <i class="ph ph-folder-open cat-icon"></i>
+                                <span class="cat-label">Case</span>
+                            </button>
+                            <button class="airtable-picker-category-btn" onclick="selectAirtableCategory('events')">
+                                <i class="ph ph-calendar cat-icon"></i>
+                                <span class="cat-label">Event</span>
+                            </button>
+                            <button class="airtable-picker-category-btn" onclick="selectAirtableCategory('applications')">
+                                <i class="ph ph-file-text cat-icon"></i>
+                                <span class="cat-label">App</span>
+                            </button>
+                            <button class="airtable-picker-category-btn" onclick="selectAirtableCategory('users')">
+                                <i class="ph ph-user-circle cat-icon"></i>
+                                <span class="cat-label">User</span>
+                            </button>
+                        </div>
+                    </div>
+
+                    <div class="airtable-picker-search">
+                        <input type="text" id="airtablePickerSearch" placeholder="Search records..."
+                               oninput="searchAirtableRecords(this.value)">
+                    </div>
+
+                    <div class="airtable-picker-results" id="airtablePickerResults">
+                        <div class="airtable-picker-empty">
+                            <i class="ph ph-hand-pointing" style="font-size: 32px; margin-bottom: 8px;"></i>
+                            <div>Select a category above to browse records</div>
+                        </div>
+                    </div>
+
+                    <div class="airtable-picker-footer">
+                        <span class="airtable-picker-footer-link" onclick="browseAllAirtableTables()">
+                            <i class="ph ph-database"></i> Browse all tables
+                        </span>
+                    </div>
+                </div>
+            `;
+
+            document.body.appendChild(modal);
+        }
+
+        // Select a category and load records
+        async function selectAirtableCategory(category) {
+            airtablePickerState.selectedCategory = category;
+            airtablePickerState.searchQuery = '';
+
+            // Update UI - highlight selected category
+            document.querySelectorAll('.airtable-picker-category-btn').forEach(btn => {
+                btn.classList.remove('active');
+            });
+            event.target.closest('.airtable-picker-category-btn').classList.add('active');
+
+            // Clear search
+            document.getElementById('airtablePickerSearch').value = '';
+
+            // Load records
+            await loadAirtableRecords(category);
+        }
+
+        // Load records for a category
+        async function loadAirtableRecords(category, searchQuery = '') {
+            const resultsContainer = document.getElementById('airtablePickerResults');
+            airtablePickerState.isLoading = true;
+
+            // Show loading
+            resultsContainer.innerHTML = `
+                <div class="airtable-picker-loading">
+                    <i class="ph ph-spinner"></i> Loading records...
+                </div>
+            `;
+
+            try {
+                let result;
+                if (searchQuery) {
+                    result = await AirtableAPI.search(category, searchQuery);
+                } else {
+                    result = await AirtableAPI.getRecords(category);
+                }
+
+                airtablePickerState.results = result.records || [];
+                renderAirtablePickerResults();
+
+            } catch (error) {
+                console.error('Error loading Airtable records:', error);
+                resultsContainer.innerHTML = `
+                    <div class="airtable-picker-empty">
+                        <i class="ph ph-warning" style="font-size: 32px; margin-bottom: 8px; color: #DC2626;"></i>
+                        <div>Error loading records</div>
+                        <div style="font-size: 12px; margin-top: 4px; color: #999;">${error.message}</div>
+                    </div>
+                `;
+            } finally {
+                airtablePickerState.isLoading = false;
+            }
+        }
+
+        // Render search/browse results
+        function renderAirtablePickerResults() {
+            const resultsContainer = document.getElementById('airtablePickerResults');
+            const results = airtablePickerState.results;
+            const category = airtablePickerState.selectedCategory;
+            const config = AirtableAPI.getTableConfig(category);
+
+            if (!results || results.length === 0) {
+                resultsContainer.innerHTML = `
+                    <div class="airtable-picker-empty">
+                        <i class="ph ph-magnifying-glass" style="font-size: 32px; margin-bottom: 8px;"></i>
+                        <div>No records found</div>
+                    </div>
+                `;
+                return;
+            }
+
+            resultsContainer.innerHTML = results.map(record => {
+                const displayField = config?.displayField || 'Name';
+                const name = record.fields?.[displayField] || record.label || 'Unnamed';
+
+                return `
+                    <div class="airtable-picker-item type-${category}" onclick="selectAirtableRecord('${record.id}', '${escapeHtml(name)}')">
+                        <div class="item-icon">
+                            <i class="ph ${config?.icon || 'ph-tag'}"></i>
+                        </div>
+                        <div class="item-info">
+                            <div class="item-name">${escapeHtml(name)}</div>
+                            <div class="item-type">${config?.label || category}</div>
+                        </div>
+                    </div>
+                `;
+            }).join('');
+        }
+
+        // Search records with debounce
+        let airtableSearchTimeout = null;
+        function searchAirtableRecords(query) {
+            clearTimeout(airtableSearchTimeout);
+            airtablePickerState.searchQuery = query;
+
+            if (!airtablePickerState.selectedCategory) {
+                return;
+            }
+
+            airtableSearchTimeout = setTimeout(() => {
+                loadAirtableRecords(airtablePickerState.selectedCategory, query);
+            }, 300);
+        }
+
+        // Select a record and add it as a tag
+        async function selectAirtableRecord(recordId, label) {
+            const taskId = airtablePickerState.taskId;
+            const category = airtablePickerState.selectedCategory;
+            const config = AirtableAPI.getTableConfig(category);
+
+            if (!taskId || !category) {
+                console.error('Invalid picker state');
+                return;
+            }
+
+            const task = entities.task.find(t => t.id === taskId);
+            if (!task) {
+                console.error('Task not found:', taskId);
+                return;
+            }
+
+            // Initialize airtableTags if needed
+            if (!task.airtableTags) {
+                task.airtableTags = [];
+            }
+
+            // Check if already tagged
+            if (task.airtableTags.some(t => t.id === recordId)) {
+                showToast('Record already linked to this task', 'info');
+                closeAirtableTagPicker();
+                return;
+            }
+
+            // Create the tag object
+            const tag = {
+                id: recordId,
+                type: category,
+                table: config.tableId,
+                label: label,
+                clientId: null  // Will be resolved for cases/applications
+            };
+
+            // For cases and applications, resolve the parent client ID
+            if (category === 'cases' || category === 'applications') {
+                try {
+                    const result = await AirtableAPI.getRecordWithParents(category, recordId);
+                    if (result.clientId) {
+                        tag.clientId = result.clientId;
+                    } else if (result.parents?.client?.id) {
+                        tag.clientId = result.parents.client.id;
+                    }
+                } catch (e) {
+                    console.warn('Could not resolve parent client:', e);
+                }
+            }
+
+            // For clients, clientId is the record itself
+            if (category === 'clients') {
+                tag.clientId = recordId;
+            }
+
+            // Add the tag
+            task.airtableTags.push(tag);
+
+            // Save
+            saveToLocalStorage();
+
+            // Log activity
+            logActivityToXano({
+                event_verb: 'Link Airtable Record',
+                eo_operator: 'CON',
+                object_type: 'task',
+                object_id: taskId,
+                object_label: task.name,
+                data_json: {
+                    airtable_record_id: recordId,
+                    airtable_type: category,
+                    airtable_label: label
+                }
+            });
+
+            // Update UI
+            closeAirtableTagPicker();
+            showToast(`Linked ${label} to task`, 'success');
+
+            // Refresh the task modal if open
+            if (currentModalEntity?.id === taskId) {
+                const roleAssignmentEl = document.getElementById('modalRoleAssignment');
+                if (roleAssignmentEl) {
+                    roleAssignmentEl.innerHTML = renderTaskModalInfo(task);
+                }
+            }
+        }
+
+        // Remove an Airtable tag from a task
+        function removeAirtableTag(taskId, tagId) {
+            const task = entities.task.find(t => t.id === taskId);
+            if (!task || !task.airtableTags) return;
+
+            const tagIndex = task.airtableTags.findIndex(t => t.id === tagId);
+            if (tagIndex === -1) return;
+
+            const removedTag = task.airtableTags[tagIndex];
+
+            // Track in undo history
+            pushToUndoHistory({
+                type: 'update_entity',
+                entityType: 'task',
+                data: { id: taskId },
+                oldData: { airtableTags: [...task.airtableTags] },
+                description: `Remove linked record: ${removedTag.label}`
+            });
+
+            // Remove the tag
+            task.airtableTags.splice(tagIndex, 1);
+
+            // Save
+            saveToLocalStorage();
+
+            // Log activity
+            logActivityToXano({
+                event_verb: 'Unlink Airtable Record',
+                eo_operator: 'ALT',
+                object_type: 'task',
+                object_id: taskId,
+                object_label: task.name,
+                data_json: {
+                    airtable_record_id: tagId,
+                    airtable_type: removedTag.type,
+                    airtable_label: removedTag.label
+                }
+            });
+
+            showToast(`Removed ${removedTag.label}`, 'info');
+
+            // Refresh the task modal if open
+            if (currentModalEntity?.id === taskId) {
+                const roleAssignmentEl = document.getElementById('modalRoleAssignment');
+                if (roleAssignmentEl) {
+                    roleAssignmentEl.innerHTML = renderTaskModalInfo(task);
+                }
+            }
+        }
+
+        // Browse all Airtable tables (future feature)
+        function browseAllAirtableTables() {
+            showToast('Browse all tables coming soon', 'info');
+        }
+
+        // Helper: escape HTML for safe rendering
+        function escapeHtml(text) {
+            const div = document.createElement('div');
+            div.textContent = text;
+            return div.innerHTML;
         }
 
         // Toggle simple task section visibility
@@ -37078,6 +38083,7 @@ Options:
                 recurring: null,
                 producesProductId: null,
                 followsWorkflowId: null,
+                airtableTags: [],  // Airtable record tags (clients, cases, events, apps)
                 createdAt: new Date().toISOString(),
                 createdBy: currentUserId,
                 visibility: quickAddModalState.visibility,
@@ -37613,6 +38619,7 @@ Options:
                 recurring: null,
                 producesProductId: null,
                 followsWorkflowId: null,
+                airtableTags: [],  // Airtable record tags (clients, cases, events, apps)
                 createdAt: new Date().toISOString()
             };
             entities.task.push(taskObject);
@@ -39716,6 +40723,7 @@ Options:
                     recurring: recurringValue || null,
                     producesProductId: null,
                     followsWorkflowId: workflowId || null,
+                    airtableTags: [],  // Airtable record tags (clients, cases, events, apps)
                     createdAt: new Date().toISOString(),
                     createdBy: currentUserId,
                     visibility: heroVisibility || 'public',
