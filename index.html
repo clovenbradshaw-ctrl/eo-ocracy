@@ -19346,49 +19346,75 @@
         .airtable-tag {
             display: inline-flex;
             align-items: center;
-            gap: 6px;
-            padding: 6px 10px;
-            border-radius: 6px;
-            font-size: 12px;
-            font-weight: 500;
+            gap: 8px;
+            padding: 10px 14px;
+            border-radius: 8px;
+            font-size: 13px;
+            font-weight: 600;
             cursor: pointer;
             transition: all 0.2s;
-            border: 1px solid transparent;
+            border: 2px solid;
             text-decoration: none;
+            position: relative;
         }
 
         .airtable-tag:hover {
-            transform: translateY(-1px);
-            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(0,0,0,0.15);
         }
 
         .airtable-tag .tag-icon {
-            font-size: 14px;
+            font-size: 16px;
         }
 
         .airtable-tag .tag-label {
-            max-width: 150px;
+            max-width: 180px;
             overflow: hidden;
             text-overflow: ellipsis;
             white-space: nowrap;
+            text-decoration: underline;
+            text-decoration-style: dotted;
+            text-underline-offset: 2px;
+        }
+
+        .airtable-tag:hover .tag-label {
+            text-decoration-style: solid;
         }
 
         .airtable-tag .tag-type {
             font-size: 9px;
             text-transform: uppercase;
-            opacity: 0.7;
+            opacity: 0.8;
             letter-spacing: 0.5px;
+            background: rgba(255,255,255,0.5);
+            padding: 2px 6px;
+            border-radius: 4px;
+        }
+
+        .airtable-tag .tag-link-icon {
+            font-size: 14px;
+            opacity: 0.7;
+            transition: all 0.2s;
+        }
+
+        .airtable-tag:hover .tag-link-icon {
+            opacity: 1;
+            transform: translate(2px, -2px);
         }
 
         .airtable-tag .tag-remove {
             margin-left: 4px;
-            opacity: 0.6;
+            opacity: 0.5;
             cursor: pointer;
-            font-size: 12px;
+            font-size: 14px;
+            padding: 2px;
+            border-radius: 4px;
+            transition: all 0.2s;
         }
 
         .airtable-tag .tag-remove:hover {
             opacity: 1;
+            background: rgba(0,0,0,0.1);
         }
 
         /* Tag type colors */
@@ -19525,6 +19551,13 @@
         .simple-task-section-label i {
             font-size: 16px;
             color: #8B6F47;
+        }
+
+        .section-label-hint {
+            font-weight: 400;
+            font-size: 11px;
+            color: #8B6F47;
+            margin-left: 6px;
         }
 
         .simple-task-airtable-container {
@@ -41001,7 +41034,8 @@ Cmd/Ctrl + K - Command palette
                 <!-- Airtable Linked Records Section -->
                 <div class="simple-task-airtable-section">
                     <label class="simple-task-section-label">
-                        <i class="ph ph-database"></i> Linked Records
+                        <i class="ph ph-link"></i> Linked Records
+                        ${tags.length > 0 ? '<span class="section-label-hint">(click to open in Softr)</span>' : ''}
                     </label>
                     <div class="simple-task-airtable-container">
                         <div class="simple-task-airtable-tags-list">
@@ -41012,7 +41046,7 @@ Cmd/Ctrl + K - Command palette
                         </button>
                     </div>
                     <div class="simple-task-airtable-hint">
-                        <i class="ph ph-info"></i> Link to Airtable records for easy filtering and navigation
+                        <i class="ph ph-info"></i> Link records to quickly navigate to client details in Softr
                     </div>
                 </div>
             `;
@@ -41025,11 +41059,12 @@ Cmd/Ctrl + K - Command palette
             const label = config?.label || tag.type.toUpperCase();
 
             return `
-                <div class="airtable-tag tag-${tag.type}" onclick="event.stopPropagation(); openAirtableTagInSoftr('${encodeURIComponent(JSON.stringify(tag))}')">
+                <div class="airtable-tag tag-${tag.type}" onclick="event.stopPropagation(); openAirtableTagInSoftr('${encodeURIComponent(JSON.stringify(tag))}')" title="Click to open in Softr">
                     <i class="ph ${icon} tag-icon"></i>
                     <span class="tag-label">${tag.label}</span>
                     <span class="tag-type">${label}</span>
-                    <span class="tag-remove" onclick="event.stopPropagation(); removeAirtableTag('${taskId}', '${tag.id}')" title="Remove">
+                    <i class="ph ph-arrow-square-out tag-link-icon"></i>
+                    <span class="tag-remove" onclick="event.stopPropagation(); removeAirtableTag('${taskId}', '${tag.id}')" title="Remove link">
                         <i class="ph ph-x"></i>
                     </span>
                 </div>
