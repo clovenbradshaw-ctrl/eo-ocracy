@@ -22397,14 +22397,20 @@ John Doe,Engineering,john@example.com"
                 const config = this.getTableConfig(tableType);
                 if (!config) throw new Error(`Unknown table type: ${tableType}`);
 
-                const result = await this.request('getRecords', {
+                const params = {
                     table: config.tableId,
                     tableName: tableType,
                     query: options.query || "",
                     fields: options.fields || [config.displayField],
-                    filterFormula: options.filterFormula || null,
                     maxRecords: options.maxRecords || 50
-                });
+                };
+
+                // Only include filterFormula when provided
+                if (options.filterFormula) {
+                    params.filterFormula = options.filterFormula;
+                }
+
+                const result = await this.request('getRecords', params);
 
                 // Normalize response to handle both flat and nested field formats
                 return this.normalizeResponse(result);
@@ -22415,12 +22421,18 @@ John Doe,Engineering,john@example.com"
                 const config = this.getTableConfig(tableType);
                 if (!config) throw new Error(`Unknown table type: ${tableType}`);
 
-                const result = await this.request('getRecord', {
+                const params = {
                     table: config.tableId,
                     tableName: tableType,
-                    recordId,
-                    filterFormula: options.filterFormula || null
-                });
+                    recordId
+                };
+
+                // Only include filterFormula when provided
+                if (options.filterFormula) {
+                    params.filterFormula = options.filterFormula;
+                }
+
+                const result = await this.request('getRecord', params);
 
                 // Normalize single record response
                 return this.normalizeRecord(result);
@@ -22445,14 +22457,20 @@ John Doe,Engineering,john@example.com"
                 const config = this.getTableConfig(tableType);
                 if (!config) throw new Error(`Unknown table type: ${tableType}`);
 
-                const result = await this.request('search', {
+                const params = {
                     table: config.tableId,
                     tableName: tableType,
                     query,
                     searchField: options.searchField || config.displayField,
-                    filterFormula: options.filterFormula || null,
                     maxRecords: options.maxRecords || 50
-                });
+                };
+
+                // Only include filterFormula when provided
+                if (options.filterFormula) {
+                    params.filterFormula = options.filterFormula;
+                }
+
+                const result = await this.request('search', params);
 
                 // Normalize response to handle both flat and nested field formats
                 return this.normalizeResponse(result);
@@ -22485,13 +22503,13 @@ John Doe,Engineering,john@example.com"
             },
 
             // Load all clients with name search field for local matching
-            async loadAllClients(forceRefresh = false) {
+            async loadAllClients(forceRefresh = false, options = {}) {
                 const cacheAge = this.clientsCache.lastFetch
                     ? Date.now() - this.clientsCache.lastFetch
                     : Infinity;
 
-                // Return cached if fresh (5 minutes) and not forcing refresh
-                if (!forceRefresh && this.clientsCache.records && cacheAge < 5 * 60 * 1000) {
+                // Return cached if fresh (5 minutes) and not forcing refresh (unless filter is specified)
+                if (!forceRefresh && !options.filterFormula && this.clientsCache.records && cacheAge < 5 * 60 * 1000) {
                     return this.clientsCache.records;
                 }
 
@@ -22510,11 +22528,19 @@ John Doe,Engineering,john@example.com"
                 this.clientsCache.loading = true;
                 try {
                     const config = this.tables.clients;
-                    const result = await this.request('getRecords', {
+                    const params = {
                         table: config.tableId,
+                        tableName: 'clients',
                         fields: [config.displayField, config.searchField],
                         maxRecords: 10000  // Get all clients
-                    });
+                    };
+
+                    // Only include filterFormula when provided
+                    if (options.filterFormula) {
+                        params.filterFormula = options.filterFormula;
+                    }
+
+                    const result = await this.request('getRecords', params);
 
                     // Normalize response to handle both flat and nested field formats
                     const normalized = this.normalizeResponse(result);
@@ -36681,34 +36707,36 @@ Cmd/Ctrl + K - Command palette
             getRecords: {
                 action: 'getRecords',
                 table: 'tbl0uHmtLkGyDnSP9',
+                tableName: 'clients',
                 fields: ['Client Name'],
-                filterFormula: null,
                 maxRecords: 10
             },
             getRecord: {
                 action: 'getRecord',
                 table: 'tbl0uHmtLkGyDnSP9',
-                recordId: 'ENTER_RECORD_ID_HERE',
-                filterFormula: null
+                tableName: 'clients',
+                recordId: 'ENTER_RECORD_ID_HERE'
             },
             search: {
                 action: 'search',
                 table: 'tbl0uHmtLkGyDnSP9',
+                tableName: 'clients',
                 query: 'search term',
                 searchField: 'Client Name',
-                filterFormula: null,
                 maxRecords: 50
             },
             getRecordWithParents: {
                 action: 'getRecordWithParents',
                 table: 'tblgynOzESGvAXAsK',
+                tableName: 'cases',
                 recordId: 'ENTER_RECORD_ID_HERE'
             },
             filterExample: {
                 action: 'getRecords',
                 table: 'tbl0uHmtLkGyDnSP9',
+                tableName: 'clients',
                 fields: ['Client Name'],
-                filterFormula: "AND({Status}='Active', NOT({Archived}))",
+                filterFormula: "IF({Status}='Active',\"t\",\"\")",
                 maxRecords: 50
             },
             custom: {
