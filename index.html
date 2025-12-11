@@ -628,6 +628,105 @@
             margin: 0.25rem 0;
         }
 
+        /* Update Interval Submenu */
+        .update-settings-group {
+            padding: 0.5rem;
+            border-bottom: 1px solid #E5DDD1;
+        }
+
+        .update-settings-label {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            padding: 0.5rem;
+            font-size: 0.75rem;
+            color: #6B5744;
+            font-weight: 500;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .update-interval-options {
+            display: flex;
+            flex-direction: column;
+            gap: 0.25rem;
+        }
+
+        .update-interval-option {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            padding: 0.5rem 0.75rem;
+            border: none;
+            background: none;
+            cursor: pointer;
+            color: #3D2E1F;
+            font-size: 0.875rem;
+            border-radius: 4px;
+            transition: background 0.15s;
+            text-align: left;
+            width: 100%;
+        }
+
+        .update-interval-option:hover {
+            background: #FAF7F5;
+        }
+
+        .update-interval-option.active {
+            background: #F5EFE6;
+            color: #C88F4A;
+        }
+
+        .update-interval-option .check-icon {
+            width: 16px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .update-interval-option .check-icon i {
+            opacity: 0;
+        }
+
+        .update-interval-option.active .check-icon i {
+            opacity: 1;
+            color: #C88F4A;
+        }
+
+        .update-status-indicator {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            padding: 0.5rem 0.75rem;
+            font-size: 0.75rem;
+            color: #6B5744;
+            background: #FAF7F5;
+            border-radius: 4px;
+            margin-top: 0.5rem;
+        }
+
+        .update-status-indicator.active {
+            color: #2e7d32;
+            background: #e8f5e9;
+        }
+
+        .update-status-indicator .status-dot {
+            width: 6px;
+            height: 6px;
+            border-radius: 50%;
+            background: #9e9e9e;
+        }
+
+        .update-status-indicator.active .status-dot {
+            background: #4caf50;
+            animation: pulse-dot 2s ease-in-out infinite;
+        }
+
+        @keyframes pulse-dot {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.4; }
+        }
+
         /* View Filter Dropdown */
         .view-filter-dropdown {
             position: relative;
@@ -17202,9 +17301,32 @@
                         <i class="ph ph-upload-simple"></i> Bulk Import (CSV)
                     </button>
                     <div class="header-dropdown-divider"></div>
-                    <button class="header-dropdown-item" onclick="toggleAutoRefresh(); closeActionsMenu()" id="autoRefreshMenuItem">
-                        <i class="ph ph-arrows-clockwise"></i>
-                        <span id="autoRefreshMenuText">Enable Auto-Refresh</span>
+                    <!-- Update Settings -->
+                    <div class="update-settings-group" id="updateSettingsGroup">
+                        <div class="update-settings-label">
+                            <i class="ph ph-arrows-clockwise"></i> Auto-Update Settings
+                        </div>
+                        <div class="update-interval-options">
+                            <button class="update-interval-option" onclick="setUpdateInterval(0)" id="updateIntervalOff">
+                                <span class="check-icon"><i class="ph ph-check"></i></span>
+                                <span>Off</span>
+                            </button>
+                            <button class="update-interval-option" onclick="setUpdateInterval(30000)" id="updateInterval30s">
+                                <span class="check-icon"><i class="ph ph-check"></i></span>
+                                <span>Every 30 seconds</span>
+                            </button>
+                            <button class="update-interval-option" onclick="setUpdateInterval(60000)" id="updateInterval60s">
+                                <span class="check-icon"><i class="ph ph-check"></i></span>
+                                <span>Every 1 minute</span>
+                            </button>
+                        </div>
+                        <div class="update-status-indicator" id="updateStatusIndicator">
+                            <span class="status-dot"></span>
+                            <span id="updateStatusText">Updates disabled</span>
+                        </div>
+                    </div>
+                    <button class="header-dropdown-item" onclick="checkForUpdatesNow(); closeActionsMenu()">
+                        <i class="ph ph-cloud-arrow-down"></i> Check for Updates Now
                     </button>
                     <button class="header-dropdown-item" onclick="restoreFromXano(); closeActionsMenu()">
                         <i class="ph ph-cloud-arrow-down"></i> Restore from Cloud
@@ -26566,6 +26688,241 @@ Cmd/Ctrl + K - Command palette
         }
         // ============================================
         // END AUTO-REFRESH FUNCTIONALITY
+        // ============================================
+
+        // ============================================
+        // XANO UPDATE POLLING FUNCTIONALITY
+        // ============================================
+        let updatePollingEnabled = false;
+        let updatePollingInterval = null;
+        let updatePollingIntervalMs = 0; // 0 = disabled, 30000 = 30s, 60000 = 1min
+        let lastUpdateTimestamp = null;
+        let updatePollingInProgress = false;
+
+        // Fetch updates from the Xano activity_store_updates endpoint
+        async function fetchUpdatesFromXano() {
+            try {
+                const params = new URLSearchParams({
+                    app_id: APP_ID
+                });
+
+                // If we have a last timestamp, only get updates since then
+                if (lastUpdateTimestamp) {
+                    params.append('since', lastUpdateTimestamp);
+                }
+
+                console.log('🔄 Checking for updates from Xano...');
+                const response = await fetchWithRetry(
+                    `${XANO_BASE_URL}/activity_store_updates?${params.toString()}`,
+                    {
+                        method: 'GET',
+                        mode: 'cors',
+                        headers: {
+                            'Content-Type': 'application/json'
+                        }
+                    },
+                    2, // fewer retries for polling
+                    500
+                );
+
+                if (!response.ok) {
+                    console.warn('⚠️ Failed to fetch updates:', response.status);
+                    return null;
+                }
+
+                const data = await response.json();
+                console.log('📥 Updates received:', data);
+
+                // Update the last timestamp if we got data
+                if (data && data.length > 0) {
+                    // Find the most recent timestamp from the updates
+                    const timestamps = data.map(u => u.created_at || u.timestamp).filter(Boolean);
+                    if (timestamps.length > 0) {
+                        lastUpdateTimestamp = Math.max(...timestamps.map(t => new Date(t).getTime()));
+                    }
+                }
+
+                return data;
+            } catch (error) {
+                console.error('❌ Error fetching updates:', error);
+                return null;
+            }
+        }
+
+        // Process updates and apply them to the local state
+        async function processUpdates(updates) {
+            if (!updates || updates.length === 0) {
+                console.log('✓ No new updates');
+                return false;
+            }
+
+            console.log(`📥 Processing ${updates.length} update(s)...`);
+
+            try {
+                // Get full activity list to reconstruct state
+                const activities = await getActivitiesFromXano();
+
+                if (activities && activities.length > 0) {
+                    // Reconstruct entities from activities
+                    const reconstructed = reconstructEntitiesFromActivities(activities);
+                    const totalEntities = Object.values(reconstructed.entities).reduce(
+                        (sum, arr) => sum + arr.length, 0
+                    );
+
+                    if (totalEntities > 0) {
+                        // Update current workspace with new data
+                        entities = normalizeEntities(JSON.parse(JSON.stringify(reconstructed.entities)));
+                        relationships = JSON.parse(JSON.stringify(reconstructed.relationships));
+
+                        // Update workspace
+                        if (currentWorkspaceId && workspaces[currentWorkspaceId]) {
+                            workspaces[currentWorkspaceId].entities = JSON.parse(JSON.stringify(entities));
+                            workspaces[currentWorkspaceId].relationships = JSON.parse(JSON.stringify(relationships));
+                            workspaces[currentWorkspaceId].updatedAt = Date.now();
+                        }
+
+                        // Save to localStorage
+                        saveWorkspaces();
+
+                        // Refresh all views
+                        refreshAllViews();
+                        updateFilterStatus();
+                        updateTaskCountBadge();
+
+                        console.log(`✅ Applied ${updates.length} update(s), now have ${totalEntities} entities`);
+                        showActivityToast('success', 'Updates Applied', `${updates.length} change(s) synced`);
+                        return true;
+                    }
+                }
+            } catch (error) {
+                console.error('❌ Error processing updates:', error);
+            }
+
+            return false;
+        }
+
+        // Perform a single update check
+        async function performUpdateCheck() {
+            if (updatePollingInProgress) return;
+            updatePollingInProgress = true;
+
+            const statusIndicator = document.getElementById('updateStatusIndicator');
+            const statusText = document.getElementById('updateStatusText');
+
+            try {
+                if (statusText) {
+                    statusText.textContent = 'Checking...';
+                }
+
+                const updates = await fetchUpdatesFromXano();
+                await processUpdates(updates);
+
+                // Update status text
+                if (statusText && updatePollingIntervalMs > 0) {
+                    const intervalLabel = updatePollingIntervalMs === 30000 ? '30s' : '1min';
+                    statusText.textContent = `Active (every ${intervalLabel})`;
+                }
+            } catch (error) {
+                console.error('❌ Update check error:', error);
+                if (statusText) {
+                    statusText.textContent = 'Error checking updates';
+                }
+            } finally {
+                updatePollingInProgress = false;
+            }
+        }
+
+        // Check for updates immediately (manual trigger)
+        async function checkForUpdatesNow() {
+            showActivityToast('syncing', 'Checking for Updates', 'Contacting Xano...');
+            await performUpdateCheck();
+        }
+
+        // Set the update interval
+        function setUpdateInterval(intervalMs) {
+            updatePollingIntervalMs = intervalMs;
+
+            // Stop any existing interval
+            if (updatePollingInterval) {
+                clearInterval(updatePollingInterval);
+                updatePollingInterval = null;
+            }
+
+            // Update UI to show selected option
+            const options = ['updateIntervalOff', 'updateInterval30s', 'updateInterval60s'];
+            options.forEach(id => {
+                const el = document.getElementById(id);
+                if (el) el.classList.remove('active');
+            });
+
+            const statusIndicator = document.getElementById('updateStatusIndicator');
+            const statusText = document.getElementById('updateStatusText');
+
+            if (intervalMs === 0) {
+                document.getElementById('updateIntervalOff')?.classList.add('active');
+                updatePollingEnabled = false;
+                if (statusIndicator) statusIndicator.classList.remove('active');
+                if (statusText) statusText.textContent = 'Updates disabled';
+                console.log('⏹️ Update polling disabled');
+            } else {
+                updatePollingEnabled = true;
+                if (statusIndicator) statusIndicator.classList.add('active');
+
+                if (intervalMs === 30000) {
+                    document.getElementById('updateInterval30s')?.classList.add('active');
+                    if (statusText) statusText.textContent = 'Active (every 30s)';
+                } else if (intervalMs === 60000) {
+                    document.getElementById('updateInterval60s')?.classList.add('active');
+                    if (statusText) statusText.textContent = 'Active (every 1min)';
+                }
+
+                // Do an immediate check
+                performUpdateCheck();
+
+                // Start interval
+                updatePollingInterval = setInterval(() => {
+                    if (isTabVisible && !updatePollingInProgress) {
+                        performUpdateCheck();
+                    }
+                }, intervalMs);
+
+                console.log(`🔄 Update polling enabled: every ${intervalMs / 1000}s`);
+            }
+
+            // Save preference to localStorage
+            try {
+                localStorage.setItem('updatePollingIntervalMs', intervalMs);
+            } catch (e) {
+                console.warn('Could not save update interval preference');
+            }
+        }
+
+        // Restore update polling preference from localStorage
+        function restoreUpdatePollingPreference() {
+            try {
+                const savedInterval = localStorage.getItem('updatePollingIntervalMs');
+                if (savedInterval !== null) {
+                    const intervalMs = parseInt(savedInterval, 10);
+                    if ([0, 30000, 60000].includes(intervalMs)) {
+                        setUpdateInterval(intervalMs);
+                        console.log('🔄 Update polling preference restored:', intervalMs);
+                    }
+                } else {
+                    // Default to off
+                    setUpdateInterval(0);
+                }
+            } catch (e) {
+                console.warn('Could not restore update polling preference');
+                setUpdateInterval(0);
+            }
+        }
+
+        // Initialize update polling system
+        function initUpdatePolling() {
+            restoreUpdatePollingPreference();
+        }
+        // ============================================
+        // END XANO UPDATE POLLING FUNCTIONALITY
         // ============================================
 
         // Ensure agent is declared in the activity store (user details stored once)
@@ -40950,6 +41307,10 @@ Options:
                 // Initialize auto-refresh system
                 initAutoRefresh();
                 console.log('🔄 Auto-refresh system initialized');
+
+                // Initialize update polling system
+                initUpdatePolling();
+                console.log('🔄 Update polling system initialized');
 
                 console.log('🎉 Initialization complete!');
                 console.log('📊 Current state:', {
