@@ -11730,6 +11730,32 @@
             gap: 0.35rem;
         }
 
+        .assign-resources-btn {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.35rem;
+            padding: 0.35rem 0.75rem;
+            background: linear-gradient(135deg, #C88F4A, #A67535);
+            color: white;
+            border: none;
+            border-radius: 6px;
+            font-size: 0.8125rem;
+            font-weight: 500;
+            cursor: pointer;
+            margin-left: auto;
+            transition: all 0.2s ease;
+        }
+
+        .assign-resources-btn:hover {
+            background: linear-gradient(135deg, #D9A05B, #B78646);
+            transform: translateY(-1px);
+            box-shadow: 0 2px 8px rgba(200, 143, 74, 0.3);
+        }
+
+        .assign-resources-btn i {
+            font-size: 1rem;
+        }
+
         .structure-tree {
             background: white;
             border-radius: 12px;
@@ -20140,6 +20166,9 @@
                     </button>
                     <button class="header-dropdown-item" onclick="restoreFromXano(); closeActionsMenu()">
                         <i class="ph ph-cloud-arrow-down"></i> Restore from Cloud
+                    </button>
+                    <button class="header-dropdown-item" onclick="assignResourcesToUnits(); closeActionsMenu()">
+                        <i class="ph ph-tree-structure"></i> Assign Resources to Units
                     </button>
                     <div class="header-dropdown-divider"></div>
                     <button class="header-dropdown-item" onclick="toggleSampleData(); closeActionsMenu()" id="sampleDataBtn">
@@ -32242,6 +32271,207 @@ Cmd/Ctrl + K - Command palette
             // THEN create a team to group them. Structure emerges from work.
         }
 
+        // Assign resources (teams and roles) to appropriate organizational units
+        // This function creates DES relationships based on logical organizational structure
+        function assignResourcesToUnits() {
+            // Define the organizational assignments for an immigration law firm
+            // Format: { unitName: { teams: [], roles: [] } }
+            const assignments = {
+                'Amino Immigration LLC': {
+                    teams: [
+                        'Client Engagement Department',
+                        'Case Manager Team',
+                        'Drafting Team',
+                        'EAD Department',
+                        'USCIS Team',
+                        'EOIR Team',
+                        'Record Requests'
+                    ],
+                    roles: []  // Roles will be assigned to teams below
+                },
+                'Amino Immigration PLLC': {
+                    teams: ['Communications Team'],
+                    roles: []
+                },
+                'Amino Initiatives': {
+                    teams: ['Finance'],
+                    roles: []
+                },
+                'Amino Integration': {
+                    teams: ['Technology and Operations'],
+                    roles: []
+                }
+            };
+
+            // Define role-to-team assignments
+            const roleToTeamAssignments = {
+                'Case Manager Team': [
+                    'Case Manager',
+                    'Supervising Case Manager',
+                    'Case Coordinator'
+                ],
+                'USCIS Team': [
+                    'USCIS Lead Case Manager',
+                    'USCIS Case Manager'
+                ],
+                'EAD Department': [
+                    'EAD Manager'
+                ],
+                'Drafting Team': [
+                    'Attorney',
+                    'Paralegal'
+                ],
+                'Client Engagement Department': [
+                    'Front Desk',
+                    'Front Desk Manager'
+                ],
+                'Finance': [
+                    'Finance Manager',
+                    'Finance Assistant',
+                    'Accounting Analyst'
+                ],
+                'Technology and Operations': [
+                    'Data & Operations Analyst',
+                    'Amino Developer',
+                    'Admin Assistant'
+                ]
+            };
+
+            let assignedCount = 0;
+            let timestamp = Date.now();
+
+            // Helper to find entity by name and type
+            function findByName(type, name) {
+                return entities[type]?.find(e => e.name === name);
+            }
+
+            // Helper to check if relationship already exists
+            function relationshipExists(subjectId, predicateType, objectId) {
+                return relationships.some(r =>
+                    r.subject === subjectId &&
+                    r.predicate === predicateType &&
+                    r.object === objectId
+                );
+            }
+
+            // Helper to check if entity already has a parent
+            function hasParent(entityId) {
+                return relationships.some(r =>
+                    r.predicate === 'DES' && r.object === entityId
+                );
+            }
+
+            // Assign teams to units
+            for (const [unitName, config] of Object.entries(assignments)) {
+                const unit = findByName('unit', unitName);
+                if (!unit) continue;
+
+                for (const teamName of config.teams) {
+                    const team = findByName('team', teamName);
+                    if (!team) continue;
+
+                    // Skip if team already has a parent or relationship exists
+                    if (hasParent(team.id) || relationshipExists(unit.id, 'DES', team.id)) {
+                        continue;
+                    }
+
+                    const relId = 'rel' + (timestamp++);
+                    relationships.push({
+                        id: relId,
+                        subject: unit.id,
+                        predicate: 'DES',
+                        object: team.id,
+                        description: 'Auto-assigned'
+                    });
+                    assignedCount++;
+
+                    // Log activity
+                    logActivityToXano({
+                        event_verb: 'Define Connection',
+                        eo_operator: 'DES',
+                        object_type: 'relationship',
+                        object_id: relId,
+                        object_label: `${unit.name} → ${team.name}`,
+                        data_json: {
+                            subject_id: unit.id,
+                            subject_type: 'unit',
+                            subject_name: unit.name,
+                            predicate: 'DES',
+                            object_id: team.id,
+                            object_type: 'team',
+                            object_name: team.name
+                        }
+                    });
+                }
+            }
+
+            // Assign roles to teams
+            for (const [teamName, roleNames] of Object.entries(roleToTeamAssignments)) {
+                const team = findByName('team', teamName);
+                if (!team) continue;
+
+                for (const roleName of roleNames) {
+                    const role = findByName('role', roleName);
+                    if (!role) continue;
+
+                    // Skip if role already has a parent or relationship exists
+                    if (hasParent(role.id) || relationshipExists(team.id, 'DES', role.id)) {
+                        continue;
+                    }
+
+                    const relId = 'rel' + (timestamp++);
+                    relationships.push({
+                        id: relId,
+                        subject: team.id,
+                        predicate: 'DES',
+                        object: role.id,
+                        description: 'Auto-assigned'
+                    });
+                    assignedCount++;
+
+                    // Log activity
+                    logActivityToXano({
+                        event_verb: 'Define Connection',
+                        eo_operator: 'DES',
+                        object_type: 'relationship',
+                        object_id: relId,
+                        object_label: `${team.name} → ${role.name}`,
+                        data_json: {
+                            subject_id: team.id,
+                            subject_type: 'team',
+                            subject_name: team.name,
+                            predicate: 'DES',
+                            object_id: role.id,
+                            object_type: 'role',
+                            object_name: role.name
+                        }
+                    });
+                }
+            }
+
+            if (assignedCount > 0) {
+                saveToLocalStorage();
+                renderEntityList();
+                updateSelects();
+                updateParentOptions();
+                renderActivityList();
+
+                if (currentView === 'graph') updateGraph();
+                else if (currentView === 'tree') renderTreeView();
+                else if (currentView === 'card') renderCardView();
+                else if (currentView === 'structure') renderStructureView();
+                else if (currentView === 'orgchart') renderOrgChartView();
+
+                showActivityToast('success', 'Resources Assigned',
+                    `Created ${assignedCount} organizational assignments`);
+            } else {
+                showActivityToast('info', 'No Changes',
+                    'All resources are already assigned or no matching entities found');
+            }
+
+            return assignedCount;
+        }
+
         // Load sample data into current workspace (called from welcome banner)
         function loadSampleData() {
             initSampleData();
@@ -35291,6 +35521,11 @@ Cmd/Ctrl + K - Command palette
             const teamCount = entities.team.length;
             const roleCount = entities.role.length;
 
+            // Check for unassigned teams and roles
+            const unassignedTeams = orphanedTeams.length;
+            const unassignedRoles = orphanedRoles.length;
+            const hasUnassigned = unassignedTeams > 0 || unassignedRoles > 0;
+
             // Build HTML
             let html = `
                 <div class="structure-container">
@@ -35300,6 +35535,9 @@ Cmd/Ctrl + K - Command palette
                             <span><i class="ph ph-buildings"></i> ${unitCount} Unit${unitCount !== 1 ? 's' : ''}</span>
                             <span><i class="ph ph-users-three"></i> ${teamCount} Team${teamCount !== 1 ? 's' : ''}</span>
                             <span><i class="ph ph-briefcase"></i> ${roleCount} Role${roleCount !== 1 ? 's' : ''}</span>
+                            ${hasUnassigned ? `<button class="assign-resources-btn" onclick="assignResourcesToUnits()" title="Auto-assign unassigned teams and roles to units">
+                                <i class="ph ph-magic-wand"></i> Auto-assign
+                            </button>` : ''}
                         </div>
                     </div>
             `;
