@@ -27670,7 +27670,7 @@ Cmd/Ctrl + K - Command palette
                 const availableRoles = entities.role.filter(r => !assignedRoleIds.includes(r.id));
 
                 const addFormHtml = availableRoles.length > 0 ? `
-                    <div id="inlineRoleAssignForm" class="role-assignment-add-form hidden">
+                    <div id="inlineRoleAssignForm" class="role-assignment-add-form">
                         ${generateRoleDropdownHTML(availableRoles)}
                         <button class="role-assignment-add-btn" onclick="assignPersonToRoleFromModal()">
                             <i class="ph ph-plus"></i> Assign
@@ -27682,7 +27682,6 @@ Cmd/Ctrl + K - Command palette
                     roleAssignmentEl.innerHTML = `
                         <div class="role-assignment-header">
                             <div class="modal-section-title" style="margin-bottom: 0;"><i class="ph ph-identification-badge"></i> Assigned Roles</div>
-                            ${availableRoles.length > 0 ? `<button class="section-add-btn" onclick="toggleInlineRoleAssignForm()" title="Assign to role"><i class="ph ph-plus"></i></button>` : ''}
                         </div>
                         <div class="role-assignment-list">
                             ${roleAssignments.map(a => {
@@ -27705,10 +27704,6 @@ Cmd/Ctrl + K - Command palette
                     roleAssignmentEl.innerHTML = `
                         <div class="role-assignment-header">
                             <div class="modal-section-title" style="margin-bottom: 0;"><i class="ph ph-identification-badge"></i> Assigned Roles</div>
-                            ${availableRoles.length > 0 ? `<button class="section-add-btn" onclick="toggleInlineRoleAssignForm()" title="Assign to role"><i class="ph ph-plus"></i></button>` : ''}
-                        </div>
-                        <div class="role-assignment-empty">
-                            Not assigned to any roles
                         </div>
                         ${addFormHtml}
                     `;
