@@ -7932,6 +7932,178 @@
             margin-top: 0.15rem;
         }
 
+        /* Entity History Section Styles */
+        .entity-history-section {
+            margin-top: 1rem;
+            border-top: 1px solid #E5DDD1;
+            padding-top: 1rem;
+        }
+
+        .entity-history-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            cursor: pointer;
+            padding: 0.5rem;
+            border-radius: 6px;
+            transition: background 0.15s;
+        }
+
+        .entity-history-header:hover {
+            background: #FAF7F5;
+        }
+
+        .entity-history-title {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            font-weight: 600;
+            color: #6B5642;
+            font-size: 0.85rem;
+        }
+
+        .entity-history-toggle {
+            color: #8B6F47;
+            transition: transform 0.2s;
+        }
+
+        .entity-history-section.collapsed .entity-history-toggle {
+            transform: rotate(-90deg);
+        }
+
+        .entity-history-list {
+            max-height: 300px;
+            overflow-y: auto;
+            margin-top: 0.5rem;
+        }
+
+        .entity-history-section.collapsed .entity-history-list {
+            display: none;
+        }
+
+        .entity-history-empty {
+            text-align: center;
+            padding: 1rem;
+            color: #8B6F47;
+            font-size: 0.8rem;
+        }
+
+        .entity-history-item {
+            display: flex;
+            align-items: flex-start;
+            gap: 0.75rem;
+            padding: 0.75rem;
+            border-radius: 8px;
+            background: #FAF7F5;
+            margin-bottom: 0.5rem;
+            font-size: 0.8rem;
+            color: #5A4A3A;
+        }
+
+        .entity-history-item:last-child {
+            margin-bottom: 0;
+        }
+
+        .entity-history-icon {
+            width: 28px;
+            height: 28px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            flex-shrink: 0;
+            font-size: 0.85rem;
+        }
+
+        .entity-history-icon.alt {
+            background: #E8F5E9;
+            color: #2E7D32;
+        }
+
+        .entity-history-icon.des {
+            background: #E3F2FD;
+            color: #1565C0;
+        }
+
+        .entity-history-icon.con {
+            background: #FFF3E0;
+            color: #E65100;
+        }
+
+        .entity-history-icon.nul {
+            background: #FFEBEE;
+            color: #C62828;
+        }
+
+        .entity-history-content {
+            flex: 1;
+            min-width: 0;
+        }
+
+        .entity-history-action {
+            font-weight: 600;
+            color: #3D2E1F;
+            line-height: 1.4;
+        }
+
+        .entity-history-change {
+            margin-top: 0.25rem;
+            padding: 0.4rem 0.6rem;
+            background: white;
+            border-radius: 4px;
+            border: 1px solid #E5DDD1;
+            font-size: 0.75rem;
+        }
+
+        .entity-history-change-old {
+            text-decoration: line-through;
+            color: #999;
+        }
+
+        .entity-history-change-arrow {
+            color: #C88F4A;
+            margin: 0 0.25rem;
+        }
+
+        .entity-history-change-new {
+            color: #2E7D32;
+            font-weight: 500;
+        }
+
+        .entity-history-meta {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            margin-top: 0.35rem;
+            font-size: 0.7rem;
+            color: #8B6F47;
+        }
+
+        .entity-history-user {
+            display: flex;
+            align-items: center;
+            gap: 0.25rem;
+        }
+
+        .entity-history-time {
+            opacity: 0.8;
+        }
+
+        .entity-history-loading {
+            text-align: center;
+            padding: 1rem;
+            color: #8B6F47;
+        }
+
+        .entity-history-loading i {
+            animation: spin 1s linear infinite;
+        }
+
+        @keyframes spin {
+            from { transform: rotate(0deg); }
+            to { transform: rotate(360deg); }
+        }
+
         /* Recycle Bin Section Styles */
         .recycle-bin-section {
             margin-top: 1rem;
@@ -16029,6 +16201,9 @@
 
                 <!-- Hidden sections for compatibility -->
                 <div class="modal-section" id="modalConnections" style="display: none;"></div>
+
+                <!-- History Section - shows change history for this entity -->
+                <div class="modal-section" id="modalHistory"></div>
             </div>
             <div class="modal-actions" id="modalFooterButtons">
                 <button class="modal-action-btn danger" id="modalDeleteButton" onclick="openDeleteConfirmModal()">
@@ -20015,6 +20190,10 @@ Cmd/Ctrl + K - Command palette
             // Update tabs visibility based on entity type
             updateModalTabsForEntityType(entityType);
 
+            // Render history section (collapsible, loads on expand)
+            const historyEl = document.getElementById('modalHistory');
+            historyEl.innerHTML = renderEntityHistorySection(entityId);
+
             document.getElementById('entityModal').classList.add('active');
         }
 
@@ -22700,34 +22879,33 @@ Cmd/Ctrl + K - Command palette
             currentModalEntity.name = newName;
             currentModalEntity.description = newDesc;
 
-            // Log to Xano
+            // Log to Xano with consistent field tracking
             if (nameChanged) {
                 logActivityToXano({
-                    event_verb: 'Shift Entity',
+                    event_verb: 'Update Name',
                     eo_operator: 'ALT',
                     object_type: currentModalEntityType,
                     object_id: currentModalEntity.id,
-                    object_label: `${currentName} → ${newName}`,
+                    object_label: newName,
                     data_json: {
-                        old_name: currentName,
-                        new_name: newName,
-                        entity_type: currentModalEntityType
+                        field: 'name',
+                        old_value: currentName,
+                        new_value: newName
                     }
                 });
             }
 
             if (descChanged) {
                 logActivityToXano({
-                    event_verb: 'Shift Description',
+                    event_verb: 'Update Description',
                     eo_operator: 'ALT',
                     object_type: currentModalEntityType,
                     object_id: currentModalEntity.id,
-                    object_label: `Updated description for ${newName}`,
+                    object_label: newName,
                     data_json: {
-                        entity_name: newName,
-                        old_description: currentDesc,
-                        new_description: newDesc,
-                        entity_type: currentModalEntityType
+                        field: 'description',
+                        old_value: currentDesc,
+                        new_value: newDesc
                     }
                 });
             }
@@ -24001,6 +24179,171 @@ Cmd/Ctrl + K - Command palette
                 updateXanoStatusIndicator('disconnected');
                 return [];
             }
+        }
+
+        // Get history for a specific entity
+        async function getEntityHistory(entityId) {
+            try {
+                const activities = await getActivitiesFromXano();
+                // Filter for activities that affect this entity
+                const entityHistory = activities
+                    .filter(a => a.entity_id === entityId || a.object_id === entityId)
+                    .filter(a => a.eo_operator !== 'AGENT_DECLARED') // Exclude agent declarations
+                    .sort((a, b) => new Date(b.created_at) - new Date(a.created_at)); // Most recent first
+
+                return entityHistory;
+            } catch (error) {
+                console.error('Error fetching entity history:', error);
+                return [];
+            }
+        }
+
+        // Render entity history section
+        function renderEntityHistorySection(entityId) {
+            return `
+                <div class="entity-history-section collapsed" id="entityHistorySection">
+                    <div class="entity-history-header" onclick="toggleEntityHistory('${entityId}')">
+                        <div class="entity-history-title">
+                            <i class="ph ph-clock-counter-clockwise"></i>
+                            <span>Change History</span>
+                        </div>
+                        <span class="entity-history-toggle"><i class="ph ph-caret-down"></i></span>
+                    </div>
+                    <div class="entity-history-list" id="entityHistoryList">
+                        <div class="entity-history-loading">
+                            <i class="ph ph-spinner"></i> Loading history...
+                        </div>
+                    </div>
+                </div>
+            `;
+        }
+
+        // Toggle entity history section and load if needed
+        async function toggleEntityHistory(entityId) {
+            const section = document.getElementById('entityHistorySection');
+            const list = document.getElementById('entityHistoryList');
+
+            if (!section || !list) return;
+
+            const wasCollapsed = section.classList.contains('collapsed');
+            section.classList.toggle('collapsed');
+
+            // If opening and we haven't loaded yet, fetch the history
+            if (wasCollapsed && list.innerHTML.includes('Loading history')) {
+                const history = await getEntityHistory(entityId);
+                renderEntityHistoryList(history, list);
+            }
+        }
+
+        // Render the history list items
+        function renderEntityHistoryList(history, container) {
+            if (!history || history.length === 0) {
+                container.innerHTML = `
+                    <div class="entity-history-empty">
+                        <i class="ph ph-clock-counter-clockwise"></i>
+                        <div>No change history available</div>
+                    </div>
+                `;
+                return;
+            }
+
+            const items = history.map(h => {
+                const operator = (h.eo_operator || '').toLowerCase();
+                const iconClass = ['alt', 'des', 'con', 'nul'].includes(operator) ? operator : 'alt';
+                const icon = getHistoryIcon(h.event_verb || h.event_type);
+                const action = formatHistoryAction(h);
+                const changeHtml = formatHistoryChange(h);
+                const user = h.agent_name || h.agent_email || 'Unknown user';
+                const time = formatTimeAgo(h.created_at);
+
+                return `
+                    <div class="entity-history-item">
+                        <div class="entity-history-icon ${iconClass}">
+                            <i class="ph ph-${icon}"></i>
+                        </div>
+                        <div class="entity-history-content">
+                            <div class="entity-history-action">${action}</div>
+                            ${changeHtml}
+                            <div class="entity-history-meta">
+                                <div class="entity-history-user">
+                                    <i class="ph ph-user"></i>
+                                    ${user}
+                                </div>
+                                <span class="entity-history-time">${time}</span>
+                            </div>
+                        </div>
+                    </div>
+                `;
+            }).join('');
+
+            container.innerHTML = items;
+        }
+
+        // Get icon for history action type
+        function getHistoryIcon(eventVerb) {
+            const iconMap = {
+                'Update Due Date': 'calendar',
+                'Update Priority': 'flag',
+                'Update Status': 'check-circle',
+                'Update Description': 'text-align-left',
+                'Update Name': 'pencil',
+                'Add Entity': 'plus-circle',
+                'Delete Entity': 'trash',
+                'Link Tasks': 'link',
+                'Cascade Date Change': 'arrows-clockwise'
+            };
+            return iconMap[eventVerb] || 'arrow-clockwise';
+        }
+
+        // Format the action text for history
+        function formatHistoryAction(h) {
+            const verb = h.event_verb || h.event_type || 'Changed';
+            return verb;
+        }
+
+        // Format the change details (old → new value)
+        function formatHistoryChange(h) {
+            const data = h.data_json || h;
+            const field = data.field;
+            let oldVal = data.old_value || data.old_display;
+            let newVal = data.new_value || data.new_display;
+
+            if (!oldVal && !newVal) return '';
+
+            // Format display values
+            if (field === 'dueDate') {
+                oldVal = oldVal || 'No date';
+                newVal = newVal || 'No date';
+            } else if (field === 'description') {
+                // Truncate long descriptions
+                oldVal = oldVal ? (oldVal.length > 50 ? oldVal.substring(0, 50) + '...' : oldVal) : 'No description';
+                newVal = newVal ? (newVal.length > 50 ? newVal.substring(0, 50) + '...' : newVal) : 'No description';
+            }
+
+            return `
+                <div class="entity-history-change">
+                    <span class="entity-history-change-old">${oldVal || '(empty)'}</span>
+                    <span class="entity-history-change-arrow">→</span>
+                    <span class="entity-history-change-new">${newVal || '(empty)'}</span>
+                </div>
+            `;
+        }
+
+        // Format time ago for history items
+        function formatTimeAgo(dateString) {
+            if (!dateString) return '';
+            const date = new Date(dateString);
+            const now = new Date();
+            const diffMs = now - date;
+            const diffMins = Math.floor(diffMs / 60000);
+            const diffHours = Math.floor(diffMs / 3600000);
+            const diffDays = Math.floor(diffMs / 86400000);
+
+            if (diffMins < 1) return 'just now';
+            if (diffMins < 60) return `${diffMins}m ago`;
+            if (diffHours < 24) return `${diffHours}h ago`;
+            if (diffDays < 7) return `${diffDays}d ago`;
+            return date.toLocaleDateString();
         }
 
         // Reconstruct entities from Xano activity history
@@ -31600,6 +31943,14 @@ Cmd/Ctrl + K - Command palette
                                     <div class="date-option" onclick="event.stopPropagation(); setTaskDueDate('${task.id}', 'nextmonth')">Next Month</div>
                                     <div class="date-option" onclick="event.stopPropagation(); setTaskDueDate('${task.id}', 'none')">No Date</div>
                                 </div>
+                                <div class="date-picker-custom" onclick="event.stopPropagation();">
+                                    <input type="text"
+                                           id="customDate_${task.id}"
+                                           placeholder="Pick a specific date..."
+                                           value="${task.dueDate || ''}"
+                                           onfocus="initTaskDatePicker('${task.id}')"
+                                           readonly>
+                                </div>
                             </div>
                         </div>
 
@@ -31773,9 +32124,35 @@ Cmd/Ctrl + K - Command palette
             if (!task) return;
 
             const newDescription = textarea.value.trim();
-            if (newDescription !== (task.description || '')) {
+            const oldDescription = task.description || '';
+
+            if (newDescription !== oldDescription) {
+                // Track in undo history before making changes
+                pushToUndoHistory({
+                    type: 'update_entity',
+                    entityType: 'task',
+                    data: { id: task.id },
+                    oldData: { description: oldDescription },
+                    description: `Edit description: ${task.name}`
+                });
+
                 task.description = newDescription;
                 saveData();
+
+                // Log to Xano with full history tracking
+                logActivityToXano({
+                    event_verb: 'Update Description',
+                    eo_operator: 'ALT',
+                    object_type: 'task',
+                    object_id: taskId,
+                    object_label: task.name,
+                    data_json: {
+                        field: 'description',
+                        old_value: oldDescription,
+                        new_value: newDescription
+                    }
+                });
+
                 showToast('Description saved', 'success');
             }
         }
@@ -31884,14 +32261,38 @@ Options:
             const task = entities.task.find(t => t.id === taskId);
             if (!task) return;
 
+            // Capture old value for history tracking
+            const oldStatus = task.status || 'pending';
+
+            // Only proceed if status actually changed
+            if (oldStatus === newStatus) return;
+
+            // Track in undo history before making changes
+            pushToUndoHistory({
+                type: 'update_entity',
+                entityType: 'task',
+                data: { id: task.id },
+                oldData: { status: oldStatus },
+                description: `Change status: ${task.name}`
+            });
+
             task.status = newStatus;
             saveData();
 
-            // Log activity
+            // Log activity with full history tracking
             logActivityToXano({
-                event_verb: 'Update Task Status',
-                event_object: JSON.stringify({ taskId, name: task.name, status: newStatus }),
-                details: `Changed status to ${newStatus}`
+                event_verb: 'Update Status',
+                eo_operator: 'ALT',
+                object_type: 'task',
+                object_id: taskId,
+                object_label: task.name,
+                data_json: {
+                    field: 'status',
+                    old_value: oldStatus,
+                    new_value: newStatus,
+                    old_display: getStatusLabel(oldStatus),
+                    new_display: getStatusLabel(newStatus)
+                }
             });
 
             // Re-render the modal to update the UI
@@ -33180,9 +33581,45 @@ Options:
             }
         }
 
+        // Store flatpickr instances to avoid multiple initializations
+        const taskDatePickers = {};
+
+        function initTaskDatePicker(taskId) {
+            const inputEl = document.getElementById(`customDate_${taskId}`);
+            if (!inputEl || taskDatePickers[taskId]) return;
+
+            const task = entities.task.find(t => t.id === taskId);
+
+            taskDatePickers[taskId] = flatpickr(inputEl, {
+                dateFormat: 'Y-m-d',
+                defaultDate: task?.dueDate || null,
+                allowInput: false,
+                onChange: function(selectedDates, dateStr) {
+                    if (dateStr) {
+                        setTaskDueDate(taskId, dateStr);
+                    }
+                },
+                onClose: function() {
+                    // Clean up picker instance after closing
+                    setTimeout(() => {
+                        if (taskDatePickers[taskId]) {
+                            taskDatePickers[taskId].destroy();
+                            delete taskDatePickers[taskId];
+                        }
+                    }, 100);
+                }
+            });
+
+            // Open the picker immediately
+            taskDatePickers[taskId].open();
+        }
+
         function setTaskDueDate(taskId, dateOption) {
             const task = entities.task.find(t => t.id === taskId);
             if (!task) return;
+
+            // Capture old value for history tracking
+            const oldDate = task.dueDate || null;
 
             let newDate = null;
             const today = new Date();
@@ -33217,10 +33654,48 @@ Options:
                 case 'none':
                     newDate = null;
                     break;
+                default:
+                    // Handle custom date string (YYYY-MM-DD format)
+                    if (dateOption && /^\d{4}-\d{2}-\d{2}$/.test(dateOption)) {
+                        newDate = dateOption;
+                    }
+                    break;
             }
+
+            // Only proceed if date actually changed
+            if (oldDate === newDate) {
+                const picker = document.getElementById(`taskDatePicker_${taskId}`);
+                if (picker) picker.classList.remove('show');
+                return;
+            }
+
+            // Track in undo history before making changes
+            pushToUndoHistory({
+                type: 'update_entity',
+                entityType: 'task',
+                data: { id: task.id },
+                oldData: { dueDate: oldDate },
+                description: `Change due date: ${task.name}`
+            });
 
             task.dueDate = newDate;
             saveToLocalStorage();
+
+            // Log to Xano with full history tracking
+            logActivityToXano({
+                event_verb: 'Update Due Date',
+                eo_operator: 'ALT',
+                object_type: 'task',
+                object_id: taskId,
+                object_label: task.name,
+                data_json: {
+                    field: 'dueDate',
+                    old_value: oldDate,
+                    new_value: newDate,
+                    old_display: oldDate ? formatDateShort(oldDate) : 'No date',
+                    new_display: newDate ? formatDateShort(newDate) : 'No date'
+                }
+            });
 
             // Close the picker
             const picker = document.getElementById(`taskDatePicker_${taskId}`);
@@ -33241,12 +33716,39 @@ Options:
             const task = entities.task.find(t => t.id === taskId);
             if (!task) return;
 
-            const priorities = ['low', 'medium', 'high', 'urgent'];
-            const currentIndex = priorities.indexOf(task.priority || 'medium');
-            const nextIndex = (currentIndex + 1) % priorities.length;
-            task.priority = priorities[nextIndex];
+            // Capture old value for history tracking
+            const oldPriority = task.priority || 'medium';
 
+            const priorities = ['low', 'medium', 'high', 'urgent'];
+            const currentIndex = priorities.indexOf(oldPriority);
+            const nextIndex = (currentIndex + 1) % priorities.length;
+            const newPriority = priorities[nextIndex];
+
+            // Track in undo history before making changes
+            pushToUndoHistory({
+                type: 'update_entity',
+                entityType: 'task',
+                data: { id: task.id },
+                oldData: { priority: oldPriority },
+                description: `Change priority: ${task.name}`
+            });
+
+            task.priority = newPriority;
             saveToLocalStorage();
+
+            // Log to Xano with full history tracking
+            logActivityToXano({
+                event_verb: 'Update Priority',
+                eo_operator: 'ALT',
+                object_type: 'task',
+                object_id: taskId,
+                object_label: task.name,
+                data_json: {
+                    field: 'priority',
+                    old_value: oldPriority,
+                    new_value: newPriority
+                }
+            });
 
             // Refresh the modal
             openEntityModal(taskId, 'task');
@@ -33256,7 +33758,7 @@ Options:
                 renderTaskBoard();
             }
 
-            showToast(`Priority: ${task.priority.charAt(0).toUpperCase() + task.priority.slice(1)}`, 'success');
+            showToast(`Priority: ${newPriority.charAt(0).toUpperCase() + newPriority.slice(1)}`, 'success');
         }
 
         // Close date picker when clicking outside
