@@ -10916,6 +10916,98 @@
             cursor: pointer;
         }
 
+        /* Inline Filter Controls */
+        .inline-filter-bar {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            flex-wrap: wrap;
+        }
+
+        .inline-filter-group {
+            display: flex;
+            align-items: center;
+            gap: 4px;
+            background: #F8F5F0;
+            border-radius: 6px;
+            padding: 4px;
+        }
+
+        .inline-filter-btn {
+            display: flex;
+            align-items: center;
+            gap: 4px;
+            padding: 6px 10px;
+            border: none;
+            border-radius: 4px;
+            background: transparent;
+            font-size: 0.8rem;
+            cursor: pointer;
+            color: #6B5642;
+            transition: all 0.15s ease;
+            white-space: nowrap;
+        }
+
+        .inline-filter-btn:hover {
+            background: rgba(200, 143, 74, 0.15);
+        }
+
+        .inline-filter-btn.active {
+            background: white;
+            color: #3D2E1F;
+            box-shadow: 0 1px 2px rgba(0,0,0,0.1);
+        }
+
+        .inline-filter-btn i {
+            font-size: 0.9rem;
+        }
+
+        .inline-filter-btn.status-pending.active { color: #8B6F47; }
+        .inline-filter-btn.status-in_progress.active { color: #C88F4A; }
+        .inline-filter-btn.status-completed.active { color: #5B8A5A; }
+
+        .inline-filter-divider {
+            width: 1px;
+            height: 20px;
+            background: #E5DDD1;
+            margin: 0 4px;
+        }
+
+        .inline-filter-more-btn {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 6px 10px;
+            border: 1px solid #E5DDD1;
+            border-radius: 6px;
+            background: white;
+            font-size: 0.8rem;
+            cursor: pointer;
+            color: #6B5642;
+            gap: 4px;
+            transition: all 0.15s ease;
+        }
+
+        .inline-filter-more-btn:hover {
+            background: #F8F5F0;
+            border-color: #C88F4A;
+        }
+
+        .inline-filter-more-btn.has-filters {
+            background: #FDF8F3;
+            border-color: #C88F4A;
+            color: #C88F4A;
+        }
+
+        .inline-filter-badge {
+            background: #C88F4A;
+            color: white;
+            font-size: 0.65rem;
+            padding: 2px 5px;
+            border-radius: 10px;
+            font-weight: 600;
+        }
+
         /* Quick Add Bar - Simplified task creation */
         .quick-add-bar {
             display: flex;
@@ -17211,6 +17303,25 @@
                             <div class="suggestion-item"><strong>#tag</strong> — Add tags</div>
                         </div>
                     </div>
+                    <!-- Inline Filters -->
+                    <div class="inline-filter-bar" id="inlineFilterBar">
+                        <div class="inline-filter-group">
+                            <button class="inline-filter-btn status-pending active" data-status="pending" onclick="toggleInlineStatusFilter('pending')" title="To Do">
+                                <i class="ph ph-circle"></i> To Do
+                            </button>
+                            <button class="inline-filter-btn status-in_progress active" data-status="in_progress" onclick="toggleInlineStatusFilter('in_progress')" title="In Progress">
+                                <i class="ph ph-spinner"></i> In Progress
+                            </button>
+                            <button class="inline-filter-btn status-completed active" data-status="completed" onclick="toggleInlineStatusFilter('completed')" title="Done">
+                                <i class="ph ph-check-circle"></i> Done
+                            </button>
+                        </div>
+                        <button class="inline-filter-more-btn" id="inlineFilterMoreBtn" onclick="openAdvancedFilterPanel()" title="More filters">
+                            <i class="ph ph-funnel"></i>
+                            <span>More</span>
+                            <span class="inline-filter-badge" id="inlineFilterBadge" style="display: none;">0</span>
+                        </button>
+                    </div>
                     <input type="text"
                            id="taskBoardSearch"
                            class="task-board-search"
@@ -20421,6 +20532,16 @@ John Doe,Engineering,john@example.com"
                 renderFlowView();
             } else if (currentView === 'shape') {
                 renderShapeView();
+            } else if (currentView === 'kanban') {
+                renderKanbanBoard();
+            } else if (currentView === 'table') {
+                renderTaskTable();
+            } else if (currentView === 'timeline') {
+                renderTimeline();
+            } else if (currentView === 'gantt') {
+                renderGanttView();
+            } else if (currentView === 'calendar') {
+                renderCalendarView();
             }
         }
 
@@ -20720,7 +20841,75 @@ John Doe,Engineering,john@example.com"
             }
 
             updateFilterActiveCount();
+            updateInlineFilterUI();
             applyAdvancedFilters();
+        }
+
+        // Inline status filter toggle (syncs with advanced filters)
+        function toggleInlineStatusFilter(status) {
+            const btn = document.querySelector(`.inline-filter-btn[data-status="${status}"]`);
+            if (!btn) return;
+
+            btn.classList.toggle('active');
+            const isActive = btn.classList.contains('active');
+
+            // Update advancedFilters
+            if (isActive) {
+                if (!advancedFilters.status.includes(status)) {
+                    advancedFilters.status.push(status);
+                }
+            } else {
+                advancedFilters.status = advancedFilters.status.filter(s => s !== status);
+            }
+
+            // Sync with advanced filter panel chips
+            const panelChip = document.querySelector(`.filter-chip[data-filter="status"][data-value="${status}"]`);
+            if (panelChip) {
+                if (isActive) {
+                    panelChip.classList.add('active');
+                } else {
+                    panelChip.classList.remove('active');
+                }
+            }
+
+            updateFilterActiveCount();
+            updateInlineFilterUI();
+            applyAdvancedFilters();
+        }
+
+        // Update inline filter buttons to match advancedFilters state
+        function updateInlineFilterUI() {
+            // Update status buttons
+            ['pending', 'in_progress', 'completed'].forEach(status => {
+                const btn = document.querySelector(`.inline-filter-btn[data-status="${status}"]`);
+                if (btn) {
+                    if (advancedFilters.status.includes(status)) {
+                        btn.classList.add('active');
+                    } else {
+                        btn.classList.remove('active');
+                    }
+                }
+            });
+
+            // Count non-status active filters for badge
+            let additionalFilters = 0;
+            if (advancedFilters.priority.length < 3) additionalFilters++;
+            if (advancedFilters.dateFrom || advancedFilters.dateTo || advancedFilters.datePreset) additionalFilters++;
+            if (advancedFilters.assignees.length > 0) additionalFilters++;
+            if (advancedFilters.tags.length > 0) additionalFilters++;
+
+            const badge = document.getElementById('inlineFilterBadge');
+            const moreBtn = document.getElementById('inlineFilterMoreBtn');
+            if (badge && moreBtn) {
+                if (additionalFilters > 0) {
+                    badge.textContent = additionalFilters;
+                    badge.style.display = 'inline';
+                    moreBtn.classList.add('has-filters');
+                } else {
+                    badge.style.display = 'none';
+                    moreBtn.classList.remove('has-filters');
+                }
+            }
         }
 
         function setDatePreset(preset) {
@@ -20904,6 +21093,7 @@ John Doe,Engineering,john@example.com"
 
             populateAssigneeList();
             updateFilterActiveCount();
+            updateInlineFilterUI();
             applyAdvancedFilters();
         }
 
@@ -20914,6 +21104,9 @@ John Doe,Engineering,john@example.com"
 
             if (dateFrom) advancedFilters.dateFrom = new Date(dateFrom);
             if (dateTo) advancedFilters.dateTo = new Date(dateTo);
+
+            // Update inline filter UI to stay in sync
+            updateInlineFilterUI();
 
             // Re-render current view with filters
             if (currentView === 'kanban') {
