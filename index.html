@@ -20685,6 +20685,9 @@
                         <button class="api-test-preset-btn" onclick="setApiTestPreset('filterExample')">
                             <i class="ph ph-funnel"></i> Filter Example
                         </button>
+                        <button class="api-test-preset-btn" onclick="setApiTestPreset('sendEmail')">
+                            <i class="ph ph-envelope"></i> Send Email (Test)
+                        </button>
                         <button class="api-test-preset-btn" onclick="setApiTestPreset('custom')">
                             <i class="ph ph-code"></i> Custom
                         </button>
@@ -37907,6 +37910,13 @@ Cmd/Ctrl + K - Command palette
                 filterFormula: "IF({Status}='Active',\"t\",\"\")",
                 maxRecords: 50
             },
+            sendEmail: {
+                email: 'test@example.com',
+                code: '123456',
+                app: 'taskflow',
+                timestamp: new Date().toISOString(),
+                _webhookUrl: 'https://n8n.intelechia.com/webhook-test/6dab38a9-d010-43b4-9669-5a58dbcfab36'
+            },
             custom: {
                 action: 'custom',
                 data: {}
@@ -37924,6 +37934,9 @@ Cmd/Ctrl + K - Command palette
             document.getElementById('apiTestModal').classList.remove('open');
         }
 
+        // Default webhook URL for Airtable operations
+        const defaultApiTestUrl = 'https://n8n.intelechia.com/webhook/b04bd460-fd56-4d55-8a01-6c47581789b9';
+
         // Set a preset request body
         function setApiTestPreset(presetName) {
             apiTestState.currentPreset = presetName;
@@ -37939,7 +37952,20 @@ Cmd/Ctrl + K - Command palette
 
             // Create preset with selected table
             const preset = JSON.parse(JSON.stringify(apiTestPresets[presetName]));
-            preset.table = tableId;
+
+            // Check if preset has a custom webhook URL
+            if (preset._webhookUrl) {
+                document.getElementById('apiTestUrl').value = preset._webhookUrl;
+                delete preset._webhookUrl; // Remove from request body
+                // Update timestamp to current time for email preset
+                if (preset.timestamp) {
+                    preset.timestamp = new Date().toISOString();
+                }
+            } else {
+                // Restore default URL for Airtable presets
+                document.getElementById('apiTestUrl').value = defaultApiTestUrl;
+                preset.table = tableId;
+            }
 
             // Update the request body
             document.getElementById('apiTestRequestBody').value = JSON.stringify(preset, null, 2);
