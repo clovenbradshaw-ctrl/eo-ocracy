@@ -10801,6 +10801,156 @@
             border-color: #C88F4A;
         }
 
+        /* Inline Date Picker for Task Lists */
+        .inline-date-trigger {
+            display: inline-flex;
+            align-items: center;
+            gap: 4px;
+            padding: 3px 8px;
+            border-radius: 4px;
+            cursor: pointer;
+            transition: all 0.15s;
+            font-size: 12px;
+            position: relative;
+        }
+
+        .inline-date-trigger:hover {
+            background: rgba(200, 143, 74, 0.15);
+        }
+
+        .inline-date-trigger.empty {
+            color: #999;
+            border: 1px dashed #ccc;
+        }
+
+        .inline-date-trigger.empty:hover {
+            border-color: #C88F4A;
+            color: #C88F4A;
+        }
+
+        .inline-date-popup {
+            position: absolute;
+            top: calc(100% + 4px);
+            left: 0;
+            background: white;
+            border: 1px solid #E5DDD1;
+            border-radius: 8px;
+            padding: 8px;
+            box-shadow: 0 4px 16px rgba(0,0,0,0.15);
+            display: none;
+            z-index: 1000;
+            min-width: 200px;
+        }
+
+        .inline-date-popup.show {
+            display: block;
+            animation: slideDown 0.15s ease-out;
+        }
+
+        .inline-date-options {
+            display: flex;
+            flex-direction: column;
+            gap: 2px;
+        }
+
+        .inline-date-option {
+            padding: 8px 10px;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 13px;
+            color: #555;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            transition: background 0.1s;
+        }
+
+        .inline-date-option:hover {
+            background: #FAF7F5;
+            color: #3D2E1F;
+        }
+
+        .inline-date-option i {
+            font-size: 14px;
+            color: #888;
+            width: 18px;
+        }
+
+        .inline-date-option:hover i {
+            color: #C88F4A;
+        }
+
+        .inline-date-option.clear {
+            border-top: 1px solid #eee;
+            margin-top: 4px;
+            padding-top: 10px;
+            color: #999;
+        }
+
+        .inline-date-option.clear:hover {
+            color: #dc2626;
+        }
+
+        .inline-date-option.calendar {
+            border-top: 1px solid #eee;
+            margin-top: 4px;
+            padding-top: 10px;
+            color: #666;
+        }
+
+        /* Quick Date Buttons in Modal */
+        .quick-date-section {
+            margin-bottom: 16px;
+            padding: 12px;
+            background: #FAFAFA;
+            border-radius: 8px;
+            border: 1px solid #f0f0f0;
+        }
+
+        .quick-date-label {
+            font-size: 12px;
+            color: #888;
+            font-weight: 500;
+            margin-bottom: 8px;
+            display: block;
+        }
+
+        .quick-date-buttons {
+            display: flex;
+            gap: 6px;
+            flex-wrap: wrap;
+        }
+
+        .quick-date-btn {
+            padding: 6px 12px;
+            border-radius: 16px;
+            border: 1px solid #E5DDD1;
+            background: white;
+            font-size: 12px;
+            cursor: pointer;
+            transition: all 0.15s;
+            color: #6B5642;
+            display: inline-flex;
+            align-items: center;
+            gap: 4px;
+        }
+
+        .quick-date-btn:hover {
+            border-color: #C88F4A;
+            background: #FAF7F5;
+            color: #C88F4A;
+        }
+
+        .quick-date-btn.active {
+            background: #C88F4A;
+            border-color: #C88F4A;
+            color: white;
+        }
+
+        .quick-date-btn i {
+            font-size: 12px;
+        }
+
         /* Role Selector Grid */
         .role-selector-grid {
             display: grid;
@@ -12532,6 +12682,41 @@
         .simple-task-chip.filled:hover {
             background: #eee;
             transform: translateY(-1px);
+        }
+
+        /* Date chip with edit hint */
+        .simple-task-chip.filled:has(+ .quick-date-buttons),
+        .simple-task-chip.empty:first-of-type {
+            position: relative;
+        }
+
+        .simple-task-chip.filled:has(+ .quick-date-buttons)::after,
+        .simple-task-chip.empty:first-of-type::after {
+            content: '';
+            position: absolute;
+            right: 8px;
+            width: 0;
+            height: 0;
+            border-left: 4px solid transparent;
+            border-right: 4px solid transparent;
+            border-top: 4px solid currentColor;
+            opacity: 0.5;
+        }
+
+        /* Due date color states for inline date triggers */
+        .inline-date-trigger.overdue {
+            color: #dc2626 !important;
+            background: rgba(220, 38, 38, 0.1);
+        }
+
+        .inline-date-trigger.due-today {
+            color: #ea580c !important;
+            background: rgba(234, 88, 12, 0.1);
+        }
+
+        .inline-date-trigger.due-soon {
+            color: #ca8a04 !important;
+            background: rgba(202, 138, 4, 0.1);
         }
 
         .simple-task-chip.status-pending {
@@ -32459,6 +32644,25 @@ Cmd/Ctrl + K - Command palette
             return '';
         }
 
+        // Check if a date string is today
+        function isToday(dateStr) {
+            if (!dateStr) return false;
+            const today = new Date();
+            today.setHours(0, 0, 0, 0);
+            const date = parseLocalDate(dateStr);
+            return date.getTime() === today.getTime();
+        }
+
+        // Check if a date string is tomorrow
+        function isTomorrow(dateStr) {
+            if (!dateStr) return false;
+            const tomorrow = new Date();
+            tomorrow.setHours(0, 0, 0, 0);
+            tomorrow.setDate(tomorrow.getDate() + 1);
+            const date = parseLocalDate(dateStr);
+            return date.getTime() === tomorrow.getTime();
+        }
+
         // Render task-specific modal info section - Simplified version
         function renderTaskModalInfo(task) {
             const dueDateStatus = getTaskDueDateStatus(task);
@@ -32593,6 +32797,30 @@ Cmd/Ctrl + K - Command palette
                         <div class="simple-task-chip ${connectedRoles.length ? 'filled' : 'empty'}" ${connectedRoles.length ? `onclick="openEntityModal('${connectedRoles[0].id}', 'role')"` : `onclick="showToast('Use Edit button to assign role', 'info')"`}>
                             <i class="ph ph-briefcase"></i>
                             <span>${connectedRoles.length ? connectedRoles[0].name : 'Assign role'}</span>
+                        </div>
+                    </div>
+
+                    <!-- Quick Date Buttons -->
+                    <div class="quick-date-section">
+                        <span class="quick-date-label">Quick set deadline:</span>
+                        <div class="quick-date-buttons">
+                            <button class="quick-date-btn ${isToday(task.dueDate) ? 'active' : ''}" onclick="setTaskDueDate('${task.id}', 'today')">
+                                <i class="ph ph-sun"></i> Today
+                            </button>
+                            <button class="quick-date-btn ${isTomorrow(task.dueDate) ? 'active' : ''}" onclick="setTaskDueDate('${task.id}', 'tomorrow')">
+                                <i class="ph ph-sun-horizon"></i> Tomorrow
+                            </button>
+                            <button class="quick-date-btn" onclick="setTaskDueDate('${task.id}', 'nextweek')">
+                                <i class="ph ph-calendar-plus"></i> +1 Week
+                            </button>
+                            <button class="quick-date-btn" onclick="openInlineFlatpickr('${task.id}', event)">
+                                <i class="ph ph-calendar-blank"></i> Pick...
+                            </button>
+                            ${task.dueDate ? `
+                            <button class="quick-date-btn" onclick="setTaskDueDate('${task.id}', 'none')" title="Clear date">
+                                <i class="ph ph-x"></i>
+                            </button>
+                            ` : ''}
                         </div>
                     </div>
 
@@ -33072,8 +33300,6 @@ Options:
                             </div>
                             <div class="role-task-list">
                                 ${connectedTasks.map(task => {
-                                    const dueDateStatus = getTaskDueDateStatus(task);
-                                    const dueLabel = task.dueDate ? formatDateShort(task.dueDate) : '';
                                     const statusIcon = task.status === 'completed' ? 'ph-check' :
                                                        task.status === 'in_progress' ? 'ph-spinner' : '';
                                     return `
@@ -33083,13 +33309,9 @@ Options:
                                         </div>
                                         <div class="role-task-info">
                                             <div class="role-task-name">${task.name}</div>
-                                            ${task.dueDate ? `
-                                                <div class="role-task-meta">
-                                                    <span class="role-task-due ${dueDateStatus}">
-                                                        <i class="ph ph-calendar"></i> ${dueLabel}
-                                                    </span>
-                                                </div>
-                                            ` : ''}
+                                            <div class="role-task-meta">
+                                                ${renderInlineDatePicker(task.id, task.dueDate)}
+                                            </div>
                                         </div>
                                     </div>
                                     `;
@@ -34208,6 +34430,131 @@ Options:
             if (picker) {
                 picker.classList.toggle('show');
             }
+        }
+
+        // Inline date picker for task list items
+        let activeInlineDatePicker = null;
+
+        function showInlineDatePicker(taskId, event) {
+            event.stopPropagation();
+
+            // Close any existing picker
+            closeAllInlineDatePickers();
+
+            const picker = document.getElementById(`inlineDatePicker_${taskId}`);
+            if (picker) {
+                picker.classList.add('show');
+                activeInlineDatePicker = taskId;
+
+                // Close when clicking outside
+                setTimeout(() => {
+                    document.addEventListener('click', closeInlineDatePickerOnOutsideClick);
+                }, 10);
+            }
+        }
+
+        function closeAllInlineDatePickers() {
+            document.querySelectorAll('.inline-date-popup.show').forEach(p => p.classList.remove('show'));
+            document.removeEventListener('click', closeInlineDatePickerOnOutsideClick);
+            activeInlineDatePicker = null;
+        }
+
+        function closeInlineDatePickerOnOutsideClick(event) {
+            if (!event.target.closest('.inline-date-popup') && !event.target.closest('.inline-date-trigger')) {
+                closeAllInlineDatePickers();
+            }
+        }
+
+        function setInlineTaskDate(taskId, dateOption, event) {
+            if (event) event.stopPropagation();
+            closeAllInlineDatePickers();
+            setTaskDueDate(taskId, dateOption);
+
+            // Refresh any open modals or views
+            const entityModal = document.getElementById('entityModal');
+            if (entityModal && entityModal.classList.contains('active')) {
+                const modalTaskId = entityModal.dataset.entityId;
+                const modalType = entityModal.dataset.entityType;
+                if (modalType === 'task' || modalType === 'role') {
+                    openEntityModal(modalTaskId, modalType);
+                }
+            }
+        }
+
+        function openInlineFlatpickr(taskId, event) {
+            if (event) event.stopPropagation();
+            closeAllInlineDatePickers();
+
+            const task = entities.task.find(t => t.id === taskId);
+
+            // Create a temporary input for flatpickr
+            const tempInput = document.createElement('input');
+            tempInput.style.position = 'absolute';
+            tempInput.style.opacity = '0';
+            tempInput.style.pointerEvents = 'none';
+            document.body.appendChild(tempInput);
+
+            const fp = flatpickr(tempInput, {
+                dateFormat: 'Y-m-d',
+                defaultDate: task?.dueDate || null,
+                allowInput: false,
+                onChange: function(selectedDates, dateStr) {
+                    if (dateStr) {
+                        setTaskDueDate(taskId, dateStr);
+                        // Refresh any open modals
+                        const entityModal = document.getElementById('entityModal');
+                        if (entityModal && entityModal.classList.contains('active')) {
+                            const modalTaskId = entityModal.dataset.entityId;
+                            const modalType = entityModal.dataset.entityType;
+                            if (modalType === 'task' || modalType === 'role') {
+                                openEntityModal(modalTaskId, modalType);
+                            }
+                        }
+                    }
+                },
+                onClose: function() {
+                    setTimeout(() => {
+                        fp.destroy();
+                        tempInput.remove();
+                    }, 100);
+                }
+            });
+
+            fp.open();
+        }
+
+        // Generate inline date picker HTML for use in task lists
+        function renderInlineDatePicker(taskId, currentDate) {
+            const displayDate = currentDate ? formatDateShort(currentDate) : 'Set date';
+            const dueDateStatus = currentDate ? getTaskDueDateStatus({ dueDate: currentDate, status: 'pending' }) : '';
+
+            return `
+                <div class="inline-date-trigger ${currentDate ? dueDateStatus : 'empty'}" onclick="showInlineDatePicker('${taskId}', event)">
+                    <i class="ph ph-calendar"></i>
+                    <span>${displayDate}</span>
+                    <div class="inline-date-popup" id="inlineDatePicker_${taskId}">
+                        <div class="inline-date-options">
+                            <div class="inline-date-option" onclick="setInlineTaskDate('${taskId}', 'today', event)">
+                                <i class="ph ph-sun"></i> Today
+                            </div>
+                            <div class="inline-date-option" onclick="setInlineTaskDate('${taskId}', 'tomorrow', event)">
+                                <i class="ph ph-sun-horizon"></i> Tomorrow
+                            </div>
+                            <div class="inline-date-option" onclick="setInlineTaskDate('${taskId}', 'nextweek', event)">
+                                <i class="ph ph-calendar-plus"></i> Next week
+                            </div>
+                            <div class="inline-date-option calendar" onclick="openInlineFlatpickr('${taskId}', event)">
+                                <i class="ph ph-calendar-blank"></i> Pick date...
+                            </div>
+                            ${currentDate ? `
+                            <div class="inline-date-option clear" onclick="setInlineTaskDate('${taskId}', 'none', event)">
+                                <i class="ph ph-x"></i> Clear date
+                            </div>
+                            ` : ''}
+                        </div>
+                    </div>
+                </div>
+            `;
         }
 
         // Store flatpickr instances to avoid multiple initializations
@@ -35653,7 +36000,7 @@ Options:
                                         <div class="subtask-name">${subtask.name}</div>
                                         <div class="subtask-meta">
                                             ${role ? `<span class="subtask-role"><i class="ph ph-briefcase"></i> ${role.name}</span>` : ''}
-                                            ${subtask.dueDate ? `<span class="subtask-due"><i class="ph ph-calendar"></i> ${formatDateShort(subtask.dueDate)}</span>` : ''}
+                                            ${renderInlineDatePicker(subtask.id, subtask.dueDate)}
                                         </div>
                                     </div>
                                 </div>
