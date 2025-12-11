@@ -1078,7 +1078,7 @@
 
         .container {
             display: grid;
-            grid-template-columns: 300px 1fr;
+            grid-template-columns: 260px 1fr;
             height: calc(100vh - 65px);
         }
 
@@ -1182,7 +1182,7 @@
 
         /* Right panel removed - no longer needed */
         .container.right-collapsed {
-            grid-template-columns: 300px 1fr;
+            grid-template-columns: 260px 1fr;
         }
 
         .container.left-collapsed.right-collapsed {
@@ -8009,6 +8009,231 @@
 
         .recycle-bin-actions .btn-icon.delete:hover {
             color: #d32f2f;
+        }
+
+        /* Sidebar Tabs Styles */
+        .sidebar-tabs {
+            display: flex;
+            gap: 0;
+            margin-bottom: 1rem;
+            background: #FAF7F5;
+            border-radius: 8px;
+            padding: 4px;
+            margin-top: 2.5rem;
+        }
+
+        .sidebar-tab {
+            flex: 1;
+            padding: 0.5rem 0.75rem;
+            border: none;
+            background: transparent;
+            color: #8B6F47;
+            font-size: 0.8rem;
+            font-weight: 500;
+            cursor: pointer;
+            border-radius: 6px;
+            transition: all 0.2s ease;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 0.35rem;
+        }
+
+        .sidebar-tab:hover {
+            color: #6B5642;
+            background: rgba(255, 255, 255, 0.5);
+        }
+
+        .sidebar-tab.active {
+            background: white;
+            color: #3D2E1F;
+            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.08);
+        }
+
+        .sidebar-tab i {
+            font-size: 1rem;
+        }
+
+        .sidebar-tab-content {
+            display: none;
+            flex-direction: column;
+            flex: 1;
+            min-height: 0;
+            overflow: hidden;
+        }
+
+        .sidebar-tab-content.active {
+            display: flex;
+        }
+
+        .sidebar-tab-scroll {
+            flex: 1;
+            overflow-y: auto;
+            min-height: 0;
+        }
+
+        /* People tab specific styles */
+        .people-list {
+            display: flex;
+            flex-direction: column;
+            gap: 0.5rem;
+        }
+
+        .person-card {
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+            padding: 0.75rem;
+            background: #FAF7F5;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: all 0.15s ease;
+        }
+
+        .person-card:hover {
+            background: #F5EFE6;
+            transform: translateX(2px);
+        }
+
+        .person-avatar {
+            width: 36px;
+            height: 36px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, #C88F4A 0%, #B87B5B 100%);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-weight: 600;
+            font-size: 0.9rem;
+            flex-shrink: 0;
+        }
+
+        .person-info {
+            flex: 1;
+            min-width: 0;
+        }
+
+        .person-name {
+            font-weight: 500;
+            color: #3D2E1F;
+            font-size: 0.9rem;
+            margin-bottom: 0.15rem;
+        }
+
+        .person-roles {
+            font-size: 0.75rem;
+            color: #8B6F47;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+
+        .person-actions {
+            opacity: 0;
+            transition: opacity 0.15s;
+        }
+
+        .person-card:hover .person-actions {
+            opacity: 1;
+        }
+
+        /* Recent tab styles */
+        .recent-section {
+            margin-bottom: 1rem;
+        }
+
+        .recent-section-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 0.5rem 0;
+            border-bottom: 1px solid #E5DDD1;
+            margin-bottom: 0.5rem;
+        }
+
+        .recent-section-title {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            font-weight: 600;
+            color: #6B5642;
+            font-size: 0.8rem;
+            text-transform: uppercase;
+            letter-spacing: 0.03em;
+        }
+
+        /* Sidebar add button */
+        .sidebar-add-btn {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 0.5rem;
+            padding: 0.75rem;
+            background: linear-gradient(135deg, #C88F4A 0%, #B87B5B 100%);
+            color: white;
+            border: none;
+            border-radius: 8px;
+            font-weight: 500;
+            font-size: 0.85rem;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            margin-top: auto;
+            flex-shrink: 0;
+        }
+
+        .sidebar-add-btn:hover {
+            background: linear-gradient(135deg, #D9A05B 0%, #C98C6C 100%);
+            transform: translateY(-1px);
+            box-shadow: 0 4px 12px rgba(200, 143, 74, 0.3);
+        }
+
+        .sidebar-add-btn i {
+            font-size: 1.1rem;
+        }
+
+        /* Adjust panel-left for flex layout */
+        .panel-left {
+            display: flex;
+            flex-direction: column;
+            overflow: hidden;
+        }
+
+        .panel-left .entity-list {
+            flex: 1;
+            overflow-y: auto;
+        }
+
+        /* Activity feed in Recent tab - remove max-height constraint */
+        .recent-section .activity-feed-list {
+            max-height: none;
+        }
+
+        .recent-section .recycle-bin-list {
+            max-height: none;
+        }
+
+        /* Empty state for tabs */
+        .tab-empty-state {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            padding: 2rem 1rem;
+            text-align: center;
+            color: #8B6F47;
+        }
+
+        .tab-empty-state i {
+            font-size: 2.5rem;
+            opacity: 0.4;
+            margin-bottom: 0.75rem;
+        }
+
+        .tab-empty-state p {
+            margin: 0;
+            font-size: 0.85rem;
+            opacity: 0.8;
         }
 
         /* Task Wizard Styles */
@@ -15537,106 +15762,88 @@
             <button class="panel-collapse-btn" onclick="togglePanel('left')" title="Collapse sidebar">
                 <i class="ph ph-caret-left"></i>
             </button>
-            <!-- Search at top -->
+
+            <!-- Sidebar Tabs -->
+            <div class="sidebar-tabs">
+                <button class="sidebar-tab active" data-tab="org" onclick="switchSidebarTab('org')">
+                    <i class="ph ph-tree-structure"></i>
+                    <span>Org</span>
+                </button>
+                <button class="sidebar-tab" data-tab="people" onclick="switchSidebarTab('people')">
+                    <i class="ph ph-users"></i>
+                    <span>People</span>
+                </button>
+                <button class="sidebar-tab" data-tab="recent" onclick="switchSidebarTab('recent')">
+                    <i class="ph ph-clock-counter-clockwise"></i>
+                    <span>Recent</span>
+                </button>
+            </div>
+
+            <!-- Search -->
             <div class="input-group" style="margin-bottom: 1rem;">
-                <input type="text" id="entitySearch" placeholder="Search..." oninput="filterEntities()">
+                <input type="text" id="entitySearch" placeholder="Search..." oninput="filterSidebarContent()">
             </div>
 
-            <!-- Hidden: Entity creation sections (functionality available in modals) -->
-            <div class="collapsible-section collapsed" id="addEntitySection" style="display: none;">
-                <div class="collapsible-header" onclick="toggleCollapsible('addEntitySection')">
-                    <span><i class="ph ph-user-circle"></i> Who does it</span>
-                    <i class="ph ph-caret-down collapse-icon"></i>
-                </div>
-                <div class="collapsible-content">
-                    <div class="help-text" style="margin-bottom: 0.75rem;">Add roles and people as you assign work</div>
-                    <div class="entity-type-selector">
-                        <button class="entity-type-btn active" data-type="role" onclick="selectEntityType('role')" title="A function or responsibility - work gets assigned here">
-                            <i class="ph ph-briefcase"></i> Role
-                        </button>
-                        <button class="entity-type-btn" data-type="person" onclick="selectEntityType('person')" title="A real person who fills roles">
-                            <i class="ph ph-user"></i> Person
-                        </button>
-                    </div>
-
-                    <div class="input-group">
-                        <input type="text" id="entityName" placeholder="Enter name..." onkeypress="if(event.key==='Enter') addEntity()">
-                    </div>
-
-                    <button class="btn btn-secondary" onclick="addEntity()" id="addEntityBtn" style="width: 100%; display: flex; align-items: center; justify-content: center; gap: 0.5rem;">
-                        <i class="ph ph-plus-circle" style="font-size: 1.125rem;"></i> Add Role
-                    </button>
+            <!-- Tab Content: Org -->
+            <div class="sidebar-tab-content active" id="tabOrg">
+                <div class="sidebar-tab-scroll">
+                    <div id="entityList" class="entity-list"></div>
                 </div>
             </div>
 
-            <!-- Hidden: Structure section (functionality available in modals) -->
-            <div class="collapsible-section collapsed" id="structureSection" style="display: none;">
-                <div class="collapsible-header" onclick="toggleCollapsible('structureSection')">
-                    <span><i class="ph ph-tree-structure"></i> Organize structure</span>
-                    <i class="ph ph-caret-down collapse-icon"></i>
-                </div>
-                <div class="collapsible-content">
-                    <div class="help-text" style="margin-bottom: 0.75rem;">Group roles into teams as patterns emerge</div>
-                    <div class="entity-type-selector" style="margin-bottom: 0.75rem;">
-                        <button class="entity-type-btn" data-type="team" onclick="selectEntityType('team')" title="A working group of roles">
-                            <i class="ph ph-users-three"></i> Team
-                        </button>
-                        <button class="entity-type-btn" data-type="unit" onclick="selectEntityType('unit')" title="A department or division">
-                            <i class="ph ph-buildings"></i> Unit
-                        </button>
-                    </div>
-                    <div class="input-group">
-                        <input type="text" id="structureName" placeholder="Enter name..." onkeypress="if(event.key==='Enter') addStructureEntity()">
-                    </div>
-                    <button class="btn btn-secondary" onclick="addStructureEntity()" id="addStructureBtn" style="width: 100%; display: flex; align-items: center; justify-content: center; gap: 0.5rem;">
-                        <i class="ph ph-plus-circle" style="font-size: 1.125rem;"></i> Add Team
-                    </button>
-                    <div class="input-group" id="parentSelectGroup" style="margin-top: 0.75rem;">
-                        <label>Nest under</label>
-                        <select id="parentEntitySelect">
-                            <option value="">None - Top Level</option>
-                        </select>
-                    </div>
+            <!-- Tab Content: People -->
+            <div class="sidebar-tab-content" id="tabPeople">
+                <div class="sidebar-tab-scroll">
+                    <div id="peopleList" class="people-list"></div>
                 </div>
             </div>
-            <div id="entityList" class="entity-list"></div>
 
-            <!-- Activity Feed Section -->
-            <div class="activity-feed-section" id="activityFeedSection">
-                <div class="activity-feed-header" onclick="toggleActivityFeed()">
-                    <div class="activity-feed-title">
-                        <i class="ph ph-clock-counter-clockwise"></i>
-                        Recent Activity
-                        <span class="activity-feed-count" id="activityFeedCount">0</span>
+            <!-- Tab Content: Recent -->
+            <div class="sidebar-tab-content" id="tabRecent">
+                <div class="sidebar-tab-scroll">
+                    <!-- Activity Feed -->
+                    <div class="recent-section">
+                        <div class="recent-section-header">
+                            <div class="recent-section-title">
+                                <i class="ph ph-clock-counter-clockwise"></i>
+                                Activity
+                                <span class="activity-feed-count" id="activityFeedCount">0</span>
+                            </div>
+                        </div>
+                        <div class="activity-feed-list" id="activityFeedList">
+                            <div class="activity-feed-empty">
+                                <p>No recent activity</p>
+                            </div>
+                        </div>
                     </div>
-                    <i class="ph ph-caret-down activity-feed-toggle"></i>
-                </div>
-                <div class="activity-feed-list" id="activityFeedList">
-                    <div class="activity-feed-empty">
-                        <p>No recent activity</p>
+
+                    <!-- Recycle Bin -->
+                    <div class="recent-section">
+                        <div class="recent-section-header">
+                            <div class="recent-section-title">
+                                <i class="ph ph-trash"></i>
+                                Recycle Bin
+                                <span class="recycle-bin-count" id="recycleBinCount" style="display: none;">0</span>
+                            </div>
+                            <button class="recycle-bin-empty-btn" onclick="emptyRecycleBin()" title="Empty recycle bin">
+                                Empty
+                            </button>
+                        </div>
+                        <div class="recycle-bin-list" id="recycleBinList">
+                            <div class="recycle-bin-empty">
+                                <i class="ph ph-trash"></i>
+                                <p>Recycle bin is empty</p>
+                            </div>
+                        </div>
                     </div>
                 </div>
             </div>
 
-            <!-- Recycle Bin Section -->
-            <div class="recycle-bin-section">
-                <div class="recycle-bin-header">
-                    <div class="recycle-bin-title">
-                        <i class="ph ph-trash"></i>
-                        Recycle Bin
-                        <span class="recycle-bin-count" id="recycleBinCount" style="display: none;">0</span>
-                    </div>
-                    <button class="recycle-bin-empty-btn" onclick="emptyRecycleBin()" title="Empty recycle bin">
-                        Empty
-                    </button>
-                </div>
-                <div class="recycle-bin-list" id="recycleBinList">
-                    <div class="recycle-bin-empty">
-                        <i class="ph ph-trash"></i>
-                        <p>Recycle bin is empty</p>
-                    </div>
-                </div>
-            </div>
+            <!-- Contextual Add Button -->
+            <button class="sidebar-add-btn" id="sidebarAddBtn" onclick="handleSidebarAdd()">
+                <i class="ph ph-plus"></i>
+                <span id="sidebarAddBtnText">Add Unit</span>
+            </button>
         </div>
 
         <!-- Center Panel: Multiple Views -->
@@ -24996,57 +25203,15 @@ Cmd/Ctrl + K - Command palette
                 }
             }
 
-            // 5. PEOPLE - Separate section at the bottom
-            if (entities.person.length > 0 && (!searchTerm || entities.person.some(p => p.name.toLowerCase().includes(searchTerm)))) {
-                const section = document.createElement('div');
-                section.className = 'entity-section';
-                const header = document.createElement('div');
-                header.className = 'entity-section-header';
-                header.innerHTML = '<i class="ph ph-user" style="margin-right: 0.25rem;"></i> People';
-                section.appendChild(header);
-
-                entities.person.forEach(person => {
-                    if (searchTerm && !person.name.toLowerCase().includes(searchTerm)) return;
-
-                    // Find roles this person is assigned to
-                    const assignedRoles = relationships
-                        .filter(r => r.predicate === 'INS' && r.subject === person.id)
-                        .map(r => findEntity(r.object))
-                        .filter(e => e !== null && e.type === 'role');
-
-                    const roleBadges = assignedRoles.length > 0
-                        ? `<div style="display: flex; gap: 0.25rem; flex-wrap: wrap; margin-top: 0.25rem;">
-                            ${assignedRoles.map(role =>
-                                `<span style="font-size: 0.65rem; padding: 0.125rem 0.375rem; background: rgba(139, 111, 71, 0.1); color: #8B6F47; border-radius: 10px; cursor: pointer;" onclick="event.stopPropagation(); openEntityModal('${role.id}', 'role')"><i class="ph ph-briefcase"></i> ${role.name}</span>`
-                            ).join('')}
-                           </div>`
-                        : '';
-
-                    const node = document.createElement('div');
-                    node.className = 'entity-item person';
-                    node.style.cursor = 'pointer';
-                    node.onclick = (e) => {
-                        if (!e.target.closest('.btn-icon')) {
-                            openEntityModal(person.id, 'person');
-                        }
-                    };
-                    node.innerHTML = `
-                        <div style="flex: 1;">
-                            <div class="entity-name"><i class="ph ph-user"></i> ${person.name}</div>
-                            ${roleBadges}
-                        </div>
-                        <button class="btn-icon" onclick="event.stopPropagation(); deleteEntity('${person.id}', 'person')"><i class="ph ph-x"></i></button>
-                    `;
-                    section.appendChild(node);
-                });
-
-                if (section.children.length > 1) {
-                    list.appendChild(section);
-                }
-            }
+            // People are now in their own tab - removed from Org tab
 
             if (list.children.length === 0) {
-                list.innerHTML = '<div style="color: #8B6F47; text-align: center; padding: 2rem;">No matching entities</div>';
+                list.innerHTML = '<div class="tab-empty-state"><i class="ph ph-tree-structure"></i><p>No units, teams, or roles yet</p></div>';
+            }
+
+            // Also update People tab if it exists
+            if (typeof renderPeopleList === 'function' && currentSidebarTab === 'people') {
+                renderPeopleList();
             }
         }
 
@@ -25103,6 +25268,165 @@ Cmd/Ctrl + K - Command palette
 
         function filterEntities() {
             renderEntityList();
+        }
+
+        // ========== Sidebar Tabs Functions ==========
+        let currentSidebarTab = 'org';
+
+        function switchSidebarTab(tabName) {
+            currentSidebarTab = tabName;
+
+            // Update tab buttons
+            document.querySelectorAll('.sidebar-tab').forEach(tab => {
+                tab.classList.toggle('active', tab.dataset.tab === tabName);
+            });
+
+            // Update tab content
+            document.querySelectorAll('.sidebar-tab-content').forEach(content => {
+                content.classList.remove('active');
+            });
+            document.getElementById('tab' + tabName.charAt(0).toUpperCase() + tabName.slice(1))?.classList.add('active');
+
+            // Update search placeholder
+            const searchInput = document.getElementById('entitySearch');
+            if (searchInput) {
+                const placeholders = {
+                    'org': 'Search units, teams, roles...',
+                    'people': 'Search people...',
+                    'recent': 'Search activity...'
+                };
+                searchInput.placeholder = placeholders[tabName] || 'Search...';
+            }
+
+            // Update add button text
+            updateSidebarAddButton();
+
+            // Render tab content
+            if (tabName === 'people') {
+                renderPeopleList();
+            } else if (tabName === 'org') {
+                renderEntityList();
+            }
+
+            // Clear search when switching tabs
+            if (searchInput) {
+                searchInput.value = '';
+            }
+        }
+
+        function filterSidebarContent() {
+            if (currentSidebarTab === 'org') {
+                renderEntityList();
+            } else if (currentSidebarTab === 'people') {
+                renderPeopleList();
+            }
+            // Recent tab filtering could be added here
+        }
+
+        function renderPeopleList() {
+            const list = document.getElementById('peopleList');
+            if (!list) return;
+
+            const searchTerm = document.getElementById('entitySearch')?.value.toLowerCase() || '';
+            list.innerHTML = '';
+
+            // Get all people
+            const people = entities.person || [];
+
+            // Filter by search
+            const filteredPeople = searchTerm
+                ? people.filter(p => p.name.toLowerCase().includes(searchTerm))
+                : people;
+
+            if (filteredPeople.length === 0) {
+                list.innerHTML = `
+                    <div class="tab-empty-state">
+                        <i class="ph ph-users"></i>
+                        <p>${searchTerm ? 'No people found' : 'No people added yet'}</p>
+                    </div>
+                `;
+                return;
+            }
+
+            // Render each person
+            filteredPeople.forEach(person => {
+                // Get roles this person fills (via INS relationship)
+                const rolesForPerson = relationships
+                    .filter(r => r.predicate === 'INS' && r.subject === person.id)
+                    .map(r => findEntity(r.object))
+                    .filter(e => e && e.type === 'role')
+                    .map(r => r.name);
+
+                const card = document.createElement('div');
+                card.className = 'person-card';
+                card.onclick = () => openEntityModal(person.id, 'person');
+
+                // Get initials for avatar
+                const initials = person.name.split(' ').map(n => n[0]).join('').toUpperCase().slice(0, 2);
+
+                card.innerHTML = `
+                    <div class="person-avatar">${initials}</div>
+                    <div class="person-info">
+                        <div class="person-name">${person.name}</div>
+                        <div class="person-roles">${rolesForPerson.length > 0 ? rolesForPerson.join(', ') : 'No roles assigned'}</div>
+                    </div>
+                    <div class="person-actions">
+                        <button class="btn-icon" onclick="event.stopPropagation(); deleteEntity('${person.id}', 'person')" title="Delete">
+                            <i class="ph ph-x"></i>
+                        </button>
+                    </div>
+                `;
+
+                list.appendChild(card);
+            });
+        }
+
+        function updateSidebarAddButton() {
+            const btnText = document.getElementById('sidebarAddBtnText');
+            const btn = document.getElementById('sidebarAddBtn');
+            if (!btnText || !btn) return;
+
+            const config = {
+                'org': { text: 'Add Unit', icon: 'ph-buildings' },
+                'people': { text: 'Add Person', icon: 'ph-user-plus' },
+                'recent': { text: 'View All Activity', icon: 'ph-clock-counter-clockwise' }
+            };
+
+            const current = config[currentSidebarTab] || config['org'];
+            btnText.textContent = current.text;
+
+            // Update icon
+            const iconEl = btn.querySelector('i');
+            if (iconEl) {
+                iconEl.className = 'ph ' + (currentSidebarTab === 'recent' ? current.icon : 'ph-plus');
+            }
+
+            // Hide button on Recent tab (or make it do something else)
+            btn.style.display = currentSidebarTab === 'recent' ? 'none' : 'flex';
+        }
+
+        function handleSidebarAdd() {
+            if (currentSidebarTab === 'org') {
+                // Open command palette with unit creation
+                openCommandPalette();
+                setTimeout(() => {
+                    const input = document.getElementById('commandPaletteInput');
+                    if (input) input.value = 'add unit ';
+                }, 100);
+            } else if (currentSidebarTab === 'people') {
+                // Open command palette with person creation
+                openCommandPalette();
+                setTimeout(() => {
+                    const input = document.getElementById('commandPaletteInput');
+                    if (input) input.value = 'add person ';
+                }, 100);
+            }
+        }
+
+        // Initialize sidebar on load
+        function initSidebar() {
+            updateSidebarAddButton();
+            renderPeopleList();
         }
 
         function applyFilters() {
@@ -37152,6 +37476,7 @@ Options:
                     checkWelcomeBanner();
                     restorePanelStates();
                     updateStructureSectionVisibility();
+                    initSidebar();
                 } catch (e) {
                     console.error('❌ Error rendering UI:', e);
                     updateStatus('Error rendering UI', false);
