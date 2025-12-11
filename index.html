@@ -36971,6 +36971,9 @@ Cmd/Ctrl + K - Command palette
                             ${renderSubtasksSection(task.id)}
                         </div>
 
+                        <!-- Airtable Linked Records -->
+                        ${renderAirtableTags(task)}
+
                         <!-- Dependencies Link -->
                         <div class="simple-task-option-link" onclick="toggleSimpleTaskSection('deps_${task.id}')">
                             <div class="simple-task-option-text">
@@ -37043,9 +37046,6 @@ Cmd/Ctrl + K - Command palette
                             </div>
                             `}
                         </div>
-
-                        <!-- Airtable Linked Records -->
-                        ${renderAirtableTags(task)}
 
                         <!-- Comments Link -->
                         <div class="simple-task-option-link" onclick="toggleSimpleTaskSection('comments_${task.id}')">
