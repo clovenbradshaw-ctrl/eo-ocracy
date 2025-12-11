@@ -10217,6 +10217,40 @@
             border-top: 1px solid #E5DDD1;
         }
 
+        .date-picker-custom-label {
+            display: block;
+            font-size: 11px;
+            font-weight: 500;
+            color: #8B7355;
+            margin-bottom: 6px;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .date-picker-custom-input {
+            width: 100%;
+            padding: 10px 12px;
+            border: 1px solid #E5DDD1;
+            border-radius: 6px;
+            font-size: 13px;
+            font-family: inherit;
+            color: #3D2E1F;
+            background: white;
+            cursor: pointer;
+            box-sizing: border-box;
+        }
+
+        .date-picker-custom-input:hover {
+            border-color: #C88F4A;
+            background: #FAF7F5;
+        }
+
+        .date-picker-custom-input:focus {
+            outline: none;
+            border-color: #C88F4A;
+            box-shadow: 0 0 0 3px rgba(200, 143, 74, 0.1);
+        }
+
         .date-picker-custom input {
             width: 100%;
             padding: 10px 12px;
@@ -31624,6 +31658,15 @@ Cmd/Ctrl + K - Command palette
                                     <div class="date-option" onclick="event.stopPropagation(); setTaskDueDate('${task.id}', 'nextmonth')">Next Month</div>
                                     <div class="date-option" onclick="event.stopPropagation(); setTaskDueDate('${task.id}', 'none')">No Date</div>
                                 </div>
+                                <div class="date-picker-custom">
+                                    <label class="date-picker-custom-label">Pick a date</label>
+                                    <input type="date"
+                                        class="date-picker-custom-input"
+                                        id="taskDateInput_${task.id}"
+                                        value="${task.dueDate || ''}"
+                                        onclick="event.stopPropagation();"
+                                        onchange="event.stopPropagation(); setTaskCustomDate('${task.id}', this.value)">
+                                </div>
                             </div>
                         </div>
 
@@ -33259,6 +33302,28 @@ Options:
             }
 
             showToast(newDate ? `Due date: ${formatDateShort(newDate)}` : 'Due date cleared', 'success');
+        }
+
+        function setTaskCustomDate(taskId, dateValue) {
+            const task = entities.task.find(t => t.id === taskId);
+            if (!task) return;
+
+            task.dueDate = dateValue || null;
+            saveToLocalStorage();
+
+            // Close the picker
+            const picker = document.getElementById(`taskDatePicker_${taskId}`);
+            if (picker) picker.classList.remove('show');
+
+            // Refresh the modal
+            openEntityModal(taskId, 'task');
+
+            // Update task board if visible
+            if (document.getElementById('taskBoardView')?.classList.contains('active')) {
+                renderTaskBoard();
+            }
+
+            showToast(dateValue ? `Due date: ${formatDateShort(dateValue)}` : 'Due date cleared', 'success');
         }
 
         function cycleTaskPriority(taskId) {
