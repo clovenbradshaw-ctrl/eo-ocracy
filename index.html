@@ -25825,13 +25825,8 @@ Cmd/Ctrl + K - Command palette
             updateSelects();
             renderActivityList();
 
-            if (currentView === 'graph') {
-                updateGraph();
-            } else if (currentView === 'tree') {
-                renderTreeView();
-            } else if (currentView === 'card') {
-                renderCardView();
-            }
+            // Refresh current view (handles all view types including kanban, table, etc.)
+            renderCurrentView();
         }
 
         // Legacy function - redirect to new modal
@@ -26128,13 +26123,8 @@ Cmd/Ctrl + K - Command palette
             saveToLocalStorage();
             renderActivityList();
 
-            if (currentView === 'graph') {
-                updateGraph();
-            } else if (currentView === 'tree') {
-                renderTreeView();
-            } else if (currentView === 'card') {
-                renderCardView();
-            }
+            // Refresh current view (handles all view types including kanban, table, etc.)
+            renderCurrentView();
         }
 
         // Sentence Preview
@@ -28089,13 +28079,8 @@ Cmd/Ctrl + K - Command palette
             updateSelects();
             renderActivityList();
 
-            if (currentView === 'graph') {
-                updateGraph();
-            } else if (currentView === 'tree') {
-                renderTreeView();
-            } else if (currentView === 'card') {
-                renderCardView();
-            }
+            // Refresh current view (handles all view types including kanban, table, etc.)
+            renderCurrentView();
         }
 
         function renderEntityList() {
@@ -28950,13 +28935,8 @@ Cmd/Ctrl + K - Command palette
             saveToLocalStorage();
             renderActivityList();
 
-            if (currentView === 'graph') {
-                updateGraph();
-            } else if (currentView === 'tree') {
-                renderTreeView();
-            } else if (currentView === 'card') {
-                renderCardView();
-            }
+            // Refresh current view (handles all view types including kanban, table, etc.)
+            renderCurrentView();
         }
 
         function renderActivityList() {
