@@ -11135,6 +11135,48 @@
             border: 2px solid #ddd;
             cursor: pointer;
             transition: all 0.2s ease;
+            position: relative;
+        }
+
+        .priority-dot::after {
+            content: attr(data-label);
+            position: absolute;
+            bottom: calc(100% + 8px);
+            left: 50%;
+            transform: translateX(-50%);
+            background: #3D3229;
+            color: white;
+            padding: 4px 8px;
+            border-radius: 4px;
+            font-size: 11px;
+            font-weight: 500;
+            white-space: nowrap;
+            opacity: 0;
+            visibility: hidden;
+            transition: all 0.2s ease;
+            pointer-events: none;
+            z-index: 1000;
+        }
+
+        .priority-dot::before {
+            content: '';
+            position: absolute;
+            bottom: calc(100% + 4px);
+            left: 50%;
+            transform: translateX(-50%);
+            border: 4px solid transparent;
+            border-top-color: #3D3229;
+            opacity: 0;
+            visibility: hidden;
+            transition: all 0.2s ease;
+            pointer-events: none;
+            z-index: 1000;
+        }
+
+        .priority-dot:hover::after,
+        .priority-dot:hover::before {
+            opacity: 1;
+            visibility: visible;
         }
 
         .priority-dot:hover {
@@ -17371,10 +17413,10 @@
                                onblur="document.getElementById('quickAddBar').classList.remove('focused')"
                                oninput="handleQuickAddInput(event)">
                         <div class="priority-dots" id="quickAddPriorityDots">
-                            <div class="priority-dot low" data-priority="low" onclick="selectQuickAddPriority('low')" title="Low priority"></div>
-                            <div class="priority-dot medium active" data-priority="medium" onclick="selectQuickAddPriority('medium')" title="Medium priority"></div>
-                            <div class="priority-dot high" data-priority="high" onclick="selectQuickAddPriority('high')" title="High priority"></div>
-                            <div class="priority-dot urgent" data-priority="urgent" onclick="selectQuickAddPriority('urgent')" title="Urgent"></div>
+                            <div class="priority-dot low" data-priority="low" data-label="Low" onclick="selectQuickAddPriority('low')" title="Low priority"></div>
+                            <div class="priority-dot medium active" data-priority="medium" data-label="Medium" onclick="selectQuickAddPriority('medium')" title="Medium priority"></div>
+                            <div class="priority-dot high" data-priority="high" data-label="High" onclick="selectQuickAddPriority('high')" title="High priority"></div>
+                            <div class="priority-dot urgent" data-priority="urgent" data-label="Urgent" onclick="selectQuickAddPriority('urgent')" title="Urgent"></div>
                         </div>
                         <span class="keyboard-hint slash-hint">/</span>
                         <span class="keyboard-hint enter-hint">⏎</span>
