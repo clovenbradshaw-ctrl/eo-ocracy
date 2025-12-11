@@ -18689,6 +18689,74 @@
             flex: 1;
         }
 
+        .airtable-picker-filters {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 6px;
+            margin-top: 10px;
+        }
+
+        .airtable-filter-pill {
+            display: inline-flex;
+            align-items: center;
+            gap: 4px;
+            padding: 5px 10px;
+            border: 1px solid #E5E7EB;
+            border-radius: 16px;
+            background: #F9FAFB;
+            color: #6B7280;
+            font-size: 12px;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.15s;
+        }
+
+        .airtable-filter-pill:hover {
+            border-color: #D1D5DB;
+            background: #F3F4F6;
+        }
+
+        .airtable-filter-pill.active {
+            border-color: #C88F4A;
+            background: #FDF8F3;
+            color: #C88F4A;
+        }
+
+        .airtable-filter-pill i {
+            font-size: 13px;
+        }
+
+        /* Category-specific colors when active */
+        .airtable-filter-pill[data-category="clients"].active {
+            border-color: #1D4ED8;
+            background: rgba(29, 78, 216, 0.1);
+            color: #1D4ED8;
+        }
+
+        .airtable-filter-pill[data-category="cases"].active {
+            border-color: #6D28D9;
+            background: rgba(109, 40, 217, 0.1);
+            color: #6D28D9;
+        }
+
+        .airtable-filter-pill[data-category="events"].active {
+            border-color: #C2410C;
+            background: rgba(194, 65, 12, 0.1);
+            color: #C2410C;
+        }
+
+        .airtable-filter-pill[data-category="applications"].active {
+            border-color: #15803D;
+            background: rgba(21, 128, 61, 0.1);
+            color: #15803D;
+        }
+
+        .airtable-filter-pill[data-category="users"].active {
+            border-color: #0F766E;
+            background: rgba(15, 118, 110, 0.1);
+            color: #0F766E;
+        }
+
         .airtable-picker-refresh-btn {
             width: 38px;
             height: 38px;
@@ -22774,10 +22842,14 @@ John Doe,Engineering,john@example.com"
                     .slice(0, 100);  // Limit results
             },
 
-            // Search across ALL categories at once
-            searchAllRecordsLocal(query) {
+            // Search across ALL categories at once (or filtered categories)
+            searchAllRecordsLocal(query, categoryFilters = []) {
                 const allResults = [];
-                const categories = Object.keys(this.tables);
+                const allCategories = Object.keys(this.tables);
+                // If filters are provided, use only those categories; otherwise search all
+                const categories = categoryFilters.length > 0
+                    ? allCategories.filter(cat => categoryFilters.includes(cat))
+                    : allCategories;
 
                 for (const category of categories) {
                     const cache = this.recordsCache[category];
@@ -22878,7 +22950,8 @@ John Doe,Engineering,john@example.com"
             selectedCategory: null,
             searchQuery: '',
             isLoading: false,
-            results: []
+            results: [],
+            categoryFilters: []  // Array of active category filters (e.g., ['clients', 'cases'])
         };
 
         // ==========================================
@@ -39649,7 +39722,8 @@ Cmd/Ctrl + K - Command palette
                 selectedCategory: 'all',
                 searchQuery: '',
                 isLoading: false,
-                results: []
+                results: [],
+                categoryFilters: []  // Reset filters when opening
             };
 
             // Create or show the picker modal
@@ -39661,6 +39735,7 @@ Cmd/Ctrl + K - Command palette
 
             // Reset UI state
             document.getElementById('airtablePickerSearch').value = '';
+            updateAirtableFilterUI();  // Initialize filter buttons
 
             // Show overlay
             overlay.classList.add('show');
@@ -39704,6 +39779,23 @@ Cmd/Ctrl + K - Command palette
                                 <i class="ph ph-arrows-clockwise"></i>
                             </button>
                         </div>
+                        <div class="airtable-picker-filters" id="airtablePickerFilters">
+                            <button class="airtable-filter-pill" data-category="clients" onclick="toggleAirtableFilter('clients')">
+                                <i class="ph ph-user"></i> Clients
+                            </button>
+                            <button class="airtable-filter-pill" data-category="cases" onclick="toggleAirtableFilter('cases')">
+                                <i class="ph ph-folder-open"></i> Cases
+                            </button>
+                            <button class="airtable-filter-pill" data-category="events" onclick="toggleAirtableFilter('events')">
+                                <i class="ph ph-calendar"></i> Events
+                            </button>
+                            <button class="airtable-filter-pill" data-category="applications" onclick="toggleAirtableFilter('applications')">
+                                <i class="ph ph-file-text"></i> Apps
+                            </button>
+                            <button class="airtable-filter-pill" data-category="users" onclick="toggleAirtableFilter('users')">
+                                <i class="ph ph-users"></i> Users
+                            </button>
+                        </div>
                         <div class="airtable-picker-cache-status" id="airtablePickerCacheStatus"></div>
                     </div>
 
@@ -39723,6 +39815,47 @@ Cmd/Ctrl + K - Command palette
             `;
 
             document.body.appendChild(modal);
+        }
+
+        // Toggle a category filter on/off
+        function toggleAirtableFilter(category) {
+            const filters = airtablePickerState.categoryFilters;
+            const index = filters.indexOf(category);
+
+            if (index === -1) {
+                // Add filter
+                filters.push(category);
+            } else {
+                // Remove filter
+                filters.splice(index, 1);
+            }
+
+            // Update filter button UI
+            updateAirtableFilterUI();
+
+            // Re-run search with updated filters
+            searchAirtableRecords(airtablePickerState.searchQuery);
+        }
+
+        // Update the visual state of filter buttons
+        function updateAirtableFilterUI() {
+            const filters = airtablePickerState.categoryFilters;
+            const buttons = document.querySelectorAll('.airtable-filter-pill');
+
+            buttons.forEach(btn => {
+                const category = btn.dataset.category;
+                if (filters.length === 0 || filters.includes(category)) {
+                    btn.classList.add('active');
+                } else {
+                    btn.classList.remove('active');
+                }
+            });
+        }
+
+        // Reset filters when opening picker
+        function resetAirtableFilters() {
+            airtablePickerState.categoryFilters = [];
+            updateAirtableFilterUI();
         }
 
         // Load records - unified search across all cached categories
@@ -39748,8 +39881,8 @@ Cmd/Ctrl + K - Command palette
             }
 
             try {
-                // Search across all categories using cached data
-                const records = AirtableAPI.searchAllRecordsLocal(searchQuery);
+                // Search across categories using cached data, applying filters
+                const records = AirtableAPI.searchAllRecordsLocal(searchQuery, airtablePickerState.categoryFilters);
 
                 airtablePickerState.results = records;
                 renderAirtablePickerResults();
@@ -39893,12 +40026,12 @@ Cmd/Ctrl + K - Command palette
             }).join('');
         }
 
-        // Search records - unified search across all cached categories
+        // Search records - unified search across all cached categories (respecting filters)
         function searchAirtableRecords(query) {
             airtablePickerState.searchQuery = query;
 
-            // Search across all categories using cached data
-            const results = AirtableAPI.searchAllRecordsLocal(query);
+            // Search across categories using cached data, applying filters
+            const results = AirtableAPI.searchAllRecordsLocal(query, airtablePickerState.categoryFilters);
             airtablePickerState.results = results;
             renderAirtablePickerResults();
         }
@@ -41669,7 +41802,8 @@ Options:
                 selectedCategory: null,
                 searchQuery: '',
                 isLoading: false,
-                results: []
+                results: [],
+                categoryFilters: []  // Reset filters when opening
             };
 
             // Create or show the picker modal
@@ -41681,17 +41815,10 @@ Options:
 
             // Reset UI state
             document.getElementById('airtablePickerSearch').value = '';
-            document.getElementById('airtablePickerResults').innerHTML = `
-                <div class="airtable-picker-empty">
-                    <i class="ph ph-hand-pointing" style="font-size: 32px; margin-bottom: 8px;"></i>
-                    <div>Select a category above to browse records</div>
-                </div>
-            `;
+            updateAirtableFilterUI();  // Initialize filter buttons
 
-            // Clear active category buttons
-            document.querySelectorAll('.airtable-picker-category-btn').forEach(btn => {
-                btn.classList.remove('active');
-            });
+            // Load all records immediately
+            loadAirtableRecords('all');
 
             // Show overlay
             overlay.classList.add('show');
@@ -42421,7 +42548,8 @@ Options:
                 selectedCategory: null,
                 searchQuery: '',
                 isLoading: false,
-                results: []
+                results: [],
+                categoryFilters: []  // Reset filters when opening
             };
 
             // Create or show the picker modal
@@ -42433,17 +42561,10 @@ Options:
 
             // Reset UI state
             document.getElementById('airtablePickerSearch').value = '';
-            document.getElementById('airtablePickerResults').innerHTML = `
-                <div class="airtable-picker-empty">
-                    <i class="ph ph-hand-pointing" style="font-size: 32px; margin-bottom: 8px;"></i>
-                    <div>Select a category above to browse records</div>
-                </div>
-            `;
+            updateAirtableFilterUI();  // Initialize filter buttons
 
-            // Clear active category buttons
-            document.querySelectorAll('.airtable-picker-category-btn').forEach(btn => {
-                btn.classList.remove('active');
-            });
+            // Load all records immediately
+            loadAirtableRecords('all');
 
             // Show overlay
             overlay.classList.add('show');
