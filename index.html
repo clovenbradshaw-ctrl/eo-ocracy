@@ -5085,6 +5085,10 @@
             box-shadow: 0 2px 6px rgba(200, 143, 74, 0.3);
         }
 
+        .role-assignment-add-form.hidden {
+            display: none;
+        }
+
         .role-assignment-empty {
             color: #8B6F47;
             font-size: 0.9rem;
@@ -20107,28 +20111,50 @@ Cmd/Ctrl + K - Command palette
                     .map(r => ({ relationship: r, role: findEntity(r.object) }))
                     .filter(a => a.role !== null);
 
+                // Get available roles (not already assigned)
+                const assignedRoleIds = roleAssignments.map(a => a.role.id);
+                const availableRoles = entities.role.filter(r => !assignedRoleIds.includes(r.id));
+
+                const addFormHtml = availableRoles.length > 0 ? `
+                    <div id="inlineRoleAssignForm" class="role-assignment-add-form hidden">
+                        <select id="inlineRoleSelect">
+                            <option value="">Select role...</option>
+                            ${availableRoles.map(role => `<option value="${role.id}">${role.name}</option>`).join('')}
+                        </select>
+                        <button class="role-assignment-add-btn" onclick="assignPersonToRoleFromModal()">
+                            <i class="ph ph-plus"></i> Assign
+                        </button>
+                    </div>
+                ` : '';
+
                 if (roleAssignments.length > 0) {
                     roleAssignmentEl.innerHTML = `
-                        <div class="modal-section-title"><i class="ph ph-identification-badge"></i> Assigned Roles</div>
+                        <div class="role-assignment-header">
+                            <div class="modal-section-title" style="margin-bottom: 0;"><i class="ph ph-identification-badge"></i> Assigned Roles</div>
+                            ${availableRoles.length > 0 ? `<button class="section-add-btn" onclick="toggleInlineRoleAssignForm()" title="Assign to role"><i class="ph ph-plus"></i></button>` : ''}
+                        </div>
                         <div class="role-assignment-list">
                             ${roleAssignments.map(a => `
-                                <div class="role-assignment-item">
-                                    <span class="role-assignment-name" onclick="openEntityModal('${a.role.id}', 'role')" style="cursor: pointer;">
-                                        <i class="ph ph-identification-badge"></i> ${a.role.name}
-                                    </span>
-                                    <button class="role-assignment-remove" onclick="removeRoleAssignment('${a.relationship.id}')" title="Remove assignment">
+                                <div class="role-assignment-chip" onclick="openEntityModal('${a.role.id}', 'role')">
+                                    <i class="ph ph-identification-badge"></i> ${a.role.name}
+                                    <button class="chip-remove-btn" onclick="event.stopPropagation(); removeRoleAssignment('${a.relationship.id}')" title="Remove assignment">
                                         <i class="ph ph-x"></i>
                                     </button>
                                 </div>
                             `).join('')}
                         </div>
+                        ${addFormHtml}
                     `;
                 } else {
                     roleAssignmentEl.innerHTML = `
-                        <div class="modal-section-title"><i class="ph ph-identification-badge"></i> Assigned Roles</div>
-                        <div class="empty-state" style="padding: 1rem; text-align: center; color: #8B6F47; font-size: 0.875rem;">
-                            <em>Not assigned to any roles</em>
+                        <div class="role-assignment-header">
+                            <div class="modal-section-title" style="margin-bottom: 0;"><i class="ph ph-identification-badge"></i> Assigned Roles</div>
+                            ${availableRoles.length > 0 ? `<button class="section-add-btn" onclick="toggleInlineRoleAssignForm()" title="Assign to role"><i class="ph ph-plus"></i></button>` : ''}
                         </div>
+                        <div class="role-assignment-empty">
+                            Not assigned to any roles
+                        </div>
+                        ${addFormHtml}
                     `;
                 }
             } else if (entityType === 'task') {
@@ -22275,6 +22301,14 @@ Cmd/Ctrl + K - Command palette
             }
         }
 
+        // Toggle inline role assignment form visibility
+        function toggleInlineRoleAssignForm() {
+            const form = document.getElementById('inlineRoleAssignForm');
+            if (form) {
+                form.classList.toggle('hidden');
+            }
+        }
+
         // Remove parent relationship (unlink from parent)
         function removeParentRelationship(childId, parentId) {
             // Find and remove the DES relationship where child is subject and parent is object
@@ -22614,7 +22648,10 @@ Cmd/Ctrl + K - Command palette
         function assignPersonToRoleFromModal() {
             if (!currentModalEntity || currentModalEntityType !== 'person') return;
 
-            const roleId = document.getElementById('modalRoleSelect').value;
+            // Try inline select first, fall back to tab select
+            const inlineSelect = document.getElementById('inlineRoleSelect');
+            const tabSelect = document.getElementById('modalRoleSelect');
+            const roleId = (inlineSelect && inlineSelect.value) || (tabSelect && tabSelect.value);
 
             if (!roleId) {
                 alert('Please select a role to assign');
