@@ -9885,6 +9885,242 @@
             pointer-events: none;
         }
 
+        /* Custom Branded Dropdown for Hero Modal */
+        .hero-dropdown-container {
+            position: relative;
+            width: 100%;
+        }
+
+        .hero-dropdown-trigger {
+            width: 100%;
+            padding: 0.875rem 1rem;
+            padding-right: 2.5rem;
+            background: white;
+            border: 2px solid #E5DDD1;
+            border-radius: 10px;
+            font-size: 1rem;
+            color: #3D2E1F;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            transition: all 0.2s ease;
+            position: relative;
+        }
+
+        .hero-dropdown-trigger:hover {
+            border-color: #C88F4A;
+            background: #FFFBF5;
+            box-shadow: 0 2px 8px rgba(200, 143, 74, 0.15);
+        }
+
+        .hero-dropdown-trigger.open {
+            border-color: #C88F4A;
+            border-bottom-left-radius: 0;
+            border-bottom-right-radius: 0;
+            background: white;
+            box-shadow: 0 -2px 12px rgba(200, 143, 74, 0.1);
+        }
+
+        .hero-dropdown-trigger .trigger-text {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            color: #8B6F47;
+            flex: 1;
+        }
+
+        .hero-dropdown-trigger .trigger-text.has-selection {
+            color: #3D2E1F;
+            font-weight: 500;
+        }
+
+        .hero-dropdown-trigger .trigger-text i {
+            color: #C88F4A;
+            font-size: 1.1rem;
+        }
+
+        .hero-dropdown-trigger .trigger-arrow {
+            position: absolute;
+            right: 1rem;
+            color: #8B6F47;
+            transition: transform 0.25s ease;
+            font-size: 0.9rem;
+        }
+
+        .hero-dropdown-trigger.open .trigger-arrow {
+            transform: rotate(180deg);
+            color: #C88F4A;
+        }
+
+        .hero-dropdown-menu {
+            position: absolute;
+            top: 100%;
+            left: 0;
+            right: 0;
+            background: white;
+            border: 2px solid #C88F4A;
+            border-top: none;
+            border-radius: 0 0 10px 10px;
+            max-height: 320px;
+            overflow-y: auto;
+            z-index: 1000;
+            box-shadow: 0 8px 24px rgba(200, 143, 74, 0.2);
+            display: none;
+            animation: heroDropdownSlide 0.2s ease-out;
+        }
+
+        @keyframes heroDropdownSlide {
+            from {
+                opacity: 0;
+                transform: translateY(-8px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .hero-dropdown-menu.open {
+            display: block;
+        }
+
+        .hero-dropdown-group {
+            border-bottom: 1px solid #F0EBE3;
+        }
+
+        .hero-dropdown-group:last-child {
+            border-bottom: none;
+        }
+
+        .hero-dropdown-unit-header {
+            padding: 0.7rem 1rem;
+            background: linear-gradient(135deg, #C88F4A 0%, #B87B5B 100%);
+            font-size: 0.7rem;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 0.8px;
+            color: white;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            position: sticky;
+            top: 0;
+            z-index: 2;
+        }
+
+        .hero-dropdown-unit-header i {
+            color: rgba(255, 255, 255, 0.9);
+            font-size: 1rem;
+        }
+
+        .hero-dropdown-team-header {
+            padding: 0.55rem 1rem 0.55rem 1.25rem;
+            background: linear-gradient(135deg, #FAF7F5 0%, #F5F2ED 100%);
+            font-size: 0.7rem;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            color: #B87B5B;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            border-bottom: 1px solid #E5DDD1;
+            border-top: 1px solid #E5DDD1;
+        }
+
+        .hero-dropdown-team-header i {
+            color: #C88F4A;
+            font-size: 0.9rem;
+        }
+
+        .hero-dropdown-item {
+            padding: 0.7rem 1rem 0.7rem 2rem;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            gap: 0.6rem;
+            font-size: 0.95rem;
+            color: #3D2E1F;
+            transition: all 0.15s ease;
+            border-left: 3px solid transparent;
+        }
+
+        .hero-dropdown-item:hover {
+            background: linear-gradient(135deg, #FFF8F0 0%, #FFF4E8 100%);
+            border-left-color: #C88F4A;
+        }
+
+        .hero-dropdown-item i {
+            color: #8B6F47;
+            font-size: 1rem;
+            transition: color 0.15s ease;
+        }
+
+        .hero-dropdown-item:hover i {
+            color: #C88F4A;
+        }
+
+        .hero-dropdown-item.selected {
+            background: linear-gradient(135deg, #FFF4E8 0%, #FFEDD5 100%);
+            border-left-color: #C88F4A;
+            font-weight: 500;
+        }
+
+        .hero-dropdown-item.selected i {
+            color: #C88F4A;
+        }
+
+        .hero-dropdown-item.selected::after {
+            content: '\e901';
+            font-family: 'Phosphor';
+            margin-left: auto;
+            color: #C88F4A;
+        }
+
+        .hero-dropdown-unassigned .hero-dropdown-team-header {
+            background: linear-gradient(135deg, #F5F3F0 0%, #EFEDE8 100%);
+            color: #8B6F47;
+        }
+
+        .hero-dropdown-unassigned .hero-dropdown-team-header i {
+            color: #8B6F47;
+        }
+
+        /* Scrollbar styling for hero dropdown */
+        .hero-dropdown-menu::-webkit-scrollbar {
+            width: 6px;
+        }
+
+        .hero-dropdown-menu::-webkit-scrollbar-track {
+            background: #F5F2ED;
+            border-radius: 0 0 10px 0;
+        }
+
+        .hero-dropdown-menu::-webkit-scrollbar-thumb {
+            background: linear-gradient(180deg, #D4C4B0 0%, #C88F4A 100%);
+            border-radius: 3px;
+        }
+
+        .hero-dropdown-menu::-webkit-scrollbar-thumb:hover {
+            background: #C88F4A;
+        }
+
+        /* Empty state for dropdown */
+        .hero-dropdown-empty {
+            padding: 1.5rem;
+            text-align: center;
+            color: #8B6F47;
+            font-size: 0.9rem;
+        }
+
+        .hero-dropdown-empty i {
+            display: block;
+            font-size: 2rem;
+            color: #D4C4B0;
+            margin-bottom: 0.5rem;
+        }
+
         .hero-task-or-create {
             margin-top: 0.5rem;
             font-size: 0.875rem;
@@ -34790,7 +35026,8 @@ Cmd/Ctrl + K - Command palette
 
             // Clear existing options (except first)
             if (roleSelect) roleSelect.innerHTML = '<option value="">Select a role...</option>';
-            if (roleSelectMain) roleSelectMain.innerHTML = '<option value="">Select a role...</option>';
+            // roleSelectMain is now a hidden input for the custom dropdown
+            if (roleSelectMain) roleSelectMain.value = '';
             personSelect.innerHTML = '<option value="">Select a person...</option>';
             predecessorSelect.innerHTML = '<option value="">No dependency...</option>';
             workflowSelect.innerHTML = '<option value="">Select a workflow...</option>';
@@ -34897,7 +35134,8 @@ Cmd/Ctrl + K - Command palette
 
             // Populate both role selectors
             populateRoleSelect(roleSelect, false);
-            populateRoleSelect(roleSelectMain, true);
+            // Populate custom dropdown for main role selector
+            populateHeroRoleDropdown(roleHierarchy);
 
             // Add people
             (entities.person || []).forEach(person => {
@@ -34915,6 +35153,163 @@ Cmd/Ctrl + K - Command palette
                 option.textContent = task.name + (task.dueDate ? ` (due: ${formatDateShort(task.dueDate)})` : '');
                 predecessorSelect.appendChild(option);
             });
+
+            // Reset the dropdown trigger text
+            const trigger = document.querySelector('#heroRoleDropdownContainer .hero-dropdown-trigger');
+            if (trigger) {
+                const triggerText = trigger.querySelector('.trigger-text');
+                triggerText.innerHTML = '<i class="ph ph-briefcase"></i> Select a role...';
+                triggerText.classList.remove('has-selection');
+                trigger.classList.remove('open');
+            }
+            const menu = document.getElementById('heroRoleDropdownMenu');
+            if (menu) menu.classList.remove('open');
+        }
+
+        // Populate the custom hero role dropdown with hierarchical structure
+        function populateHeroRoleDropdown(roleHierarchy) {
+            const menuEl = document.getElementById('heroRoleDropdownMenu');
+            if (!menuEl) return;
+
+            let html = '';
+
+            // Add units with their teams and roles
+            roleHierarchy.units.forEach(unit => {
+                html += `<div class="hero-dropdown-group">`;
+                html += `<div class="hero-dropdown-unit-header">
+                    <i class="ph ph-buildings"></i> ${unit.name}
+                </div>`;
+
+                unit.teams.forEach(team => {
+                    html += `<div class="hero-dropdown-team-header">
+                        <i class="ph ph-users-three"></i> ${team.name}
+                    </div>`;
+                    team.roles.forEach(role => {
+                        html += `<div class="hero-dropdown-item" data-role-id="${role.id}" onclick="selectHeroRole('${role.id}', '${role.name.replace(/'/g, "\\'")}')">
+                            <i class="ph ph-briefcase"></i> ${role.name}
+                        </div>`;
+                    });
+                });
+                html += `</div>`;
+            });
+
+            // Add orphan teams (teams not in any unit)
+            roleHierarchy.orphanTeams.forEach(team => {
+                html += `<div class="hero-dropdown-group">`;
+                html += `<div class="hero-dropdown-team-header">
+                    <i class="ph ph-users-three"></i> ${team.name}
+                </div>`;
+                team.roles.forEach(role => {
+                    html += `<div class="hero-dropdown-item" data-role-id="${role.id}" onclick="selectHeroRole('${role.id}', '${role.name.replace(/'/g, "\\'")}')">
+                        <i class="ph ph-briefcase"></i> ${role.name}
+                    </div>`;
+                });
+                html += `</div>`;
+            });
+
+            // Add orphan roles (roles not in any team)
+            if (roleHierarchy.orphanRoles.length > 0) {
+                const hasHierarchy = roleHierarchy.units.length > 0 || roleHierarchy.orphanTeams.length > 0;
+
+                if (hasHierarchy) {
+                    html += `<div class="hero-dropdown-group hero-dropdown-unassigned">`;
+                    html += `<div class="hero-dropdown-team-header">
+                        <i class="ph ph-briefcase"></i> Other Roles
+                    </div>`;
+                }
+
+                roleHierarchy.orphanRoles.forEach(role => {
+                    html += `<div class="hero-dropdown-item" data-role-id="${role.id}" onclick="selectHeroRole('${role.id}', '${role.name.replace(/'/g, "\\'")}')">
+                        <i class="ph ph-briefcase"></i> ${role.name}
+                    </div>`;
+                });
+
+                if (hasHierarchy) {
+                    html += `</div>`;
+                }
+            }
+
+            // Show empty state if no roles
+            if (!html) {
+                html = `<div class="hero-dropdown-empty">
+                    <i class="ph ph-briefcase"></i>
+                    No roles available yet
+                </div>`;
+            }
+
+            menuEl.innerHTML = html;
+        }
+
+        // Toggle the hero role dropdown
+        function toggleHeroRoleDropdown(event) {
+            event.stopPropagation();
+            const container = document.getElementById('heroRoleDropdownContainer');
+            const trigger = container.querySelector('.hero-dropdown-trigger');
+            const menu = document.getElementById('heroRoleDropdownMenu');
+            const isOpen = trigger.classList.contains('open');
+
+            // Close any other open hero dropdowns first
+            document.querySelectorAll('.hero-dropdown-trigger.open').forEach(t => {
+                t.classList.remove('open');
+            });
+            document.querySelectorAll('.hero-dropdown-menu.open').forEach(m => {
+                m.classList.remove('open');
+            });
+
+            if (!isOpen) {
+                trigger.classList.add('open');
+                menu.classList.add('open');
+
+                // Close on outside click
+                setTimeout(() => {
+                    document.addEventListener('click', closeHeroRoleDropdownOnOutsideClick);
+                }, 0);
+            }
+        }
+
+        // Close hero dropdown when clicking outside
+        function closeHeroRoleDropdownOnOutsideClick(event) {
+            const container = event.target.closest('.hero-dropdown-container');
+            if (!container) {
+                document.querySelectorAll('.hero-dropdown-trigger.open').forEach(t => {
+                    t.classList.remove('open');
+                });
+                document.querySelectorAll('.hero-dropdown-menu.open').forEach(m => {
+                    m.classList.remove('open');
+                });
+                document.removeEventListener('click', closeHeroRoleDropdownOnOutsideClick);
+            }
+        }
+
+        // Select a role from the hero dropdown
+        function selectHeroRole(roleId, roleName) {
+            // Update hidden input
+            document.getElementById('heroTaskRoleMain').value = roleId;
+
+            // Update trigger text
+            const container = document.getElementById('heroRoleDropdownContainer');
+            const trigger = container.querySelector('.hero-dropdown-trigger');
+            const triggerText = trigger.querySelector('.trigger-text');
+            triggerText.innerHTML = `<i class="ph ph-briefcase"></i> ${roleName}`;
+            triggerText.classList.add('has-selection');
+
+            // Update selected state in menu
+            const menu = document.getElementById('heroRoleDropdownMenu');
+            menu.querySelectorAll('.hero-dropdown-item').forEach(item => {
+                item.classList.remove('selected');
+                if (item.dataset.roleId === roleId) {
+                    item.classList.add('selected');
+                }
+            });
+
+            // Close dropdown
+            trigger.classList.remove('open');
+            menu.classList.remove('open');
+            document.removeEventListener('click', closeHeroRoleDropdownOnOutsideClick);
+
+            // Trigger updates
+            updateHeroTaskPreview();
+            updateRoleContext();
         }
 
         // Parse date string to local Date object (avoids timezone issues)
@@ -35953,14 +36348,12 @@ Options:
 
             // Refresh selects and select the new role
             populateHeroSelects();
-            document.getElementById('heroTaskRoleMain').value = roleId;
+            // Select the newly created role in the custom dropdown
+            selectHeroRole(roleId, name);
 
             // Clear and hide inline create
             nameInput.value = '';
             document.getElementById('heroRoleCreateMain').classList.remove('active');
-
-            updateHeroTaskPreview();
-            updateRoleContext();
         }
 
         // ============================================
@@ -41488,10 +41881,17 @@ Options:
                     <label class="hero-task-label">
                         <i class="ph ph-briefcase"></i> Assign to Role<span class="required-indicator">*</span>
                     </label>
-                    <div class="hero-task-select-wrapper">
-                        <select id="heroTaskRoleMain" class="hero-task-select" onchange="updateHeroTaskPreview(); updateRoleContext()">
-                            <option value="">Select a role...</option>
-                        </select>
+                    <div class="hero-dropdown-container" id="heroRoleDropdownContainer">
+                        <input type="hidden" id="heroTaskRoleMain" value="">
+                        <div class="hero-dropdown-trigger" onclick="toggleHeroRoleDropdown(event)">
+                            <span class="trigger-text">
+                                <i class="ph ph-briefcase"></i> Select a role...
+                            </span>
+                            <i class="ph ph-caret-down trigger-arrow"></i>
+                        </div>
+                        <div class="hero-dropdown-menu" id="heroRoleDropdownMenu">
+                            <!-- Populated dynamically -->
+                        </div>
                     </div>
                     <div class="hero-task-or-create">
                         or <a onclick="toggleHeroRoleCreateMain()">create new role</a>
