@@ -22030,6 +22030,7 @@ John Doe,Engineering,john@example.com"
                 const result = await this.request('getRecords', {
                     table: config.tableId,
                     tableName: tableType,
+                    query: options.query || "",
                     fields: options.fields || [config.displayField],
                     filterFormula: options.filterFormula || null,
                     maxRecords: options.maxRecords || 50
