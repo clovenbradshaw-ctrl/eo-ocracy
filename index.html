@@ -18049,6 +18049,90 @@
             font-size: 14px;
         }
 
+        /* Simple Task Modal - Airtable Linked Records Section */
+        .simple-task-airtable-section {
+            margin-top: 16px;
+            padding-top: 16px;
+            border-top: 1px solid #E5DDD1;
+        }
+
+        .simple-task-section-label {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            font-size: 13px;
+            font-weight: 600;
+            color: #3D2E1F;
+            margin-bottom: 10px;
+        }
+
+        .simple-task-section-label i {
+            font-size: 16px;
+            color: #8B6F47;
+        }
+
+        .simple-task-airtable-container {
+            background: #FAF7F5;
+            border: 1px solid #E5DDD1;
+            border-radius: 10px;
+            padding: 14px;
+        }
+
+        .simple-task-airtable-tags-list {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 8px;
+            margin-bottom: 10px;
+        }
+
+        .simple-task-airtable-tags-list:empty {
+            margin-bottom: 0;
+        }
+
+        .simple-task-airtable-tags-list .airtable-tag {
+            margin: 0;
+        }
+
+        .simple-task-airtable-add-btn {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            padding: 10px 16px;
+            border: 2px dashed #C88F4A;
+            border-radius: 8px;
+            background: transparent;
+            color: #C88F4A;
+            font-size: 14px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.2s;
+            width: 100%;
+            justify-content: center;
+        }
+
+        .simple-task-airtable-add-btn:hover {
+            background: #FDF8F3;
+            border-style: solid;
+            transform: translateY(-1px);
+        }
+
+        .simple-task-airtable-add-btn i {
+            font-size: 16px;
+        }
+
+        .simple-task-airtable-hint {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            margin-top: 10px;
+            font-size: 12px;
+            color: #9CA3AF;
+        }
+
+        .simple-task-airtable-hint i {
+            font-size: 14px;
+        }
+
         /* Airtable Tag Picker Modal */
         .airtable-picker-overlay {
             position: fixed;
@@ -37966,6 +38050,9 @@ Cmd/Ctrl + K - Command palette
                         >${task.description || ''}</textarea>
                     </div>
 
+                    <!-- Airtable Linked Records - Always Visible -->
+                    ${renderAirtableTags(task)}
+
                     <!-- Option Links for Additional Features -->
                     <div class="simple-task-options">
                         <!-- Subtasks Link -->
@@ -37980,9 +38067,6 @@ Cmd/Ctrl + K - Command palette
                         <div class="simple-task-expanded-section" id="subtasks_${task.id}" style="display: none;">
                             ${renderSubtasksSection(task.id)}
                         </div>
-
-                        <!-- Airtable Linked Records -->
-                        ${renderAirtableTags(task)}
 
                         <!-- Dependencies Link -->
                         <div class="simple-task-option-link" onclick="toggleSimpleTaskSection('deps_${task.id}')">
@@ -38081,24 +38165,23 @@ Cmd/Ctrl + K - Command palette
         // Render Airtable tags for a task
         function renderAirtableTags(task) {
             const tags = task.airtableTags || [];
-            const tagCount = tags.length;
 
             return `
-                <!-- Airtable Tags Link -->
-                <div class="simple-task-option-link" onclick="toggleSimpleTaskSection('airtable_tags_${task.id}')">
-                    <div class="simple-task-option-text">
-                        <i class="ph ph-database"></i>
-                        <span>Linked Records</span>
-                        ${tagCount > 0 ? `<span class="simple-task-option-badge">${tagCount}</span>` : ''}
-                    </div>
-                    <span class="simple-task-option-arrow"><i class="ph ph-caret-right"></i></span>
-                </div>
-                <div class="simple-task-expanded-section" id="airtable_tags_${task.id}" style="display: none;">
-                    <div class="airtable-tags-container">
-                        ${tags.map(tag => renderAirtableTag(tag, task.id)).join('')}
-                        <button class="airtable-tag-add-btn" onclick="event.stopPropagation(); openAirtableTagPicker('${task.id}')">
-                            <i class="ph ph-plus"></i> Link Record
+                <!-- Airtable Linked Records Section -->
+                <div class="simple-task-airtable-section">
+                    <label class="simple-task-section-label">
+                        <i class="ph ph-database"></i> Linked Records
+                    </label>
+                    <div class="simple-task-airtable-container">
+                        <div class="simple-task-airtable-tags-list">
+                            ${tags.map(tag => renderAirtableTag(tag, task.id)).join('')}
+                        </div>
+                        <button class="simple-task-airtable-add-btn" onclick="event.stopPropagation(); openAirtableTagPicker('${task.id}')">
+                            <i class="ph ph-plus"></i> Link Client, Case, Event...
                         </button>
+                    </div>
+                    <div class="simple-task-airtable-hint">
+                        <i class="ph ph-info"></i> Link to Airtable records for easy filtering and navigation
                     </div>
                 </div>
             `;
