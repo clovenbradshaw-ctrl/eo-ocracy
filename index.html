@@ -9792,6 +9792,88 @@
             color: #8B6F47;
         }
 
+        /* Hero Visibility Options */
+        .hero-visibility-options {
+            display: flex;
+            gap: 0.75rem;
+            flex-wrap: wrap;
+        }
+
+        .hero-visibility-option {
+            flex: 1;
+            min-width: 140px;
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+            padding: 0.875rem 1rem;
+            border: 2px solid #E5DDD1;
+            border-radius: 10px;
+            cursor: pointer;
+            transition: all 0.2s;
+            background: #FAF7F5;
+        }
+
+        .hero-visibility-option:hover {
+            border-color: #C88F4A;
+            background: #FFF;
+        }
+
+        .hero-visibility-option.selected {
+            border-color: #4CAF50;
+            background: rgba(76, 175, 80, 0.05);
+        }
+
+        .hero-visibility-option.selected[data-visibility="team"] {
+            border-color: #2196F3;
+            background: rgba(33, 150, 243, 0.05);
+        }
+
+        .hero-visibility-option.selected[data-visibility="private"] {
+            border-color: #9C27B0;
+            background: rgba(156, 39, 176, 0.05);
+        }
+
+        .hero-visibility-icon {
+            width: 36px;
+            height: 36px;
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-size: 18px;
+            flex-shrink: 0;
+        }
+
+        .hero-visibility-icon.public {
+            background: linear-gradient(135deg, #4CAF50 0%, #45a049 100%);
+        }
+
+        .hero-visibility-icon.team {
+            background: linear-gradient(135deg, #2196F3 0%, #1976D2 100%);
+        }
+
+        .hero-visibility-icon.private {
+            background: linear-gradient(135deg, #9C27B0 0%, #7B1FA2 100%);
+        }
+
+        .hero-visibility-text {
+            display: flex;
+            flex-direction: column;
+            gap: 2px;
+        }
+
+        .hero-visibility-title {
+            font-weight: 600;
+            font-size: 0.875rem;
+            color: #3D2E1F;
+        }
+
+        .hero-visibility-desc {
+            font-size: 0.75rem;
+            color: #8B6F47;
+        }
+
         .hero-task-or-create a {
             color: #C88F4A;
             cursor: pointer;
@@ -10322,6 +10404,155 @@
             border: 2px solid #e74c3c;
             background: rgba(231, 76, 60, 0.1);
             animation: shake 0.5s ease-in-out;
+        }
+
+        /* Visibility chip styles */
+        .quick-add-meta-chip.visibility-public {
+            background: linear-gradient(135deg, #4CAF50 0%, #45a049 100%);
+            color: white;
+            border: 1px solid #4CAF50;
+            border-style: solid;
+        }
+
+        .quick-add-meta-chip.visibility-public:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(76, 175, 80, 0.3);
+        }
+
+        .quick-add-meta-chip.visibility-team {
+            background: linear-gradient(135deg, #2196F3 0%, #1976D2 100%);
+            color: white;
+            border: 1px solid #2196F3;
+            border-style: solid;
+        }
+
+        .quick-add-meta-chip.visibility-team:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(33, 150, 243, 0.3);
+        }
+
+        .quick-add-meta-chip.visibility-private {
+            background: linear-gradient(135deg, #9C27B0 0%, #7B1FA2 100%);
+            color: white;
+            border: 1px solid #9C27B0;
+            border-style: solid;
+        }
+
+        .quick-add-meta-chip.visibility-private:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(156, 39, 176, 0.3);
+        }
+
+        /* Visibility dropdown with team selector */
+        .quick-add-visibility-dropdown {
+            position: absolute;
+            background: white;
+            border-radius: 8px;
+            box-shadow: 0 8px 30px rgba(0, 0, 0, 0.15);
+            border: 1px solid #e5e5e5;
+            padding: 8px 0;
+            min-width: 220px;
+            z-index: 100;
+            display: none;
+            left: 24px;
+            top: auto;
+            margin-top: 4px;
+        }
+
+        .quick-add-visibility-dropdown.show {
+            display: block;
+            animation: dropdownSlide 0.2s ease-out;
+        }
+
+        .visibility-option {
+            padding: 12px 16px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            color: #555;
+            font-size: 14px;
+            transition: background 0.15s;
+        }
+
+        .visibility-option:hover {
+            background: #f5f5f5;
+        }
+
+        .visibility-option.selected {
+            background: rgba(200, 143, 74, 0.1);
+        }
+
+        .visibility-option-icon {
+            width: 32px;
+            height: 32px;
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-size: 16px;
+        }
+
+        .visibility-option-icon.public {
+            background: linear-gradient(135deg, #4CAF50 0%, #45a049 100%);
+        }
+
+        .visibility-option-icon.team {
+            background: linear-gradient(135deg, #2196F3 0%, #1976D2 100%);
+        }
+
+        .visibility-option-icon.private {
+            background: linear-gradient(135deg, #9C27B0 0%, #7B1FA2 100%);
+        }
+
+        .visibility-option-text {
+            flex: 1;
+        }
+
+        .visibility-option-title {
+            font-weight: 500;
+            color: #333;
+        }
+
+        .visibility-option-desc {
+            font-size: 12px;
+            color: #888;
+            margin-top: 2px;
+        }
+
+        .visibility-team-selector {
+            padding: 8px 16px;
+            border-top: 1px solid #eee;
+            display: none;
+        }
+
+        .visibility-team-selector.show {
+            display: block;
+        }
+
+        .visibility-team-selector label {
+            font-size: 12px;
+            color: #666;
+            font-weight: 500;
+            display: block;
+            margin-bottom: 6px;
+        }
+
+        .visibility-team-selector select {
+            width: 100%;
+            padding: 8px 12px;
+            border: 1px solid #ddd;
+            border-radius: 6px;
+            font-size: 13px;
+            color: #333;
+            background: white;
+            cursor: pointer;
+        }
+
+        .visibility-team-selector select:focus {
+            outline: none;
+            border-color: #2196F3;
         }
 
         @keyframes shake {
@@ -20935,10 +21166,125 @@ John Doe,Engineering,john@example.com"
             applyViewFilters();
         }
 
+        // ============================================
+        // VISIBILITY ACCESS CONTROL FUNCTIONS
+        // ============================================
+
+        /**
+         * Get the current user's ID (from SoftrIdentity or email auth)
+         */
+        function getCurrentUserId() {
+            return SoftrIdentity.currentUser?.id || SoftrIdentity.currentUser?.email || null;
+        }
+
+        /**
+         * Get all teams the current user belongs to.
+         * Users belong to teams through their Person entity -> Role assignments -> Team hierarchy
+         * (Person INS Role, Team DES Role)
+         */
+        function getCurrentUserTeams() {
+            const currentUserId = getCurrentUserId();
+            if (!currentUserId) return [];
+
+            // Find person entities that might match the current user
+            // This could be by email match or by stored user ID
+            const currentUserEmail = SoftrIdentity.currentUser?.email;
+            const persons = (entities.person || []).filter(p => {
+                // Match by ID if stored
+                if (p.userId === currentUserId) return true;
+                // Match by email if available
+                if (currentUserEmail && p.email && p.email.toLowerCase() === currentUserEmail.toLowerCase()) return true;
+                // Match by name if it contains the email prefix (fallback)
+                if (currentUserEmail && p.name && p.name.toLowerCase() === currentUserEmail.split('@')[0].toLowerCase()) return true;
+                return false;
+            });
+
+            if (persons.length === 0) return [];
+
+            const teamIds = new Set();
+
+            persons.forEach(person => {
+                // Find all roles this person is assigned to (Person INS Role)
+                const roleRelationships = relationships.filter(r =>
+                    r.subject === person.id &&
+                    r.predicate === 'INS' &&
+                    r.object.startsWith('r')
+                );
+
+                roleRelationships.forEach(roleRel => {
+                    const roleId = roleRel.object;
+
+                    // Find the team this role belongs to (Team DES Role)
+                    const teamRel = relationships.find(r =>
+                        r.predicate === 'DES' &&
+                        r.object === roleId &&
+                        (entities.team || []).some(t => t.id === r.subject)
+                    );
+
+                    if (teamRel) {
+                        teamIds.add(teamRel.subject);
+                    }
+                });
+            });
+
+            return Array.from(teamIds);
+        }
+
+        /**
+         * Check if the current user is a member of a specific team
+         */
+        function isUserInTeam(teamId) {
+            if (!teamId) return false;
+            const userTeams = getCurrentUserTeams();
+            return userTeams.includes(teamId);
+        }
+
+        /**
+         * Check if the current user can see a task based on visibility settings
+         * @param {Object} task - The task object to check
+         * @returns {boolean} - True if user can see the task
+         */
+        function canUserSeeTask(task) {
+            if (!task) return false;
+
+            const visibility = task.visibility || 'public';
+
+            // Public tasks are visible to everyone
+            if (visibility === 'public') {
+                return true;
+            }
+
+            const currentUserId = getCurrentUserId();
+
+            // Private tasks are only visible to the creator
+            if (visibility === 'private') {
+                // If no current user, can't see private tasks
+                if (!currentUserId) return false;
+                // Check if task was created by current user
+                return task.createdBy === currentUserId ||
+                       task.createdBy === SoftrIdentity.currentUser?.email;
+            }
+
+            // Team tasks are visible to team members
+            if (visibility === 'team') {
+                // If no visibility team specified, treat as public
+                if (!task.visibilityTeamId) return true;
+
+                // Check if user is in the specified team
+                return isUserInTeam(task.visibilityTeamId);
+            }
+
+            // Default to visible (fail open for unknown visibility types)
+            return true;
+        }
+
         function getFilteredTasks() {
             let filteredTasks = [...(entities.task || [])];
 
-            // If all filters are enabled, return all tasks
+            // Apply visibility filtering first - only show tasks the user can see
+            filteredTasks = filteredTasks.filter(task => canUserSeeTask(task));
+
+            // If all filters are enabled, return all visible tasks
             if (viewFilters.role && viewFilters.person && viewFilters.team && viewFilters.unit) {
                 return filteredTasks;
             }
@@ -21344,6 +21690,9 @@ John Doe,Engineering,john@example.com"
         // Enhanced getFilteredTasks with advanced filters
         function getAdvancedFilteredTasks() {
             let tasks = [...(entities.task || [])];
+
+            // Apply visibility filtering first - only show tasks the user can see
+            tasks = tasks.filter(task => canUserSeeTask(task));
 
             // Filter by status
             if (advancedFilters.status.length < 3) {
@@ -34254,6 +34603,25 @@ Cmd/Ctrl + K - Command palette
                 }
             });
 
+            // Reset visibility to public
+            heroVisibility = 'public';
+            heroVisibilityTeamId = null;
+            const visibilityOptions = document.querySelectorAll('#heroVisibilityOptions .hero-visibility-option');
+            visibilityOptions.forEach(opt => {
+                opt.classList.remove('selected');
+                if (opt.dataset.visibility === 'public') {
+                    opt.classList.add('selected');
+                }
+            });
+            const visibilityTeamSelect = document.getElementById('heroVisibilityTeamSelect');
+            if (visibilityTeamSelect) {
+                visibilityTeamSelect.style.display = 'none';
+            }
+            const visibilityTeam = document.getElementById('heroVisibilityTeam');
+            if (visibilityTeam) {
+                visibilityTeam.value = '';
+            }
+
             // Reset tags
             heroTaskTags = [];
             const tagsContainer = document.getElementById('heroTagsContainer');
@@ -35498,6 +35866,48 @@ Options:
         // ============================================
         let selectedPriority = 'medium';
 
+        // VISIBILITY SELECTION (Hero Task Modal)
+        let heroVisibility = 'public';
+        let heroVisibilityTeamId = null;
+
+        function selectHeroVisibility(visibility) {
+            heroVisibility = visibility;
+
+            // Update UI - remove selected class from all options
+            const options = document.querySelectorAll('#heroVisibilityOptions .hero-visibility-option');
+            options.forEach(opt => opt.classList.remove('selected'));
+
+            // Add selected class to the clicked option
+            const selectedOption = document.querySelector(`#heroVisibilityOptions .hero-visibility-option[data-visibility="${visibility}"]`);
+            if (selectedOption) {
+                selectedOption.classList.add('selected');
+            }
+
+            // Show/hide team selector
+            const teamSelector = document.getElementById('heroVisibilityTeamSelect');
+            if (visibility === 'team') {
+                teamSelector.style.display = 'block';
+                populateHeroVisibilityTeams();
+            } else {
+                teamSelector.style.display = 'none';
+                heroVisibilityTeamId = null;
+            }
+
+            updateHeroTaskPreview();
+        }
+
+        function populateHeroVisibilityTeams() {
+            const select = document.getElementById('heroVisibilityTeam');
+            const teams = entities.team || [];
+
+            let optionsHtml = '<option value="">Select a team...</option>';
+            teams.forEach(team => {
+                optionsHtml += `<option value="${team.id}">${team.name}</option>`;
+            });
+
+            select.innerHTML = optionsHtml;
+        }
+
         function selectPriority(priority) {
             selectedPriority = priority;
             const options = document.querySelectorAll('#heroPrioritySelect .priority-option');
@@ -35594,7 +36004,9 @@ Options:
             priority: 'medium',
             roleId: null,
             description: '',
-            tags: []
+            tags: [],
+            visibility: 'public',      // 'public', 'team', or 'private'
+            visibilityTeamId: null     // Team ID when visibility is 'team'
         };
 
         function openQuickAddModal(rawTaskName) {
@@ -35643,7 +36055,9 @@ Options:
                 priority: priority,
                 roleId: null,
                 description: '',
-                tags: tags
+                tags: tags,
+                visibility: 'public',
+                visibilityTeamId: null
             };
 
             // Show the modal
@@ -35722,6 +36136,7 @@ Options:
 
             // Create the task
             const taskId = 'task' + Date.now();
+            const currentUserId = SoftrIdentity.currentUser?.id || SoftrIdentity.currentUser?.email || null;
             const taskObject = {
                 id: taskId,
                 name: taskName,
@@ -35736,7 +36151,10 @@ Options:
                 recurring: null,
                 producesProductId: null,
                 followsWorkflowId: null,
-                createdAt: new Date().toISOString()
+                createdAt: new Date().toISOString(),
+                createdBy: currentUserId,
+                visibility: quickAddModalState.visibility,
+                visibilityTeamId: quickAddModalState.visibilityTeamId
             };
             entities.task.push(taskObject);
 
@@ -35764,7 +36182,10 @@ Options:
                     dueDate: quickAddModalState.dueDate,
                     status: 'pending',
                     priority: quickAddModalState.priority,
-                    tags: quickAddModalState.tags
+                    tags: quickAddModalState.tags,
+                    visibility: quickAddModalState.visibility,
+                    visibilityTeamId: quickAddModalState.visibilityTeamId,
+                    createdBy: currentUserId
                 }
             });
 
@@ -35863,6 +36284,9 @@ Options:
                 roleChip.classList.remove('filled');
                 roleLabel.textContent = 'Assign role';
             }
+
+            // Update visibility chip
+            updateVisibilityChip();
         }
 
         function formatDateForDisplay(dateStr) {
@@ -35885,6 +36309,7 @@ Options:
         function hideAllQuickAddDropdowns() {
             document.getElementById('quickAddDateDropdown')?.classList.remove('show');
             document.getElementById('quickAddRoleDropdown')?.classList.remove('show');
+            document.getElementById('quickAddVisibilityDropdown')?.classList.remove('show');
         }
 
         function toggleQuickAddDatePicker() {
@@ -36082,6 +36507,98 @@ Options:
             const teamId = getTeamForRole(roleId);
             if (teamId) {
                 trackTeamUsage(teamId);
+            }
+        }
+
+        // ============================================
+        // VISIBILITY PICKER FUNCTIONS
+        // ============================================
+
+        function toggleQuickAddVisibilityPicker() {
+            const dropdown = document.getElementById('quickAddVisibilityDropdown');
+            const wasOpen = dropdown.classList.contains('show');
+            hideAllQuickAddDropdowns();
+            if (!wasOpen) {
+                populateVisibilityTeamOptions();
+                dropdown.classList.add('show');
+                // Show team selector if team visibility is already selected
+                const teamSelector = document.getElementById('quickAddVisibilityTeamSelector');
+                if (quickAddModalState.visibility === 'team') {
+                    teamSelector.classList.add('show');
+                } else {
+                    teamSelector.classList.remove('show');
+                }
+            }
+        }
+
+        function populateVisibilityTeamOptions() {
+            const select = document.getElementById('quickAddVisibilityTeamSelect');
+            const teams = entities.team || [];
+
+            let optionsHtml = '<option value="">Choose a team...</option>';
+            teams.forEach(team => {
+                const selected = quickAddModalState.visibilityTeamId === team.id ? 'selected' : '';
+                optionsHtml += `<option value="${team.id}" ${selected}>${team.name}</option>`;
+            });
+
+            select.innerHTML = optionsHtml;
+        }
+
+        function setQuickAddVisibility(visibility) {
+            quickAddModalState.visibility = visibility;
+
+            const teamSelector = document.getElementById('quickAddVisibilityTeamSelector');
+
+            if (visibility === 'team') {
+                // Show team selector
+                teamSelector.classList.add('show');
+                populateVisibilityTeamOptions();
+                // Don't close dropdown yet - let user select team
+            } else {
+                // Clear team selection for non-team visibility
+                quickAddModalState.visibilityTeamId = null;
+                teamSelector.classList.remove('show');
+                hideAllQuickAddDropdowns();
+            }
+
+            updateQuickAddModalChips();
+        }
+
+        function setQuickAddVisibilityTeam(teamId) {
+            quickAddModalState.visibilityTeamId = teamId || null;
+            if (teamId) {
+                hideAllQuickAddDropdowns();
+            }
+            updateQuickAddModalChips();
+        }
+
+        function updateVisibilityChip() {
+            const chip = document.getElementById('quickAddVisibilityChip');
+            const icon = document.getElementById('quickAddVisibilityIcon');
+            const label = document.getElementById('quickAddVisibilityLabel');
+
+            // Remove all visibility classes
+            chip.classList.remove('visibility-public', 'visibility-team', 'visibility-private');
+
+            const visibility = quickAddModalState.visibility;
+
+            if (visibility === 'public') {
+                chip.classList.add('visibility-public');
+                icon.className = 'ph ph-globe';
+                label.textContent = 'Public';
+            } else if (visibility === 'team') {
+                chip.classList.add('visibility-team');
+                icon.className = 'ph ph-users-three';
+                if (quickAddModalState.visibilityTeamId) {
+                    const team = (entities.team || []).find(t => t.id === quickAddModalState.visibilityTeamId);
+                    label.textContent = team ? `Team: ${team.name}` : 'Team';
+                } else {
+                    label.textContent = 'Team';
+                }
+            } else if (visibility === 'private') {
+                chip.classList.add('visibility-private');
+                icon.className = 'ph ph-lock';
+                label.textContent = 'Private';
             }
         }
 
@@ -37781,6 +38298,10 @@ Options:
                 return idx > max ? idx : max;
             }, 0);
 
+            // Get parent task to inherit visibility settings
+            const parentTask = (entities.task || []).find(t => t.id === parentTaskId);
+            const currentUserId = SoftrIdentity.currentUser?.id || SoftrIdentity.currentUser?.email || null;
+
             const subtask = {
                 id: subtaskId,
                 name: subtaskName,
@@ -37793,7 +38314,11 @@ Options:
                 tags: [],
                 description: '',
                 createdAt: new Date().toISOString(),
-                orderIndex: maxOrderIndex + 1 // Lower orderIndex = first to complete (top of list)
+                orderIndex: maxOrderIndex + 1, // Lower orderIndex = first to complete (top of list)
+                // Inherit visibility from parent task
+                createdBy: currentUserId,
+                visibility: parentTask?.visibility || 'public',
+                visibilityTeamId: parentTask?.visibilityTeamId || null
             };
 
             entities.task.push(subtask);
@@ -38245,6 +38770,11 @@ Options:
 
                 // 1. Create task entity with enhanced fields
                 taskId = 'task' + Date.now();
+                const currentUserId = SoftrIdentity.currentUser?.id || SoftrIdentity.currentUser?.email || null;
+                // Get visibility team ID from the select if team visibility is selected
+                const visibilityTeamIdValue = heroVisibility === 'team'
+                    ? (document.getElementById('heroVisibilityTeam')?.value || null)
+                    : null;
                 const taskObject = {
                     id: taskId,
                     name: taskName,
@@ -38259,7 +38789,10 @@ Options:
                     recurring: recurringValue || null,
                     producesProductId: null,
                     followsWorkflowId: workflowId || null,
-                    createdAt: new Date().toISOString()
+                    createdAt: new Date().toISOString(),
+                    createdBy: currentUserId,
+                    visibility: heroVisibility || 'public',
+                    visibilityTeamId: visibilityTeamIdValue
                 };
                 entities.task.push(taskObject);
 
@@ -38279,7 +38812,10 @@ Options:
                         tags: [...heroTaskTags],
                         collaborators: [...heroCollaborators],
                         recurring: recurringValue || null,
-                        followsWorkflowId: workflowId || null
+                        followsWorkflowId: workflowId || null,
+                        visibility: heroVisibility || 'public',
+                        visibilityTeamId: visibilityTeamIdValue,
+                        createdBy: currentUserId
                     }
                 });
 
@@ -40969,6 +41505,45 @@ Options:
                     </div>
                 </div>
 
+                <!-- Visibility Setting -->
+                <div class="hero-task-input-group" style="margin-top: 1rem;">
+                    <label class="hero-task-label"><i class="ph ph-eye"></i> Visibility</label>
+                    <div class="hero-visibility-options" id="heroVisibilityOptions">
+                        <div class="hero-visibility-option selected" data-visibility="public" onclick="selectHeroVisibility('public')">
+                            <div class="hero-visibility-icon public">
+                                <i class="ph ph-globe"></i>
+                            </div>
+                            <div class="hero-visibility-text">
+                                <span class="hero-visibility-title">Public</span>
+                                <span class="hero-visibility-desc">Visible to everyone</span>
+                            </div>
+                        </div>
+                        <div class="hero-visibility-option" data-visibility="team" onclick="selectHeroVisibility('team')">
+                            <div class="hero-visibility-icon team">
+                                <i class="ph ph-users-three"></i>
+                            </div>
+                            <div class="hero-visibility-text">
+                                <span class="hero-visibility-title">Team</span>
+                                <span class="hero-visibility-desc">Team members only</span>
+                            </div>
+                        </div>
+                        <div class="hero-visibility-option" data-visibility="private" onclick="selectHeroVisibility('private')">
+                            <div class="hero-visibility-icon private">
+                                <i class="ph ph-lock"></i>
+                            </div>
+                            <div class="hero-visibility-text">
+                                <span class="hero-visibility-title">Private</span>
+                                <span class="hero-visibility-desc">Only you</span>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="hero-visibility-team-select" id="heroVisibilityTeamSelect" style="display: none; margin-top: 0.75rem;">
+                        <select id="heroVisibilityTeam" class="hero-task-select" onchange="updateHeroTaskPreview()">
+                            <option value="">Select a team...</option>
+                        </select>
+                    </div>
+                </div>
+
                 <!-- Role Assignment (Required for EO integration) -->
                 <div class="hero-task-input-group" style="margin-top: 1rem;">
                     <label class="hero-task-label">
@@ -41163,6 +41738,10 @@ Options:
                     <i class="ph ph-briefcase"></i>
                     <span id="quickAddRoleLabel">Assign role</span>
                 </div>
+                <div class="quick-add-meta-chip visibility-public" id="quickAddVisibilityChip" onclick="toggleQuickAddVisibilityPicker()">
+                    <i class="ph ph-globe" id="quickAddVisibilityIcon"></i>
+                    <span id="quickAddVisibilityLabel">Public</span>
+                </div>
             </div>
 
             <!-- Date Picker Dropdown -->
@@ -41186,6 +41765,44 @@ Options:
             <div class="quick-add-dropdown" id="quickAddRoleDropdown">
                 <div id="quickAddRoleOptions">
                     <!-- Populated dynamically -->
+                </div>
+            </div>
+
+            <!-- Visibility Picker Dropdown -->
+            <div class="quick-add-visibility-dropdown" id="quickAddVisibilityDropdown">
+                <div class="visibility-option" onclick="setQuickAddVisibility('public')">
+                    <div class="visibility-option-icon public">
+                        <i class="ph ph-globe"></i>
+                    </div>
+                    <div class="visibility-option-text">
+                        <div class="visibility-option-title">Public</div>
+                        <div class="visibility-option-desc">Visible to everyone</div>
+                    </div>
+                </div>
+                <div class="visibility-option" onclick="setQuickAddVisibility('team')">
+                    <div class="visibility-option-icon team">
+                        <i class="ph ph-users-three"></i>
+                    </div>
+                    <div class="visibility-option-text">
+                        <div class="visibility-option-title">Team</div>
+                        <div class="visibility-option-desc">Visible only to team members</div>
+                    </div>
+                </div>
+                <div class="visibility-option" onclick="setQuickAddVisibility('private')">
+                    <div class="visibility-option-icon private">
+                        <i class="ph ph-lock"></i>
+                    </div>
+                    <div class="visibility-option-text">
+                        <div class="visibility-option-title">Private</div>
+                        <div class="visibility-option-desc">Visible only to you</div>
+                    </div>
+                </div>
+                <div class="visibility-team-selector" id="quickAddVisibilityTeamSelector">
+                    <label>Select team:</label>
+                    <select id="quickAddVisibilityTeamSelect" onchange="setQuickAddVisibilityTeam(this.value)">
+                        <option value="">Choose a team...</option>
+                        <!-- Populated dynamically -->
+                    </select>
                 </div>
             </div>
 
