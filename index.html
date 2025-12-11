@@ -1253,6 +1253,220 @@
             display: block;
         }
 
+        /* History Panel */
+        .history-panel-overlay {
+            position: fixed;
+            inset: 0;
+            background: rgba(0,0,0,0.3);
+            z-index: 1000;
+            display: none;
+        }
+
+        .history-panel-overlay.open {
+            display: block;
+        }
+
+        .history-panel {
+            position: fixed;
+            top: 0;
+            right: -420px;
+            width: 400px;
+            height: 100vh;
+            background: white;
+            box-shadow: -4px 0 24px rgba(0,0,0,0.15);
+            z-index: 1001;
+            transition: right 0.3s ease;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .history-panel.open {
+            right: 0;
+        }
+
+        .history-panel-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 1rem 1.25rem;
+            border-bottom: 1px solid #E5DDD1;
+            background: #FAF7F5;
+        }
+
+        .history-panel-title {
+            font-size: 1rem;
+            font-weight: 600;
+            color: #3D2E1F;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .history-panel-close {
+            background: none;
+            border: none;
+            color: #8B6F47;
+            cursor: pointer;
+            padding: 0.5rem;
+            border-radius: 6px;
+            transition: background 0.15s;
+        }
+
+        .history-panel-close:hover {
+            background: #E5DDD1;
+        }
+
+        .history-panel-content {
+            flex: 1;
+            overflow-y: auto;
+            padding: 0;
+        }
+
+        .history-panel-loading {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            padding: 3rem;
+            color: #8B6F47;
+            gap: 0.75rem;
+        }
+
+        .history-panel-loading i {
+            font-size: 2rem;
+            animation: spin 1s linear infinite;
+        }
+
+        .history-panel-empty {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            padding: 3rem;
+            color: #8B6F47;
+            gap: 0.5rem;
+            text-align: center;
+        }
+
+        .history-panel-empty i {
+            font-size: 2.5rem;
+            opacity: 0.5;
+        }
+
+        .history-item {
+            display: flex;
+            gap: 0.75rem;
+            padding: 0.875rem 1.25rem;
+            border-bottom: 1px solid #F0EBE4;
+            transition: background 0.15s;
+        }
+
+        .history-item:hover {
+            background: #FAF7F5;
+        }
+
+        .history-item-icon {
+            width: 32px;
+            height: 32px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            flex-shrink: 0;
+            font-size: 0.875rem;
+        }
+
+        .history-item-icon.ins { background: #D1FAE5; color: #059669; }
+        .history-item-icon.alt { background: #DBEAFE; color: #2563EB; }
+        .history-item-icon.nul { background: #FEE2E2; color: #DC2626; }
+        .history-item-icon.des { background: #F3E8FF; color: #7C3AED; }
+        .history-item-icon.con { background: #FEF3C7; color: #D97706; }
+
+        .history-item-content {
+            flex: 1;
+            min-width: 0;
+        }
+
+        .history-item-action {
+            font-size: 0.875rem;
+            font-weight: 500;
+            color: #3D2E1F;
+            margin-bottom: 0.25rem;
+        }
+
+        .history-item-entity {
+            font-size: 0.8rem;
+            color: #6B5642;
+            display: flex;
+            align-items: center;
+            gap: 0.375rem;
+            margin-bottom: 0.25rem;
+        }
+
+        .history-item-entity i {
+            font-size: 0.75rem;
+            opacity: 0.7;
+        }
+
+        .history-item-change {
+            display: flex;
+            align-items: center;
+            gap: 0.375rem;
+            font-size: 0.75rem;
+            color: #8B6F47;
+            margin-bottom: 0.25rem;
+        }
+
+        .history-item-change-old {
+            background: #FEE2E2;
+            color: #991B1B;
+            padding: 0.125rem 0.375rem;
+            border-radius: 3px;
+            text-decoration: line-through;
+        }
+
+        .history-item-change-arrow {
+            color: #8B6F47;
+        }
+
+        .history-item-change-new {
+            background: #D1FAE5;
+            color: #065F46;
+            padding: 0.125rem 0.375rem;
+            border-radius: 3px;
+        }
+
+        .history-item-meta {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            font-size: 0.7rem;
+            color: #9CA3AF;
+        }
+
+        .history-item-user {
+            display: flex;
+            align-items: center;
+            gap: 0.25rem;
+        }
+
+        .history-item-time {
+            font-style: italic;
+        }
+
+        .history-date-group {
+            padding: 0.5rem 1.25rem;
+            background: #F5F0EA;
+            font-size: 0.7rem;
+            font-weight: 600;
+            color: #8B6F47;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            position: sticky;
+            top: 0;
+            z-index: 1;
+        }
+
         /* Time Travel Modal */
         .time-travel-modal-overlay {
             position: fixed;
@@ -18927,14 +19141,14 @@
 
         <!-- RIGHT ZONE: Actions & User -->
         <div class="header-right">
-            <!-- Advanced Filter Button -->
-            <button class="header-icon-btn" onclick="openAdvancedFilterPanel()" title="Filters & History">
+            <!-- Filter Button -->
+            <button class="header-icon-btn" onclick="openAdvancedFilterPanel()" title="Filters">
                 <i class="ph ph-funnel"></i>
                 <span class="filter-active-badge" id="viewFilterBadge" style="display: none;"></span>
             </button>
 
-            <!-- Time Travel Button -->
-            <button class="header-icon-btn" onclick="openAdvancedFilterPanel(); document.getElementById('timeTravelDateInput').focus();" title="Time Travel" id="timeTravelBtn">
+            <!-- History Button -->
+            <button class="header-icon-btn" onclick="openHistoryPanel()" title="History" id="historyBtn">
                 <i class="ph ph-clock-counter-clockwise"></i>
             </button>
 
@@ -19221,6 +19435,26 @@
         <div class="filter-panel-footer">
             <button class="btn btn-outline" onclick="clearAllFilters()">Clear All</button>
             <button class="btn btn-primary" onclick="applyAdvancedFilters(); closeAdvancedFilterPanel()">Apply Filters</button>
+        </div>
+    </div>
+
+    <!-- History Panel -->
+    <div class="history-panel-overlay" id="historyPanelOverlay" onclick="closeHistoryPanel()"></div>
+    <div class="history-panel" id="historyPanel">
+        <div class="history-panel-header">
+            <div class="history-panel-title">
+                <i class="ph ph-clock-counter-clockwise"></i>
+                Activity History
+            </div>
+            <button class="history-panel-close" onclick="closeHistoryPanel()">
+                <i class="ph ph-x"></i>
+            </button>
+        </div>
+        <div class="history-panel-content" id="historyPanelContent">
+            <div class="history-panel-loading">
+                <i class="ph ph-spinner"></i>
+                <span>Loading history...</span>
+            </div>
         </div>
     </div>
 
@@ -23556,6 +23790,223 @@ John Doe,Engineering,john@example.com"
         function closeAdvancedFilterPanel() {
             document.getElementById('advancedFilterPanel').classList.remove('open');
             document.getElementById('filterPanelOverlay').classList.remove('open');
+        }
+
+        // History Panel Functions
+        function openHistoryPanel() {
+            document.getElementById('historyPanel').classList.add('open');
+            document.getElementById('historyPanelOverlay').classList.add('open');
+            loadHistoryPanel();
+        }
+
+        function closeHistoryPanel() {
+            document.getElementById('historyPanel').classList.remove('open');
+            document.getElementById('historyPanelOverlay').classList.remove('open');
+        }
+
+        async function loadHistoryPanel() {
+            const container = document.getElementById('historyPanelContent');
+            container.innerHTML = `
+                <div class="history-panel-loading">
+                    <i class="ph ph-spinner"></i>
+                    <span>Loading history...</span>
+                </div>
+            `;
+
+            try {
+                const activities = await getActivitiesFromXano();
+
+                // Filter out AGENT_DECLARED and sort by most recent first
+                const filteredActivities = activities
+                    .filter(a => a.eo_operator !== 'AGENT_DECLARED')
+                    .sort((a, b) => new Date(b.created_at) - new Date(a.created_at));
+
+                if (filteredActivities.length === 0) {
+                    container.innerHTML = `
+                        <div class="history-panel-empty">
+                            <i class="ph ph-clock-counter-clockwise"></i>
+                            <div>No activity history yet</div>
+                            <div style="font-size: 0.75rem; margin-top: 0.25rem;">Changes will appear here as you work</div>
+                        </div>
+                    `;
+                    return;
+                }
+
+                // Group activities by date
+                const groupedByDate = {};
+                filteredActivities.forEach(activity => {
+                    const date = new Date(activity.created_at);
+                    const dateKey = date.toLocaleDateString('en-US', {
+                        weekday: 'long',
+                        year: 'numeric',
+                        month: 'long',
+                        day: 'numeric'
+                    });
+
+                    if (!groupedByDate[dateKey]) {
+                        groupedByDate[dateKey] = [];
+                    }
+                    groupedByDate[dateKey].push(activity);
+                });
+
+                // Build HTML
+                let html = '';
+                for (const [dateKey, activities] of Object.entries(groupedByDate)) {
+                    html += `<div class="history-date-group">${dateKey}</div>`;
+
+                    activities.forEach(activity => {
+                        html += renderHistoryItem(activity);
+                    });
+                }
+
+                container.innerHTML = html;
+            } catch (error) {
+                console.error('Error loading history:', error);
+                container.innerHTML = `
+                    <div class="history-panel-empty">
+                        <i class="ph ph-warning"></i>
+                        <div>Failed to load history</div>
+                        <div style="font-size: 0.75rem; margin-top: 0.25rem;">Please try again later</div>
+                    </div>
+                `;
+            }
+        }
+
+        function renderHistoryItem(activity) {
+            const operator = (activity.eo_operator || '').toLowerCase();
+            const iconClass = ['ins', 'alt', 'nul', 'des', 'con'].includes(operator) ? operator : 'alt';
+            const icon = getHistoryItemIcon(activity);
+            const action = formatHistoryItemAction(activity);
+            const entityName = getHistoryEntityName(activity);
+            const changeHtml = formatHistoryItemChange(activity);
+            const user = activity.agent_name || activity.agent_email || 'Unknown user';
+            const time = formatTimeAgo(activity.created_at);
+
+            return `
+                <div class="history-item">
+                    <div class="history-item-icon ${iconClass}">
+                        <i class="ph ph-${icon}"></i>
+                    </div>
+                    <div class="history-item-content">
+                        <div class="history-item-action">${action}</div>
+                        ${entityName ? `<div class="history-item-entity"><i class="ph ph-cube"></i> ${entityName}</div>` : ''}
+                        ${changeHtml}
+                        <div class="history-item-meta">
+                            <div class="history-item-user">
+                                <i class="ph ph-user"></i>
+                                ${user}
+                            </div>
+                            <span class="history-item-time">${time}</span>
+                        </div>
+                    </div>
+                </div>
+            `;
+        }
+
+        function getHistoryItemIcon(activity) {
+            const operator = (activity.eo_operator || '').toUpperCase();
+            const eventVerb = activity.event_verb || activity.event_type || '';
+
+            // Icon based on operator type
+            const operatorIcons = {
+                'INS': 'plus-circle',
+                'ALT': 'pencil',
+                'NUL': 'trash',
+                'DES': 'tree-structure',
+                'CON': 'link'
+            };
+
+            // Icon based on event verb
+            const verbIcons = {
+                'Update Due Date': 'calendar',
+                'Update Priority': 'flag',
+                'Update Status': 'check-circle',
+                'Update Description': 'text-align-left',
+                'Update Name': 'pencil',
+                'Add Entity': 'plus-circle',
+                'Delete Entity': 'trash',
+                'Link Tasks': 'link',
+                'Cascade Date Change': 'arrows-clockwise',
+                'Add': 'plus-circle',
+                'Create': 'plus-circle',
+                'Update': 'pencil',
+                'Delete': 'trash'
+            };
+
+            return verbIcons[eventVerb] || operatorIcons[operator] || 'arrow-clockwise';
+        }
+
+        function formatHistoryItemAction(activity) {
+            const eventVerb = activity.event_verb || activity.event_type || '';
+            const operator = (activity.eo_operator || '').toUpperCase();
+
+            // Use event_verb if available
+            if (eventVerb && eventVerb !== 'undefined') {
+                return eventVerb;
+            }
+
+            // Fall back to operator label
+            const operatorLabels = {
+                'INS': 'Created',
+                'ALT': 'Updated',
+                'NUL': 'Deleted',
+                'DES': 'Nested under',
+                'CON': 'Connected'
+            };
+
+            return operatorLabels[operator] || 'Changed';
+        }
+
+        function getHistoryEntityName(activity) {
+            // Try to find the entity name from the activity data
+            const entityId = activity.entity_id || activity.object_id;
+            if (!entityId) return '';
+
+            // Look up entity name
+            const entity = findEntity(entityId);
+            if (entity) {
+                return entity.name;
+            }
+
+            // Fall back to subject/object names in the activity data
+            if (activity.subject_name) return activity.subject_name;
+            if (activity.name) return activity.name;
+
+            return '';
+        }
+
+        function formatHistoryItemChange(activity) {
+            const data = activity.data_json || activity;
+            const field = data.field;
+            let oldVal = data.old_value || data.old_display;
+            let newVal = data.new_value || data.new_display;
+
+            if (!oldVal && !newVal) return '';
+
+            // Format display values
+            if (field === 'dueDate') {
+                oldVal = oldVal || 'No date';
+                newVal = newVal || 'No date';
+            } else if (field === 'description') {
+                oldVal = oldVal ? (oldVal.length > 30 ? oldVal.substring(0, 30) + '...' : oldVal) : 'No description';
+                newVal = newVal ? (newVal.length > 30 ? newVal.substring(0, 30) + '...' : newVal) : 'No description';
+            } else if (field === 'status') {
+                const statusLabels = { pending: 'Pending', in_progress: 'In Progress', completed: 'Completed' };
+                oldVal = statusLabels[oldVal] || oldVal || '(empty)';
+                newVal = statusLabels[newVal] || newVal || '(empty)';
+            } else if (field === 'priority') {
+                const priorityLabels = { high: 'High', medium: 'Medium', low: 'Low' };
+                oldVal = priorityLabels[oldVal] || oldVal || '(empty)';
+                newVal = priorityLabels[newVal] || newVal || '(empty)';
+            }
+
+            return `
+                <div class="history-item-change">
+                    <span class="history-item-change-old">${oldVal || '(empty)'}</span>
+                    <span class="history-item-change-arrow">→</span>
+                    <span class="history-item-change-new">${newVal || '(empty)'}</span>
+                </div>
+            `;
         }
 
         function toggleFilterChip(chip) {
