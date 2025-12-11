@@ -13598,6 +13598,30 @@
             color: #065F46;
         }
 
+        .simple-task-chip.priority-urgent {
+            background: #FEE2E2;
+            border-color: #F87171;
+            color: #DC2626;
+        }
+
+        .simple-task-chip.priority-high {
+            background: #FEF3C7;
+            border-color: #F59E0B;
+            color: #B45309;
+        }
+
+        .simple-task-chip.priority-medium {
+            background: #DBEAFE;
+            border-color: #60A5FA;
+            color: #1D4ED8;
+        }
+
+        .simple-task-chip.priority-low {
+            background: #F3F4F6;
+            border-color: #D1D5DB;
+            color: #4B5563;
+        }
+
         .simple-task-chip i {
             font-size: 14px;
         }
@@ -34750,7 +34774,7 @@ Cmd/Ctrl + K - Command palette
                         </div>
 
                         <!-- Priority Chip -->
-                        <div class="simple-task-chip filled" onclick="cycleTaskPriority('${task.id}')" title="Click to change priority">
+                        <div class="simple-task-chip filled priority-${task.priority || 'medium'}" onclick="cycleTaskPriority('${task.id}')" title="Click to change priority">
                             <i class="ph ph-flag"></i>
                             <span>${(task.priority || 'medium').charAt(0).toUpperCase() + (task.priority || 'medium').slice(1)}</span>
                         </div>
