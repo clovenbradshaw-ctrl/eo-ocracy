@@ -5485,6 +5485,20 @@
             color: #8B5A2B;
         }
 
+        .role-assignment-chip .chip-role-name {
+            font-weight: 600;
+        }
+
+        .role-assignment-chip .chip-team-label {
+            font-size: 0.75rem;
+            font-weight: 500;
+            color: #B87B5B;
+            background: rgba(184, 123, 91, 0.12);
+            padding: 0.2rem 0.5rem;
+            border-radius: 4px;
+            margin-left: 0.25rem;
+        }
+
         .role-assignment-add-form {
             display: flex;
             gap: 0.5rem;
@@ -5582,6 +5596,165 @@
         .role-assignment-remove:hover {
             background: rgba(200, 50, 50, 0.1);
             color: #c83232;
+        }
+
+        /* Custom Styled Role Dropdown with Team Groupings */
+        .role-dropdown-container {
+            position: relative;
+            flex: 1;
+        }
+
+        .role-dropdown-trigger {
+            width: 100%;
+            padding: 0.7rem 1rem;
+            background: white;
+            border: 2px solid #E5DDD1;
+            border-radius: 8px;
+            font-size: 0.875rem;
+            color: #3D2E1F;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            transition: all 0.2s;
+        }
+
+        .role-dropdown-trigger:hover {
+            border-color: #C88F4A;
+            background: #FFFBF5;
+        }
+
+        .role-dropdown-trigger.open {
+            border-color: #C88F4A;
+            border-bottom-left-radius: 0;
+            border-bottom-right-radius: 0;
+        }
+
+        .role-dropdown-trigger .trigger-text {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            color: #8B6F47;
+        }
+
+        .role-dropdown-trigger .trigger-text.has-selection {
+            color: #3D2E1F;
+            font-weight: 500;
+        }
+
+        .role-dropdown-trigger .trigger-text i {
+            color: #C88F4A;
+        }
+
+        .role-dropdown-trigger .trigger-arrow {
+            color: #8B6F47;
+            transition: transform 0.2s;
+        }
+
+        .role-dropdown-trigger.open .trigger-arrow {
+            transform: rotate(180deg);
+        }
+
+        .role-dropdown-menu {
+            position: absolute;
+            top: 100%;
+            left: 0;
+            right: 0;
+            background: white;
+            border: 2px solid #C88F4A;
+            border-top: none;
+            border-radius: 0 0 8px 8px;
+            max-height: 320px;
+            overflow-y: auto;
+            z-index: 1000;
+            box-shadow: 0 4px 12px rgba(200, 143, 74, 0.2);
+            display: none;
+        }
+
+        .role-dropdown-menu.open {
+            display: block;
+        }
+
+        .role-dropdown-team {
+            border-bottom: 1px solid #F0EBE3;
+        }
+
+        .role-dropdown-team:last-child {
+            border-bottom: none;
+        }
+
+        .role-dropdown-team-header {
+            padding: 0.6rem 1rem;
+            background: linear-gradient(135deg, #FAF7F5 0%, #F5F2ED 100%);
+            font-size: 0.75rem;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            color: #B87B5B;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            border-bottom: 1px solid #E5DDD1;
+        }
+
+        .role-dropdown-team-header i {
+            color: #B87B5B;
+            font-size: 0.9rem;
+        }
+
+        .role-dropdown-item {
+            padding: 0.65rem 1rem 0.65rem 1.75rem;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            font-size: 0.875rem;
+            color: #3D2E1F;
+            transition: all 0.15s;
+        }
+
+        .role-dropdown-item:hover {
+            background: linear-gradient(135deg, #FFF8F0 0%, #FFF4E8 100%);
+        }
+
+        .role-dropdown-item i {
+            color: #8B6F47;
+            font-size: 0.9rem;
+        }
+
+        .role-dropdown-item:hover i {
+            color: #C88F4A;
+        }
+
+        .role-dropdown-unassigned {
+            border-top: 1px dashed #E5DDD1;
+        }
+
+        .role-dropdown-unassigned .role-dropdown-team-header {
+            background: linear-gradient(135deg, #F5F3F0 0%, #EFEDE8 100%);
+            color: #8B6F47;
+        }
+
+        .role-dropdown-unassigned .role-dropdown-team-header i {
+            color: #8B6F47;
+        }
+
+        /* Scrollbar styling for dropdown */
+        .role-dropdown-menu::-webkit-scrollbar {
+            width: 6px;
+        }
+
+        .role-dropdown-menu::-webkit-scrollbar-track {
+            background: #F5F2ED;
+        }
+
+        .role-dropdown-menu::-webkit-scrollbar-thumb {
+            background: #D4C4B0;
+            border-radius: 3px;
+        }
+
+        .role-dropdown-menu::-webkit-scrollbar-thumb:hover {
+            background: #C88F4A;
         }
 
         .modal-section-title {
@@ -21753,10 +21926,7 @@ Cmd/Ctrl + K - Command palette
 
                 const addFormHtml = availableRoles.length > 0 ? `
                     <div id="inlineRoleAssignForm" class="role-assignment-add-form hidden">
-                        <select id="inlineRoleSelect">
-                            <option value="">Select role...</option>
-                            ${availableRoles.map(role => `<option value="${role.id}">${role.name}</option>`).join('')}
-                        </select>
+                        ${generateRoleDropdownHTML(availableRoles)}
                         <button class="role-assignment-add-btn" onclick="assignPersonToRoleFromModal()">
                             <i class="ph ph-plus"></i> Assign
                         </button>
@@ -21770,14 +21940,19 @@ Cmd/Ctrl + K - Command palette
                             ${availableRoles.length > 0 ? `<button class="section-add-btn" onclick="toggleInlineRoleAssignForm()" title="Assign to role"><i class="ph ph-plus"></i></button>` : ''}
                         </div>
                         <div class="role-assignment-list">
-                            ${roleAssignments.map(a => `
+                            ${roleAssignments.map(a => {
+                                const parentTeam = getRoleParentTeam(a.role.id);
+                                const teamLabel = parentTeam ? `<span class="chip-team-label">${parentTeam.name}</span>` : '';
+                                return `
                                 <div class="role-assignment-chip" onclick="openEntityModal('${a.role.id}', 'role')">
-                                    <i class="ph ph-identification-badge"></i> ${a.role.name}
+                                    <i class="ph ph-briefcase"></i>
+                                    <span class="chip-role-name">${a.role.name}</span>
+                                    ${teamLabel}
                                     <button class="chip-remove-btn" onclick="event.stopPropagation(); removeRoleAssignment('${a.relationship.id}')" title="Remove assignment">
                                         <i class="ph ph-x"></i>
                                     </button>
                                 </div>
-                            `).join('')}
+                            `}).join('')}
                         </div>
                         ${addFormHtml}
                     `;
@@ -24282,6 +24457,156 @@ Cmd/Ctrl + K - Command palette
             }
 
             renderActivityList();
+        }
+
+        // Get the parent team of a role (via DES relationship)
+        function getRoleParentTeam(roleId) {
+            const desRelationship = relationships.find(r =>
+                r.predicate === 'DES' && r.object === roleId
+            );
+            if (!desRelationship) return null;
+            const parent = findEntity(desRelationship.subject);
+            if (parent && (parent.type === 'team' || parent.type === 'unit')) {
+                return parent;
+            }
+            return null;
+        }
+
+        // Group roles by their parent team
+        function groupRolesByTeam(roles) {
+            const groups = {};
+            const unassigned = [];
+
+            roles.forEach(role => {
+                const parent = getRoleParentTeam(role.id);
+                if (parent) {
+                    if (!groups[parent.id]) {
+                        groups[parent.id] = {
+                            team: parent,
+                            roles: []
+                        };
+                    }
+                    groups[parent.id].roles.push(role);
+                } else {
+                    unassigned.push(role);
+                }
+            });
+
+            return { groups: Object.values(groups), unassigned };
+        }
+
+        // Generate custom role dropdown HTML with team groupings
+        function generateRoleDropdownHTML(availableRoles) {
+            const { groups, unassigned } = groupRolesByTeam(availableRoles);
+
+            let menuHtml = '';
+
+            // Sort groups by team name
+            groups.sort((a, b) => a.team.name.localeCompare(b.team.name));
+
+            groups.forEach(group => {
+                const teamIcon = group.team.type === 'unit' ? 'ph-buildings' : 'ph-users-three';
+                menuHtml += `
+                    <div class="role-dropdown-team">
+                        <div class="role-dropdown-team-header">
+                            <i class="ph ${teamIcon}"></i> ${group.team.name}
+                        </div>
+                        ${group.roles.map(role => `
+                            <div class="role-dropdown-item" data-role-id="${role.id}" onclick="selectRoleFromDropdown('${role.id}', '${role.name.replace(/'/g, "\\'")}')">
+                                <i class="ph ph-briefcase"></i> ${role.name}
+                            </div>
+                        `).join('')}
+                    </div>
+                `;
+            });
+
+            // Add unassigned roles if any
+            if (unassigned.length > 0) {
+                menuHtml += `
+                    <div class="role-dropdown-team role-dropdown-unassigned">
+                        <div class="role-dropdown-team-header">
+                            <i class="ph ph-briefcase"></i> Other Roles
+                        </div>
+                        ${unassigned.map(role => `
+                            <div class="role-dropdown-item" data-role-id="${role.id}" onclick="selectRoleFromDropdown('${role.id}', '${role.name.replace(/'/g, "\\'")}')">
+                                <i class="ph ph-briefcase"></i> ${role.name}
+                            </div>
+                        `).join('')}
+                    </div>
+                `;
+            }
+
+            return `
+                <div class="role-dropdown-container">
+                    <input type="hidden" id="inlineRoleSelect" value="">
+                    <div class="role-dropdown-trigger" onclick="toggleRoleDropdown(event)">
+                        <span class="trigger-text">
+                            <i class="ph ph-briefcase"></i> Select role...
+                        </span>
+                        <i class="ph ph-caret-down trigger-arrow"></i>
+                    </div>
+                    <div class="role-dropdown-menu" id="roleDropdownMenu">
+                        ${menuHtml}
+                    </div>
+                </div>
+            `;
+        }
+
+        // Toggle the role dropdown open/close
+        function toggleRoleDropdown(event) {
+            event.stopPropagation();
+            const trigger = event.currentTarget;
+            const menu = document.getElementById('roleDropdownMenu');
+            const isOpen = trigger.classList.contains('open');
+
+            // Close any other open dropdowns first
+            document.querySelectorAll('.role-dropdown-trigger.open').forEach(t => {
+                t.classList.remove('open');
+            });
+            document.querySelectorAll('.role-dropdown-menu.open').forEach(m => {
+                m.classList.remove('open');
+            });
+
+            if (!isOpen) {
+                trigger.classList.add('open');
+                menu.classList.add('open');
+
+                // Close on outside click
+                setTimeout(() => {
+                    document.addEventListener('click', closeRoleDropdownOnOutsideClick);
+                }, 0);
+            }
+        }
+
+        // Close dropdown when clicking outside
+        function closeRoleDropdownOnOutsideClick(event) {
+            const container = event.target.closest('.role-dropdown-container');
+            if (!container) {
+                document.querySelectorAll('.role-dropdown-trigger.open').forEach(t => {
+                    t.classList.remove('open');
+                });
+                document.querySelectorAll('.role-dropdown-menu.open').forEach(m => {
+                    m.classList.remove('open');
+                });
+                document.removeEventListener('click', closeRoleDropdownOnOutsideClick);
+            }
+        }
+
+        // Select a role from the dropdown
+        function selectRoleFromDropdown(roleId, roleName) {
+            // Update hidden input
+            document.getElementById('inlineRoleSelect').value = roleId;
+
+            // Update trigger text
+            const trigger = document.querySelector('.role-dropdown-trigger');
+            const triggerText = trigger.querySelector('.trigger-text');
+            triggerText.innerHTML = `<i class="ph ph-briefcase"></i> ${roleName}`;
+            triggerText.classList.add('has-selection');
+
+            // Close dropdown
+            trigger.classList.remove('open');
+            document.getElementById('roleDropdownMenu').classList.remove('open');
+            document.removeEventListener('click', closeRoleDropdownOnOutsideClick);
         }
 
         // Assign person to role from modal (creates INS relationship)
