@@ -35928,9 +35928,9 @@ Cmd/Ctrl + K - Command palette
                 return;
             }
 
-            // Parse request body for POST/PUT
+            // Parse request body if provided
             let body = null;
-            if (method === 'POST' || method === 'PUT') {
+            if (requestBody && requestBody.trim()) {
                 try {
                     body = JSON.parse(requestBody);
                 } catch (e) {
