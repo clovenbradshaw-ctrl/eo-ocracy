@@ -931,6 +931,8 @@
         .filter-chip.priority-medium.active { background: #F59E0B; border-color: #F59E0B; }
         .filter-chip.priority-low.active { background: #6B7280; border-color: #6B7280; }
 
+        .filter-chip.quick-filter-chip.active { background: #8B5CF6; border-color: #8B5CF6; }
+
         .filter-date-inputs {
             display: flex;
             gap: 0.5rem;
@@ -18559,6 +18561,39 @@
             </button>
         </div>
         <div class="filter-panel-content">
+            <!-- Status Filter -->
+            <div class="filter-group">
+                <div class="filter-group-title">
+                    <i class="ph ph-circle-dashed"></i> Status
+                </div>
+                <div class="filter-chips">
+                    <div class="filter-chip status-pending active" data-filter="status" data-value="pending" onclick="toggleFilterChip(this)">
+                        <i class="ph ph-circle"></i> Pending
+                    </div>
+                    <div class="filter-chip status-in_progress active" data-filter="status" data-value="in_progress" onclick="toggleFilterChip(this)">
+                        <i class="ph ph-spinner"></i> In Progress
+                    </div>
+                    <div class="filter-chip status-completed active" data-filter="status" data-value="completed" onclick="toggleFilterChip(this)">
+                        <i class="ph ph-check-circle"></i> Completed
+                    </div>
+                </div>
+            </div>
+
+            <!-- Quick Filters -->
+            <div class="filter-group">
+                <div class="filter-group-title">
+                    <i class="ph ph-lightning"></i> Quick Filters
+                </div>
+                <div class="filter-chips">
+                    <div class="filter-chip quick-filter-chip" data-filter="quick" data-value="onlyMe" onclick="toggleQuickFilterChip(this)">
+                        <i class="ph ph-user"></i> Only me
+                    </div>
+                    <div class="filter-chip quick-filter-chip" data-filter="quick" data-value="onlyMyTeams" onclick="toggleQuickFilterChip(this)">
+                        <i class="ph ph-users-three"></i> My team(s)
+                    </div>
+                </div>
+            </div>
+
             <!-- Priority Filter -->
             <div class="filter-group">
                 <div class="filter-group-title">
@@ -18855,24 +18890,9 @@
                     </div>
                     <!-- Inline Filters -->
                     <div class="inline-filter-bar" id="inlineFilterBar">
-                        <div class="inline-filter-group">
-                            <button class="inline-filter-btn status-pending active" data-status="pending" onclick="toggleInlineStatusFilter('pending')" title="Show pending tasks">
-                                <i class="ph ph-circle"></i>
-                                <span>Pending</span>
-                            </button>
-                            <button class="inline-filter-btn status-in_progress active" data-status="in_progress" onclick="toggleInlineStatusFilter('in_progress')" title="Show in progress tasks">
-                                <i class="ph ph-spinner"></i>
-                                <span>In Progress</span>
-                            </button>
-                            <button class="inline-filter-btn status-completed active" data-status="completed" onclick="toggleInlineStatusFilter('completed')" title="Show completed tasks">
-                                <i class="ph ph-check-circle"></i>
-                                <span>Completed</span>
-                            </button>
-                        </div>
-                        <div class="inline-filter-divider"></div>
-                        <button class="inline-filter-more-btn" id="inlineFilterMoreBtn" onclick="openAdvancedFilterPanel()" title="More filters">
+                        <button class="inline-filter-more-btn" id="inlineFilterMoreBtn" onclick="openAdvancedFilterPanel()" title="Filters">
                             <i class="ph ph-funnel"></i>
-                            <span>More</span>
+                            <span>Filter</span>
                             <span class="inline-filter-badge" id="inlineFilterBadge" style="display: none;">0</span>
                         </button>
                         <button class="inline-filter-icon-btn" onclick="openTimeTravelModal()" title="Historical view">
@@ -22786,7 +22806,53 @@ John Doe,Engineering,john@example.com"
             }
 
             updateFilterActiveCount();
+            updateQuickFilterChipUI();
             applyAdvancedFilters();
+        }
+
+        // Toggle quick filter chip in advanced panel
+        function toggleQuickFilterChip(chip) {
+            const filterValue = chip.dataset.value;
+
+            if (filterValue === 'onlyMe') {
+                advancedFilters.onlyMe = !advancedFilters.onlyMe;
+                // If enabling onlyMe, disable onlyMyTeams
+                if (advancedFilters.onlyMe) {
+                    advancedFilters.onlyMyTeams = false;
+                }
+            } else if (filterValue === 'onlyMyTeams') {
+                advancedFilters.onlyMyTeams = !advancedFilters.onlyMyTeams;
+                // If enabling onlyMyTeams, disable onlyMe
+                if (advancedFilters.onlyMyTeams) {
+                    advancedFilters.onlyMe = false;
+                }
+            }
+
+            updateFilterActiveCount();
+            updateQuickFilterChipUI();
+            applyAdvancedFilters();
+        }
+
+        // Update quick filter chip UI to reflect state
+        function updateQuickFilterChipUI() {
+            const onlyMeChip = document.querySelector('.filter-chip[data-filter="quick"][data-value="onlyMe"]');
+            const onlyMyTeamsChip = document.querySelector('.filter-chip[data-filter="quick"][data-value="onlyMyTeams"]');
+
+            if (onlyMeChip) {
+                if (advancedFilters.onlyMe) {
+                    onlyMeChip.classList.add('active');
+                } else {
+                    onlyMeChip.classList.remove('active');
+                }
+            }
+
+            if (onlyMyTeamsChip) {
+                if (advancedFilters.onlyMyTeams) {
+                    onlyMyTeamsChip.classList.add('active');
+                } else {
+                    onlyMyTeamsChip.classList.remove('active');
+                }
+            }
         }
 
         // Time Travel Modal functions
@@ -22834,20 +22900,8 @@ John Doe,Engineering,john@example.com"
             }
         });
 
-        // Update inline filter buttons to match advancedFilters state
+        // Update inline filter button and badge to reflect advancedFilters state
         function updateInlineFilterUI() {
-            // Sync inline status buttons with advancedFilters state
-            ['pending', 'in_progress', 'completed'].forEach(status => {
-                const btn = document.querySelector(`.inline-filter-btn[data-status="${status}"]`);
-                if (btn) {
-                    if (advancedFilters.status.includes(status)) {
-                        btn.classList.add('active');
-                    } else {
-                        btn.classList.remove('active');
-                    }
-                }
-            });
-
             // Sync entity filter checkboxes
             ['unit', 'team', 'role', 'person'].forEach(entity => {
                 const checkbox = document.getElementById(`entityFilter${entity.charAt(0).toUpperCase() + entity.slice(1)}`);
@@ -22856,12 +22910,20 @@ John Doe,Engineering,john@example.com"
                 }
             });
 
-            // Count active advanced filters for badge (excluding status and entities since they're now inline/in settings)
-            let activeFilters = 0;
-            if (advancedFilters.priority.length < 3) activeFilters++;
-            if (advancedFilters.dateFrom || advancedFilters.dateTo || advancedFilters.datePreset) activeFilters++;
-            if (advancedFilters.assignees.length > 0) activeFilters++;
-            if (advancedFilters.tags.length > 0) activeFilters++;
+            // Sync status filter chips in advanced panel
+            ['pending', 'in_progress', 'completed'].forEach(status => {
+                const chip = document.querySelector(`.filter-chip[data-filter="status"][data-value="${status}"]`);
+                if (chip) {
+                    if (advancedFilters.status.includes(status)) {
+                        chip.classList.add('active');
+                    } else {
+                        chip.classList.remove('active');
+                    }
+                }
+            });
+
+            // Count all active filters for badge
+            const activeFilters = getActiveAdvancedFilterCount();
 
             const badge = document.getElementById('inlineFilterBadge');
             const moreBtn = document.getElementById('inlineFilterMoreBtn');
@@ -22877,13 +22939,16 @@ John Doe,Engineering,john@example.com"
             }
         }
 
-        // Get count of active non-status filters for badges
+        // Get count of all active filters for badges
         function getActiveAdvancedFilterCount() {
             let count = 0;
+            if (advancedFilters.status.length < 3) count++;
             if (advancedFilters.priority.length < 3) count++;
             if (advancedFilters.dateFrom || advancedFilters.dateTo || advancedFilters.datePreset) count++;
             if (advancedFilters.assignees.length > 0) count++;
             if (advancedFilters.tags.length > 0) count++;
+            if (advancedFilters.onlyMe) count++;
+            if (advancedFilters.onlyMyTeams) count++;
             return count;
         }
 
@@ -23054,7 +23119,7 @@ John Doe,Engineering,john@example.com"
             // Reset UI
             document.querySelectorAll('.filter-chip').forEach(chip => {
                 const filterType = chip.dataset.filter;
-                if (filterType === 'tag') {
+                if (filterType === 'tag' || filterType === 'quick') {
                     chip.classList.remove('active');
                 } else {
                     chip.classList.add('active');
@@ -41855,39 +41920,7 @@ Options:
                 { key: 'completed', label: 'Done', icon: 'ph-check-circle' }
             ];
 
-            // Build content-level filter bar
-            const hasAdvancedFilters = advancedFilters.priority.length !== 3 ||
-                advancedFilters.dateFrom || advancedFilters.dateTo || advancedFilters.datePreset ||
-                advancedFilters.assignees.length > 0 || advancedFilters.tags.length > 0;
-            const activeFilterCount = getActiveAdvancedFilterCount();
-
-            let html = `
-                <div class="content-filter-bar">
-                    <div class="content-filter-left">
-                        <div class="content-filter-group">
-                            <button class="content-filter-chip quick-filter ${advancedFilters.onlyMe ? 'active' : ''}"
-                                    onclick="toggleQuickFilter('onlyMe')" title="Show only tasks related to me">
-                                <i class="ph ph-user"></i>
-                                <span>Only me</span>
-                            </button>
-                            <button class="content-filter-chip quick-filter ${advancedFilters.onlyMyTeams ? 'active' : ''}"
-                                    onclick="toggleQuickFilter('onlyMyTeams')" title="Show only tasks from my team(s)">
-                                <i class="ph ph-users-three"></i>
-                                <span>My team(s)</span>
-                            </button>
-                        </div>
-                    </div>
-                    <div class="content-filter-right">
-                        <button class="content-filter-more ${hasAdvancedFilters || activeFilterCount > 0 ? 'has-filters' : ''}" onclick="openAdvancedFilterPanel()">
-                            <i class="ph ph-funnel"></i>
-                            <span>Filter</span>
-                            ${activeFilterCount > 0 ? `<span class="content-filter-badge">${activeFilterCount}</span>` : ''}
-                        </button>
-                    </div>
-                </div>
-            `;
-
-            html += '<div class="kanban-board">';
+            let html = '<div class="kanban-board">';
 
             statuses.forEach(status => {
                 // Get tasks for this column
