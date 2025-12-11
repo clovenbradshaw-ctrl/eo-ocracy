@@ -121,7 +121,7 @@
             font-size: 0.875rem;
             font-weight: 500;
             transition: all 0.2s;
-            max-width: 200px;
+            max-width: 280px;
         }
 
         .workspace-dropdown-toggle:hover {
@@ -142,8 +142,8 @@
             background: white;
             border-radius: 8px;
             box-shadow: 0 4px 20px rgba(0,0,0,0.15);
-            min-width: 250px;
-            max-width: 300px;
+            min-width: 320px;
+            max-width: 400px;
             z-index: 1000;
             display: none;
             overflow: hidden;
@@ -17316,7 +17316,9 @@ John Doe,Engineering,john@example.com"
             taskLinks = JSON.parse(JSON.stringify(ws.taskLinks || []));
 
             // Update UI
-            document.getElementById('workspaceNameText').textContent = ws.name;
+            const nameEl = document.getElementById('workspaceNameText');
+            nameEl.textContent = ws.name;
+            nameEl.title = ws.name;
 
             // Update sample data button
             const btnText = document.getElementById('sampleDataText');
@@ -17374,7 +17376,9 @@ John Doe,Engineering,john@example.com"
 
             // Update display if it's the current workspace
             if (workspaceId === currentWorkspaceId) {
-                document.getElementById('workspaceNameText').textContent = workspaces[workspaceId].name;
+                const nameEl = document.getElementById('workspaceNameText');
+                nameEl.textContent = workspaces[workspaceId].name;
+                nameEl.title = workspaces[workspaceId].name;
             }
 
             saveWorkspaces();
@@ -17869,7 +17873,7 @@ John Doe,Engineering,john@example.com"
 
             listEl.innerHTML = sortedWorkspaces.map(ws => `
                 <div class="workspace-item ${ws.id === currentWorkspaceId ? 'active' : ''}" onclick="switchWorkspace('${ws.id}')">
-                    <div class="workspace-item-name">
+                    <div class="workspace-item-name" title="${escapeHtml(ws.name)}">
                         <i class="ph ${ws.id === currentWorkspaceId ? 'ph-check-circle' : 'ph-folder'}"></i>
                         <span>${escapeHtml(ws.name)}</span>
                     </div>
@@ -24120,7 +24124,10 @@ Cmd/Ctrl + K - Command palette
 
                 // Update UI
                 const nameEl = document.getElementById('workspaceNameText');
-                if (nameEl) nameEl.textContent = workspaces[wsId].name;
+                if (nameEl) {
+                    nameEl.textContent = workspaces[wsId].name;
+                    nameEl.title = workspaces[wsId].name;
+                }
 
                 renderEntityList();
                 updateSelects();
@@ -30921,6 +30928,7 @@ Cmd/Ctrl + K - Command palette
                 const nameEl = document.getElementById('workspaceNameText');
                 if (nameEl) {
                     nameEl.textContent = ws.name;
+                    nameEl.title = ws.name;
                 }
 
                 const btnText = document.getElementById('sampleDataText');
@@ -37242,7 +37250,10 @@ Options:
 
                             // Update UI
                             const nameEl = document.getElementById('workspaceNameText');
-                            if (nameEl) nameEl.textContent = workspaces[wsId].name;
+                            if (nameEl) {
+                                nameEl.textContent = workspaces[wsId].name;
+                                nameEl.title = workspaces[wsId].name;
+                            }
 
                             completeInitialization();
                         } else {
