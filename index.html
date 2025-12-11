@@ -42529,7 +42529,7 @@ Options:
             }
 
             // Re-render the current view
-            const currentView = document.querySelector('.view-toggle-btn.active')?.dataset?.view;
+            const currentView = document.querySelector('.view-tab.active')?.dataset?.view;
             if (currentView === 'kanban') {
                 renderKanbanBoard();
             } else if (currentView === 'table') {
