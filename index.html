@@ -712,6 +712,446 @@
             margin-top: 0.25rem;
         }
 
+        /* Advanced Filter Panel Styles */
+        .advanced-filter-panel {
+            position: fixed;
+            top: 0;
+            right: -400px;
+            width: 380px;
+            height: 100vh;
+            background: white;
+            box-shadow: -4px 0 24px rgba(0,0,0,0.15);
+            z-index: 1001;
+            transition: right 0.3s ease;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .advanced-filter-panel.open {
+            right: 0;
+        }
+
+        .filter-panel-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 1rem 1.25rem;
+            border-bottom: 1px solid #E5DDD1;
+            background: #FAF7F5;
+        }
+
+        .filter-panel-title {
+            font-size: 1rem;
+            font-weight: 600;
+            color: #3D2E1F;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .filter-panel-close {
+            background: none;
+            border: none;
+            color: #8B6F47;
+            cursor: pointer;
+            padding: 0.5rem;
+            border-radius: 6px;
+            transition: background 0.15s;
+        }
+
+        .filter-panel-close:hover {
+            background: #E5DDD1;
+        }
+
+        .filter-panel-content {
+            flex: 1;
+            overflow-y: auto;
+            padding: 1rem;
+        }
+
+        .filter-group {
+            margin-bottom: 1.25rem;
+        }
+
+        .filter-group-title {
+            font-size: 0.75rem;
+            font-weight: 600;
+            color: #8B6F47;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            margin-bottom: 0.75rem;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .filter-group-title i {
+            font-size: 0.875rem;
+        }
+
+        .filter-chips {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 0.5rem;
+        }
+
+        .filter-chip {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.375rem;
+            padding: 0.375rem 0.75rem;
+            background: #FAF7F5;
+            border: 1px solid #E5DDD1;
+            border-radius: 20px;
+            font-size: 0.8rem;
+            color: #6B5642;
+            cursor: pointer;
+            transition: all 0.15s;
+        }
+
+        .filter-chip:hover {
+            border-color: #C88F4A;
+            background: #FFF9F0;
+        }
+
+        .filter-chip.active {
+            background: #C88F4A;
+            border-color: #C88F4A;
+            color: white;
+        }
+
+        .filter-chip i {
+            font-size: 0.875rem;
+        }
+
+        .filter-chip.status-pending.active { background: #F59E0B; border-color: #F59E0B; }
+        .filter-chip.status-in_progress.active { background: #3B82F6; border-color: #3B82F6; }
+        .filter-chip.status-completed.active { background: #10B981; border-color: #10B981; }
+
+        .filter-chip.priority-high.active { background: #EF4444; border-color: #EF4444; }
+        .filter-chip.priority-medium.active { background: #F59E0B; border-color: #F59E0B; }
+        .filter-chip.priority-low.active { background: #6B7280; border-color: #6B7280; }
+
+        .filter-date-inputs {
+            display: flex;
+            gap: 0.5rem;
+            align-items: center;
+        }
+
+        .filter-date-input {
+            flex: 1;
+            padding: 0.5rem 0.75rem;
+            border: 1px solid #E5DDD1;
+            border-radius: 6px;
+            font-size: 0.8rem;
+            color: #3D2E1F;
+            background: #FAF7F5;
+        }
+
+        .filter-date-input:focus {
+            outline: none;
+            border-color: #C88F4A;
+            background: white;
+        }
+
+        .filter-date-presets {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 0.375rem;
+            margin-top: 0.5rem;
+        }
+
+        .filter-date-preset {
+            padding: 0.25rem 0.625rem;
+            background: transparent;
+            border: 1px solid #E5DDD1;
+            border-radius: 4px;
+            font-size: 0.7rem;
+            color: #6B5642;
+            cursor: pointer;
+            transition: all 0.15s;
+        }
+
+        .filter-date-preset:hover {
+            border-color: #C88F4A;
+            background: #FFF9F0;
+        }
+
+        .filter-date-preset.active {
+            background: #C88F4A;
+            border-color: #C88F4A;
+            color: white;
+        }
+
+        .filter-assignee-search {
+            width: 100%;
+            padding: 0.5rem 0.75rem;
+            border: 1px solid #E5DDD1;
+            border-radius: 6px;
+            font-size: 0.8rem;
+            margin-bottom: 0.5rem;
+            background: #FAF7F5;
+        }
+
+        .filter-assignee-search:focus {
+            outline: none;
+            border-color: #C88F4A;
+            background: white;
+        }
+
+        .filter-assignee-list {
+            max-height: 150px;
+            overflow-y: auto;
+            border: 1px solid #E5DDD1;
+            border-radius: 6px;
+            background: #FAF7F5;
+        }
+
+        .filter-assignee-item {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            padding: 0.5rem 0.75rem;
+            cursor: pointer;
+            transition: background 0.15s;
+        }
+
+        .filter-assignee-item:hover {
+            background: #F5EFE6;
+        }
+
+        .filter-assignee-item.selected {
+            background: #FFF9F0;
+            border-left: 3px solid #C88F4A;
+        }
+
+        .filter-assignee-item input[type="checkbox"] {
+            accent-color: #C88F4A;
+        }
+
+        .filter-panel-footer {
+            display: flex;
+            gap: 0.5rem;
+            padding: 1rem 1.25rem;
+            border-top: 1px solid #E5DDD1;
+            background: #FAF7F5;
+        }
+
+        .filter-panel-footer .btn {
+            flex: 1;
+        }
+
+        .filter-active-count {
+            background: #C88F4A;
+            color: white;
+            padding: 0.125rem 0.5rem;
+            border-radius: 10px;
+            font-size: 0.7rem;
+            font-weight: 600;
+            margin-left: 0.5rem;
+        }
+
+        /* Time Travel UI Styles */
+        .time-travel-bar {
+            display: none;
+            align-items: center;
+            gap: 1rem;
+            padding: 0.75rem 1.5rem;
+            background: linear-gradient(135deg, #1E3A5F 0%, #2D4A6F 100%);
+            color: white;
+            position: fixed;
+            top: 60px;
+            left: 0;
+            right: 0;
+            z-index: 999;
+            box-shadow: 0 2px 12px rgba(0,0,0,0.2);
+        }
+
+        .time-travel-bar.active {
+            display: flex;
+        }
+
+        .time-travel-icon {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            font-weight: 600;
+            color: #FFD93D;
+        }
+
+        .time-travel-icon i {
+            font-size: 1.25rem;
+            animation: pulse 2s infinite;
+        }
+
+        @keyframes pulse {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.5; }
+        }
+
+        .time-travel-date-display {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            background: rgba(255,255,255,0.15);
+            padding: 0.5rem 1rem;
+            border-radius: 6px;
+            cursor: pointer;
+            transition: background 0.15s;
+        }
+
+        .time-travel-date-display:hover {
+            background: rgba(255,255,255,0.25);
+        }
+
+        .time-travel-slider-container {
+            flex: 1;
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+        }
+
+        .time-travel-slider {
+            flex: 1;
+            height: 6px;
+            -webkit-appearance: none;
+            background: rgba(255,255,255,0.2);
+            border-radius: 3px;
+            outline: none;
+        }
+
+        .time-travel-slider::-webkit-slider-thumb {
+            -webkit-appearance: none;
+            width: 18px;
+            height: 18px;
+            background: #FFD93D;
+            border-radius: 50%;
+            cursor: pointer;
+            box-shadow: 0 2px 6px rgba(0,0,0,0.3);
+            transition: transform 0.15s;
+        }
+
+        .time-travel-slider::-webkit-slider-thumb:hover {
+            transform: scale(1.2);
+        }
+
+        .time-travel-slider::-moz-range-thumb {
+            width: 18px;
+            height: 18px;
+            background: #FFD93D;
+            border-radius: 50%;
+            cursor: pointer;
+            border: none;
+        }
+
+        .time-travel-date-label {
+            font-size: 0.75rem;
+            color: rgba(255,255,255,0.7);
+            min-width: 80px;
+            text-align: center;
+        }
+
+        .time-travel-actions {
+            display: flex;
+            gap: 0.5rem;
+        }
+
+        .time-travel-btn {
+            padding: 0.5rem 1rem;
+            border: none;
+            border-radius: 6px;
+            font-size: 0.8rem;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.15s;
+            display: flex;
+            align-items: center;
+            gap: 0.375rem;
+        }
+
+        .time-travel-btn.primary {
+            background: #FFD93D;
+            color: #1E3A5F;
+        }
+
+        .time-travel-btn.primary:hover {
+            background: #FFE566;
+        }
+
+        .time-travel-btn.secondary {
+            background: rgba(255,255,255,0.15);
+            color: white;
+        }
+
+        .time-travel-btn.secondary:hover {
+            background: rgba(255,255,255,0.25);
+        }
+
+        /* Time Travel Mode Indicator */
+        .time-travel-mode-indicator {
+            position: fixed;
+            bottom: 1.5rem;
+            left: 50%;
+            transform: translateX(-50%);
+            background: linear-gradient(135deg, #1E3A5F 0%, #2D4A6F 100%);
+            color: white;
+            padding: 0.75rem 1.5rem;
+            border-radius: 30px;
+            box-shadow: 0 4px 16px rgba(0,0,0,0.3);
+            display: none;
+            align-items: center;
+            gap: 0.75rem;
+            z-index: 1000;
+            animation: slideUp 0.3s ease;
+        }
+
+        .time-travel-mode-indicator.active {
+            display: flex;
+        }
+
+        @keyframes slideUp {
+            from {
+                opacity: 0;
+                transform: translateX(-50%) translateY(20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateX(-50%) translateY(0);
+            }
+        }
+
+        .time-travel-mode-text {
+            font-size: 0.875rem;
+            font-weight: 500;
+        }
+
+        .time-travel-mode-date {
+            background: #FFD93D;
+            color: #1E3A5F;
+            padding: 0.25rem 0.75rem;
+            border-radius: 15px;
+            font-size: 0.8rem;
+            font-weight: 600;
+        }
+
+        /* Adjust main content when time travel is active */
+        .app-container.time-travel-active {
+            margin-top: 52px;
+        }
+
+        /* Filter Panel Overlay */
+        .filter-panel-overlay {
+            position: fixed;
+            inset: 0;
+            background: rgba(0,0,0,0.3);
+            z-index: 1000;
+            display: none;
+        }
+
+        .filter-panel-overlay.open {
+            display: block;
+        }
+
         /* Command Palette Styles */
         .command-palette-overlay {
             position: fixed;
@@ -16273,12 +16713,19 @@
 
         <!-- RIGHT ZONE: Actions & User -->
         <div class="header-right">
-            <!-- Filter Button -->
-            <div class="view-filter-dropdown">
-                <button class="header-icon-btn" onclick="toggleViewFilter(event)" title="Filter entities">
-                    <i class="ph ph-funnel"></i>
-                    <span class="filter-active-badge" id="viewFilterBadge" style="display: none;"></span>
-                </button>
+            <!-- Advanced Filter Button -->
+            <button class="header-icon-btn" onclick="openAdvancedFilterPanel()" title="Filters & History">
+                <i class="ph ph-funnel"></i>
+                <span class="filter-active-badge" id="viewFilterBadge" style="display: none;"></span>
+            </button>
+
+            <!-- Time Travel Button -->
+            <button class="header-icon-btn" onclick="openAdvancedFilterPanel(); document.getElementById('timeTravelDateInput').focus();" title="Time Travel" id="timeTravelBtn">
+                <i class="ph ph-clock-counter-clockwise"></i>
+            </button>
+
+            <!-- Legacy Filter Dropdown (hidden, kept for compatibility) -->
+            <div class="view-filter-dropdown" style="display: none;">
                 <div class="view-filter-menu" id="viewFilterMenu">
                     <div class="view-filter-section">
                         <div class="view-filter-section-title">Filter by</div>
@@ -16384,6 +16831,177 @@
             <div class="header-more-menu" style="display: none !important;">
                 <div class="header-dropdown" id="headerDropdown"></div>
             </div>
+        </div>
+    </div>
+
+    <!-- Time Travel Bar -->
+    <div class="time-travel-bar" id="timeTravelBar">
+        <div class="time-travel-icon">
+            <i class="ph ph-clock-counter-clockwise"></i>
+            <span>Time Travel</span>
+        </div>
+        <div class="time-travel-date-display" onclick="openTimeTravelDatePicker()">
+            <i class="ph ph-calendar"></i>
+            <span id="timeTravelDateText">Select date...</span>
+        </div>
+        <div class="time-travel-slider-container">
+            <span class="time-travel-date-label" id="timeTravelStartLabel">Start</span>
+            <input type="range" class="time-travel-slider" id="timeTravelSlider" min="0" max="100" value="100" oninput="onTimeTravelSliderChange()">
+            <span class="time-travel-date-label" id="timeTravelEndLabel">Now</span>
+        </div>
+        <div class="time-travel-actions">
+            <button class="time-travel-btn secondary" onclick="stepTimeTravel(-1)">
+                <i class="ph ph-caret-left"></i> Prev
+            </button>
+            <button class="time-travel-btn secondary" onclick="stepTimeTravel(1)">
+                Next <i class="ph ph-caret-right"></i>
+            </button>
+            <button class="time-travel-btn primary" onclick="exitTimeTravel()">
+                <i class="ph ph-arrow-counter-clockwise"></i> Return to Present
+            </button>
+        </div>
+    </div>
+
+    <!-- Time Travel Mode Indicator (bottom floating) -->
+    <div class="time-travel-mode-indicator" id="timeTravelIndicator">
+        <i class="ph ph-clock-counter-clockwise"></i>
+        <span class="time-travel-mode-text">Viewing history from</span>
+        <span class="time-travel-mode-date" id="timeTravelIndicatorDate">-</span>
+        <button class="time-travel-btn primary" onclick="exitTimeTravel()" style="padding: 0.25rem 0.75rem; font-size: 0.75rem;">
+            Exit
+        </button>
+    </div>
+
+    <!-- Advanced Filter Panel -->
+    <div class="filter-panel-overlay" id="filterPanelOverlay" onclick="closeAdvancedFilterPanel()"></div>
+    <div class="advanced-filter-panel" id="advancedFilterPanel">
+        <div class="filter-panel-header">
+            <div class="filter-panel-title">
+                <i class="ph ph-funnel"></i>
+                Filters
+                <span class="filter-active-count" id="filterActiveCount" style="display: none;">0</span>
+            </div>
+            <button class="filter-panel-close" onclick="closeAdvancedFilterPanel()">
+                <i class="ph ph-x"></i>
+            </button>
+        </div>
+        <div class="filter-panel-content">
+            <!-- Status Filter -->
+            <div class="filter-group">
+                <div class="filter-group-title">
+                    <i class="ph ph-flag"></i> Status
+                </div>
+                <div class="filter-chips">
+                    <div class="filter-chip status-pending active" data-filter="status" data-value="pending" onclick="toggleFilterChip(this)">
+                        <i class="ph ph-circle"></i> Pending
+                    </div>
+                    <div class="filter-chip status-in_progress active" data-filter="status" data-value="in_progress" onclick="toggleFilterChip(this)">
+                        <i class="ph ph-spinner"></i> In Progress
+                    </div>
+                    <div class="filter-chip status-completed active" data-filter="status" data-value="completed" onclick="toggleFilterChip(this)">
+                        <i class="ph ph-check-circle"></i> Completed
+                    </div>
+                </div>
+            </div>
+
+            <!-- Priority Filter -->
+            <div class="filter-group">
+                <div class="filter-group-title">
+                    <i class="ph ph-warning"></i> Priority
+                </div>
+                <div class="filter-chips">
+                    <div class="filter-chip priority-high active" data-filter="priority" data-value="high" onclick="toggleFilterChip(this)">
+                        <i class="ph ph-arrow-up"></i> High
+                    </div>
+                    <div class="filter-chip priority-medium active" data-filter="priority" data-value="medium" onclick="toggleFilterChip(this)">
+                        <i class="ph ph-minus"></i> Medium
+                    </div>
+                    <div class="filter-chip priority-low active" data-filter="priority" data-value="low" onclick="toggleFilterChip(this)">
+                        <i class="ph ph-arrow-down"></i> Low
+                    </div>
+                </div>
+            </div>
+
+            <!-- Due Date Filter -->
+            <div class="filter-group">
+                <div class="filter-group-title">
+                    <i class="ph ph-calendar"></i> Due Date
+                </div>
+                <div class="filter-date-inputs">
+                    <input type="date" class="filter-date-input" id="filterDateFrom" onchange="applyAdvancedFilters()" placeholder="From">
+                    <span style="color: #8B6F47;">to</span>
+                    <input type="date" class="filter-date-input" id="filterDateTo" onchange="applyAdvancedFilters()" placeholder="To">
+                </div>
+                <div class="filter-date-presets">
+                    <button class="filter-date-preset" data-preset="overdue" onclick="setDatePreset('overdue')">Overdue</button>
+                    <button class="filter-date-preset" data-preset="today" onclick="setDatePreset('today')">Today</button>
+                    <button class="filter-date-preset" data-preset="week" onclick="setDatePreset('week')">This Week</button>
+                    <button class="filter-date-preset" data-preset="month" onclick="setDatePreset('month')">This Month</button>
+                    <button class="filter-date-preset" data-preset="nodate" onclick="setDatePreset('nodate')">No Date</button>
+                </div>
+            </div>
+
+            <!-- Assignee Filter -->
+            <div class="filter-group">
+                <div class="filter-group-title">
+                    <i class="ph ph-user"></i> Assigned To
+                </div>
+                <input type="text" class="filter-assignee-search" id="filterAssigneeSearch" placeholder="Search people..." oninput="filterAssigneeList()">
+                <div class="filter-assignee-list" id="filterAssigneeList">
+                    <!-- Populated dynamically -->
+                </div>
+            </div>
+
+            <!-- Entity Type Filter -->
+            <div class="filter-group">
+                <div class="filter-group-title">
+                    <i class="ph ph-squares-four"></i> Entity Type
+                </div>
+                <div class="filter-chips">
+                    <div class="filter-chip active" data-filter="entity" data-value="unit" onclick="toggleFilterChip(this)">
+                        <i class="ph ph-buildings"></i> Units
+                    </div>
+                    <div class="filter-chip active" data-filter="entity" data-value="team" onclick="toggleFilterChip(this)">
+                        <i class="ph ph-users"></i> Teams
+                    </div>
+                    <div class="filter-chip active" data-filter="entity" data-value="role" onclick="toggleFilterChip(this)">
+                        <i class="ph ph-briefcase"></i> Roles
+                    </div>
+                    <div class="filter-chip active" data-filter="entity" data-value="person" onclick="toggleFilterChip(this)">
+                        <i class="ph ph-user"></i> People
+                    </div>
+                </div>
+            </div>
+
+            <!-- Tags Filter -->
+            <div class="filter-group">
+                <div class="filter-group-title">
+                    <i class="ph ph-tag"></i> Tags
+                </div>
+                <div class="filter-chips" id="filterTagsChips">
+                    <!-- Populated dynamically based on existing tags -->
+                </div>
+            </div>
+
+            <!-- Time Travel Section -->
+            <div class="filter-group" style="border-top: 1px solid #E5DDD1; padding-top: 1rem; margin-top: 0.5rem;">
+                <div class="filter-group-title">
+                    <i class="ph ph-clock-counter-clockwise"></i> Historical View
+                </div>
+                <p style="font-size: 0.8rem; color: #6B5642; margin-bottom: 0.75rem;">
+                    Travel back in time to see how things looked at a specific date.
+                </p>
+                <div class="filter-date-inputs">
+                    <input type="datetime-local" class="filter-date-input" id="timeTravelDateInput" style="flex: 2;">
+                    <button class="btn btn-primary" onclick="activateTimeTravel()" style="white-space: nowrap;">
+                        <i class="ph ph-clock-counter-clockwise"></i> Go
+                    </button>
+                </div>
+            </div>
+        </div>
+        <div class="filter-panel-footer">
+            <button class="btn btn-outline" onclick="clearAllFilters()">Clear All</button>
+            <button class="btn btn-primary" onclick="applyAdvancedFilters(); closeAdvancedFilterPanel()">Apply Filters</button>
         </div>
     </div>
 
@@ -20017,6 +20635,633 @@ John Doe,Engineering,john@example.com"
                 if (!taskRole && !person && !team && !unit) return true;
 
                 return false;
+            });
+        }
+
+        // ==========================================
+        // ADVANCED FILTERING SYSTEM
+        // ==========================================
+
+        // Advanced filter state
+        let advancedFilters = {
+            status: ['pending', 'in_progress', 'completed'],
+            priority: ['high', 'medium', 'low'],
+            dateFrom: null,
+            dateTo: null,
+            datePreset: null,
+            assignees: [], // Array of person IDs
+            entities: ['unit', 'team', 'role', 'person'],
+            tags: []
+        };
+
+        // Time travel state
+        let timeTravelState = {
+            active: false,
+            targetDate: null,
+            activities: [],
+            originalEntities: null,
+            originalRelationships: null,
+            activityTimestamps: []
+        };
+
+        function openAdvancedFilterPanel() {
+            document.getElementById('advancedFilterPanel').classList.add('open');
+            document.getElementById('filterPanelOverlay').classList.add('open');
+            populateAssigneeList();
+            populateTagsFilter();
+            updateFilterActiveCount();
+        }
+
+        function closeAdvancedFilterPanel() {
+            document.getElementById('advancedFilterPanel').classList.remove('open');
+            document.getElementById('filterPanelOverlay').classList.remove('open');
+        }
+
+        function toggleFilterChip(chip) {
+            chip.classList.toggle('active');
+
+            const filterType = chip.dataset.filter;
+            const filterValue = chip.dataset.value;
+
+            if (filterType === 'status') {
+                if (chip.classList.contains('active')) {
+                    if (!advancedFilters.status.includes(filterValue)) {
+                        advancedFilters.status.push(filterValue);
+                    }
+                } else {
+                    advancedFilters.status = advancedFilters.status.filter(s => s !== filterValue);
+                }
+            } else if (filterType === 'priority') {
+                if (chip.classList.contains('active')) {
+                    if (!advancedFilters.priority.includes(filterValue)) {
+                        advancedFilters.priority.push(filterValue);
+                    }
+                } else {
+                    advancedFilters.priority = advancedFilters.priority.filter(p => p !== filterValue);
+                }
+            } else if (filterType === 'entity') {
+                if (chip.classList.contains('active')) {
+                    if (!advancedFilters.entities.includes(filterValue)) {
+                        advancedFilters.entities.push(filterValue);
+                    }
+                } else {
+                    advancedFilters.entities = advancedFilters.entities.filter(e => e !== filterValue);
+                }
+                // Sync with legacy viewFilters
+                viewFilters[filterValue] = chip.classList.contains('active');
+            } else if (filterType === 'tag') {
+                if (chip.classList.contains('active')) {
+                    if (!advancedFilters.tags.includes(filterValue)) {
+                        advancedFilters.tags.push(filterValue);
+                    }
+                } else {
+                    advancedFilters.tags = advancedFilters.tags.filter(t => t !== filterValue);
+                }
+            }
+
+            updateFilterActiveCount();
+            applyAdvancedFilters();
+        }
+
+        function setDatePreset(preset) {
+            // Clear all preset active states
+            document.querySelectorAll('.filter-date-preset').forEach(btn => btn.classList.remove('active'));
+
+            const today = new Date();
+            today.setHours(0, 0, 0, 0);
+
+            let fromDate = null;
+            let toDate = null;
+
+            switch (preset) {
+                case 'overdue':
+                    toDate = new Date(today);
+                    toDate.setDate(toDate.getDate() - 1);
+                    advancedFilters.datePreset = 'overdue';
+                    break;
+                case 'today':
+                    fromDate = today;
+                    toDate = today;
+                    advancedFilters.datePreset = 'today';
+                    break;
+                case 'week':
+                    fromDate = today;
+                    toDate = new Date(today);
+                    toDate.setDate(toDate.getDate() + 7);
+                    advancedFilters.datePreset = 'week';
+                    break;
+                case 'month':
+                    fromDate = today;
+                    toDate = new Date(today);
+                    toDate.setMonth(toDate.getMonth() + 1);
+                    advancedFilters.datePreset = 'month';
+                    break;
+                case 'nodate':
+                    advancedFilters.datePreset = 'nodate';
+                    break;
+                default:
+                    advancedFilters.datePreset = null;
+            }
+
+            advancedFilters.dateFrom = fromDate;
+            advancedFilters.dateTo = toDate;
+
+            // Update input fields
+            document.getElementById('filterDateFrom').value = fromDate ? formatDateForInput(fromDate) : '';
+            document.getElementById('filterDateTo').value = toDate ? formatDateForInput(toDate) : '';
+
+            // Mark the selected preset as active
+            const selectedBtn = document.querySelector(`.filter-date-preset[data-preset="${preset}"]`);
+            if (selectedBtn) selectedBtn.classList.add('active');
+
+            updateFilterActiveCount();
+            applyAdvancedFilters();
+        }
+
+        function formatDateForInput(date) {
+            return date.toISOString().split('T')[0];
+        }
+
+        function populateAssigneeList() {
+            const container = document.getElementById('filterAssigneeList');
+            const people = entities.person || [];
+
+            if (people.length === 0) {
+                container.innerHTML = '<div style="padding: 0.75rem; color: #8B6F47; font-size: 0.8rem;">No people found</div>';
+                return;
+            }
+
+            container.innerHTML = people.map(person => `
+                <label class="filter-assignee-item ${advancedFilters.assignees.includes(person.id) ? 'selected' : ''}">
+                    <input type="checkbox"
+                           ${advancedFilters.assignees.includes(person.id) ? 'checked' : ''}
+                           onchange="toggleAssigneeFilter('${person.id}')">
+                    <i class="ph ph-user" style="color: #8B6F47;"></i>
+                    <span>${person.name}</span>
+                </label>
+            `).join('');
+        }
+
+        function toggleAssigneeFilter(personId) {
+            const idx = advancedFilters.assignees.indexOf(personId);
+            if (idx === -1) {
+                advancedFilters.assignees.push(personId);
+            } else {
+                advancedFilters.assignees.splice(idx, 1);
+            }
+            populateAssigneeList();
+            updateFilterActiveCount();
+            applyAdvancedFilters();
+        }
+
+        function filterAssigneeList() {
+            const searchTerm = document.getElementById('filterAssigneeSearch').value.toLowerCase();
+            const items = document.querySelectorAll('.filter-assignee-item');
+
+            items.forEach(item => {
+                const name = item.querySelector('span').textContent.toLowerCase();
+                item.style.display = name.includes(searchTerm) ? 'flex' : 'none';
+            });
+        }
+
+        function populateTagsFilter() {
+            const container = document.getElementById('filterTagsChips');
+
+            // Collect all unique tags from tasks
+            const allTags = new Set();
+            (entities.task || []).forEach(task => {
+                if (task.tags && Array.isArray(task.tags)) {
+                    task.tags.forEach(tag => allTags.add(tag));
+                }
+            });
+
+            if (allTags.size === 0) {
+                container.innerHTML = '<div style="color: #8B6F47; font-size: 0.8rem;">No tags found</div>';
+                return;
+            }
+
+            container.innerHTML = Array.from(allTags).map(tag => `
+                <div class="filter-chip ${advancedFilters.tags.includes(tag) ? 'active' : ''}"
+                     data-filter="tag" data-value="${tag}" onclick="toggleFilterChip(this)">
+                    <i class="ph ph-tag"></i> ${tag}
+                </div>
+            `).join('');
+        }
+
+        function updateFilterActiveCount() {
+            let count = 0;
+
+            // Count non-default filters
+            if (advancedFilters.status.length < 3) count++;
+            if (advancedFilters.priority.length < 3) count++;
+            if (advancedFilters.dateFrom || advancedFilters.dateTo || advancedFilters.datePreset) count++;
+            if (advancedFilters.assignees.length > 0) count++;
+            if (advancedFilters.entities.length < 4) count++;
+            if (advancedFilters.tags.length > 0) count++;
+
+            const badge = document.getElementById('filterActiveCount');
+            const viewBadge = document.getElementById('viewFilterBadge');
+
+            if (count > 0) {
+                badge.textContent = count;
+                badge.style.display = 'inline';
+                if (viewBadge) viewBadge.style.display = 'block';
+            } else {
+                badge.style.display = 'none';
+                if (viewBadge) viewBadge.style.display = 'none';
+            }
+        }
+
+        function clearAllFilters() {
+            // Reset to defaults
+            advancedFilters = {
+                status: ['pending', 'in_progress', 'completed'],
+                priority: ['high', 'medium', 'low'],
+                dateFrom: null,
+                dateTo: null,
+                datePreset: null,
+                assignees: [],
+                entities: ['unit', 'team', 'role', 'person'],
+                tags: []
+            };
+
+            // Reset UI
+            document.querySelectorAll('.filter-chip').forEach(chip => {
+                const filterType = chip.dataset.filter;
+                if (filterType === 'tag') {
+                    chip.classList.remove('active');
+                } else {
+                    chip.classList.add('active');
+                }
+            });
+
+            document.querySelectorAll('.filter-date-preset').forEach(btn => btn.classList.remove('active'));
+            document.getElementById('filterDateFrom').value = '';
+            document.getElementById('filterDateTo').value = '';
+
+            // Sync with legacy
+            viewFilters = { role: true, person: true, team: true, unit: true };
+
+            populateAssigneeList();
+            updateFilterActiveCount();
+            applyAdvancedFilters();
+        }
+
+        function applyAdvancedFilters() {
+            // Update date filters from inputs
+            const dateFrom = document.getElementById('filterDateFrom').value;
+            const dateTo = document.getElementById('filterDateTo').value;
+
+            if (dateFrom) advancedFilters.dateFrom = new Date(dateFrom);
+            if (dateTo) advancedFilters.dateTo = new Date(dateTo);
+
+            // Re-render current view with filters
+            if (currentView === 'kanban') {
+                renderKanbanBoard();
+            } else if (currentView === 'table') {
+                renderTaskTable();
+            } else if (currentView === 'timeline') {
+                renderTimeline();
+            } else if (currentView === 'gantt') {
+                renderGanttView();
+            } else if (currentView === 'calendar') {
+                renderCalendarView();
+            }
+
+            // Also update sidebar entity list
+            renderEntityList();
+            renderPeopleList();
+        }
+
+        // Enhanced getFilteredTasks with advanced filters
+        function getAdvancedFilteredTasks() {
+            let tasks = [...(entities.task || [])];
+
+            // Filter by status
+            if (advancedFilters.status.length < 3) {
+                tasks = tasks.filter(task => {
+                    const status = task.status || 'pending';
+                    return advancedFilters.status.includes(status);
+                });
+            }
+
+            // Filter by priority
+            if (advancedFilters.priority.length < 3) {
+                tasks = tasks.filter(task => {
+                    const priority = task.priority || 'medium';
+                    return advancedFilters.priority.includes(priority);
+                });
+            }
+
+            // Filter by due date
+            if (advancedFilters.datePreset === 'nodate') {
+                tasks = tasks.filter(task => !task.dueDate);
+            } else if (advancedFilters.datePreset === 'overdue') {
+                const today = new Date();
+                today.setHours(0, 0, 0, 0);
+                tasks = tasks.filter(task => {
+                    if (!task.dueDate) return false;
+                    const dueDate = new Date(task.dueDate);
+                    return dueDate < today && task.status !== 'completed';
+                });
+            } else if (advancedFilters.dateFrom || advancedFilters.dateTo) {
+                tasks = tasks.filter(task => {
+                    if (!task.dueDate) return false;
+                    const dueDate = new Date(task.dueDate);
+
+                    if (advancedFilters.dateFrom && dueDate < advancedFilters.dateFrom) return false;
+                    if (advancedFilters.dateTo) {
+                        const toDate = new Date(advancedFilters.dateTo);
+                        toDate.setHours(23, 59, 59, 999);
+                        if (dueDate > toDate) return false;
+                    }
+
+                    return true;
+                });
+            }
+
+            // Filter by assignees
+            if (advancedFilters.assignees.length > 0) {
+                tasks = tasks.filter(task => {
+                    // Find role assigned to task
+                    const taskRoleRel = relationships.find(r =>
+                        r.object === task.id && r.predicate === 'CON' && r.subject.startsWith('r')
+                    );
+                    if (!taskRoleRel) return false;
+
+                    // Find person in that role
+                    const personRel = relationships.find(r =>
+                        r.object === taskRoleRel.subject && r.predicate === 'INS' && r.subject.startsWith('p')
+                    );
+                    if (!personRel) return false;
+
+                    return advancedFilters.assignees.includes(personRel.subject);
+                });
+            }
+
+            // Filter by tags
+            if (advancedFilters.tags.length > 0) {
+                tasks = tasks.filter(task => {
+                    if (!task.tags || !Array.isArray(task.tags)) return false;
+                    return advancedFilters.tags.some(tag => task.tags.includes(tag));
+                });
+            }
+
+            return tasks;
+        }
+
+        // ==========================================
+        // TIME TRAVEL SYSTEM
+        // ==========================================
+
+        async function activateTimeTravel() {
+            const dateInput = document.getElementById('timeTravelDateInput');
+            if (!dateInput.value) {
+                showActivityToast('warning', 'Select Date', 'Please select a date to travel to');
+                return;
+            }
+
+            const targetDate = new Date(dateInput.value);
+
+            // Store current state for restoration
+            timeTravelState.originalEntities = JSON.parse(JSON.stringify(entities));
+            timeTravelState.originalRelationships = JSON.parse(JSON.stringify(relationships));
+
+            // Show loading
+            const loadingStatus = document.getElementById('loadingStatus');
+            if (loadingStatus) {
+                loadingStatus.style.display = 'block';
+                loadingStatus.innerHTML = '<i class="ph ph-spinner"></i> Loading historical data...';
+            }
+
+            try {
+                // Fetch all activities from Xano
+                const activities = await getActivitiesFromXano();
+
+                if (!activities || activities.length === 0) {
+                    showActivityToast('warning', 'No History', 'No historical data available');
+                    if (loadingStatus) loadingStatus.style.display = 'none';
+                    return;
+                }
+
+                timeTravelState.activities = activities;
+                timeTravelState.targetDate = targetDate;
+                timeTravelState.active = true;
+
+                // Build list of unique timestamps for the slider
+                const timestamps = [...new Set(activities.map(a => new Date(a.created_at).getTime()))].sort((a, b) => a - b);
+                timeTravelState.activityTimestamps = timestamps;
+
+                // Reconstruct state at target date
+                reconstructStateAtDate(targetDate);
+
+                // Update UI
+                updateTimeTravelUI();
+                closeAdvancedFilterPanel();
+
+                showActivityToast('info', 'Time Travel Active', `Viewing state as of ${formatTimeTravelDate(targetDate)}`);
+
+            } catch (error) {
+                console.error('Time travel error:', error);
+                showActivityToast('error', 'Error', 'Failed to load historical data');
+            }
+
+            if (loadingStatus) loadingStatus.style.display = 'none';
+        }
+
+        function reconstructStateAtDate(targetDate) {
+            const activities = timeTravelState.activities;
+
+            // Filter activities up to the target date
+            const relevantActivities = activities.filter(a => {
+                const activityDate = new Date(a.created_at);
+                return activityDate <= targetDate;
+            });
+
+            // Use the existing reconstruction function
+            const reconstructed = reconstructEntitiesFromActivities(relevantActivities);
+
+            // Apply reconstructed state
+            entities = reconstructed.entities;
+            relationships = reconstructed.relationships;
+
+            // Re-render all views
+            renderEntityList();
+            renderPeopleList();
+            renderCurrentView();
+        }
+
+        function updateTimeTravelUI() {
+            const bar = document.getElementById('timeTravelBar');
+            const indicator = document.getElementById('timeTravelIndicator');
+            const timeTravelBtn = document.getElementById('timeTravelBtn');
+            const mainContainer = document.getElementById('mainContainer');
+
+            if (timeTravelState.active) {
+                bar.classList.add('active');
+                indicator.classList.add('active');
+                if (timeTravelBtn) timeTravelBtn.style.color = '#FFD93D';
+                if (mainContainer) mainContainer.classList.add('time-travel-active');
+
+                // Update date displays
+                const dateText = formatTimeTravelDate(timeTravelState.targetDate);
+                document.getElementById('timeTravelDateText').textContent = dateText;
+                document.getElementById('timeTravelIndicatorDate').textContent = dateText;
+
+                // Update slider
+                updateTimeTravelSlider();
+            } else {
+                bar.classList.remove('active');
+                indicator.classList.remove('active');
+                if (timeTravelBtn) timeTravelBtn.style.color = '';
+                if (mainContainer) mainContainer.classList.remove('time-travel-active');
+            }
+        }
+
+        function updateTimeTravelSlider() {
+            const slider = document.getElementById('timeTravelSlider');
+            const timestamps = timeTravelState.activityTimestamps;
+
+            if (timestamps.length < 2) return;
+
+            const minTime = timestamps[0];
+            const maxTime = timestamps[timestamps.length - 1];
+            const currentTime = timeTravelState.targetDate.getTime();
+
+            // Calculate slider position
+            const position = ((currentTime - minTime) / (maxTime - minTime)) * 100;
+            slider.value = Math.max(0, Math.min(100, position));
+
+            // Update labels
+            document.getElementById('timeTravelStartLabel').textContent = formatShortDate(new Date(minTime));
+            document.getElementById('timeTravelEndLabel').textContent = 'Now';
+        }
+
+        function onTimeTravelSliderChange() {
+            const slider = document.getElementById('timeTravelSlider');
+            const timestamps = timeTravelState.activityTimestamps;
+
+            if (timestamps.length < 2) return;
+
+            const minTime = timestamps[0];
+            const maxTime = timestamps[timestamps.length - 1];
+            const position = slider.value / 100;
+
+            const targetTime = minTime + (maxTime - minTime) * position;
+            const targetDate = new Date(targetTime);
+
+            timeTravelState.targetDate = targetDate;
+            reconstructStateAtDate(targetDate);
+
+            // Update date displays
+            const dateText = formatTimeTravelDate(targetDate);
+            document.getElementById('timeTravelDateText').textContent = dateText;
+            document.getElementById('timeTravelIndicatorDate').textContent = dateText;
+        }
+
+        function stepTimeTravel(direction) {
+            const timestamps = timeTravelState.activityTimestamps;
+            if (timestamps.length === 0) return;
+
+            const currentTime = timeTravelState.targetDate.getTime();
+            let newTime;
+
+            if (direction < 0) {
+                // Find previous timestamp
+                const prevTimestamps = timestamps.filter(t => t < currentTime);
+                if (prevTimestamps.length === 0) return;
+                newTime = prevTimestamps[prevTimestamps.length - 1];
+            } else {
+                // Find next timestamp
+                const nextTimestamps = timestamps.filter(t => t > currentTime);
+                if (nextTimestamps.length === 0) return;
+                newTime = nextTimestamps[0];
+            }
+
+            timeTravelState.targetDate = new Date(newTime);
+            reconstructStateAtDate(timeTravelState.targetDate);
+            updateTimeTravelUI();
+        }
+
+        function openTimeTravelDatePicker() {
+            // Create a temporary date input for the picker
+            const input = document.createElement('input');
+            input.type = 'datetime-local';
+            input.style.position = 'absolute';
+            input.style.opacity = '0';
+            input.value = timeTravelState.targetDate ?
+                timeTravelState.targetDate.toISOString().slice(0, 16) :
+                new Date().toISOString().slice(0, 16);
+
+            document.body.appendChild(input);
+
+            input.addEventListener('change', () => {
+                if (input.value) {
+                    timeTravelState.targetDate = new Date(input.value);
+                    reconstructStateAtDate(timeTravelState.targetDate);
+                    updateTimeTravelUI();
+                }
+                document.body.removeChild(input);
+            });
+
+            input.addEventListener('blur', () => {
+                setTimeout(() => {
+                    if (document.body.contains(input)) {
+                        document.body.removeChild(input);
+                    }
+                }, 100);
+            });
+
+            input.click();
+        }
+
+        function exitTimeTravel() {
+            if (!timeTravelState.active) return;
+
+            // Restore original state
+            if (timeTravelState.originalEntities) {
+                entities = timeTravelState.originalEntities;
+            }
+            if (timeTravelState.originalRelationships) {
+                relationships = timeTravelState.originalRelationships;
+            }
+
+            // Reset time travel state
+            timeTravelState = {
+                active: false,
+                targetDate: null,
+                activities: [],
+                originalEntities: null,
+                originalRelationships: null,
+                activityTimestamps: []
+            };
+
+            // Update UI
+            updateTimeTravelUI();
+
+            // Re-render all views
+            renderEntityList();
+            renderPeopleList();
+            renderCurrentView();
+
+            showActivityToast('info', 'Returned to Present', 'Now viewing current data');
+        }
+
+        function formatTimeTravelDate(date) {
+            return date.toLocaleDateString('en-US', {
+                weekday: 'short',
+                year: 'numeric',
+                month: 'short',
+                day: 'numeric',
+                hour: '2-digit',
+                minute: '2-digit'
+            });
+        }
+
+        function formatShortDate(date) {
+            return date.toLocaleDateString('en-US', {
+                month: 'short',
+                day: 'numeric'
             });
         }
 
@@ -37001,15 +38246,21 @@ Options:
 
         function renderKanbanBoard() {
             const content = document.getElementById('taskBoardContent');
-            const tasks = entities.task || [];
+            const allTasks = entities.task || [];
+            const tasks = getAdvancedFilteredTasks(); // Apply advanced filters
 
-            // Update total count
-            document.getElementById('taskBoardTotal').textContent = tasks.length;
+            // Update total count (show filtered/total)
+            const totalEl = document.getElementById('taskBoardTotal');
+            if (tasks.length !== allTasks.length) {
+                totalEl.textContent = `${tasks.length}/${allTasks.length}`;
+            } else {
+                totalEl.textContent = tasks.length;
+            }
             updateTaskCountBadge();
 
             const fab = document.querySelector('.task-fab');
 
-            if (tasks.length === 0) {
+            if (allTasks.length === 0) {
                 if (fab) fab.style.display = 'none';
                 content.innerHTML = `
                     <div class="task-board-empty">
@@ -37018,6 +38269,21 @@ Options:
                         <p>Create tasks to see them organized by status on this Kanban board.</p>
                         <button class="hero-task-btn hero-task-btn-primary" onclick="openHeroTaskModal()" style="padding: 0.75rem 1.25rem;">
                             <i class="ph ph-plus"></i> Create Task
+                        </button>
+                    </div>
+                `;
+                return;
+            }
+
+            if (tasks.length === 0 && allTasks.length > 0) {
+                if (fab) fab.style.display = 'flex';
+                content.innerHTML = `
+                    <div class="task-board-empty">
+                        <i class="ph ph-funnel"></i>
+                        <h3>No matching tasks</h3>
+                        <p>No tasks match your current filters. Try adjusting the filter criteria.</p>
+                        <button class="hero-task-btn hero-task-btn-secondary" onclick="openAdvancedFilterPanel()" style="padding: 0.75rem 1.25rem;">
+                            <i class="ph ph-funnel"></i> Adjust Filters
                         </button>
                     </div>
                 `;
@@ -37308,14 +38574,21 @@ Options:
 
         function renderTaskTable() {
             const content = document.getElementById('taskBoardContent');
-            const tasks = entities.task || [];
+            const allTasks = entities.task || [];
+            const tasks = getAdvancedFilteredTasks(); // Apply advanced filters
 
-            document.getElementById('taskBoardTotal').textContent = tasks.length;
+            // Update total count (show filtered/total)
+            const totalEl = document.getElementById('taskBoardTotal');
+            if (tasks.length !== allTasks.length) {
+                totalEl.textContent = `${tasks.length}/${allTasks.length}`;
+            } else {
+                totalEl.textContent = tasks.length;
+            }
             updateTaskCountBadge();
 
             const fab = document.querySelector('.task-fab');
 
-            if (tasks.length === 0) {
+            if (allTasks.length === 0) {
                 if (fab) fab.style.display = 'none';
                 content.innerHTML = `
                     <div class="task-board-empty">
@@ -37324,6 +38597,21 @@ Options:
                         <p>Create tasks to see them in a table format.</p>
                         <button class="hero-task-btn hero-task-btn-primary" onclick="openHeroTaskModal()" style="padding: 0.75rem 1.25rem;">
                             <i class="ph ph-plus"></i> Create Task
+                        </button>
+                    </div>
+                `;
+                return;
+            }
+
+            if (tasks.length === 0 && allTasks.length > 0) {
+                if (fab) fab.style.display = 'flex';
+                content.innerHTML = `
+                    <div class="task-board-empty">
+                        <i class="ph ph-funnel"></i>
+                        <h3>No matching tasks</h3>
+                        <p>No tasks match your current filters. Try adjusting the filter criteria.</p>
+                        <button class="hero-task-btn hero-task-btn-secondary" onclick="openAdvancedFilterPanel()" style="padding: 0.75rem 1.25rem;">
+                            <i class="ph ph-funnel"></i> Adjust Filters
                         </button>
                     </div>
                 `;
@@ -37458,9 +38746,16 @@ Options:
 
         function renderTimeline() {
             const content = document.getElementById('taskBoardContent');
-            const tasks = entities.task || [];
+            const allTasks = entities.task || [];
+            const tasks = getAdvancedFilteredTasks(); // Apply advanced filters
 
-            document.getElementById('taskBoardTotal').textContent = tasks.length;
+            // Update total count (show filtered/total)
+            const totalEl = document.getElementById('taskBoardTotal');
+            if (tasks.length !== allTasks.length) {
+                totalEl.textContent = `${tasks.length}/${allTasks.length}`;
+            } else {
+                totalEl.textContent = tasks.length;
+            }
             updateTaskCountBadge();
 
             const fab = document.querySelector('.task-fab');
@@ -37468,7 +38763,7 @@ Options:
             // Filter tasks with due dates
             const tasksWithDates = tasks.filter(t => t.dueDate);
 
-            if (tasks.length === 0) {
+            if (allTasks.length === 0) {
                 if (fab) fab.style.display = 'none';
                 content.innerHTML = `
                     <div class="task-board-empty">
@@ -37484,6 +38779,20 @@ Options:
             }
 
             if (fab) fab.style.display = 'flex';
+
+            if (tasks.length === 0 && allTasks.length > 0) {
+                content.innerHTML = `
+                    <div class="task-board-empty">
+                        <i class="ph ph-funnel"></i>
+                        <h3>No matching tasks</h3>
+                        <p>No tasks match your current filters. Try adjusting the filter criteria.</p>
+                        <button class="hero-task-btn hero-task-btn-secondary" onclick="openAdvancedFilterPanel()" style="padding: 0.75rem 1.25rem;">
+                            <i class="ph ph-funnel"></i> Adjust Filters
+                        </button>
+                    </div>
+                `;
+                return;
+            }
 
             if (tasksWithDates.length === 0) {
                 content.innerHTML = `
@@ -38247,7 +39556,7 @@ Options:
 
         function renderGanttView() {
             const content = document.getElementById('ganttViewContent');
-            const filteredTasks = getFilteredTasks();
+            const filteredTasks = getAdvancedFilteredTasks();
 
             if (filteredTasks.length === 0) {
                 content.innerHTML = `
@@ -38381,7 +39690,7 @@ Options:
 
         function renderCalendarView() {
             const content = document.getElementById('calendarViewContent');
-            const filteredTasks = getFilteredTasks();
+            const filteredTasks = getAdvancedFilteredTasks();
 
             const year = calendarCurrentMonth.getFullYear();
             const month = calendarCurrentMonth.getMonth();
