@@ -40256,7 +40256,7 @@ Cmd/Ctrl + K - Command palette
         }
 
         // Select a record and add it as a tag
-        async function selectAirtableRecord(recordId, label, recordCategory = null) {
+        function selectAirtableRecord(recordId, label, recordCategory = null) {
             const taskId = airtablePickerState.taskId;
             // Use passed category (from 'all' mode) or fall back to selected category
             const category = recordCategory || airtablePickerState.selectedCategory;
@@ -40294,32 +40294,30 @@ Cmd/Ctrl + K - Command palette
                 clientId: null  // Will be resolved for cases/applications
             };
 
-            // For cases and applications, resolve the parent client ID
-            if (category === 'cases' || category === 'applications') {
-                try {
-                    const result = await AirtableAPI.getRecordWithParents(category, recordId);
-                    if (result.clientId) {
-                        tag.clientId = result.clientId;
-                    } else if (result.parents?.client?.id) {
-                        tag.clientId = result.parents.client.id;
-                    }
-                } catch (e) {
-                    console.warn('Could not resolve parent client:', e);
-                }
-            }
-
             // For clients, clientId is the record itself
             if (category === 'clients') {
                 tag.clientId = recordId;
             }
 
-            // Add the tag
+            // Add the tag immediately for instant feedback
             task.airtableTags.push(tag);
 
-            // Save
+            // Close modal and update UI instantly
+            closeAirtableTagPicker();
+            showToast(`Linked ${label} to task`, 'success');
+
+            // Refresh the task modal if open
+            if (currentModalEntity?.id === taskId) {
+                const roleAssignmentEl = document.getElementById('modalRoleAssignment');
+                if (roleAssignmentEl) {
+                    roleAssignmentEl.innerHTML = renderTaskModalInfo(task);
+                }
+            }
+
+            // Save immediately
             saveToLocalStorage();
 
-            // Log activity
+            // Log activity (non-blocking)
             logActivityToXano({
                 event_verb: 'Link Airtable Record',
                 eo_operator: 'CON',
@@ -40333,16 +40331,19 @@ Cmd/Ctrl + K - Command palette
                 }
             });
 
-            // Update UI
-            closeAirtableTagPicker();
-            showToast(`Linked ${label} to task`, 'success');
-
-            // Refresh the task modal if open
-            if (currentModalEntity?.id === taskId) {
-                const roleAssignmentEl = document.getElementById('modalRoleAssignment');
-                if (roleAssignmentEl) {
-                    roleAssignmentEl.innerHTML = renderTaskModalInfo(task);
-                }
+            // For cases and applications, resolve the parent client ID in the background
+            if (category === 'cases' || category === 'applications') {
+                AirtableAPI.getRecordWithParents(category, recordId).then(result => {
+                    if (result.clientId) {
+                        tag.clientId = result.clientId;
+                    } else if (result.parents?.client?.id) {
+                        tag.clientId = result.parents.client.id;
+                    }
+                    // Save again with the resolved clientId
+                    saveToLocalStorage();
+                }).catch(e => {
+                    console.warn('Could not resolve parent client:', e);
+                });
             }
         }
 
