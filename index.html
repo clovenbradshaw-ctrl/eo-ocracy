@@ -27320,13 +27320,18 @@ Cmd/Ctrl + K - Command palette
         function updateParentOptions() {
             const parentSelectGroup = document.getElementById('parentSelectGroup');
             const parentSelect = document.getElementById('parentEntitySelect');
-            
+
+            // Guard against missing DOM elements during initialization
+            if (!parentSelectGroup || !parentSelect) {
+                return;
+            }
+
             // Persons cannot have parents
             if (selectedEntityType === 'person') {
                 parentSelectGroup.style.display = 'none';
                 return;
             }
-            
+
             parentSelectGroup.style.display = 'block';
             parentSelect.innerHTML = '<option value="">None - Top Level</option>';
 
