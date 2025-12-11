@@ -22948,12 +22948,17 @@ John Doe,Engineering,john@example.com"
                 // Clear existing people to avoid duplicates
                 entities.person = [];
 
-                // Convert Airtable users to person entities
+                // Convert Airtable users to person entities - only include Active users
                 records.forEach((record, index) => {
                     const fields = record.fields || {};
                     const userName = fields['User Name'] || fields['Name'] || 'Unknown User';
                     const email = fields['Email'] || '';
                     const activityStatus = fields['Activity Status'] || 'Active'; // Default to Active if not set
+
+                    // Only include users with Activity Status = "Active"
+                    if (activityStatus !== 'Active') {
+                        return; // Skip inactive users
+                    }
 
                     // Create a unique ID using the Airtable record ID or generate one
                     const personId = record.id || `person_${Date.now()}_${index}`;
@@ -22970,7 +22975,7 @@ John Doe,Engineering,john@example.com"
                     });
                 });
 
-                console.log(`✅ Created ${entities.person.length} person entities from API users`);
+                console.log(`✅ Created ${entities.person.length} Active person entities from API users (filtered from ${records.length} total)`);
 
                 // Re-render the UI to show the new people
                 if (typeof renderEntityList === 'function') {
@@ -40307,9 +40312,9 @@ Options:
             const assignedPeople = assignedPeopleWithRels.map(item => item.person);
             const assignedPersonIds = assignedPeople.map(p => p.id);
 
-            // Get unassigned people for the dropdown - only show Active people for new assignments
+            // Get unassigned people for the dropdown (all people in entities are Active)
             const unassignedPeople = entities.person.filter(p =>
-                !assignedPersonIds.includes(p.id) && p.activityStatus === 'Active'
+                !assignedPersonIds.includes(p.id)
             );
 
             // Get current parent team/unit (DES relationship where role is the object)
