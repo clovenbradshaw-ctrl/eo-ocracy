@@ -16282,6 +16282,474 @@
         }
 
         /* ============================================
+           WORKFLOWS VIEW STYLES
+           ============================================ */
+
+        .workflows-view {
+            display: none;
+            flex-direction: column;
+            height: 100%;
+            background: #FAF7F5;
+        }
+
+        .workflows-view.active {
+            display: flex;
+        }
+
+        .workflows-view-header {
+            padding: 1.5rem;
+            background: white;
+            border-bottom: 1px solid #E5DDD1;
+        }
+
+        .workflows-view-title {
+            font-size: 1.25rem;
+            font-weight: 600;
+            color: #3D2E1F;
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+        }
+
+        .workflows-view-title i {
+            color: #C88F4A;
+        }
+
+        .workflows-view-subtitle {
+            font-size: 0.875rem;
+            color: #8B6F47;
+            margin-top: 0.25rem;
+        }
+
+        .workflows-view-controls {
+            padding: 1rem 1.5rem;
+            background: white;
+            border-bottom: 1px solid #E5DDD1;
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+        }
+
+        .workflows-view-search {
+            flex: 1;
+            max-width: 300px;
+            padding: 0.625rem 1rem;
+            border: 1px solid #E5DDD1;
+            border-radius: 6px;
+            font-size: 0.9rem;
+        }
+
+        .workflows-view-search:focus {
+            outline: none;
+            border-color: #C88F4A;
+        }
+
+        .workflows-view-content {
+            flex: 1;
+            overflow-y: auto;
+            padding: 1.5rem;
+        }
+
+        .workflows-view-empty {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            height: 100%;
+            text-align: center;
+            color: #8B6F47;
+        }
+
+        .workflows-view-empty i {
+            font-size: 4rem;
+            margin-bottom: 1rem;
+            color: #C88F4A;
+            opacity: 0.5;
+        }
+
+        .workflows-view-empty h3 {
+            font-size: 1.25rem;
+            margin-bottom: 0.5rem;
+            color: #3D2E1F;
+        }
+
+        .workflows-view-empty p {
+            font-size: 0.9rem;
+            margin-bottom: 1.5rem;
+            max-width: 400px;
+        }
+
+        .workflows-view-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+            gap: 1.25rem;
+        }
+
+        .workflow-template-card {
+            background: white;
+            border-radius: 12px;
+            border: 1px solid #E5DDD1;
+            overflow: hidden;
+            transition: all 0.2s;
+        }
+
+        .workflow-template-card:hover {
+            border-color: #C88F4A;
+            box-shadow: 0 4px 12px rgba(200, 143, 74, 0.15);
+        }
+
+        .workflow-template-header {
+            padding: 1.25rem;
+            background: linear-gradient(135deg, #FAF7F5 0%, #F5EFE6 100%);
+            border-bottom: 1px solid #E5DDD1;
+        }
+
+        .workflow-template-title {
+            font-size: 1.1rem;
+            font-weight: 600;
+            color: #3D2E1F;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .workflow-template-title i {
+            color: #C88F4A;
+        }
+
+        .workflow-template-meta {
+            display: flex;
+            gap: 1rem;
+            margin-top: 0.5rem;
+            font-size: 0.8rem;
+            color: #8B6F47;
+        }
+
+        .workflow-template-meta span {
+            display: flex;
+            align-items: center;
+            gap: 0.25rem;
+        }
+
+        .workflow-template-body {
+            padding: 1.25rem;
+        }
+
+        .workflow-template-description {
+            font-size: 0.875rem;
+            color: #6B5642;
+            margin-bottom: 1rem;
+            line-height: 1.5;
+        }
+
+        .workflow-template-tasks {
+            display: flex;
+            flex-direction: column;
+            gap: 0.5rem;
+            margin-bottom: 1rem;
+        }
+
+        .workflow-template-task {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            padding: 0.5rem 0.75rem;
+            background: #FAF7F5;
+            border-radius: 6px;
+            font-size: 0.85rem;
+            color: #3D2E1F;
+        }
+
+        .workflow-template-task i {
+            color: #8B6F47;
+            font-size: 0.9rem;
+        }
+
+        .workflow-template-task .task-order {
+            font-size: 0.7rem;
+            color: white;
+            background: #C88F4A;
+            width: 18px;
+            height: 18px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 600;
+        }
+
+        .workflow-template-task-more {
+            font-size: 0.8rem;
+            color: #8B6F47;
+            padding: 0.25rem 0.75rem;
+            font-style: italic;
+        }
+
+        .workflow-template-actions {
+            display: flex;
+            gap: 0.5rem;
+        }
+
+        .workflow-template-actions .btn {
+            flex: 1;
+        }
+
+        .workflow-template-card.default {
+            border-color: #E5DDD1;
+        }
+
+        .workflow-template-card.default .workflow-template-header {
+            background: linear-gradient(135deg, #F5F2ED 0%, #EAE4DC 100%);
+        }
+
+        .workflow-badge {
+            font-size: 0.65rem;
+            font-weight: 600;
+            color: #8B6F47;
+            background: rgba(139, 111, 71, 0.15);
+            padding: 0.2rem 0.5rem;
+            border-radius: 10px;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            margin-left: auto;
+        }
+
+        .workflow-badge.custom {
+            color: #C88F4A;
+            background: rgba(200, 143, 74, 0.15);
+        }
+
+        /* Workflow Preview Modal */
+        .workflow-preview-modal {
+            background: white;
+            border-radius: 12px;
+            max-width: 550px;
+            width: 90%;
+            max-height: 80vh;
+            overflow: hidden;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .workflow-preview-header {
+            padding: 1.25rem 1.5rem;
+            background: linear-gradient(135deg, #C88F4A 0%, #B87B5B 100%);
+            color: white;
+        }
+
+        .workflow-preview-header h3 {
+            font-size: 1.1rem;
+            font-weight: 600;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .workflow-preview-header p {
+            font-size: 0.85rem;
+            margin-top: 0.25rem;
+            opacity: 0.9;
+        }
+
+        .workflow-preview-body {
+            padding: 1.5rem;
+            overflow-y: auto;
+            flex: 1;
+        }
+
+        .workflow-preview-task-list {
+            display: flex;
+            flex-direction: column;
+            gap: 0.75rem;
+        }
+
+        .workflow-preview-task {
+            display: flex;
+            align-items: flex-start;
+            gap: 0.75rem;
+            padding: 0.75rem 1rem;
+            background: #FAF7F5;
+            border-radius: 8px;
+            border: 1px solid #E5DDD1;
+        }
+
+        .workflow-preview-task .task-order {
+            font-size: 0.75rem;
+            color: white;
+            background: #C88F4A;
+            min-width: 24px;
+            height: 24px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 600;
+        }
+
+        .workflow-preview-task-content {
+            flex: 1;
+        }
+
+        .workflow-preview-task-content h4 {
+            font-size: 0.9rem;
+            font-weight: 600;
+            color: #3D2E1F;
+            margin-bottom: 0.25rem;
+        }
+
+        .workflow-preview-task-content p {
+            font-size: 0.8rem;
+            color: #8B6F47;
+        }
+
+        .workflow-preview-task-link {
+            display: flex;
+            align-items: center;
+            gap: 0.25rem;
+            font-size: 0.7rem;
+            color: #7B95A3;
+            margin-top: 0.25rem;
+        }
+
+        .workflow-preview-actions {
+            padding: 1rem 1.5rem;
+            background: #FAF7F5;
+            border-top: 1px solid #E5DDD1;
+            display: flex;
+            gap: 0.75rem;
+            justify-content: flex-end;
+        }
+
+        /* Use Workflow Modal */
+        .use-workflow-modal {
+            background: white;
+            border-radius: 12px;
+            max-width: 500px;
+            width: 90%;
+            max-height: 85vh;
+            overflow: hidden;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .use-workflow-header {
+            padding: 1.25rem 1.5rem;
+            background: linear-gradient(135deg, #C88F4A 0%, #B87B5B 100%);
+            color: white;
+        }
+
+        .use-workflow-header h3 {
+            font-size: 1.1rem;
+            font-weight: 600;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .use-workflow-body {
+            padding: 1.5rem;
+            overflow-y: auto;
+            flex: 1;
+        }
+
+        .use-workflow-field {
+            margin-bottom: 1.25rem;
+        }
+
+        .use-workflow-field:last-child {
+            margin-bottom: 0;
+        }
+
+        .use-workflow-field label {
+            display: block;
+            font-size: 0.85rem;
+            font-weight: 600;
+            color: #3D2E1F;
+            margin-bottom: 0.5rem;
+        }
+
+        .use-workflow-field label span {
+            font-weight: 400;
+            color: #8B6F47;
+        }
+
+        .use-workflow-field input[type="text"],
+        .use-workflow-field input[type="date"],
+        .use-workflow-field select {
+            width: 100%;
+            padding: 0.625rem 0.875rem;
+            border: 1px solid #E5DDD1;
+            border-radius: 6px;
+            font-size: 0.9rem;
+            color: #3D2E1F;
+        }
+
+        .use-workflow-field input:focus,
+        .use-workflow-field select:focus {
+            outline: none;
+            border-color: #C88F4A;
+        }
+
+        .use-workflow-checkbox {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            padding: 0.75rem;
+            background: #FAF7F5;
+            border-radius: 6px;
+            cursor: pointer;
+        }
+
+        .use-workflow-checkbox input[type="checkbox"] {
+            width: 18px;
+            height: 18px;
+            accent-color: #C88F4A;
+        }
+
+        .use-workflow-checkbox-label {
+            flex: 1;
+        }
+
+        .use-workflow-checkbox-label strong {
+            display: block;
+            font-size: 0.85rem;
+            color: #3D2E1F;
+        }
+
+        .use-workflow-checkbox-label span {
+            font-size: 0.75rem;
+            color: #8B6F47;
+        }
+
+        .use-workflow-summary {
+            background: #FAF7F5;
+            border-radius: 8px;
+            padding: 1rem;
+            margin-top: 1rem;
+        }
+
+        .use-workflow-summary h4 {
+            font-size: 0.85rem;
+            font-weight: 600;
+            color: #3D2E1F;
+            margin-bottom: 0.5rem;
+        }
+
+        .use-workflow-summary p {
+            font-size: 0.8rem;
+            color: #8B6F47;
+        }
+
+        .use-workflow-actions {
+            padding: 1rem 1.5rem;
+            background: #FAF7F5;
+            border-top: 1px solid #E5DDD1;
+            display: flex;
+            gap: 0.75rem;
+            justify-content: flex-end;
+        }
+
+        /* ============================================
            SHAPE VIEW STYLES
            ============================================ */
 
@@ -20035,6 +20503,10 @@
                     <i class="ph ph-tree-structure"></i>
                     <span>Structure</span>
                 </button>
+                <button class="view-tab" data-view="workflows" onclick="switchView('workflows')">
+                    <i class="ph ph-git-branch"></i>
+                    <span>Workflows</span>
+                </button>
             </div>
         </div>
 
@@ -20685,6 +21157,30 @@
             <div id="calendarView" class="calendar-view">
                 <div class="calendar-view-content" id="calendarViewContent">
                     <!-- Populated dynamically -->
+                </div>
+            </div>
+
+            <!-- Workflows View (Template-based task creation) -->
+            <div id="workflowsView" class="workflows-view">
+                <div class="workflows-view-header">
+                    <div class="workflows-view-title">
+                        <i class="ph ph-git-branch"></i>
+                        <span>Workflows</span>
+                    </div>
+                    <div class="workflows-view-subtitle">Reusable templates for creating sequences of tasks</div>
+                </div>
+                <div class="workflows-view-controls">
+                    <input type="text"
+                           id="workflowsViewSearch"
+                           class="workflows-view-search"
+                           placeholder="Search workflows..."
+                           oninput="filterWorkflowsView()">
+                    <button class="btn btn-primary" onclick="openCreateWorkflowModal()">
+                        <i class="ph ph-plus"></i> Create Workflow
+                    </button>
+                </div>
+                <div class="workflows-view-content" id="workflowsViewContent">
+                    <!-- Populated dynamically by renderWorkflowsView() -->
                 </div>
             </div>
         </div>
@@ -24634,6 +25130,7 @@ John Doe,Engineering,john@example.com"
             document.getElementById('shapeView').classList.remove('active');
             document.getElementById('ganttView').classList.remove('active');
             document.getElementById('calendarView').classList.remove('active');
+            document.getElementById('workflowsView').classList.remove('active');
 
             if (view === 'tree') {
                 document.getElementById('treeView').classList.add('active');
@@ -24674,6 +25171,9 @@ John Doe,Engineering,john@example.com"
             } else if (view === 'structure') {
                 document.getElementById('structureView').classList.add('active');
                 renderStructureView();
+            } else if (view === 'workflows') {
+                document.getElementById('workflowsView').classList.add('active');
+                renderWorkflowsView();
             } else {
                 document.getElementById('graphView').classList.add('active');
                 setTimeout(() => updateGraph(), 100);
@@ -46760,6 +47260,439 @@ Options:
             setTimeout(() => {
                 switchModalTab('connect');
             }, 100);
+        }
+
+        // ============================================
+        // WORKFLOWS VIEW FUNCTIONS (Template-based Tasks)
+        // ============================================
+
+        // Default workflow templates
+        const defaultWorkflowTemplates = [
+            {
+                id: 'wf_client_onboarding',
+                name: 'Client Onboarding',
+                description: 'Standard process for onboarding new clients with all necessary setup and introduction tasks.',
+                icon: 'ph-handshake',
+                isDefault: true,
+                tasks: [
+                    { name: 'Initial client meeting', description: 'Meet with client to understand their needs and expectations.', dayOffset: 0 },
+                    { name: 'Send welcome package', description: 'Send branded welcome materials and account setup instructions.', dayOffset: 1 },
+                    { name: 'Setup client accounts', description: 'Create accounts in all relevant systems and tools.', dayOffset: 2 },
+                    { name: 'Schedule kickoff call', description: 'Arrange the official project kickoff meeting.', dayOffset: 3 },
+                    { name: 'Complete onboarding checklist', description: 'Verify all onboarding items are completed and documented.', dayOffset: 5 }
+                ],
+                createdAt: new Date().toISOString()
+            },
+            {
+                id: 'wf_weekly_review',
+                name: 'Weekly Review',
+                description: 'Recurring weekly review process to assess progress, blockers, and plan for the upcoming week.',
+                icon: 'ph-calendar-check',
+                isDefault: true,
+                tasks: [
+                    { name: 'Gather team updates', description: 'Collect status updates from all team members.', dayOffset: 0 },
+                    { name: 'Review completed tasks', description: 'Assess what was accomplished during the week.', dayOffset: 0 },
+                    { name: 'Identify blockers', description: 'Document any obstacles preventing progress.', dayOffset: 0 },
+                    { name: 'Plan next week priorities', description: 'Define key priorities and goals for the coming week.', dayOffset: 1 },
+                    { name: 'Send weekly summary', description: 'Distribute summary report to stakeholders.', dayOffset: 1 }
+                ],
+                createdAt: new Date().toISOString()
+            },
+            {
+                id: 'wf_project_kickoff',
+                name: 'Project Kickoff',
+                description: 'Essential steps to properly launch a new project with clear goals, resources, and timelines.',
+                icon: 'ph-rocket-launch',
+                isDefault: true,
+                tasks: [
+                    { name: 'Define project scope', description: 'Document project objectives, deliverables, and boundaries.', dayOffset: 0 },
+                    { name: 'Identify stakeholders', description: 'List all project stakeholders and their roles.', dayOffset: 1 },
+                    { name: 'Create project timeline', description: 'Develop detailed timeline with milestones and deadlines.', dayOffset: 2 },
+                    { name: 'Assign team roles', description: 'Allocate responsibilities to team members.', dayOffset: 2 },
+                    { name: 'Setup project workspace', description: 'Configure project management tools and communication channels.', dayOffset: 3 },
+                    { name: 'Host kickoff meeting', description: 'Conduct official project launch meeting with all stakeholders.', dayOffset: 5 }
+                ],
+                createdAt: new Date().toISOString()
+            }
+        ];
+
+        // Seed default workflow templates if none exist
+        function seedDefaultWorkflowTemplates() {
+            if (workflowTemplates.length === 0) {
+                workflowTemplates = JSON.parse(JSON.stringify(defaultWorkflowTemplates));
+                saveWorkspaces();
+                console.log('✅ Seeded default workflow templates');
+            } else {
+                // Ensure all default templates exist (for existing workspaces)
+                defaultWorkflowTemplates.forEach(defaultTemplate => {
+                    if (!workflowTemplates.some(t => t.id === defaultTemplate.id)) {
+                        workflowTemplates.push(JSON.parse(JSON.stringify(defaultTemplate)));
+                    }
+                });
+            }
+        }
+
+        // Filter workflows view by search
+        function filterWorkflowsView() {
+            renderWorkflowsView();
+        }
+
+        // Render the workflows view
+        function renderWorkflowsView() {
+            const content = document.getElementById('workflowsViewContent');
+            if (!content) return;
+
+            // Ensure default templates are seeded
+            seedDefaultWorkflowTemplates();
+
+            const searchTerm = (document.getElementById('workflowsViewSearch')?.value || '').toLowerCase();
+
+            // Filter templates by search
+            const filteredTemplates = workflowTemplates.filter(wf =>
+                !searchTerm ||
+                wf.name.toLowerCase().includes(searchTerm) ||
+                (wf.description && wf.description.toLowerCase().includes(searchTerm))
+            );
+
+            if (filteredTemplates.length === 0 && !searchTerm) {
+                content.innerHTML = `
+                    <div class="workflows-view-empty">
+                        <i class="ph ph-git-branch"></i>
+                        <h3>No workflow templates yet</h3>
+                        <p>Create reusable workflow templates to quickly generate sequences of linked tasks for common processes.</p>
+                        <button class="btn btn-primary" onclick="openCreateWorkflowModal()">
+                            <i class="ph ph-plus"></i> Create Your First Workflow
+                        </button>
+                    </div>
+                `;
+                return;
+            }
+
+            if (filteredTemplates.length === 0 && searchTerm) {
+                content.innerHTML = `
+                    <div class="workflows-view-empty">
+                        <i class="ph ph-magnifying-glass"></i>
+                        <h3>No matching workflows</h3>
+                        <p>No workflow templates match your search "${searchTerm}".</p>
+                    </div>
+                `;
+                return;
+            }
+
+            // Separate default and custom templates
+            const defaultTemplates = filteredTemplates.filter(t => t.isDefault);
+            const customTemplates = filteredTemplates.filter(t => !t.isDefault);
+
+            let html = '<div class="workflows-view-grid">';
+
+            // Render all templates
+            [...customTemplates, ...defaultTemplates].forEach(template => {
+                const taskCount = template.tasks?.length || 0;
+                const icon = template.icon || 'ph-git-branch';
+                const badge = template.isDefault ? 'Default' : 'Custom';
+                const badgeClass = template.isDefault ? '' : 'custom';
+
+                // Show first 3 tasks
+                const previewTasks = (template.tasks || []).slice(0, 3);
+                const moreTasks = taskCount - 3;
+
+                html += `
+                    <div class="workflow-template-card ${template.isDefault ? 'default' : ''}">
+                        <div class="workflow-template-header">
+                            <div class="workflow-template-title">
+                                <i class="ph ${icon}"></i>
+                                ${template.name}
+                                <span class="workflow-badge ${badgeClass}">${badge}</span>
+                            </div>
+                            <div class="workflow-template-meta">
+                                <span><i class="ph ph-list-checks"></i> ${taskCount} tasks</span>
+                            </div>
+                        </div>
+                        <div class="workflow-template-body">
+                            <div class="workflow-template-description">${template.description || 'No description'}</div>
+                            <div class="workflow-template-tasks">
+                                ${previewTasks.map((task, idx) => `
+                                    <div class="workflow-template-task">
+                                        <span class="task-order">${idx + 1}</span>
+                                        <span>${task.name}</span>
+                                    </div>
+                                `).join('')}
+                                ${moreTasks > 0 ? `<div class="workflow-template-task-more">+${moreTasks} more task${moreTasks > 1 ? 's' : ''}</div>` : ''}
+                            </div>
+                            <div class="workflow-template-actions">
+                                <button class="btn btn-outline" onclick="openWorkflowPreview('${template.id}')">
+                                    <i class="ph ph-eye"></i> Preview
+                                </button>
+                                <button class="btn btn-primary" onclick="openUseWorkflowModal('${template.id}')">
+                                    <i class="ph ph-play"></i> Use
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                `;
+            });
+
+            html += '</div>';
+            content.innerHTML = html;
+        }
+
+        // State for workflow modals
+        let currentWorkflowPreviewId = null;
+        let currentUseWorkflowId = null;
+
+        // Open workflow preview modal
+        function openWorkflowPreview(templateId) {
+            const template = workflowTemplates.find(t => t.id === templateId);
+            if (!template) return;
+
+            currentWorkflowPreviewId = templateId;
+            const icon = template.icon || 'ph-git-branch';
+
+            let modalHtml = `
+                <div id="workflowPreviewModal" class="modal-overlay" onclick="if(event.target === this) closeWorkflowPreviewModal()">
+                    <div class="workflow-preview-modal">
+                        <div class="workflow-preview-header">
+                            <h3><i class="ph ${icon}"></i> ${template.name}</h3>
+                            <p>${template.tasks?.length || 0} tasks will be created</p>
+                        </div>
+                        <div class="workflow-preview-body">
+                            <div class="workflow-preview-task-list">
+                                ${(template.tasks || []).map((task, idx) => `
+                                    <div class="workflow-preview-task">
+                                        <span class="task-order">${idx + 1}</span>
+                                        <div class="workflow-preview-task-content">
+                                            <h4>${task.name}</h4>
+                                            <p>${task.description || 'No description'}</p>
+                                            ${idx > 0 ? `
+                                                <div class="workflow-preview-task-link">
+                                                    <i class="ph ph-arrow-right"></i>
+                                                    Follows task ${idx}
+                                                </div>
+                                            ` : ''}
+                                            ${task.dayOffset !== undefined ? `
+                                                <div class="workflow-preview-task-link">
+                                                    <i class="ph ph-calendar"></i>
+                                                    Due: Start date +${task.dayOffset} day${task.dayOffset !== 1 ? 's' : ''}
+                                                </div>
+                                            ` : ''}
+                                        </div>
+                                    </div>
+                                `).join('')}
+                            </div>
+                        </div>
+                        <div class="workflow-preview-actions">
+                            <button class="btn" onclick="closeWorkflowPreviewModal()">Close</button>
+                            <button class="btn btn-primary" onclick="closeWorkflowPreviewModal(); openUseWorkflowModal('${templateId}')">
+                                <i class="ph ph-play"></i> Use This Workflow
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            `;
+
+            // Remove existing modal if any
+            const existingModal = document.getElementById('workflowPreviewModal');
+            if (existingModal) existingModal.remove();
+
+            // Add modal to document
+            document.body.insertAdjacentHTML('beforeend', modalHtml);
+        }
+
+        function closeWorkflowPreviewModal() {
+            const modal = document.getElementById('workflowPreviewModal');
+            if (modal) modal.remove();
+            currentWorkflowPreviewId = null;
+        }
+
+        // Open use workflow modal
+        function openUseWorkflowModal(templateId) {
+            const template = workflowTemplates.find(t => t.id === templateId);
+            if (!template) return;
+
+            currentUseWorkflowId = templateId;
+            const icon = template.icon || 'ph-git-branch';
+            const today = new Date().toISOString().split('T')[0];
+            const taskCount = template.tasks?.length || 0;
+
+            // Get available roles for assignment
+            const roles = entities.role || [];
+            const roleOptions = roles.map(r => `<option value="${r.id}">${r.name}</option>`).join('');
+
+            let modalHtml = `
+                <div id="useWorkflowModal" class="modal-overlay" onclick="if(event.target === this) closeUseWorkflowModal()">
+                    <div class="use-workflow-modal">
+                        <div class="use-workflow-header">
+                            <h3><i class="ph ${icon}"></i> Use: ${template.name}</h3>
+                        </div>
+                        <div class="use-workflow-body">
+                            <div class="use-workflow-field">
+                                <label>Instance Name <span>(optional)</span></label>
+                                <input type="text" id="useWorkflowName" placeholder="e.g., Client ABC Onboarding" value="${template.name}">
+                            </div>
+
+                            <div class="use-workflow-field">
+                                <label>Start Date</label>
+                                <input type="date" id="useWorkflowStartDate" value="${today}">
+                            </div>
+
+                            <div class="use-workflow-field">
+                                <label>Assign to Role <span>(optional)</span></label>
+                                <select id="useWorkflowRole">
+                                    <option value="">Don't assign to role</option>
+                                    ${roleOptions}
+                                </select>
+                            </div>
+
+                            <div class="use-workflow-field">
+                                <label class="use-workflow-checkbox">
+                                    <input type="checkbox" id="useWorkflowLinkTasks" checked>
+                                    <div class="use-workflow-checkbox-label">
+                                        <strong>Link tasks as sequence</strong>
+                                        <span>Each task will depend on the previous one</span>
+                                    </div>
+                                </label>
+                            </div>
+
+                            <div class="use-workflow-summary">
+                                <h4>Summary</h4>
+                                <p>This will create <strong>${taskCount}</strong> linked task${taskCount !== 1 ? 's' : ''} based on the "${template.name}" workflow template.</p>
+                            </div>
+                        </div>
+                        <div class="use-workflow-actions">
+                            <button class="btn" onclick="closeUseWorkflowModal()">Cancel</button>
+                            <button class="btn btn-primary" onclick="instantiateWorkflow('${templateId}')">
+                                <i class="ph ph-check"></i> Create ${taskCount} Task${taskCount !== 1 ? 's' : ''}
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            `;
+
+            // Remove existing modal if any
+            const existingModal = document.getElementById('useWorkflowModal');
+            if (existingModal) existingModal.remove();
+
+            // Add modal to document
+            document.body.insertAdjacentHTML('beforeend', modalHtml);
+        }
+
+        function closeUseWorkflowModal() {
+            const modal = document.getElementById('useWorkflowModal');
+            if (modal) modal.remove();
+            currentUseWorkflowId = null;
+        }
+
+        // Instantiate workflow - create tasks from template
+        async function instantiateWorkflow(templateId) {
+            const template = workflowTemplates.find(t => t.id === templateId);
+            if (!template) {
+                showToast('Workflow template not found', 'error');
+                return;
+            }
+
+            // Get options from modal
+            const instanceName = document.getElementById('useWorkflowName')?.value || template.name;
+            const startDateStr = document.getElementById('useWorkflowStartDate')?.value;
+            const roleId = document.getElementById('useWorkflowRole')?.value || null;
+            const linkTasks = document.getElementById('useWorkflowLinkTasks')?.checked ?? true;
+
+            const startDate = startDateStr ? new Date(startDateStr) : new Date();
+            const tasks = template.tasks || [];
+
+            if (tasks.length === 0) {
+                showToast('This workflow has no tasks to create', 'warning');
+                return;
+            }
+
+            // Generate instance ID for grouping
+            const instanceId = 'wfi_' + Date.now();
+            const createdTaskIds = [];
+
+            // Save undo state before bulk creation
+            saveUndoState('instantiate_workflow');
+
+            // Create tasks from template
+            for (let i = 0; i < tasks.length; i++) {
+                const taskTemplate = tasks[i];
+                const taskId = 'task_' + Date.now() + '_' + i;
+
+                // Calculate due date based on dayOffset
+                const dueDate = new Date(startDate);
+                if (taskTemplate.dayOffset !== undefined) {
+                    dueDate.setDate(dueDate.getDate() + taskTemplate.dayOffset);
+                }
+
+                // Determine predecessor (previous task in sequence)
+                const predecessorId = (linkTasks && i > 0) ? createdTaskIds[i - 1] : null;
+
+                // Create the task object
+                const taskObject = {
+                    id: taskId,
+                    name: taskTemplate.name,
+                    type: 'task',
+                    description: taskTemplate.description || '',
+                    dueDate: dueDate.toISOString().split('T')[0],
+                    status: 'pending',
+                    predecessorId: predecessorId,
+                    workflowInstanceId: instanceId,
+                    workflowTemplateId: templateId,
+                    workflowInstanceName: instanceName,
+                    createdAt: new Date().toISOString(),
+                    createdBy: SoftrIdentity.getUser()?.id || 'anonymous'
+                };
+
+                // Add task to entities
+                if (!entities.task) entities.task = [];
+                entities.task.push(taskObject);
+                createdTaskIds.push(taskId);
+
+                // If role is selected, create relationship
+                if (roleId) {
+                    const relId = 'rel_' + Date.now() + '_' + i;
+                    relationships.push({
+                        id: relId,
+                        subject: roleId,
+                        predicate: 'CON',
+                        object: taskId,
+                        createdAt: new Date().toISOString()
+                    });
+                }
+            }
+
+            // Save to localStorage
+            saveToLocalStorage();
+
+            // Log activity to Xano
+            await logActivityToXano({
+                event_verb: 'Instantiate Workflow',
+                eo_operator: 'SYN',
+                object_type: 'workflow',
+                object_id: instanceId,
+                object_label: instanceName,
+                data_json: {
+                    template_id: templateId,
+                    template_name: template.name,
+                    tasks_created: createdTaskIds.length,
+                    task_ids: createdTaskIds,
+                    start_date: startDate.toISOString().split('T')[0],
+                    role_id: roleId,
+                    linked: linkTasks
+                }
+            });
+
+            // Close modal
+            closeUseWorkflowModal();
+
+            // Show success message
+            showToast(`Created ${createdTaskIds.length} tasks from "${template.name}"`, 'success');
+
+            // Refresh the view - switch to kanban to see the new tasks
+            switchView('kanban');
+        }
+
+        // Create new custom workflow template (placeholder for future)
+        function openCreateWorkflowModal() {
+            showToast('Custom workflow creation coming soon! Use the default templates for now.', 'info');
         }
 
         // ============================================
