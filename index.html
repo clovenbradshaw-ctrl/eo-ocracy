@@ -18487,6 +18487,68 @@
             border-color: #C88F4A;
         }
 
+        .airtable-picker-search-row {
+            display: flex;
+            gap: 8px;
+            align-items: center;
+        }
+
+        .airtable-picker-search-row input {
+            flex: 1;
+        }
+
+        .airtable-picker-refresh-btn {
+            width: 38px;
+            height: 38px;
+            border: 1px solid #E5E7EB;
+            border-radius: 6px;
+            background: #fff;
+            color: #6B7280;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.2s;
+            flex-shrink: 0;
+        }
+
+        .airtable-picker-refresh-btn:hover {
+            background: #F3F4F6;
+            border-color: #C88F4A;
+            color: #C88F4A;
+        }
+
+        .airtable-picker-refresh-btn:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+        }
+
+        .airtable-picker-refresh-btn.spinning i {
+            animation: spin 1s linear infinite;
+        }
+
+        .airtable-picker-cache-status {
+            margin-top: 8px;
+            font-size: 11px;
+            color: #9CA3AF;
+            display: flex;
+            flex-direction: column;
+            gap: 2px;
+        }
+
+        .cache-status-info {
+            color: #6B7280;
+        }
+
+        .cache-status-hint {
+            color: #C88F4A;
+            font-style: italic;
+        }
+
+        .cache-status-loading {
+            color: #6B7280;
+        }
+
         .airtable-picker-results {
             flex: 1;
             overflow-y: auto;
@@ -22505,76 +22567,138 @@ John Doe,Engineering,john@example.com"
                 window.open(url, '_blank');
             },
 
-            // Client records cache for local name matching
-            clientsCache: {
-                records: null,
-                loading: false,
-                lastFetch: null
+            // Records cache for all categories - loaded on startup for fast local searching
+            recordsCache: {
+                clients: { records: null, loading: false, lastFetch: null },
+                cases: { records: null, loading: false, lastFetch: null },
+                events: { records: null, loading: false, lastFetch: null },
+                applications: { records: null, loading: false, lastFetch: null },
+                users: { records: null, loading: false, lastFetch: null }
             },
 
-            // Load all clients with name search field for local matching
-            async loadAllClients(forceRefresh = false, options = {}) {
-                const cacheAge = this.clientsCache.lastFetch
-                    ? Date.now() - this.clientsCache.lastFetch
-                    : Infinity;
+            // Cache TTL in milliseconds (5 minutes)
+            cacheTTL: 5 * 60 * 1000,
 
-                // Return cached if fresh (5 minutes) and not forcing refresh (unless filter is specified)
-                if (!forceRefresh && !options.filterFormula && this.clientsCache.records && cacheAge < 5 * 60 * 1000) {
-                    return this.clientsCache.records;
+            // Check if cache for a category is valid
+            isCacheValid(category) {
+                const cache = this.recordsCache[category];
+                if (!cache || !cache.records || !cache.lastFetch) return false;
+                return (Date.now() - cache.lastFetch) < this.cacheTTL;
+            },
+
+            // Load all records for a specific category
+            async loadAllRecords(category, forceRefresh = false) {
+                const cache = this.recordsCache[category];
+                if (!cache) {
+                    console.error(`Unknown category: ${category}`);
+                    return [];
+                }
+
+                // Return cached if fresh and not forcing refresh
+                if (!forceRefresh && this.isCacheValid(category)) {
+                    return cache.records;
                 }
 
                 // If already loading, wait for it
-                if (this.clientsCache.loading) {
+                if (cache.loading) {
                     return new Promise(resolve => {
                         const checkInterval = setInterval(() => {
-                            if (!this.clientsCache.loading) {
+                            if (!cache.loading) {
                                 clearInterval(checkInterval);
-                                resolve(this.clientsCache.records);
+                                resolve(cache.records || []);
                             }
                         }, 100);
                     });
                 }
 
-                this.clientsCache.loading = true;
+                cache.loading = true;
                 try {
-                    const config = this.tables.clients;
+                    const config = this.tables[category];
+                    const fields = [config.displayField];
+
+                    // Add secondary/search fields if available
+                    if (config.searchField) fields.push(config.searchField);
+                    if (config.secondaryField) fields.push(config.secondaryField);
+
                     const params = {
                         table: config.tableId,
-                        tableName: 'clients',
-                        fields: [config.displayField, config.searchField],
-                        maxRecords: 10000  // Get all clients
+                        tableName: category,
+                        fields: fields,
+                        maxRecords: 10000  // Get all records
                     };
 
-                    // Only include filterFormula when provided
-                    if (options.filterFormula) {
-                        params.filterFormula = options.filterFormula;
-                    }
-
+                    console.log(`📡 Loading all ${category} records...`);
                     const result = await this.request('getRecords', params);
 
                     // Normalize response to handle both flat and nested field formats
                     const normalized = this.normalizeResponse(result);
-                    this.clientsCache.records = normalized.records || [];
-                    this.clientsCache.lastFetch = Date.now();
-                    return this.clientsCache.records;
+                    cache.records = normalized.records || [];
+                    cache.lastFetch = Date.now();
+                    console.log(`✅ Loaded ${cache.records.length} ${category} records`);
+                    return cache.records;
+                } catch (error) {
+                    console.error(`Error loading ${category}:`, error);
+                    return cache.records || [];
                 } finally {
-                    this.clientsCache.loading = false;
+                    cache.loading = false;
                 }
             },
 
-            // Local name matching against 'name search 2.0' field
-            searchClientsLocal(query, allClients) {
+            // Load all data for all categories (called on page load)
+            async preloadAllData() {
+                console.log('🚀 Preloading all Airtable data...');
+                const startTime = Date.now();
+
+                // Load all categories in parallel
+                const categories = Object.keys(this.tables);
+                await Promise.all(categories.map(category => this.loadAllRecords(category)));
+
+                const duration = Date.now() - startTime;
+                console.log(`✅ All Airtable data preloaded in ${duration}ms`);
+
+                // Return summary
+                const summary = {};
+                for (const category of categories) {
+                    summary[category] = this.recordsCache[category].records?.length || 0;
+                }
+                return summary;
+            },
+
+            // Refresh cache for a specific category
+            async refreshCategory(category) {
+                console.log(`🔄 Refreshing ${category} cache...`);
+                return this.loadAllRecords(category, true);
+            },
+
+            // Refresh all caches
+            async refreshAllData() {
+                console.log('🔄 Refreshing all Airtable data...');
+                const categories = Object.keys(this.tables);
+                await Promise.all(categories.map(category => this.loadAllRecords(category, true)));
+                console.log('✅ All caches refreshed');
+            },
+
+            // Local search across any category
+            searchRecordsLocal(category, query) {
+                const cache = this.recordsCache[category];
+                if (!cache || !cache.records) {
+                    return [];
+                }
+
+                const records = cache.records;
+                const config = this.tables[category];
+
                 if (!query || query.trim().length === 0) {
                     // Return first 50 if no query
-                    return allClients.slice(0, 50);
+                    return records.slice(0, 50);
                 }
 
                 const searchTerms = query.toLowerCase().trim().split(/\s+/);
-                const config = this.tables.clients;
 
-                const scored = allClients.map(client => {
-                    const displayName = (client.fields?.[config.displayField] || '').toLowerCase();
-                    const searchVariations = (client.fields?.[config.searchField] || '').toLowerCase();
+                const scored = records.map(record => {
+                    const displayName = (record.fields?.[config.displayField] || '').toLowerCase();
+                    const searchField = config.searchField ? (record.fields?.[config.searchField] || '').toLowerCase() : '';
+                    const secondaryField = config.secondaryField ? (record.fields?.[config.secondaryField] || '').toLowerCase() : '';
 
                     let score = 0;
                     let matchedTerms = 0;
@@ -22585,9 +22709,13 @@ John Doe,Engineering,john@example.com"
                             score += 100;
                             matchedTerms++;
                         }
-                        // Match in search variations gets good score
-                        else if (searchVariations.includes(term)) {
+                        // Match in search/secondary field gets good score
+                        else if (searchField.includes(term)) {
                             score += 50;
+                            matchedTerms++;
+                        }
+                        else if (secondaryField.includes(term)) {
+                            score += 40;
                             matchedTerms++;
                         }
                     }
@@ -22602,21 +22730,41 @@ John Doe,Engineering,john@example.com"
                         score += 50;
                     }
 
-                    return { client, score };
+                    return { record, score };
                 });
 
                 // Filter to only matching records and sort by score
                 return scored
                     .filter(item => item.score > 0)
                     .sort((a, b) => b.score - a.score)
-                    .map(item => item.client)
+                    .map(item => item.record)
                     .slice(0, 100);  // Limit results
             },
 
-            // Search clients using local name matching
+            // Get cached records for a category (or load if not cached)
+            async getCachedRecords(category, query = '') {
+                // Ensure data is loaded
+                if (!this.isCacheValid(category)) {
+                    await this.loadAllRecords(category);
+                }
+
+                // Use local search
+                return this.searchRecordsLocal(category, query);
+            },
+
+            // Legacy support: Client records cache alias
+            get clientsCache() {
+                return this.recordsCache.clients;
+            },
+
+            // Legacy support: Load all clients
+            async loadAllClients(forceRefresh = false) {
+                return this.loadAllRecords('clients', forceRefresh);
+            },
+
+            // Legacy support: Search clients with variations
             async searchClientsWithVariations(query) {
-                const allClients = await this.loadAllClients();
-                return this.searchClientsLocal(query, allClients);
+                return this.getCachedRecords('clients', query);
             }
         };
 
@@ -39048,8 +39196,14 @@ Cmd/Ctrl + K - Command palette
                     </div>
 
                     <div class="airtable-picker-search">
-                        <input type="text" id="airtablePickerSearch" placeholder="Search records..."
-                               oninput="searchAirtableRecords(this.value)">
+                        <div class="airtable-picker-search-row">
+                            <input type="text" id="airtablePickerSearch" placeholder="Search records..."
+                                   oninput="searchAirtableRecords(this.value)">
+                            <button class="airtable-picker-refresh-btn" id="airtablePickerRefreshBtn" onclick="refreshAirtablePickerData()" title="Refresh data from Airtable">
+                                <i class="ph ph-arrows-clockwise"></i>
+                            </button>
+                        </div>
+                        <div class="airtable-picker-cache-status" id="airtablePickerCacheStatus"></div>
                     </div>
 
                     <div class="airtable-picker-results" id="airtablePickerResults">
@@ -39088,34 +39242,33 @@ Cmd/Ctrl + K - Command palette
             await loadAirtableRecords(category);
         }
 
-        // Load records for a category
+        // Load records for a category (uses cached data)
         async function loadAirtableRecords(category, searchQuery = '') {
             const resultsContainer = document.getElementById('airtablePickerResults');
             airtablePickerState.isLoading = true;
 
-            // Show loading
-            resultsContainer.innerHTML = `
-                <div class="airtable-picker-loading">
-                    <i class="ph ph-spinner"></i> Loading records...
-                </div>
-            `;
+            // Update cache status display
+            updateAirtableCacheStatus(category);
+
+            // Show loading only if cache is empty
+            const cache = AirtableAPI.recordsCache[category];
+            if (!cache || !cache.records) {
+                resultsContainer.innerHTML = `
+                    <div class="airtable-picker-loading">
+                        <i class="ph ph-spinner"></i> Loading records...
+                    </div>
+                `;
+            }
 
             try {
-                let records;
-
-                // For clients, use local matching against 'name search 2.0' field
-                if (category === 'clients') {
-                    records = await AirtableAPI.searchClientsWithVariations(searchQuery);
-                } else if (searchQuery) {
-                    const result = await AirtableAPI.search(category, searchQuery);
-                    records = result.records || [];
-                } else {
-                    const result = await AirtableAPI.getRecords(category);
-                    records = result.records || [];
-                }
+                // Use cached data with local search for all categories
+                const records = await AirtableAPI.getCachedRecords(category, searchQuery);
 
                 airtablePickerState.results = records;
                 renderAirtablePickerResults();
+
+                // Update cache status after load
+                updateAirtableCacheStatus(category);
 
             } catch (error) {
                 console.error('Error loading Airtable records:', error);
@@ -39129,6 +39282,107 @@ Cmd/Ctrl + K - Command palette
             } finally {
                 airtablePickerState.isLoading = false;
             }
+        }
+
+        // Refresh data for current category in picker
+        async function refreshAirtablePickerData() {
+            const category = airtablePickerState.selectedCategory;
+            const refreshBtn = document.getElementById('airtablePickerRefreshBtn');
+            const resultsContainer = document.getElementById('airtablePickerResults');
+
+            if (!category) {
+                // No category selected - refresh all data
+                if (refreshBtn) {
+                    refreshBtn.classList.add('spinning');
+                    refreshBtn.disabled = true;
+                }
+
+                try {
+                    await AirtableAPI.refreshAllData();
+                    showToast('All data refreshed from Airtable', 'success');
+                } catch (error) {
+                    console.error('Error refreshing data:', error);
+                    showToast('Error refreshing data', 'error');
+                } finally {
+                    if (refreshBtn) {
+                        refreshBtn.classList.remove('spinning');
+                        refreshBtn.disabled = false;
+                    }
+                }
+                return;
+            }
+
+            // Show refreshing state
+            if (refreshBtn) {
+                refreshBtn.classList.add('spinning');
+                refreshBtn.disabled = true;
+            }
+
+            resultsContainer.innerHTML = `
+                <div class="airtable-picker-loading">
+                    <i class="ph ph-spinner"></i> Refreshing ${category}...
+                </div>
+            `;
+
+            try {
+                // Force refresh the category
+                await AirtableAPI.refreshCategory(category);
+
+                // Update cache status
+                updateAirtableCacheStatus(category);
+
+                // Reload with current search query
+                await loadAirtableRecords(category, airtablePickerState.searchQuery);
+
+                showToast(`${category} data refreshed`, 'success');
+            } catch (error) {
+                console.error('Error refreshing data:', error);
+                showToast('Error refreshing data', 'error');
+            } finally {
+                if (refreshBtn) {
+                    refreshBtn.classList.remove('spinning');
+                    refreshBtn.disabled = false;
+                }
+            }
+        }
+
+        // Update cache status display in picker
+        function updateAirtableCacheStatus(category) {
+            const statusEl = document.getElementById('airtablePickerCacheStatus');
+            if (!statusEl) return;
+
+            if (!category) {
+                statusEl.innerHTML = '';
+                return;
+            }
+
+            const cache = AirtableAPI.recordsCache[category];
+            if (!cache || !cache.records) {
+                statusEl.innerHTML = `<span class="cache-status-loading">Loading ${category}...</span>`;
+                return;
+            }
+
+            const recordCount = cache.records.length;
+            const lastFetch = cache.lastFetch;
+            const ageMinutes = lastFetch ? Math.floor((Date.now() - lastFetch) / 60000) : null;
+
+            let ageText = '';
+            if (ageMinutes !== null) {
+                if (ageMinutes < 1) {
+                    ageText = 'just now';
+                } else if (ageMinutes === 1) {
+                    ageText = '1 min ago';
+                } else {
+                    ageText = `${ageMinutes} mins ago`;
+                }
+            }
+
+            statusEl.innerHTML = `
+                <span class="cache-status-info">
+                    ${recordCount} ${category} cached ${ageText ? `(${ageText})` : ''}
+                </span>
+                <span class="cache-status-hint">Don't see what you're looking for? Click refresh</span>
+            `;
         }
 
         // Render search/browse results
@@ -39172,7 +39426,7 @@ Cmd/Ctrl + K - Command palette
             }).join('');
         }
 
-        // Search records with debounce
+        // Search records - instant local search when cache is available
         let airtableSearchTimeout = null;
         function searchAirtableRecords(query) {
             clearTimeout(airtableSearchTimeout);
@@ -39182,9 +39436,20 @@ Cmd/Ctrl + K - Command palette
                 return;
             }
 
-            airtableSearchTimeout = setTimeout(() => {
-                loadAirtableRecords(airtablePickerState.selectedCategory, query);
-            }, 300);
+            const category = airtablePickerState.selectedCategory;
+            const cache = AirtableAPI.recordsCache[category];
+
+            // If cache is available, search instantly (no debounce needed for local search)
+            if (cache && cache.records) {
+                const results = AirtableAPI.searchRecordsLocal(category, query);
+                airtablePickerState.results = results;
+                renderAirtablePickerResults();
+            } else {
+                // Fallback to async loading with debounce
+                airtableSearchTimeout = setTimeout(() => {
+                    loadAirtableRecords(category, query);
+                }, 300);
+            }
         }
 
         // Select a record and add it as a tag
@@ -45851,6 +46116,13 @@ Options:
                 loadTaskComments();
                 loadNotifications();
                 loadAutomationRules();
+
+                // Preload all Airtable data for fast linking (runs in background)
+                AirtableAPI.preloadAllData().then(summary => {
+                    console.log('📊 Airtable data preloaded:', summary);
+                }).catch(err => {
+                    console.warn('⚠️ Could not preload Airtable data:', err);
+                });
 
                 // Render everything
                 try {
