@@ -6420,6 +6420,81 @@
             flex: 1;
         }
 
+        /* Modal Overflow Menu (for tasks) */
+        .modal-overflow-menu {
+            position: relative;
+        }
+
+        .modal-overflow-btn {
+            width: 36px;
+            height: 36px;
+            border-radius: 8px;
+            border: 1px solid #E5DDD1;
+            background: white;
+            color: #6B5642;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.15s;
+        }
+
+        .modal-overflow-btn:hover {
+            border-color: #C88F4A;
+            color: #C88F4A;
+        }
+
+        .modal-overflow-btn i {
+            font-size: 18px;
+        }
+
+        .modal-overflow-dropdown {
+            position: absolute;
+            bottom: 100%;
+            left: 0;
+            margin-bottom: 8px;
+            background: white;
+            border-radius: 8px;
+            box-shadow: 0 8px 30px rgba(0, 0, 0, 0.15);
+            border: 1px solid #e5e5e5;
+            padding: 4px;
+            min-width: 140px;
+            display: none;
+            z-index: 100;
+        }
+
+        .modal-overflow-dropdown.show {
+            display: block;
+            animation: dropdownSlide 0.15s ease-out;
+        }
+
+        .modal-overflow-item {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            width: 100%;
+            padding: 10px 12px;
+            border: none;
+            background: none;
+            font-size: 13px;
+            cursor: pointer;
+            border-radius: 6px;
+            transition: background 0.15s;
+            text-align: left;
+        }
+
+        .modal-overflow-item:hover {
+            background: #f5f5f5;
+        }
+
+        .modal-overflow-item.danger {
+            color: #d32f2f;
+        }
+
+        .modal-overflow-item.danger:hover {
+            background: #fff5f5;
+        }
+
         /* Entity Edit Modal */
         .entity-edit-modal-overlay {
             position: fixed;
@@ -13083,10 +13158,9 @@
         .simple-task-meta-bar {
             display: flex;
             gap: 8px;
-            padding: 16px 0;
+            padding: 12px 0;
             flex-wrap: wrap;
-            border-bottom: 1px solid #f0f0f0;
-            margin-bottom: 16px;
+            margin-bottom: 8px;
         }
 
         .simple-task-chip {
@@ -13182,31 +13256,38 @@
         }
 
         .simple-task-description {
-            margin-bottom: 20px;
+            margin-bottom: 12px;
         }
 
         .simple-task-description-field {
             width: 100%;
-            border: 1px solid #e5e5e5;
+            border: 1px solid transparent;
             border-radius: 8px;
-            padding: 14px;
+            padding: 12px;
             font-size: 14px;
             font-family: inherit;
-            resize: vertical;
-            min-height: 100px;
+            resize: none;
+            min-height: 60px;
             outline: none;
-            color: #555;
+            color: #444;
             line-height: 1.6;
-            transition: border-color 0.2s, box-shadow 0.2s;
+            transition: border-color 0.2s, box-shadow 0.2s, background 0.2s;
+            background: transparent;
+        }
+
+        .simple-task-description-field:hover {
+            background: #fafafa;
         }
 
         .simple-task-description-field:focus {
             border-color: #C88F4A;
             box-shadow: 0 0 0 3px rgba(200, 143, 74, 0.1);
+            background: white;
         }
 
         .simple-task-description-field::placeholder {
             color: #bbb;
+            font-style: italic;
         }
 
         .simple-task-options {
@@ -17448,6 +17529,18 @@
                     <i class="ph ph-trash"></i>
                     Delete
                 </button>
+                <!-- Overflow menu for tasks -->
+                <div class="modal-overflow-menu" id="modalOverflowMenu" style="display: none;">
+                    <button class="modal-overflow-btn" onclick="toggleModalOverflow(event)">
+                        <i class="ph ph-dots-three"></i>
+                    </button>
+                    <div class="modal-overflow-dropdown" id="modalOverflowDropdown">
+                        <button class="modal-overflow-item danger" onclick="openDeleteConfirmModal(); closeModalOverflow();">
+                            <i class="ph ph-trash"></i>
+                            Delete task
+                        </button>
+                    </div>
+                </div>
                 <button class="modal-action-btn" id="modalViewFromButton" onclick="openViewFromEntity(currentModalEntity?.id, currentModalEntityType)" style="display: none;">
                     <i class="ph ph-squares-four"></i>
                     View
@@ -21694,9 +21787,15 @@ Cmd/Ctrl + K - Command palette
             // Render parent badge in header for entities that can have parents
             renderModalHeaderParent(entityId, entityType);
 
-            // Show edit and delete buttons for entities
-            document.getElementById('modalEditButton').style.display = 'inline-flex';
-            document.getElementById('modalDeleteButton').style.display = 'inline-flex';
+            // Show edit and delete buttons for entities (hide Edit for tasks - everything is inline-editable)
+            document.getElementById('modalEditButton').style.display = entityType === 'task' ? 'none' : 'inline-flex';
+            document.getElementById('modalDeleteButton').style.display = entityType === 'task' ? 'none' : 'inline-flex';
+
+            // Show overflow menu for tasks (contains Delete)
+            const overflowMenu = document.getElementById('modalOverflowMenu');
+            if (overflowMenu) {
+                overflowMenu.style.display = entityType === 'task' ? 'inline-flex' : 'none';
+            }
 
             // Show "View from" button only for entity types that can be grouped by (unit, team, role)
             const canViewFrom = ['unit', 'team', 'role'].includes(entityType);
@@ -22127,7 +22226,33 @@ Cmd/Ctrl + K - Command palette
             document.getElementById('entityModal').classList.remove('active');
             // Close any open dropdowns
             closeModalParentDropdown();
+            closeModalOverflow();
         }
+
+        // Toggle modal overflow menu
+        function toggleModalOverflow(event) {
+            event.stopPropagation();
+            const dropdown = document.getElementById('modalOverflowDropdown');
+            if (dropdown) {
+                dropdown.classList.toggle('show');
+            }
+        }
+
+        // Close modal overflow menu
+        function closeModalOverflow() {
+            const dropdown = document.getElementById('modalOverflowDropdown');
+            if (dropdown) {
+                dropdown.classList.remove('show');
+            }
+        }
+
+        // Close overflow when clicking outside
+        document.addEventListener('click', function(e) {
+            const overflow = document.getElementById('modalOverflowMenu');
+            if (overflow && !overflow.contains(e.target)) {
+                closeModalOverflow();
+            }
+        });
 
         // Switch modal tabs
         function switchModalTab(tabName) {
@@ -34045,30 +34170,6 @@ Cmd/Ctrl + K - Command palette
                         </div>
                     </div>
 
-                    <!-- Quick Date Buttons -->
-                    <div class="quick-date-section">
-                        <span class="quick-date-label">Quick set deadline:</span>
-                        <div class="quick-date-buttons">
-                            <button class="quick-date-btn ${isToday(task.dueDate) ? 'active' : ''}" onclick="setTaskDueDate('${task.id}', 'today')">
-                                <i class="ph ph-sun"></i> Today
-                            </button>
-                            <button class="quick-date-btn ${isTomorrow(task.dueDate) ? 'active' : ''}" onclick="setTaskDueDate('${task.id}', 'tomorrow')">
-                                <i class="ph ph-sun-horizon"></i> Tomorrow
-                            </button>
-                            <button class="quick-date-btn" onclick="setTaskDueDate('${task.id}', 'nextweek')">
-                                <i class="ph ph-calendar-plus"></i> +1 Week
-                            </button>
-                            <button class="quick-date-btn" onclick="openInlineFlatpickr('${task.id}', event)">
-                                <i class="ph ph-calendar-blank"></i> Pick...
-                            </button>
-                            ${task.dueDate ? `
-                            <button class="quick-date-btn" onclick="setTaskDueDate('${task.id}', 'none')" title="Clear date">
-                                <i class="ph ph-x"></i>
-                            </button>
-                            ` : ''}
-                        </div>
-                    </div>
-
                     <!-- Editable Description -->
                     <div class="simple-task-description">
                         <textarea
@@ -34079,9 +34180,9 @@ Cmd/Ctrl + K - Command palette
                         >${task.description || ''}</textarea>
                     </div>
 
-                    <!-- Option Links for Additional Features -->
+                    <!-- Sections - Progressive Disclosure -->
                     <div class="simple-task-options">
-                        <!-- Subtasks Link -->
+                        <!-- Subtasks - Always show (commonly used) -->
                         <div class="simple-task-option-link" onclick="toggleSimpleTaskSection('subtasks_${task.id}')">
                             <div class="simple-task-option-text">
                                 <i class="ph ph-list-checks"></i>
@@ -34094,80 +34195,67 @@ Cmd/Ctrl + K - Command palette
                             ${renderSubtasksSection(task.id)}
                         </div>
 
-                        <!-- Dependencies Link -->
+                        <!-- Dependencies - Only show if has dependencies -->
+                        ${dependencyCount > 0 ? `
                         <div class="simple-task-option-link" onclick="toggleSimpleTaskSection('deps_${task.id}')">
                             <div class="simple-task-option-text">
                                 <i class="ph ph-git-branch"></i>
-                                <span>Dependencies</span>
-                                ${dependencyCount > 0 ? `<span class="simple-task-option-badge">${dependencyCount}</span>` : ''}
+                                <span>${predecessor ? 'Blocked by' : 'Blocking'}</span>
+                                <span class="simple-task-option-badge">${dependencyCount}</span>
                             </div>
                             <span class="simple-task-option-arrow"><i class="ph ph-caret-right"></i></span>
                         </div>
                         <div class="simple-task-expanded-section" id="deps_${task.id}" style="display: none;">
-                            ${predecessor || dependents.length > 0 ? `
-                                ${predecessor ? `
-                                <div style="margin-bottom: 12px;">
-                                    <div style="font-size: 11px; color: #888; text-transform: uppercase; margin-bottom: 6px;">Blocked by</div>
-                                    <div class="task-dep-item ${predecessor.status === 'completed' ? 'completed' : ''}" onclick="openEntityModal('${predecessor.id}', 'task')">
-                                        <div class="dep-checkbox ${predecessor.status === 'completed' ? 'completed' : ''}">
-                                            ${predecessor.status === 'completed' ? '<i class="ph ph-check"></i>' : ''}
-                                        </div>
-                                        <span class="dep-name">${predecessor.name}</span>
+                            ${predecessor ? `
+                            <div style="margin-bottom: 12px;">
+                                <div style="font-size: 11px; color: #888; text-transform: uppercase; margin-bottom: 6px;">Blocked by</div>
+                                <div class="task-dep-item ${predecessor.status === 'completed' ? 'completed' : ''}" onclick="openEntityModal('${predecessor.id}', 'task')">
+                                    <div class="dep-checkbox ${predecessor.status === 'completed' ? 'completed' : ''}">
+                                        ${predecessor.status === 'completed' ? '<i class="ph ph-check"></i>' : ''}
                                     </div>
+                                    <span class="dep-name">${predecessor.name}</span>
                                 </div>
-                                ` : ''}
-                                ${dependents.length > 0 ? `
-                                <div>
-                                    <div style="font-size: 11px; color: #888; text-transform: uppercase; margin-bottom: 6px;">Blocking (${dependents.length})</div>
-                                    ${dependents.map(dep => `
-                                        <div class="task-dep-item ${dep.status === 'completed' ? 'completed' : ''}" onclick="openEntityModal('${dep.id}', 'task')" style="margin-bottom: 6px;">
-                                            <div class="dep-checkbox ${dep.status === 'completed' ? 'completed' : ''}">
-                                                ${dep.status === 'completed' ? '<i class="ph ph-check"></i>' : ''}
-                                            </div>
-                                            <span class="dep-name">${dep.name}</span>
-                                        </div>
-                                    `).join('')}
-                                </div>
-                                ` : ''}
-                            ` : `
-                            <div style="text-align: center; color: #888; font-size: 13px; padding: 8px;">
-                                No dependencies set
                             </div>
-                            `}
+                            ` : ''}
+                            ${dependents.length > 0 ? `
+                            <div>
+                                <div style="font-size: 11px; color: #888; text-transform: uppercase; margin-bottom: 6px;">Blocking (${dependents.length})</div>
+                                ${dependents.map(dep => `
+                                    <div class="task-dep-item ${dep.status === 'completed' ? 'completed' : ''}" onclick="openEntityModal('${dep.id}', 'task')" style="margin-bottom: 6px;">
+                                        <div class="dep-checkbox ${dep.status === 'completed' ? 'completed' : ''}">
+                                            ${dep.status === 'completed' ? '<i class="ph ph-check"></i>' : ''}
+                                        </div>
+                                        <span class="dep-name">${dep.name}</span>
+                                    </div>
+                                `).join('')}
+                            </div>
+                            ` : ''}
                         </div>
+                        ` : ''}
 
-                        <!-- Related Tasks Link -->
+                        <!-- Related Tasks - Only show if has linked tasks -->
+                        ${linkedTasksData.length > 0 ? `
                         <div class="simple-task-option-link" onclick="toggleSimpleTaskSection('related_${task.id}')">
                             <div class="simple-task-option-text">
                                 <i class="ph ph-link"></i>
-                                <span>Related tasks</span>
-                                ${linkedTasksData.length > 0 ? `<span class="simple-task-option-badge">${linkedTasksData.length}</span>` : ''}
+                                <span>Linked</span>
+                                <span class="simple-task-option-badge">${linkedTasksData.length}</span>
                             </div>
                             <span class="simple-task-option-arrow"><i class="ph ph-caret-right"></i></span>
                         </div>
                         <div class="simple-task-expanded-section" id="related_${task.id}" style="display: none;">
-                            ${linkedTasksData.length > 0 ? `
-                                ${linkedTasksData.map(({ task: lt, link }) => `
-                                    <div class="task-dep-item ${lt.status === 'completed' ? 'completed' : ''}" onclick="openEntityModal('${lt.id}', 'task')" style="margin-bottom: 6px;">
-                                        <div class="dep-checkbox ${lt.status === 'completed' ? 'completed' : ''}">
-                                            ${lt.status === 'completed' ? '<i class="ph ph-check"></i>' : ''}
-                                        </div>
-                                        <span class="dep-name">${lt.name}</span>
+                            ${linkedTasksData.map(({ task: lt, link }) => `
+                                <div class="task-dep-item ${lt.status === 'completed' ? 'completed' : ''}" onclick="openEntityModal('${lt.id}', 'task')" style="margin-bottom: 6px;">
+                                    <div class="dep-checkbox ${lt.status === 'completed' ? 'completed' : ''}">
+                                        ${lt.status === 'completed' ? '<i class="ph ph-check"></i>' : ''}
                                     </div>
-                                `).join('')}
-                                <button onclick="event.stopPropagation(); openTaskLinkModal('${task.id}')" style="background: #f5f5f5; color: #666; border: 1px dashed #ddd; padding: 8px 12px; border-radius: 6px; font-size: 13px; cursor: pointer; width: 100%; margin-top: 8px;">
-                                    <i class="ph ph-plus"></i> Link another task
-                                </button>
-                            ` : `
-                            <div style="text-align: center; padding: 8px;">
-                                <button onclick="event.stopPropagation(); openTaskLinkModal('${task.id}')" style="background: #f5f5f5; color: #666; border: 1px dashed #ddd; padding: 8px 16px; border-radius: 6px; font-size: 13px; cursor: pointer;">
-                                    <i class="ph ph-plus"></i> Link a task
-                                </button>
-                            </div>
-                            `}
+                                    <span class="dep-name">${lt.name}</span>
+                                </div>
+                            `).join('')}
                         </div>
+                        ` : ''}
 
-                        <!-- Comments Link -->
+                        <!-- Comments - Always show -->
                         <div class="simple-task-option-link" onclick="toggleSimpleTaskSection('comments_${task.id}')">
                             <div class="simple-task-option-text">
                                 <i class="ph ph-chat-circle"></i>
