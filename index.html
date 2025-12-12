@@ -45878,34 +45878,35 @@ Options:
             // Save to local storage
             saveToLocalStorage();
 
-            // Close modal
+            // Update UI instantly - always refresh regardless of active view
+            renderTaskBoardView();
+            renderEntityList();
+            updateTaskCountBadge();
+
+            // Also refresh the current view (kanban, table, timeline, etc.)
+            if (currentView === 'kanban') {
+                renderKanbanBoard();
+            } else if (currentView === 'table') {
+                renderTaskTable();
+            } else if (currentView === 'timeline') {
+                renderTimeline();
+            } else if (currentView === 'gantt') {
+                renderGanttView();
+            } else if (currentView === 'calendar') {
+                renderCalendarView();
+            }
+
+            // Close modal after UI is updated so user sees task instantly
             closeQuickAddModal();
 
-            // Update the task board with animation
-            if (document.getElementById('taskBoardView')?.classList.contains('active')) {
-                renderTaskBoard();
-                // Also refresh the current view (kanban, table, timeline, etc.)
-                if (currentView === 'kanban') {
-                    renderKanbanBoard();
-                } else if (currentView === 'table') {
-                    renderTaskTable();
-                } else if (currentView === 'timeline') {
-                    renderTimeline();
-                } else if (currentView === 'gantt') {
-                    renderGanttView();
-                } else if (currentView === 'calendar') {
-                    renderCalendarView();
+            // Add animation to the new card
+            setTimeout(() => {
+                const newCard = document.querySelector(`.kanban-card[data-id="${taskId}"]`);
+                if (newCard) {
+                    newCard.classList.add('new-task');
+                    setTimeout(() => newCard.classList.remove('new-task'), 300);
                 }
-
-                // Add animation to the new card
-                setTimeout(() => {
-                    const newCard = document.querySelector(`.kanban-card[data-id="${taskId}"]`);
-                    if (newCard) {
-                        newCard.classList.add('new-task');
-                        setTimeout(() => newCard.classList.remove('new-task'), 300);
-                    }
-                }, 50);
-            }
+            }, 50);
 
             showToast('✓ Task saved!', 'success');
         }
@@ -46529,31 +46530,32 @@ Options:
             // Reset quick add priority to medium
             selectQuickAddPriority('medium');
 
-            // Update the task board with animation
-            if (document.getElementById('taskBoardView')?.classList.contains('active')) {
-                renderTaskBoard();
-                // Also refresh the current view (kanban, table, timeline, etc.)
-                if (currentView === 'kanban') {
-                    renderKanbanBoard();
-                } else if (currentView === 'table') {
-                    renderTaskTable();
-                } else if (currentView === 'timeline') {
-                    renderTimeline();
-                } else if (currentView === 'gantt') {
-                    renderGanttView();
-                } else if (currentView === 'calendar') {
-                    renderCalendarView();
-                }
+            // Update UI instantly - always refresh regardless of active view
+            renderTaskBoardView();
+            renderEntityList();
+            updateTaskCountBadge();
 
-                // Add animation to the new card
-                setTimeout(() => {
-                    const newCard = document.querySelector(`.kanban-card[data-id="${taskId}"]`);
-                    if (newCard) {
-                        newCard.classList.add('new-task');
-                        setTimeout(() => newCard.classList.remove('new-task'), 300);
-                    }
-                }, 50);
+            // Also refresh the current view (kanban, table, timeline, etc.)
+            if (currentView === 'kanban') {
+                renderKanbanBoard();
+            } else if (currentView === 'table') {
+                renderTaskTable();
+            } else if (currentView === 'timeline') {
+                renderTimeline();
+            } else if (currentView === 'gantt') {
+                renderGanttView();
+            } else if (currentView === 'calendar') {
+                renderCalendarView();
             }
+
+            // Add animation to the new card
+            setTimeout(() => {
+                const newCard = document.querySelector(`.kanban-card[data-id="${taskId}"]`);
+                if (newCard) {
+                    newCard.classList.add('new-task');
+                    setTimeout(() => newCard.classList.remove('new-task'), 300);
+                }
+            }, 50);
 
             showToast('✓ Task created', 'success');
         }
