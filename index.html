@@ -12436,6 +12436,57 @@
             position: relative;
         }
 
+        /* Quick Filter Selectors */
+        .quick-filter-selectors {
+            display: flex;
+            align-items: center;
+            gap: 4px;
+            background: #F8F5F0;
+            border-radius: 6px;
+            padding: 3px;
+        }
+
+        .quick-filter-selector {
+            display: flex;
+            align-items: center;
+            gap: 4px;
+            padding: 5px 10px;
+            border: none;
+            border-radius: 4px;
+            background: transparent;
+            font-size: 0.8rem;
+            cursor: pointer;
+            color: #6B5642;
+            transition: all 0.15s ease;
+            white-space: nowrap;
+        }
+
+        .quick-filter-selector:hover {
+            background: rgba(200, 143, 74, 0.15);
+        }
+
+        .quick-filter-selector.active {
+            background: white;
+            color: #C88F4A;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+            font-weight: 500;
+        }
+
+        .quick-filter-selector i {
+            font-size: 0.85rem;
+        }
+
+        .quick-filter-selector.completed-filter.active {
+            color: #5B8A5A;
+        }
+
+        .quick-filter-divider {
+            width: 1px;
+            height: 18px;
+            background: #DDD5C8;
+            margin: 0 2px;
+        }
+
         .view-settings-dropdown {
             position: absolute;
             top: 100%;
@@ -22873,6 +22924,28 @@
                     </div>
                     <!-- Inline Filters -->
                     <div class="inline-filter-bar" id="inlineFilterBar">
+                        <!-- Quick Filter Selectors -->
+                        <div class="quick-filter-selectors" id="quickFilterSelectors">
+                            <button class="quick-filter-selector" id="quickFilterMine" onclick="toggleQuickSelector('mine')" title="Show only my tasks">
+                                <i class="ph ph-user"></i>
+                                <span>Mine</span>
+                            </button>
+                            <div class="quick-filter-divider"></div>
+                            <button class="quick-filter-selector" id="quickFilterMyTeams" onclick="toggleQuickSelector('myTeams')" title="Show tasks from my teams">
+                                <i class="ph ph-users-three"></i>
+                                <span>My Teams</span>
+                            </button>
+                            <div class="quick-filter-divider"></div>
+                            <button class="quick-filter-selector" id="quickFilterRecent" onclick="toggleQuickSelector('recent')" title="Show recently created tasks">
+                                <i class="ph ph-clock"></i>
+                                <span>Recent</span>
+                            </button>
+                            <div class="quick-filter-divider"></div>
+                            <button class="quick-filter-selector completed-filter" id="quickFilterCompleted" onclick="toggleQuickSelector('completed')" title="Show completed tasks">
+                                <i class="ph ph-check-circle"></i>
+                                <span>Completed</span>
+                            </button>
+                        </div>
                         <button class="inline-filter-more-btn" id="inlineFilterMoreBtn" onclick="openAdvancedFilterPanel()" title="Filters">
                             <i class="ph ph-funnel"></i>
                             <span>Filter</span>
@@ -27281,7 +27354,9 @@ John Doe,Engineering,john@example.com"
             entities: ['unit', 'team', 'role', 'person'],
             tags: [],
             onlyMe: false,      // Quick filter: only tasks related to current user
-            onlyMyTeams: false  // Quick filter: only tasks related to user's teams
+            onlyMyTeams: false, // Quick filter: only tasks related to user's teams
+            recent: false,      // Quick filter: only recently created tasks (last 7 days)
+            onlyCompleted: false // Quick filter: only show completed tasks
         };
 
         // Time travel state
@@ -27595,6 +27670,10 @@ John Doe,Engineering,john@example.com"
                 } else {
                     advancedFilters.status = advancedFilters.status.filter(s => s !== filterValue);
                 }
+                // Sync with completed quick selector
+                const isOnlyCompleted = advancedFilters.status.length === 1 && advancedFilters.status[0] === 'completed';
+                advancedFilters.onlyCompleted = isOnlyCompleted;
+                updateQuickSelectorUI();
             } else if (filterType === 'priority') {
                 if (chip.classList.contains('active')) {
                     if (!advancedFilters.priority.includes(filterValue)) {
@@ -27701,6 +27780,7 @@ John Doe,Engineering,john@example.com"
 
             updateFilterActiveCount();
             updateQuickFilterChipUI();
+            updateQuickSelectorUI(); // Sync quick selector buttons
             applyAdvancedFilters();
         }
 
@@ -27724,6 +27804,79 @@ John Doe,Engineering,john@example.com"
                     onlyMyTeamsChip.classList.remove('active');
                 }
             }
+        }
+
+        // Toggle quick filter selector buttons
+        function toggleQuickSelector(filterType) {
+            switch (filterType) {
+                case 'mine':
+                    advancedFilters.onlyMe = !advancedFilters.onlyMe;
+                    // If enabling mine, disable myTeams
+                    if (advancedFilters.onlyMe) {
+                        advancedFilters.onlyMyTeams = false;
+                    }
+                    break;
+                case 'myTeams':
+                    advancedFilters.onlyMyTeams = !advancedFilters.onlyMyTeams;
+                    // If enabling myTeams, disable mine
+                    if (advancedFilters.onlyMyTeams) {
+                        advancedFilters.onlyMe = false;
+                    }
+                    break;
+                case 'recent':
+                    advancedFilters.recent = !advancedFilters.recent;
+                    break;
+                case 'completed':
+                    advancedFilters.onlyCompleted = !advancedFilters.onlyCompleted;
+                    // If showing only completed, update status filter
+                    if (advancedFilters.onlyCompleted) {
+                        advancedFilters.status = ['completed'];
+                    } else {
+                        advancedFilters.status = ['pending', 'in_progress', 'completed'];
+                    }
+                    // Sync status chips in advanced panel
+                    syncStatusChipsUI();
+                    break;
+            }
+
+            updateQuickSelectorUI();
+            updateQuickFilterChipUI();
+            updateFilterActiveCount();
+            applyAdvancedFilters();
+        }
+
+        // Update quick filter selector UI to reflect state
+        function updateQuickSelectorUI() {
+            const mineBtn = document.getElementById('quickFilterMine');
+            const myTeamsBtn = document.getElementById('quickFilterMyTeams');
+            const recentBtn = document.getElementById('quickFilterRecent');
+            const completedBtn = document.getElementById('quickFilterCompleted');
+
+            if (mineBtn) {
+                mineBtn.classList.toggle('active', advancedFilters.onlyMe);
+            }
+            if (myTeamsBtn) {
+                myTeamsBtn.classList.toggle('active', advancedFilters.onlyMyTeams);
+            }
+            if (recentBtn) {
+                recentBtn.classList.toggle('active', advancedFilters.recent);
+            }
+            if (completedBtn) {
+                completedBtn.classList.toggle('active', advancedFilters.onlyCompleted);
+            }
+        }
+
+        // Sync status chips UI with advancedFilters.status
+        function syncStatusChipsUI() {
+            const statusChips = document.querySelectorAll('.filter-chip[data-filter="status"]');
+            statusChips.forEach(chip => {
+                const value = chip.dataset.value;
+                if (advancedFilters.status.includes(value)) {
+                    chip.classList.add('active');
+                } else {
+                    chip.classList.remove('active');
+                }
+            });
         }
 
         // Time Travel Modal functions
@@ -27984,8 +28137,13 @@ John Doe,Engineering,john@example.com"
                 entities: ['unit', 'team', 'role', 'person'],
                 tags: [],
                 onlyMe: false,
-                onlyMyTeams: false
+                onlyMyTeams: false,
+                recent: false,
+                onlyCompleted: false
             };
+
+            // Reset quick filter selectors UI
+            updateQuickSelectorUI();
 
             // Reset UI
             document.querySelectorAll('.filter-chip').forEach(chip => {
@@ -28176,6 +28334,19 @@ John Doe,Engineering,john@example.com"
                         return false;
                     });
                 }
+            }
+
+            // Quick filter: Only recently created tasks (last 7 days)
+            if (advancedFilters.recent) {
+                const sevenDaysAgo = new Date();
+                sevenDaysAgo.setDate(sevenDaysAgo.getDate() - 7);
+                sevenDaysAgo.setHours(0, 0, 0, 0);
+
+                tasks = tasks.filter(task => {
+                    if (!task.createdAt) return false;
+                    const createdDate = new Date(task.createdAt);
+                    return createdDate >= sevenDaysAgo;
+                });
             }
 
             return tasks;
