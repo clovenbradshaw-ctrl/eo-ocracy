@@ -25447,31 +25447,460 @@ John Doe,Engineering,john@example.com"
             return `${Math.floor(seconds / 86400)}d ago`;
         }
 
+        // ==========================================
+        // COMPREHENSIVE VIEW REFRESH SYSTEM
+        // ==========================================
+
+        // Debounce utility for refresh operations
+        function debounce(func, wait) {
+            let timeout;
+            return function executedFunction(...args) {
+                const later = () => {
+                    clearTimeout(timeout);
+                    func(...args);
+                };
+                clearTimeout(timeout);
+                timeout = setTimeout(later, wait);
+            };
+        }
+
+        // Throttle utility for high-frequency events
+        function throttle(func, limit) {
+            let inThrottle;
+            return function(...args) {
+                if (!inThrottle) {
+                    func.apply(this, args);
+                    inThrottle = true;
+                    setTimeout(() => inThrottle = false, limit);
+                }
+            };
+        }
+
+        // Track last refresh timestamp for debugging
+        let _lastRefreshTimestamp = 0;
+        let _refreshCount = 0;
+        let _periodicSyncInterval = null;
+
+        /**
+         * Comprehensive refresh function that updates ALL 13+ view types
+         * Call this after any data mutation to ensure UI consistency
+         */
         function refreshAllViews() {
-            renderEntityList();
-            updateSelects();
-            updateParentOptions();
-            renderActivityList();
-            renderRecycleBin();
-            updateTaskCountBadge();
-            updateFilterStatus();
+            _lastRefreshTimestamp = Date.now();
+            _refreshCount++;
 
-            if (currentView === 'graph') {
-                updateGraph();
-            } else if (currentView === 'tree') {
-                renderTreeView();
-            } else if (currentView === 'card') {
-                renderCardView();
-            } else if (currentView === 'venn') {
-                renderVennView();
-            } else if (currentView === 'kanban') {
-                renderKanbanBoard();
+            // Update common UI elements first
+            try {
+                renderEntityList();
+                updateSelects();
+                updateParentOptions();
+                renderActivityList();
+                renderRecycleBin();
+                updateTaskCountBadge();
+                updateFilterStatus();
+            } catch (e) {
+                console.error('[RefreshSystem] Error updating common UI elements:', e);
             }
 
-            // Also refresh task board if visible
-            if (document.getElementById('taskBoardView')?.classList.contains('active')) {
-                renderTaskBoard();
+            // Refresh current view based on currentView state
+            try {
+                switch (currentView) {
+                    case 'graph':
+                        updateGraph();
+                        break;
+                    case 'tree':
+                        renderTreeView();
+                        break;
+                    case 'card':
+                    case 'cards':
+                        renderCardView();
+                        break;
+                    case 'venn':
+                        renderVennView();
+                        break;
+                    case 'orgchart':
+                        renderOrgChartView();
+                        break;
+                    case 'structure':
+                        renderStructureView();
+                        break;
+                    case 'flow':
+                        renderFlowView();
+                        break;
+                    case 'shape':
+                        renderShapeView();
+                        break;
+                    case 'tasks':
+                        renderTaskBoardView();
+                        break;
+                    case 'kanban':
+                        renderKanbanBoard();
+                        break;
+                    case 'table':
+                        renderTaskTable();
+                        break;
+                    case 'timeline':
+                        renderTimeline();
+                        break;
+                    case 'gantt':
+                        renderGanttView();
+                        break;
+                    case 'calendar':
+                        renderCalendarView();
+                        break;
+                    case 'workflows':
+                        if (typeof renderWorkflowsView === 'function') renderWorkflowsView();
+                        break;
+                    case 'company-rules':
+                        if (typeof renderCompanyRulesView === 'function') renderCompanyRulesView();
+                        break;
+                    default:
+                        // Default to graph view for unknown views
+                        updateGraph();
+                }
+            } catch (e) {
+                console.error('[RefreshSystem] Error refreshing view:', currentView, e);
             }
+
+            // Also refresh task board if visible (handles cases where taskBoardView is shown
+            // but currentView hasn't been updated yet)
+            try {
+                const taskBoardView = document.getElementById('taskBoardView');
+                if (taskBoardView?.classList.contains('active') &&
+                    !['tasks', 'kanban', 'table', 'timeline'].includes(currentView)) {
+                    renderTaskBoard();
+                }
+            } catch (e) {
+                console.error('[RefreshSystem] Error refreshing task board:', e);
+            }
+        }
+
+        /**
+         * Debounced version of refreshAllViews - use for high-frequency updates
+         * Default 150ms debounce prevents UI thrashing
+         */
+        const debouncedRefreshAllViews = debounce(refreshAllViews, 150);
+
+        /**
+         * Throttled version of refreshAllViews - use for scroll/resize handlers
+         * Default 250ms throttle ensures reasonable responsiveness
+         */
+        const throttledRefreshAllViews = throttle(refreshAllViews, 250);
+
+        /**
+         * Force refresh with data reload from localStorage
+         * Use when data may have changed externally (cross-tab sync, etc.)
+         */
+        function forceRefreshFromStorage() {
+            try {
+                const hasWorkspaces = loadWorkspaces();
+                if (hasWorkspaces && currentWorkspaceId && workspaces[currentWorkspaceId]) {
+                    const ws = workspaces[currentWorkspaceId];
+                    entities = normalizeEntities(ws.entities);
+                    relationships = Array.isArray(ws.relationships) ? ws.relationships : [];
+                    hasSampleData = ws.hasSampleData || false;
+
+                    // Reload workflow data if present
+                    if (ws.workflowTemplates) workflowTemplates = ws.workflowTemplates;
+                    if (ws.workflowInstances) workflowInstances = ws.workflowInstances;
+                    if (ws.workflowViolations) workflowViolations = ws.workflowViolations;
+                    if (ws.taskLinks) taskLinks = ws.taskLinks;
+                }
+                refreshAllViews();
+                console.log('[RefreshSystem] Force refresh from storage completed');
+            } catch (e) {
+                console.error('[RefreshSystem] Error during force refresh:', e);
+            }
+        }
+
+        // Debounced storage refresh for cross-tab sync
+        const debouncedForceRefreshFromStorage = debounce(forceRefreshFromStorage, 300);
+
+        // ==========================================
+        // VISIBILITY & FOCUS LISTENERS
+        // ==========================================
+
+        /**
+         * Handle tab visibility changes - refresh when returning to tab
+         * Prevents stale UI when user switches back from another tab
+         */
+        function handleVisibilityChange() {
+            if (document.visibilityState === 'visible') {
+                console.log('[RefreshSystem] Tab became visible, refreshing...');
+                debouncedForceRefreshFromStorage();
+            }
+        }
+
+        /**
+         * Handle window focus - refresh when window regains focus
+         * Catches edge cases visibility change might miss
+         */
+        function handleWindowFocus() {
+            console.log('[RefreshSystem] Window focused, refreshing...');
+            debouncedForceRefreshFromStorage();
+        }
+
+        // ==========================================
+        // CROSS-TAB SYNC VIA STORAGE EVENTS
+        // ==========================================
+
+        /**
+         * Handle storage events from other tabs
+         * Enables real-time sync across multiple browser tabs
+         */
+        function handleStorageChange(event) {
+            // Only respond to changes in our storage keys
+            if (event.key === 'holonicWorkspaces' && event.newValue) {
+                console.log('[RefreshSystem] Cross-tab storage change detected');
+                debouncedForceRefreshFromStorage();
+            }
+        }
+
+        // ==========================================
+        // ERROR RECOVERY REFRESH
+        // ==========================================
+
+        /**
+         * Handle unhandled errors by attempting a refresh
+         * Helps recover from render errors that leave UI in inconsistent state
+         */
+        function handleUnhandledError(event) {
+            console.error('[RefreshSystem] Unhandled error detected:', event.error || event.message);
+            // Attempt recovery refresh after a short delay
+            setTimeout(() => {
+                console.log('[RefreshSystem] Attempting error recovery refresh...');
+                try {
+                    refreshAllViews();
+                } catch (e) {
+                    console.error('[RefreshSystem] Error recovery refresh failed:', e);
+                }
+            }, 500);
+        }
+
+        /**
+         * Handle unhandled promise rejections
+         */
+        function handleUnhandledRejection(event) {
+            console.error('[RefreshSystem] Unhandled promise rejection:', event.reason);
+            // Attempt recovery refresh after a short delay
+            setTimeout(() => {
+                console.log('[RefreshSystem] Attempting rejection recovery refresh...');
+                try {
+                    refreshAllViews();
+                } catch (e) {
+                    console.error('[RefreshSystem] Rejection recovery refresh failed:', e);
+                }
+            }, 500);
+        }
+
+        // ==========================================
+        // PERIODIC SYNC (OPTIONAL)
+        // ==========================================
+
+        /**
+         * Start periodic sync - use for persistent sync issues
+         * @param {number} intervalMs - Sync interval in milliseconds (default 30000 = 30s)
+         */
+        function startPeriodicSync(intervalMs = 30000) {
+            if (_periodicSyncInterval) {
+                console.log('[RefreshSystem] Periodic sync already running');
+                return;
+            }
+            console.log('[RefreshSystem] Starting periodic sync every', intervalMs, 'ms');
+            _periodicSyncInterval = setInterval(() => {
+                if (document.visibilityState === 'visible') {
+                    console.log('[RefreshSystem] Periodic sync triggered');
+                    forceRefreshFromStorage();
+                }
+            }, intervalMs);
+        }
+
+        /**
+         * Stop periodic sync
+         */
+        function stopPeriodicSync() {
+            if (_periodicSyncInterval) {
+                clearInterval(_periodicSyncInterval);
+                _periodicSyncInterval = null;
+                console.log('[RefreshSystem] Periodic sync stopped');
+            }
+        }
+
+        // ==========================================
+        // MUTATION WRAPPER
+        // ==========================================
+
+        /**
+         * Wrap data mutations to ensure consistent save + refresh
+         * @param {Function} mutationFn - Function that modifies data
+         * @param {Object} options - Configuration options
+         * @param {boolean} options.debounce - Use debounced refresh (default: false)
+         * @param {boolean} options.skipSave - Skip saving to localStorage (default: false)
+         * @param {boolean} options.skipRefresh - Skip UI refresh (default: false)
+         * @returns {*} Result of the mutation function
+         */
+        function withUIRefresh(mutationFn, options = {}) {
+            const { debounce: useDebounce = false, skipSave = false, skipRefresh = false } = options;
+
+            try {
+                // Execute the mutation
+                const result = mutationFn();
+
+                // Save to localStorage unless skipped
+                if (!skipSave) {
+                    saveToLocalStorage();
+                }
+
+                // Refresh UI unless skipped
+                if (!skipRefresh) {
+                    if (useDebounce) {
+                        debouncedRefreshAllViews();
+                    } else {
+                        refreshAllViews();
+                    }
+                }
+
+                return result;
+            } catch (e) {
+                console.error('[RefreshSystem] Error in mutation:', e);
+                // Still attempt refresh to show any partial changes
+                if (!skipRefresh) {
+                    refreshAllViews();
+                }
+                throw e;
+            }
+        }
+
+        /**
+         * Async version of withUIRefresh for promise-based mutations
+         * @param {Function} mutationFn - Async function that modifies data
+         * @param {Object} options - Configuration options
+         * @returns {Promise<*>} Result of the mutation function
+         */
+        async function withUIRefreshAsync(mutationFn, options = {}) {
+            const { debounce: useDebounce = false, skipSave = false, skipRefresh = false } = options;
+
+            try {
+                // Execute the mutation
+                const result = await mutationFn();
+
+                // Save to localStorage unless skipped
+                if (!skipSave) {
+                    saveToLocalStorage();
+                }
+
+                // Refresh UI unless skipped
+                if (!skipRefresh) {
+                    if (useDebounce) {
+                        debouncedRefreshAllViews();
+                    } else {
+                        refreshAllViews();
+                    }
+                }
+
+                return result;
+            } catch (e) {
+                console.error('[RefreshSystem] Error in async mutation:', e);
+                // Still attempt refresh to show any partial changes
+                if (!skipRefresh) {
+                    refreshAllViews();
+                }
+                throw e;
+            }
+        }
+
+        // ==========================================
+        // DEBUG/DEVELOPER UTILITIES
+        // ==========================================
+
+        /**
+         * Global debug function for manual refresh
+         * Usage: window.eoRefresh() or eoRefresh()
+         */
+        window.eoRefresh = function() {
+            console.log('[RefreshSystem] Manual refresh triggered via eoRefresh()');
+            refreshAllViews();
+            return {
+                success: true,
+                timestamp: _lastRefreshTimestamp,
+                refreshCount: _refreshCount,
+                currentView: currentView
+            };
+        };
+
+        /**
+         * Global debug function to force sync from storage
+         * Usage: window.eoEnsureSync() or eoEnsureSync()
+         */
+        window.eoEnsureSync = function() {
+            console.log('[RefreshSystem] Force sync triggered via eoEnsureSync()');
+            forceRefreshFromStorage();
+            return {
+                success: true,
+                timestamp: _lastRefreshTimestamp,
+                refreshCount: _refreshCount,
+                currentView: currentView,
+                workspaceId: currentWorkspaceId
+            };
+        };
+
+        /**
+         * Get refresh system status for debugging
+         * Usage: window.eoRefreshStatus()
+         */
+        window.eoRefreshStatus = function() {
+            return {
+                lastRefreshTimestamp: _lastRefreshTimestamp,
+                lastRefreshTime: new Date(_lastRefreshTimestamp).toISOString(),
+                refreshCount: _refreshCount,
+                currentView: currentView,
+                currentWorkspaceId: currentWorkspaceId,
+                periodicSyncActive: _periodicSyncInterval !== null,
+                visibilityState: document.visibilityState
+            };
+        };
+
+        /**
+         * Control periodic sync from console
+         * Usage: window.eoPeriodicSync(true, 15000) to start with 15s interval
+         *        window.eoPeriodicSync(false) to stop
+         */
+        window.eoPeriodicSync = function(enable, intervalMs) {
+            if (enable) {
+                startPeriodicSync(intervalMs);
+            } else {
+                stopPeriodicSync();
+            }
+            return { periodicSyncActive: _periodicSyncInterval !== null };
+        };
+
+        // ==========================================
+        // INITIALIZE REFRESH SYSTEM LISTENERS
+        // ==========================================
+
+        function initRefreshSystemListeners() {
+            // Visibility change listener (tab switching)
+            document.addEventListener('visibilitychange', handleVisibilityChange);
+
+            // Window focus listener
+            window.addEventListener('focus', handleWindowFocus);
+
+            // Cross-tab storage sync
+            window.addEventListener('storage', handleStorageChange);
+
+            // Error recovery listeners
+            window.addEventListener('error', handleUnhandledError);
+            window.addEventListener('unhandledrejection', handleUnhandledRejection);
+
+            console.log('[RefreshSystem] Listeners initialized');
+        }
+
+        // Initialize listeners when DOM is ready
+        if (document.readyState === 'loading') {
+            document.addEventListener('DOMContentLoaded', initRefreshSystemListeners);
+        } else {
+            // DOM already loaded, initialize immediately
+            initRefreshSystemListeners();
         }
 
         function escapeHtml(text) {
@@ -43428,15 +43857,59 @@ Cmd/Ctrl + K - Command palette
             }
         }
 
-        function saveToLocalStorage() {
+        // Track whether auto-refresh after save is enabled
+        let _autoRefreshAfterSave = true;
+        let _saveCount = 0;
+
+        /**
+         * Save data to localStorage with optional auto-refresh
+         * @param {Object} options - Configuration options
+         * @param {boolean} options.skipRefresh - Skip auto-refresh after save (default: false)
+         * @param {boolean} options.immediate - Use immediate refresh instead of debounced (default: false)
+         */
+        function saveToLocalStorage(options = {}) {
+            const { skipRefresh = false, immediate = false } = options;
+            _saveCount++;
+
             // Delegate to workspace-aware save
             saveWorkspaces();
+
+            // Auto-refresh UI after save unless disabled or skipped
+            if (_autoRefreshAfterSave && !skipRefresh) {
+                if (immediate) {
+                    refreshAllViews();
+                } else {
+                    // Use debounced refresh to prevent UI thrashing on rapid saves
+                    debouncedRefreshAllViews();
+                }
+            }
         }
 
+        /**
+         * Enable or disable auto-refresh after save
+         * Usage: window.eoAutoRefresh(false) to disable
+         */
+        window.eoAutoRefresh = function(enable) {
+            _autoRefreshAfterSave = enable;
+            console.log('[RefreshSystem] Auto-refresh after save:', enable ? 'enabled' : 'disabled');
+            return { autoRefreshEnabled: _autoRefreshAfterSave };
+        };
+
+        /**
+         * Get save/refresh statistics
+         */
+        window.eoSaveStats = function() {
+            return {
+                saveCount: _saveCount,
+                refreshCount: _refreshCount,
+                autoRefreshEnabled: _autoRefreshAfterSave
+            };
+        };
+
         // saveData - save and refresh all views for instant visibility
+        // Now uses immediate refresh since saveToLocalStorage handles debounced refresh
         function saveData() {
-            saveToLocalStorage();
-            refreshAllViews();
+            saveToLocalStorage({ immediate: true });
         }
 
         function loadFromLocalStorage() {
