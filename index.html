@@ -27213,8 +27213,12 @@ John Doe,Engineering,john@example.com"
 
             // Team tasks are visible to team members
             if (visibility === 'team') {
-                // If no visibility team specified, treat as public
-                if (!task.visibilityTeamId) return true;
+                // If no visibility team specified, only visible to creator
+                if (!task.visibilityTeamId) {
+                    if (!currentUserId) return false;
+                    return task.createdBy === currentUserId ||
+                           task.createdBy === AminoIdentity.currentUser?.email;
+                }
 
                 // Check if user is in the specified team
                 return isUserInTeam(task.visibilityTeamId);
