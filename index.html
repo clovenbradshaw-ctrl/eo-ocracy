@@ -10498,6 +10498,41 @@
             margin-bottom: 0.5rem;
         }
 
+        /* Hero dropdown encouragement prompt */
+        .hero-dropdown-prompt {
+            padding: 0.875rem 1rem;
+            background: linear-gradient(135deg, #FFF8F0 0%, #FFF4E8 100%);
+            border-bottom: 2px solid #E5DDD1;
+            display: flex;
+            align-items: flex-start;
+            gap: 0.75rem;
+            margin-bottom: 0.25rem;
+        }
+
+        .hero-dropdown-prompt > i {
+            color: #C88F4A;
+            font-size: 1.25rem;
+            flex-shrink: 0;
+            margin-top: 2px;
+        }
+
+        .hero-dropdown-prompt-text {
+            font-size: 0.8rem;
+            color: #6B5538;
+            line-height: 1.4;
+        }
+
+        .hero-dropdown-prompt-text strong {
+            display: block;
+            font-size: 0.875rem;
+            color: #3D2E1F;
+            margin-bottom: 2px;
+        }
+
+        .hero-dropdown-prompt-text span {
+            color: #8B6F47;
+        }
+
         .hero-task-or-create {
             margin-top: 0.5rem;
             font-size: 0.875rem;
@@ -15193,15 +15228,37 @@
         }
 
         .simple-task-chip.empty {
-            border: 1px dashed #d0d0d0;
-            color: #888;
-            background: white;
+            border: 2px dashed #C88F4A;
+            color: #C88F4A;
+            background: linear-gradient(135deg, #FFF8F0 0%, #FFFAF5 100%);
+            animation: pulseRole 2s ease-in-out infinite;
+        }
+
+        @keyframes pulseRole {
+            0%, 100% { border-color: #C88F4A; box-shadow: 0 0 0 0 rgba(200, 143, 74, 0); }
+            50% { border-color: #D4A05A; box-shadow: 0 0 8px 2px rgba(200, 143, 74, 0.2); }
         }
 
         .simple-task-chip.empty:hover {
-            border-color: #C88F4A;
-            color: #666;
-            transform: translateY(-1px);
+            border-color: #B87B5B;
+            color: #8B6F47;
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(200, 143, 74, 0.25);
+            animation: none;
+        }
+
+        /* Special styling for role chip when empty */
+        .simple-task-chip.role-chip-empty {
+            font-weight: 600;
+            border-width: 2px;
+        }
+
+        .simple-task-chip.role-chip-empty i.ph-user-circle-plus {
+            font-size: 16px;
+        }
+
+        .simple-task-chip.role-chip-empty i.ph-caret-down {
+            opacity: 0.7;
         }
 
         .simple-task-chip.filled {
@@ -15441,15 +15498,15 @@
             left: 0;
             margin-top: 4px;
             background: white;
-            border-radius: 8px;
-            box-shadow: 0 8px 30px rgba(0, 0, 0, 0.15);
-            border: 1px solid #e5e5e5;
+            border-radius: 12px;
+            box-shadow: 0 12px 40px rgba(0, 0, 0, 0.2), 0 0 0 1px rgba(200, 143, 74, 0.2);
+            border: 2px solid #C88F4A;
             padding: 8px 0;
-            min-width: 200px;
-            max-width: 280px;
-            max-height: 300px;
+            min-width: 260px;
+            max-width: 320px;
+            max-height: 350px;
             overflow-y: auto;
-            z-index: 100;
+            z-index: 1001;
             display: none;
         }
 
@@ -15458,31 +15515,86 @@
             animation: dropdownSlide 0.2s ease-out;
         }
 
+        /* Role selection encouragement header */
+        .simple-task-role-prompt {
+            padding: 12px 16px;
+            background: linear-gradient(135deg, #FFF8F0 0%, #FFF4E8 100%);
+            border-bottom: 1px solid #E5DDD1;
+            display: flex;
+            align-items: flex-start;
+            gap: 10px;
+            margin-bottom: 4px;
+        }
+
+        .simple-task-role-prompt i {
+            color: #C88F4A;
+            font-size: 18px;
+            flex-shrink: 0;
+            margin-top: 1px;
+        }
+
+        .simple-task-role-prompt-text {
+            font-size: 12px;
+            color: #6B5538;
+            line-height: 1.4;
+        }
+
+        .simple-task-role-prompt-text strong {
+            display: block;
+            font-size: 13px;
+            color: #3D2E1F;
+            margin-bottom: 2px;
+        }
+
         .simple-task-role-option {
-            padding: 8px 16px;
+            padding: 10px 16px;
             cursor: pointer;
             display: flex;
             align-items: center;
-            gap: 8px;
-            font-size: 13px;
-            color: #555;
-            transition: background 0.15s;
+            gap: 10px;
+            font-size: 14px;
+            color: #3D2E1F;
+            transition: all 0.15s ease;
+            border-left: 3px solid transparent;
+            position: relative;
         }
 
         .simple-task-role-option:hover {
-            background: #f5f5f5;
-            color: #333;
+            background: linear-gradient(135deg, #FFF8F0 0%, #FFF4E8 100%);
+            border-left-color: #C88F4A;
+            padding-left: 20px;
+        }
+
+        .simple-task-role-option:hover::after {
+            content: 'Click to assign';
+            position: absolute;
+            right: 12px;
+            font-size: 10px;
+            color: #C88F4A;
+            font-weight: 500;
+            text-transform: uppercase;
+            letter-spacing: 0.03em;
         }
 
         .simple-task-role-option i {
-            font-size: 14px;
+            font-size: 16px;
             color: #C88F4A;
+            transition: transform 0.15s ease;
+        }
+
+        .simple-task-role-option:hover i {
+            transform: scale(1.1);
         }
 
         .simple-task-role-option.selected {
-            background: rgba(200, 143, 74, 0.1);
+            background: linear-gradient(135deg, #FFF4E8 0%, #FFEDD5 100%);
             color: #C88F4A;
-            font-weight: 500;
+            font-weight: 600;
+            border-left-color: #C88F4A;
+        }
+
+        .simple-task-role-option.selected:hover::after {
+            content: 'Currently assigned';
         }
 
         .simple-task-role-option.selected i.ph-check {
@@ -15500,41 +15612,64 @@
 
         .simple-task-role-option.remove-role:hover {
             background: #FEE2E2;
+            border-left-color: #DC2626;
+        }
+
+        .simple-task-role-option.remove-role:hover::after {
+            content: 'Click to remove';
+            color: #DC2626;
         }
 
         .simple-task-role-divider {
             height: 1px;
-            background: #e5e5e5;
-            margin: 6px 0;
+            background: linear-gradient(to right, transparent, #E5DDD1, transparent);
+            margin: 8px 16px;
         }
 
         .simple-task-role-group-header {
-            padding: 8px 12px 4px;
+            padding: 12px 16px 6px;
             font-size: 11px;
-            font-weight: 600;
+            font-weight: 700;
             text-transform: uppercase;
-            color: #888;
+            letter-spacing: 0.05em;
+            color: #8B6F47;
             display: flex;
             align-items: center;
-            gap: 6px;
+            gap: 8px;
+            background: linear-gradient(135deg, #FAF7F5 0%, #F5F2ED 100%);
+            border-bottom: 1px solid #E5DDD1;
+            position: sticky;
+            top: 0;
+            z-index: 1;
         }
 
         .simple-task-role-group-header i {
-            font-size: 12px;
+            font-size: 14px;
+            color: #C88F4A;
         }
 
         .simple-task-role-team-header {
-            padding: 6px 12px 4px 20px;
+            padding: 8px 16px 4px 28px;
             font-size: 11px;
-            font-weight: 500;
-            color: #999;
+            font-weight: 600;
+            color: #A08060;
             display: flex;
             align-items: center;
             gap: 6px;
         }
 
         .simple-task-role-team-header i {
-            font-size: 11px;
+            font-size: 12px;
+            color: #B87B5B;
+        }
+
+        /* Indent roles under teams */
+        .simple-task-role-team-header + .simple-task-role-option {
+            padding-left: 36px;
+        }
+
+        .simple-task-role-team-header + .simple-task-role-option:hover {
+            padding-left: 40px;
         }
 
         /* Role Work Dashboard Styles */
@@ -44091,6 +44226,20 @@ Cmd/Ctrl + K - Command palette
             const hasUnits = roleHierarchy.units.length > 0;
             const hasOrphanTeams = roleHierarchy.orphanTeams.length > 0;
             const hasOrphanRoles = roleHierarchy.orphanRoles.length > 0;
+            const hasAnyEntities = hasUnits || hasOrphanTeams || hasOrphanRoles;
+
+            // Add encouragement prompt at top of dropdown
+            if (hasAnyEntities && !heroSelectedEntityId) {
+                html += `
+                    <div class="hero-dropdown-prompt">
+                        <i class="ph ph-lightbulb"></i>
+                        <div class="hero-dropdown-prompt-text">
+                            <strong>Assign ownership for accountability</strong>
+                            <span>Tasks with clear ownership are 3x more likely to get done!</span>
+                        </div>
+                    </div>
+                `;
+            }
 
             // Add units with their teams and roles - all selectable
             roleHierarchy.units.forEach(unit => {
@@ -44526,9 +44675,12 @@ Cmd/Ctrl + K - Command palette
 
                         <!-- Role Chip with Dropdown -->
                         <div style="position: relative;" id="roleChipWrapper_${task.id}">
-                            <div class="simple-task-chip ${connectedRoles.length ? 'filled' : 'empty'}" onclick="toggleTaskRoleDropdown('${task.id}')">
-                                <i class="ph ph-briefcase"></i>
-                                <span>${connectedRoles.length ? connectedRoles[0].name : 'Assign role'}</span>
+                            <div class="simple-task-chip ${connectedRoles.length ? 'filled' : 'empty role-chip-empty'}"
+                                 onclick="toggleTaskRoleDropdown('${task.id}')"
+                                 title="${connectedRoles.length ? 'Click to change role' : 'Click to assign a role - who should own this task?'}">
+                                <i class="ph ${connectedRoles.length ? 'ph-briefcase' : 'ph-user-circle-plus'}"></i>
+                                <span>${connectedRoles.length ? connectedRoles[0].name : 'Who owns this?'}</span>
+                                ${!connectedRoles.length ? '<i class="ph ph-caret-down" style="font-size: 12px; margin-left: 2px;"></i>' : ''}
                             </div>
                             <div class="simple-task-role-dropdown" id="roleDropdown_${task.id}">
                                 <div class="simple-task-role-options" id="roleOptions_${task.id}"></div>
@@ -45383,6 +45535,19 @@ Cmd/Ctrl + K - Command palette
 
             const hierarchy = buildRoleHierarchyStructure();
             let html = '';
+
+            // Add encouragement prompt when no role is selected
+            if (!currentRoleId) {
+                html += `
+                    <div class="simple-task-role-prompt">
+                        <i class="ph ph-lightbulb"></i>
+                        <div class="simple-task-role-prompt-text">
+                            <strong>Who should own this task?</strong>
+                            Assigning a role helps track accountability and ensures nothing falls through the cracks.
+                        </div>
+                    </div>
+                `;
+            }
 
             // Add "No role" option if there's a current role
             if (currentRoleId) {
@@ -46977,18 +47142,22 @@ Options:
             // Update role chip
             const roleChip = document.getElementById('quickAddRoleChip');
             const roleLabel = document.getElementById('quickAddRoleLabel');
+            const roleIcon = roleChip?.querySelector('i');
             if (quickAddModalState.roleId) {
                 const role = (entities.role || []).find(r => r.id === quickAddModalState.roleId);
                 if (role) {
                     roleChip.classList.add('filled');
                     roleLabel.textContent = role.name;
+                    if (roleIcon) roleIcon.className = 'ph ph-briefcase';
                 } else {
                     roleChip.classList.remove('filled');
-                    roleLabel.textContent = 'Assign role';
+                    roleLabel.textContent = 'Who owns this?';
+                    if (roleIcon) roleIcon.className = 'ph ph-user-circle-plus';
                 }
             } else {
                 roleChip.classList.remove('filled');
-                roleLabel.textContent = 'Assign role';
+                roleLabel.textContent = 'Who owns this?';
+                if (roleIcon) roleIcon.className = 'ph ph-user-circle-plus';
             }
 
             // Update visibility chip
@@ -54354,13 +54523,13 @@ Options:
                 <!-- Assignment (Optional) - Supports Unit, Team, or Role -->
                 <div class="hero-task-input-group" style="margin-top: 1rem;">
                     <label class="hero-task-label">
-                        <i class="ph ph-sitemap"></i> Assign to
+                        <i class="ph ph-user-circle-plus"></i> Who should own this task?
                     </label>
                     <div class="hero-dropdown-container" id="heroRoleDropdownContainer">
                         <input type="hidden" id="heroTaskRoleMain" value="" data-entity-type="">
                         <div class="hero-dropdown-trigger" onclick="toggleHeroRoleDropdown(event)">
                             <span class="trigger-text">
-                                <i class="ph ph-sitemap"></i> Select unit, team, or role...
+                                <i class="ph ph-hand-pointing"></i> Click to assign ownership...
                             </span>
                             <i class="ph ph-caret-down trigger-arrow"></i>
                         </div>
@@ -54548,9 +54717,9 @@ Options:
                     <i class="ph ph-flag"></i>
                     <span id="quickAddPriorityLabel">Set priority</span>
                 </div>
-                <div class="quick-add-meta-chip" id="quickAddRoleChip" onclick="toggleQuickAddRolePicker()">
-                    <i class="ph ph-briefcase"></i>
-                    <span id="quickAddRoleLabel">Assign role</span>
+                <div class="quick-add-meta-chip" id="quickAddRoleChip" onclick="toggleQuickAddRolePicker()" title="Who should own this task?">
+                    <i class="ph ph-user-circle-plus"></i>
+                    <span id="quickAddRoleLabel">Who owns this?</span>
                 </div>
                 <div class="quick-add-meta-chip visibility-public" id="quickAddVisibilityChip" onclick="toggleQuickAddVisibilityPicker()">
                     <i class="ph ph-globe" id="quickAddVisibilityIcon"></i>
