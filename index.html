@@ -22286,6 +22286,19 @@
                     <i class="ph ph-calendar"></i>
                     <span>Calendar</span>
                 </button>
+                <div class="view-tabs-divider"></div>
+                <button class="view-tab" data-view="structure" onclick="switchView('structure')">
+                    <i class="ph ph-tree-structure"></i>
+                    <span>Structure</span>
+                </button>
+                <button class="view-tab" data-view="workflows" onclick="switchView('workflows')">
+                    <i class="ph ph-git-branch"></i>
+                    <span>Workflows</span>
+                </button>
+                <button class="view-tab" data-view="company-rules" onclick="switchView('company-rules')">
+                    <i class="ph ph-scales"></i>
+                    <span>Rules</span>
+                </button>
             </div>
         </div>
 
@@ -22438,8 +22451,8 @@
         </div>
     </div>
 
-    <!-- Settings Subbar - Always visible when Settings is active -->
-    <div class="settings-subbar" id="settingsSubbar">
+    <!-- Settings Subbar - Hidden since tabs are now in main header -->
+    <div class="settings-subbar" id="settingsSubbar" style="display: none !important;">
         <div class="settings-subbar-tabs">
             <button class="settings-subbar-tab" data-view="structure" onclick="switchView('structure')">
                 <i class="ph ph-tree-structure"></i>
