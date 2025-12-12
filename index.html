@@ -19094,6 +19094,76 @@
         .gantt-bar.completed { background: #10B981; }
         .gantt-bar.overdue { background: #EF4444; }
 
+        /* Gantt Bar Drag Styles */
+        .gantt-bar {
+            cursor: grab;
+            user-select: none;
+        }
+
+        .gantt-bar:active {
+            cursor: grabbing;
+        }
+
+        .gantt-bar.dragging {
+            opacity: 0.8;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+            z-index: 100;
+            cursor: grabbing;
+        }
+
+        .gantt-bar-resize-handle {
+            position: absolute;
+            top: 0;
+            width: 8px;
+            height: 100%;
+            cursor: ew-resize;
+            z-index: 10;
+        }
+
+        .gantt-bar-resize-handle.left {
+            left: 0;
+            border-radius: 4px 0 0 4px;
+        }
+
+        .gantt-bar-resize-handle.right {
+            right: 0;
+            border-radius: 0 4px 4px 0;
+        }
+
+        .gantt-bar-resize-handle:hover {
+            background: rgba(255, 255, 255, 0.3);
+        }
+
+        .gantt-bar-content {
+            flex: 1;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            white-space: nowrap;
+            padding: 0 4px;
+        }
+
+        .gantt-drag-preview {
+            position: fixed;
+            background: rgba(200, 143, 74, 0.2);
+            border: 2px dashed #C88F4A;
+            border-radius: 4px;
+            pointer-events: none;
+            z-index: 1000;
+        }
+
+        .gantt-date-tooltip {
+            position: fixed;
+            background: #3D2E1F;
+            color: white;
+            padding: 4px 8px;
+            border-radius: 4px;
+            font-size: 0.75rem;
+            white-space: nowrap;
+            pointer-events: none;
+            z-index: 1001;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
+        }
+
         /* Gantt Amino Tags */
         .gantt-amino-tags {
             display: flex;
@@ -54028,12 +54098,17 @@ Options:
                     const barClass = isOverdue ? 'overdue' : statusClass;
 
                     if (startOffset < daysToShow && endOffset >= 0) {
+                        const barLeft = Math.max(0, left);
+                        const barWidth = Math.min(width, (daysToShow - Math.max(0, startOffset)) * dayWidth);
                         barHtml = `
                             <div class="gantt-bar ${barClass}"
-                                 style="left: ${Math.max(0, left)}px; width: ${Math.min(width, (daysToShow - Math.max(0, startOffset)) * dayWidth)}px;"
-                                 onclick="openTaskModal('${task.id}')"
-                                 title="${task.name}">
-                                ${task.name}
+                                 style="left: ${barLeft}px; width: ${barWidth}px;"
+                                 onmousedown="initGanttDrag(event, '${task.id}', 'move')"
+                                 ondblclick="openTaskModal('${task.id}')"
+                                 title="${task.name} (drag to move, double-click to edit)">
+                                <div class="gantt-bar-resize-handle left" onmousedown="event.stopPropagation(); initGanttDrag(event, '${task.id}', 'resize-left')"></div>
+                                <div class="gantt-bar-content">${task.name}</div>
+                                <div class="gantt-bar-resize-handle right" onmousedown="event.stopPropagation(); initGanttDrag(event, '${task.id}', 'resize-right')"></div>
                             </div>
                         `;
                     }
@@ -54065,6 +54140,226 @@ Options:
             ganttStartDate = new Date();
             ganttStartDate.setDate(ganttStartDate.getDate() - 7);
             renderGanttView();
+        }
+
+        // Gantt Drag State
+        const ganttDragState = {
+            isDragging: false,
+            taskId: null,
+            dragType: null, // 'move', 'resize-left', 'resize-right'
+            startX: 0,
+            initialLeft: 0,
+            initialWidth: 0,
+            barElement: null,
+            tooltip: null,
+            originalStartDate: null,
+            originalDueDate: null
+        };
+
+        const GANTT_DAY_WIDTH = 40;
+
+        function initGanttDrag(e, taskId, dragType) {
+            e.preventDefault();
+            e.stopPropagation();
+
+            const task = entities.task.find(t => t.id === taskId);
+            if (!task || !task.dueDate) return;
+
+            const barElement = e.target.closest('.gantt-bar');
+            if (!barElement) return;
+
+            ganttDragState.isDragging = true;
+            ganttDragState.taskId = taskId;
+            ganttDragState.dragType = dragType;
+            ganttDragState.startX = e.clientX;
+            ganttDragState.initialLeft = parseInt(barElement.style.left) || 0;
+            ganttDragState.initialWidth = parseInt(barElement.style.width) || 0;
+            ganttDragState.barElement = barElement;
+            ganttDragState.originalDueDate = task.dueDate;
+            ganttDragState.originalStartDate = task.startDate || null;
+
+            barElement.classList.add('dragging');
+
+            // Create tooltip
+            const tooltip = document.createElement('div');
+            tooltip.className = 'gantt-date-tooltip';
+            tooltip.id = 'ganttDragTooltip';
+            document.body.appendChild(tooltip);
+            ganttDragState.tooltip = tooltip;
+            updateGanttDragTooltip(e);
+
+            document.addEventListener('mousemove', handleGanttDrag);
+            document.addEventListener('mouseup', endGanttDrag);
+        }
+
+        function handleGanttDrag(e) {
+            if (!ganttDragState.isDragging) return;
+
+            const deltaX = e.clientX - ganttDragState.startX;
+            const daysDelta = Math.round(deltaX / GANTT_DAY_WIDTH);
+            const bar = ganttDragState.barElement;
+
+            if (ganttDragState.dragType === 'move') {
+                // Move the entire bar
+                const newLeft = ganttDragState.initialLeft + (daysDelta * GANTT_DAY_WIDTH);
+                bar.style.left = newLeft + 'px';
+            } else if (ganttDragState.dragType === 'resize-right') {
+                // Resize from right (change due date)
+                const newWidth = Math.max(GANTT_DAY_WIDTH - 4, ganttDragState.initialWidth + (daysDelta * GANTT_DAY_WIDTH));
+                bar.style.width = newWidth + 'px';
+            } else if (ganttDragState.dragType === 'resize-left') {
+                // Resize from left (change start date)
+                const newLeft = ganttDragState.initialLeft + (daysDelta * GANTT_DAY_WIDTH);
+                const newWidth = Math.max(GANTT_DAY_WIDTH - 4, ganttDragState.initialWidth - (daysDelta * GANTT_DAY_WIDTH));
+                bar.style.left = newLeft + 'px';
+                bar.style.width = newWidth + 'px';
+            }
+
+            updateGanttDragTooltip(e);
+        }
+
+        function updateGanttDragTooltip(e) {
+            const tooltip = ganttDragState.tooltip;
+            if (!tooltip) return;
+
+            const deltaX = e.clientX - ganttDragState.startX;
+            const daysDelta = Math.round(deltaX / GANTT_DAY_WIDTH);
+
+            const task = entities.task.find(t => t.id === ganttDragState.taskId);
+            if (!task) return;
+
+            const originalDue = parseLocalDate(ganttDragState.originalDueDate);
+            const originalStart = ganttDragState.originalStartDate
+                ? parseLocalDate(ganttDragState.originalStartDate)
+                : new Date(originalDue.getTime() - 3 * 24 * 60 * 60 * 1000);
+
+            let newStart = new Date(originalStart);
+            let newDue = new Date(originalDue);
+
+            if (ganttDragState.dragType === 'move') {
+                newStart.setDate(newStart.getDate() + daysDelta);
+                newDue.setDate(newDue.getDate() + daysDelta);
+            } else if (ganttDragState.dragType === 'resize-right') {
+                newDue.setDate(newDue.getDate() + daysDelta);
+                if (newDue <= newStart) {
+                    newDue = new Date(newStart);
+                    newDue.setDate(newDue.getDate() + 1);
+                }
+            } else if (ganttDragState.dragType === 'resize-left') {
+                newStart.setDate(newStart.getDate() + daysDelta);
+                if (newStart >= newDue) {
+                    newStart = new Date(newDue);
+                    newStart.setDate(newStart.getDate() - 1);
+                }
+            }
+
+            const formatShort = (d) => {
+                const months = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
+                return `${months[d.getMonth()]} ${d.getDate()}`;
+            };
+
+            tooltip.textContent = `${formatShort(newStart)} → ${formatShort(newDue)}`;
+            tooltip.style.left = (e.clientX + 10) + 'px';
+            tooltip.style.top = (e.clientY - 30) + 'px';
+        }
+
+        function endGanttDrag(e) {
+            if (!ganttDragState.isDragging) return;
+
+            const deltaX = e.clientX - ganttDragState.startX;
+            const daysDelta = Math.round(deltaX / GANTT_DAY_WIDTH);
+
+            const task = entities.task.find(t => t.id === ganttDragState.taskId);
+            if (task && daysDelta !== 0) {
+                const originalDue = parseLocalDate(ganttDragState.originalDueDate);
+                const originalStart = ganttDragState.originalStartDate
+                    ? parseLocalDate(ganttDragState.originalStartDate)
+                    : new Date(originalDue.getTime() - 3 * 24 * 60 * 60 * 1000);
+
+                let newStart = new Date(originalStart);
+                let newDue = new Date(originalDue);
+
+                if (ganttDragState.dragType === 'move') {
+                    newStart.setDate(newStart.getDate() + daysDelta);
+                    newDue.setDate(newDue.getDate() + daysDelta);
+                } else if (ganttDragState.dragType === 'resize-right') {
+                    newDue.setDate(newDue.getDate() + daysDelta);
+                    if (newDue <= newStart) {
+                        newDue = new Date(newStart);
+                        newDue.setDate(newDue.getDate() + 1);
+                    }
+                } else if (ganttDragState.dragType === 'resize-left') {
+                    newStart.setDate(newStart.getDate() + daysDelta);
+                    if (newStart >= newDue) {
+                        newStart = new Date(newDue);
+                        newStart.setDate(newStart.getDate() - 1);
+                    }
+                }
+
+                updateGanttTaskDates(ganttDragState.taskId, newStart, newDue, ganttDragState.originalStartDate, ganttDragState.originalDueDate);
+            }
+
+            // Cleanup
+            if (ganttDragState.barElement) {
+                ganttDragState.barElement.classList.remove('dragging');
+            }
+            if (ganttDragState.tooltip) {
+                ganttDragState.tooltip.remove();
+            }
+
+            ganttDragState.isDragging = false;
+            ganttDragState.taskId = null;
+            ganttDragState.dragType = null;
+            ganttDragState.barElement = null;
+            ganttDragState.tooltip = null;
+
+            document.removeEventListener('mousemove', handleGanttDrag);
+            document.removeEventListener('mouseup', endGanttDrag);
+
+            renderGanttView();
+        }
+
+        function updateGanttTaskDates(taskId, newStartDate, newDueDate, oldStartDate, oldDueDate) {
+            const task = entities.task.find(t => t.id === taskId);
+            if (!task) return;
+
+            const newStartStr = formatDateForInput(newStartDate);
+            const newDueStr = formatDateForInput(newDueDate);
+
+            // Track in undo history
+            pushToUndoHistory({
+                type: 'update_entity',
+                entityType: 'task',
+                data: { id: task.id },
+                oldData: {
+                    startDate: oldStartDate,
+                    dueDate: oldDueDate
+                },
+                description: `Change dates: ${task.name}`
+            });
+
+            task.startDate = newStartStr;
+            task.dueDate = newDueStr;
+            saveToLocalStorage();
+
+            // Log to Xano
+            logActivityToXano({
+                event_verb: 'ALT',
+                eo_operator: 'ALT',
+                k_frame: 'Gantt Date Change',
+                object_type: 'task',
+                object_id: taskId,
+                object_label: task.name,
+                data_json: {
+                    field: 'dates',
+                    old_start: oldStartDate,
+                    old_due: oldDueDate,
+                    new_start: newStartStr,
+                    new_due: newDueStr
+                }
+            });
+
+            showToast(`Updated: ${formatDateShort(newStartStr)} → ${formatDateShort(newDueStr)}`, 'success');
         }
 
         // ============================================
