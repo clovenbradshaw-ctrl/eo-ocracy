@@ -13750,8 +13750,12 @@
         }
 
         .kanban-card-role-only {
-            color: #8B6F47;
-            font-style: italic;
+            color: #8B5A2B;
+            font-weight: 500;
+            background: linear-gradient(135deg, #FFF8F0 0%, #FFF4E8 100%);
+            padding: 0.2rem 0.5rem;
+            border-radius: 4px;
+            border: 1px solid rgba(200, 143, 74, 0.3);
         }
 
         .kanban-card-role-only i {
@@ -14325,6 +14329,25 @@
 
         .task-table-empty {
             color: #A99D8F;
+        }
+
+        /* Make assigned roles more visible in table view */
+        .task-table-role {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.35rem;
+            padding: 0.25rem 0.6rem;
+            background: linear-gradient(135deg, #FFF8F0 0%, #FFF4E8 100%);
+            border: 1px solid #C88F4A;
+            border-radius: 6px;
+            color: #8B5A2B;
+            font-weight: 500;
+            font-size: 0.85rem;
+        }
+
+        .task-table-role i {
+            color: #C88F4A;
+            font-size: 0.9rem;
         }
 
         .task-table td.overdue {
@@ -15078,6 +15101,24 @@
 
         .simple-task-chip.role-chip-empty i.ph-caret-down {
             opacity: 0.7;
+        }
+
+        /* Role chip when a role IS assigned - make it visually prominent */
+        .simple-task-chip.role-chip-filled {
+            background: linear-gradient(135deg, #FFF8F0 0%, #FFF4E8 100%);
+            color: #8B5A2B;
+            border: 2px solid #C88F4A;
+            font-weight: 600;
+        }
+
+        .simple-task-chip.role-chip-filled:hover {
+            background: linear-gradient(135deg, #FFF4E8 0%, #FFEDD5 100%);
+            transform: translateY(-1px);
+            box-shadow: 0 3px 10px rgba(200, 143, 74, 0.25);
+        }
+
+        .simple-task-chip.role-chip-filled i {
+            color: #C88F4A;
         }
 
         .simple-task-chip.filled {
@@ -44895,7 +44936,7 @@ Cmd/Ctrl + K - Command palette
 
                         <!-- Role Chip with Dropdown -->
                         <div style="position: relative;" id="roleChipWrapper_${task.id}">
-                            <div class="simple-task-chip ${connectedRoles.length ? 'filled' : 'empty role-chip-empty'}"
+                            <div class="simple-task-chip ${connectedRoles.length ? 'role-chip-filled' : 'empty role-chip-empty'}"
                                  onclick="toggleTaskRoleDropdown('${task.id}')"
                                  title="${connectedRoles.length ? 'Click to change role' : 'Click to assign a role - who should own this task?'}">
                                 <i class="ph ${connectedRoles.length ? 'ph-briefcase' : 'ph-user-circle-plus'}"></i>
@@ -51980,7 +52021,7 @@ Options:
                         <td>
                             <span class="task-table-status ${task.status}">${statusLabels[task.status] || task.status}</span>
                         </td>
-                        <td>${role ? role.name : '<span class="task-table-empty">Unassigned</span>'}</td>
+                        <td>${role ? `<span class="task-table-role"><i class="ph ph-briefcase"></i>${role.name}</span>` : '<span class="task-table-empty">Unassigned</span>'}</td>
                         <td>${person ? person.name : '<span class="task-table-empty">-</span>'}</td>
                         <td>${workflow ? workflow.name : '<span class="task-table-empty">-</span>'}</td>
                         <td class="${dueDateStatus}">
