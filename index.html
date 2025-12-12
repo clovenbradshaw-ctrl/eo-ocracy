@@ -18024,6 +18024,42 @@
             color: #B8A690;
         }
 
+        .workflow-task-assignment {
+            padding-left: 30px;
+            display: flex;
+            gap: 0.75rem;
+            flex-wrap: wrap;
+        }
+
+        .workflow-task-assignment-field {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            font-size: 0.8rem;
+            color: #8B6F47;
+        }
+
+        .workflow-task-assignment-field label {
+            font-weight: 500;
+            white-space: nowrap;
+        }
+
+        .workflow-task-assignment-field select {
+            padding: 0.375rem 0.5rem;
+            border: 1px solid #E5DDD1;
+            border-radius: 4px;
+            font-size: 0.8rem;
+            color: #3D2E1F;
+            background: white;
+            min-width: 120px;
+            max-width: 180px;
+        }
+
+        .workflow-task-assignment-field select:focus {
+            outline: none;
+            border-color: #C88F4A;
+        }
+
         .workflow-add-task-btn {
             width: 100%;
             padding: 0.75rem;
@@ -51968,12 +52004,28 @@ Options:
                 entities.task.push(taskObject);
                 createdTaskIds.push(taskId);
 
-                // If role is selected, create relationship
-                if (roleId) {
-                    const relId = 'rel_' + Date.now() + '_' + i;
+                // Determine role assignment: per-task from template, or global from modal
+                const taskRoleId = taskTemplate.roleId || roleId;
+                const taskTeamId = taskTemplate.teamId || null;
+
+                // If role is assigned, create relationship
+                if (taskRoleId) {
+                    const relId = 'rel_' + Date.now() + '_role_' + i;
                     relationships.push({
                         id: relId,
-                        subject: roleId,
+                        subject: taskRoleId,
+                        predicate: 'CON',
+                        object: taskId,
+                        createdAt: new Date().toISOString()
+                    });
+                }
+
+                // If team is assigned, create relationship
+                if (taskTeamId) {
+                    const relId = 'rel_' + Date.now() + '_team_' + i;
+                    relationships.push({
+                        id: relId,
+                        subject: taskTeamId,
                         predicate: 'CON',
                         object: taskId,
                         createdAt: new Date().toISOString()
@@ -52155,6 +52207,28 @@ Options:
             });
         }
 
+        // Get role options for workflow task assignment
+        function getWorkflowRoleOptions(selectedId = '') {
+            const roles = entities.role || [];
+            let options = '<option value="">None</option>';
+            roles.forEach(role => {
+                const selected = role.id === selectedId ? 'selected' : '';
+                options += `<option value="${role.id}" ${selected}>${role.name}</option>`;
+            });
+            return options;
+        }
+
+        // Get team options for workflow task assignment
+        function getWorkflowTeamOptions(selectedId = '') {
+            const teams = entities.team || [];
+            let options = '<option value="">None</option>';
+            teams.forEach(team => {
+                const selected = team.id === selectedId ? 'selected' : '';
+                options += `<option value="${team.id}" ${selected}>${team.name}</option>`;
+            });
+            return options;
+        }
+
         // Render tasks in the workflow builder
         function renderWorkflowBuilderTasks() {
             if (workflowBuilderTasks.length === 0) {
@@ -52190,6 +52264,20 @@ Options:
                                placeholder="Optional description"
                                onchange="updateWorkflowBuilderTask(${idx}, 'description', this.value)">
                     </div>
+                    <div class="workflow-task-assignment">
+                        <div class="workflow-task-assignment-field">
+                            <label><i class="ph ph-user-circle"></i> Role:</label>
+                            <select onchange="updateWorkflowBuilderTask(${idx}, 'roleId', this.value)">
+                                ${getWorkflowRoleOptions(task.roleId || '')}
+                            </select>
+                        </div>
+                        <div class="workflow-task-assignment-field">
+                            <label><i class="ph ph-users-three"></i> Team:</label>
+                            <select onchange="updateWorkflowBuilderTask(${idx}, 'teamId', this.value)">
+                                ${getWorkflowTeamOptions(task.teamId || '')}
+                            </select>
+                        </div>
+                    </div>
                 </div>
             `).join('');
         }
@@ -52215,7 +52303,9 @@ Options:
             workflowBuilderTasks.push({
                 name: '',
                 description: '',
-                dayOffset: newDayOffset
+                dayOffset: newDayOffset,
+                roleId: '',
+                teamId: ''
             });
 
             refreshWorkflowBuilderTasksUI();
@@ -52294,7 +52384,9 @@ Options:
             const cleanedTasks = validTasks.map(t => ({
                 name: t.name.trim(),
                 description: (t.description || '').trim(),
-                dayOffset: t.dayOffset || 0
+                dayOffset: t.dayOffset || 0,
+                roleId: t.roleId || '',
+                teamId: t.teamId || ''
             }));
 
             if (editingWorkflowId) {
