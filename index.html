@@ -15143,6 +15143,109 @@
             color: #065F46;
         }
 
+        /* Inline Role Dropdown Styles */
+        .simple-task-role-dropdown {
+            position: absolute;
+            top: 100%;
+            left: 0;
+            margin-top: 4px;
+            background: white;
+            border-radius: 8px;
+            box-shadow: 0 8px 30px rgba(0, 0, 0, 0.15);
+            border: 1px solid #e5e5e5;
+            padding: 8px 0;
+            min-width: 200px;
+            max-width: 280px;
+            max-height: 300px;
+            overflow-y: auto;
+            z-index: 100;
+            display: none;
+        }
+
+        .simple-task-role-dropdown.show {
+            display: block;
+            animation: dropdownSlide 0.2s ease-out;
+        }
+
+        .simple-task-role-option {
+            padding: 8px 16px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            font-size: 13px;
+            color: #555;
+            transition: background 0.15s;
+        }
+
+        .simple-task-role-option:hover {
+            background: #f5f5f5;
+            color: #333;
+        }
+
+        .simple-task-role-option i {
+            font-size: 14px;
+            color: #C88F4A;
+        }
+
+        .simple-task-role-option.selected {
+            background: rgba(200, 143, 74, 0.1);
+            color: #C88F4A;
+            font-weight: 500;
+        }
+
+        .simple-task-role-option.selected i.ph-check {
+            margin-left: auto;
+            color: #C88F4A;
+        }
+
+        .simple-task-role-option.remove-role {
+            color: #DC2626;
+        }
+
+        .simple-task-role-option.remove-role i {
+            color: #DC2626;
+        }
+
+        .simple-task-role-option.remove-role:hover {
+            background: #FEE2E2;
+        }
+
+        .simple-task-role-divider {
+            height: 1px;
+            background: #e5e5e5;
+            margin: 6px 0;
+        }
+
+        .simple-task-role-group-header {
+            padding: 8px 12px 4px;
+            font-size: 11px;
+            font-weight: 600;
+            text-transform: uppercase;
+            color: #888;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+        .simple-task-role-group-header i {
+            font-size: 12px;
+        }
+
+        .simple-task-role-team-header {
+            padding: 6px 12px 4px 20px;
+            font-size: 11px;
+            font-weight: 500;
+            color: #999;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+        .simple-task-role-team-header i {
+            font-size: 11px;
+        }
+
         /* Role Work Dashboard Styles */
         .role-work-dashboard {
             display: flex;
@@ -43338,10 +43441,15 @@ Cmd/Ctrl + K - Command palette
                             <span>${(task.priority || 'medium').charAt(0).toUpperCase() + (task.priority || 'medium').slice(1)}</span>
                         </div>
 
-                        <!-- Role Chip -->
-                        <div class="simple-task-chip ${connectedRoles.length ? 'filled' : 'empty'}" ${connectedRoles.length ? `onclick="openEntityModal('${connectedRoles[0].id}', 'role')"` : `onclick="showToast('Use Edit button to assign role', 'info')"`}>
-                            <i class="ph ph-briefcase"></i>
-                            <span>${connectedRoles.length ? connectedRoles[0].name : 'Assign role'}</span>
+                        <!-- Role Chip with Dropdown -->
+                        <div style="position: relative;" id="roleChipWrapper_${task.id}">
+                            <div class="simple-task-chip ${connectedRoles.length ? 'filled' : 'empty'}" onclick="toggleTaskRoleDropdown('${task.id}')">
+                                <i class="ph ph-briefcase"></i>
+                                <span>${connectedRoles.length ? connectedRoles[0].name : 'Assign role'}</span>
+                            </div>
+                            <div class="simple-task-role-dropdown" id="roleDropdown_${task.id}">
+                                <div class="simple-task-role-options" id="roleOptions_${task.id}"></div>
+                            </div>
                         </div>
                     </div>
 
@@ -44085,6 +44193,177 @@ Cmd/Ctrl + K - Command palette
             const dropdown = document.getElementById(`statusDropdown_${taskId}`);
             if (dropdown) {
                 dropdown.classList.remove('show');
+            }
+        }
+
+        // Toggle task role dropdown
+        function toggleTaskRoleDropdown(taskId) {
+            const dropdown = document.getElementById(`roleDropdown_${taskId}`);
+            if (dropdown) {
+                const wasOpen = dropdown.classList.contains('show');
+                // Close all other dropdowns first
+                document.querySelectorAll('.simple-task-role-dropdown.show').forEach(d => d.classList.remove('show'));
+                document.querySelectorAll('.simple-task-status-dropdown.show').forEach(d => d.classList.remove('show'));
+
+                if (!wasOpen) {
+                    populateTaskRoleOptions(taskId);
+                    dropdown.classList.add('show');
+                }
+            }
+        }
+
+        // Close task role dropdown
+        function closeTaskRoleDropdown(taskId) {
+            const dropdown = document.getElementById(`roleDropdown_${taskId}`);
+            if (dropdown) {
+                dropdown.classList.remove('show');
+            }
+        }
+
+        // Populate role options for inline task dropdown
+        function populateTaskRoleOptions(taskId) {
+            const container = document.getElementById(`roleOptions_${taskId}`);
+            const roles = entities.role || [];
+
+            // Get currently connected role
+            const connectedRoles = relationships
+                .filter(r => (r.subject === taskId || r.object === taskId) && r.predicate !== 'DES')
+                .map(r => {
+                    const otherId = r.subject === taskId ? r.object : r.subject;
+                    return findEntity(otherId);
+                })
+                .filter(e => e && e.type === 'role');
+            const currentRoleId = connectedRoles.length > 0 ? connectedRoles[0].id : null;
+
+            if (roles.length === 0) {
+                container.innerHTML = `
+                    <div class="simple-task-role-option" style="color: #888; cursor: default;">
+                        <i class="ph ph-info"></i> No roles yet
+                    </div>
+                `;
+                return;
+            }
+
+            const hierarchy = buildRoleHierarchyStructure();
+            let html = '';
+
+            // Add "No role" option if there's a current role
+            if (currentRoleId) {
+                html += `
+                    <div class="simple-task-role-option remove-role" onclick="removeTaskRoleInline('${taskId}'); closeTaskRoleDropdown('${taskId}');">
+                        <i class="ph ph-x-circle"></i> Remove role
+                    </div>
+                    <div class="simple-task-role-divider"></div>
+                `;
+            }
+
+            // Render units with their teams and roles
+            hierarchy.units.forEach(unit => {
+                html += `<div class="simple-task-role-group-header"><i class="ph ph-buildings"></i> ${unit.name}</div>`;
+                unit.teams.forEach(team => {
+                    html += `<div class="simple-task-role-team-header"><i class="ph ph-users-three"></i> ${team.name}</div>`;
+                    team.roles.forEach(role => {
+                        const isSelected = currentRoleId === role.id;
+                        html += `
+                            <div class="simple-task-role-option ${isSelected ? 'selected' : ''}"
+                                 onclick="assignRoleToTaskInline('${taskId}', '${role.id}'); closeTaskRoleDropdown('${taskId}');">
+                                <i class="ph ph-briefcase"></i> ${role.name}
+                                ${isSelected ? '<i class="ph ph-check"></i>' : ''}
+                            </div>
+                        `;
+                    });
+                });
+            });
+
+            // Render orphan teams
+            hierarchy.orphanTeams.forEach(team => {
+                html += `<div class="simple-task-role-team-header"><i class="ph ph-users-three"></i> ${team.name}</div>`;
+                team.roles.forEach(role => {
+                    const isSelected = currentRoleId === role.id;
+                    html += `
+                        <div class="simple-task-role-option ${isSelected ? 'selected' : ''}"
+                             onclick="assignRoleToTaskInline('${taskId}', '${role.id}'); closeTaskRoleDropdown('${taskId}');">
+                            <i class="ph ph-briefcase"></i> ${role.name}
+                            ${isSelected ? '<i class="ph ph-check"></i>' : ''}
+                        </div>
+                    `;
+                });
+            });
+
+            // Render orphan roles
+            if (hierarchy.orphanRoles.length > 0) {
+                if (hierarchy.units.length > 0 || hierarchy.orphanTeams.length > 0) {
+                    html += `<div class="simple-task-role-group-header">Other Roles</div>`;
+                }
+                hierarchy.orphanRoles.forEach(role => {
+                    const isSelected = currentRoleId === role.id;
+                    html += `
+                        <div class="simple-task-role-option ${isSelected ? 'selected' : ''}"
+                             onclick="assignRoleToTaskInline('${taskId}', '${role.id}'); closeTaskRoleDropdown('${taskId}');">
+                            <i class="ph ph-briefcase"></i> ${role.name}
+                            ${isSelected ? '<i class="ph ph-check"></i>' : ''}
+                        </div>
+                    `;
+                });
+            }
+
+            container.innerHTML = html;
+        }
+
+        // Assign role to task inline (from task card dropdown)
+        function assignRoleToTaskInline(taskId, roleId) {
+            // First remove any existing role connections
+            const existingRoles = relationships.filter(r =>
+                (r.subject === taskId || r.object === taskId) &&
+                r.predicate !== 'DES' &&
+                (findEntity(r.subject)?.type === 'role' || findEntity(r.object)?.type === 'role')
+            );
+            existingRoles.forEach(rel => {
+                const idx = relationships.indexOf(rel);
+                if (idx > -1) relationships.splice(idx, 1);
+            });
+
+            // Create new CON relationship
+            const relId = 'rel' + Date.now();
+            relationships.push({
+                id: relId,
+                subject: taskId,
+                predicate: 'CON',
+                object: roleId,
+                description: ''
+            });
+
+            saveData();
+
+            // Refresh the task display
+            if (typeof renderEntityDetails === 'function') {
+                const task = entities.task.find(t => t.id === taskId);
+                if (task) {
+                    renderEntityDetails(task, 'task');
+                }
+            }
+        }
+
+        // Remove role from task inline
+        function removeTaskRoleInline(taskId) {
+            const existingRoles = relationships.filter(r =>
+                (r.subject === taskId || r.object === taskId) &&
+                r.predicate !== 'DES' &&
+                (findEntity(r.subject)?.type === 'role' || findEntity(r.object)?.type === 'role')
+            );
+            existingRoles.forEach(rel => {
+                const idx = relationships.indexOf(rel);
+                if (idx > -1) relationships.splice(idx, 1);
+            });
+
+            saveData();
+
+            // Refresh the task display
+            if (typeof renderEntityDetails === 'function') {
+                const task = entities.task.find(t => t.id === taskId);
+                if (task) {
+                    renderEntityDetails(task, 'task');
+                }
             }
         }
 
@@ -46536,6 +46815,15 @@ Options:
             if (!event.target.closest('.quick-action-btn')) {
                 document.querySelectorAll('.date-picker-popup.show').forEach(picker => {
                     picker.classList.remove('show');
+                });
+            }
+        });
+
+        // Close role dropdown when clicking outside
+        document.addEventListener('click', function(event) {
+            if (!event.target.closest('.simple-task-role-dropdown') && !event.target.closest('[id^="roleChipWrapper_"]')) {
+                document.querySelectorAll('.simple-task-role-dropdown.show').forEach(dropdown => {
+                    dropdown.classList.remove('show');
                 });
             }
         });
