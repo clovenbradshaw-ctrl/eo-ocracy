@@ -12303,18 +12303,17 @@
 
         /* Assignment dropdown */
         .structure-assign-dropdown {
-            position: absolute;
-            top: 100%;
-            left: 0;
+            position: fixed;
             min-width: 200px;
             max-width: 280px;
+            max-height: 300px;
+            overflow-y: auto;
             background: white;
             border: 1px solid #E5DDD1;
             border-radius: 8px;
             box-shadow: 0 4px 12px rgba(0,0,0,0.15);
-            z-index: 1000;
+            z-index: 10000;
             padding: 0.5rem;
-            margin-top: 0.25rem;
         }
 
         .structure-assign-dropdown-header {
@@ -39678,10 +39677,25 @@ Cmd/Ctrl + K - Command palette
                 ${optionsHtml}
             `;
 
-            // Position dropdown
-            targetEl.style.position = 'relative';
-            targetEl.appendChild(dropdown);
+            // Position dropdown using fixed positioning relative to clicked element
+            const rect = targetEl.getBoundingClientRect();
+            dropdown.style.left = `${rect.left}px`;
+            dropdown.style.top = `${rect.bottom + 4}px`;
+
+            // Append to body to avoid stacking context issues
+            document.body.appendChild(dropdown);
             currentStructureDropdown = { element: dropdown, parent: targetEl };
+
+            // Adjust position if dropdown goes off-screen
+            requestAnimationFrame(() => {
+                const dropdownRect = dropdown.getBoundingClientRect();
+                if (dropdownRect.right > window.innerWidth) {
+                    dropdown.style.left = `${window.innerWidth - dropdownRect.width - 8}px`;
+                }
+                if (dropdownRect.bottom > window.innerHeight) {
+                    dropdown.style.top = `${rect.top - dropdownRect.height - 4}px`;
+                }
+            });
 
             // Close on outside click
             setTimeout(() => {
