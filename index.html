@@ -14563,6 +14563,47 @@
             color: #F57F17;
         }
 
+        /* Table Amino Tags */
+        .task-table-amino {
+            max-width: 200px;
+        }
+
+        .table-amino-tag {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.25rem;
+            padding: 0.2rem 0.5rem;
+            border-radius: 12px;
+            font-size: 0.7rem;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            margin: 0.125rem;
+            color: white;
+        }
+
+        .table-amino-tag:hover {
+            transform: scale(1.05);
+            filter: brightness(1.1);
+        }
+
+        .table-amino-tag.tag-clients { background: #1D4ED8; }
+        .table-amino-tag.tag-cases { background: #6D28D9; }
+        .table-amino-tag.tag-events { background: #C2410C; }
+        .table-amino-tag.tag-applications { background: #15803D; }
+        .table-amino-tag.tag-users { background: #0F766E; }
+
+        .table-amino-tag i {
+            font-size: 0.7rem;
+        }
+
+        .table-amino-tag span {
+            max-width: 80px;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            white-space: nowrap;
+        }
+
         /* ============================================
            TIMELINE VIEW STYLES
            ============================================ */
@@ -14714,6 +14755,41 @@
             font-size: 0.7rem;
             color: #8B6F47;
             margin-top: 0.25rem;
+        }
+
+        /* Timeline Amino Tags */
+        .timeline-task-amino-tags {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 0.25rem;
+            margin-top: 0.35rem;
+        }
+
+        .timeline-amino-tag {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            width: 18px;
+            height: 18px;
+            border-radius: 50%;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            color: white;
+        }
+
+        .timeline-amino-tag:hover {
+            transform: scale(1.15);
+            filter: brightness(1.1);
+        }
+
+        .timeline-amino-tag.tag-clients { background: #1D4ED8; }
+        .timeline-amino-tag.tag-cases { background: #6D28D9; }
+        .timeline-amino-tag.tag-events { background: #C2410C; }
+        .timeline-amino-tag.tag-applications { background: #15803D; }
+        .timeline-amino-tag.tag-users { background: #0F766E; }
+
+        .timeline-amino-tag i {
+            font-size: 0.6rem;
         }
 
         /* Task View Toggle in Header */
@@ -19099,6 +19175,41 @@
         .gantt-bar.completed { background: #10B981; }
         .gantt-bar.overdue { background: #EF4444; }
 
+        /* Gantt Amino Tags */
+        .gantt-amino-tags {
+            display: flex;
+            gap: 0.2rem;
+            margin-left: auto;
+            flex-shrink: 0;
+        }
+
+        .gantt-amino-tag {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            width: 16px;
+            height: 16px;
+            border-radius: 50%;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            color: white;
+        }
+
+        .gantt-amino-tag:hover {
+            transform: scale(1.15);
+            filter: brightness(1.1);
+        }
+
+        .gantt-amino-tag.tag-clients { background: #1D4ED8; }
+        .gantt-amino-tag.tag-cases { background: #6D28D9; }
+        .gantt-amino-tag.tag-events { background: #C2410C; }
+        .gantt-amino-tag.tag-applications { background: #15803D; }
+        .gantt-amino-tag.tag-users { background: #0F766E; }
+
+        .gantt-amino-tag i {
+            font-size: 0.55rem;
+        }
+
         .gantt-empty {
             display: flex;
             flex-direction: column;
@@ -19273,6 +19384,16 @@
             overflow: hidden;
             text-overflow: ellipsis;
             cursor: pointer;
+            display: flex;
+            align-items: center;
+            gap: 0.25rem;
+        }
+
+        .calendar-task-name {
+            overflow: hidden;
+            text-overflow: ellipsis;
+            flex: 1;
+            min-width: 0;
         }
 
         .calendar-task.pending {
@@ -19293,6 +19414,46 @@
         .calendar-task.overdue {
             background: rgba(239, 68, 68, 0.15);
             color: #DC2626;
+        }
+
+        /* Calendar Amino Tags */
+        .calendar-amino-tags {
+            display: inline-flex;
+            gap: 0.15rem;
+            flex-shrink: 0;
+        }
+
+        .calendar-amino-tag {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            width: 14px;
+            height: 14px;
+            border-radius: 50%;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            color: white;
+        }
+
+        .calendar-amino-tag:hover {
+            transform: scale(1.2);
+            filter: brightness(1.1);
+        }
+
+        .calendar-amino-tag.tag-clients { background: #1D4ED8; }
+        .calendar-amino-tag.tag-cases { background: #6D28D9; }
+        .calendar-amino-tag.tag-events { background: #C2410C; }
+        .calendar-amino-tag.tag-applications { background: #15803D; }
+        .calendar-amino-tag.tag-users { background: #0F766E; }
+
+        .calendar-amino-tag i {
+            font-size: 0.5rem;
+        }
+
+        .calendar-amino-more {
+            font-size: 0.55rem;
+            color: #8B6F47;
+            font-weight: 500;
         }
 
         .calendar-empty {
@@ -51584,6 +51745,7 @@ Options:
                                 <th onclick="sortTaskTable('dueDate')" class="sortable">
                                     Due Date <i class="ph ${getSortIcon('dueDate')}"></i>
                                 </th>
+                                <th>Linked</th>
                             </tr>
                         </thead>
                         <tbody>
@@ -51606,6 +51768,19 @@ Options:
                     'completed': 'Done'
                 };
 
+                // Render amino tags for the row
+                const aminoTags = task.airtableTags || [];
+                const aminoTagsHtml = aminoTags.length > 0 ? aminoTags.map(tag => {
+                    const config = AirtableAPI.getTableConfig(tag.type);
+                    const icon = config?.icon || 'ph-tag';
+                    return `<div class="table-amino-tag tag-${tag.type}"
+                                 onclick="event.stopPropagation(); openAirtableTagInAmino('${encodeURIComponent(JSON.stringify(tag))}')"
+                                 title="Open in Amino: ${tag.label}">
+                        <i class="ph ${icon}"></i>
+                        <span>${tag.label}</span>
+                    </div>`;
+                }).join('') : '<span class="task-table-empty">-</span>';
+
                 html += `
                     <tr onclick="showEntityDetails('${task.id}')" style="cursor: pointer;">
                         <td class="task-table-name">
@@ -51620,6 +51795,7 @@ Options:
                         <td class="${dueDateStatus}">
                             ${task.dueDate ? formatDateShort(task.dueDate) : '<span class="task-table-empty">-</span>'}
                         </td>
+                        <td class="task-table-amino">${aminoTagsHtml}</td>
                     </tr>
                 `;
             });
@@ -51775,10 +51951,27 @@ Options:
                     const roleRel = relationships.find(r => r.object === task.id && r.predicate === 'CON');
                     const role = roleRel ? entities.role.find(r => r.id === roleRel.subject) : null;
 
+                    // Render amino tags for timeline task
+                    const aminoTags = task.airtableTags || [];
+                    const aminoTagsHtml = aminoTags.length > 0 ? `
+                        <div class="timeline-task-amino-tags">
+                            ${aminoTags.map(tag => {
+                                const config = AirtableAPI.getTableConfig(tag.type);
+                                const icon = config?.icon || 'ph-tag';
+                                return `<div class="timeline-amino-tag tag-${tag.type}"
+                                             onclick="event.stopPropagation(); openAirtableTagInAmino('${encodeURIComponent(JSON.stringify(tag))}')"
+                                             title="Open in Amino: ${tag.label}">
+                                    <i class="ph ${icon}"></i>
+                                </div>`;
+                            }).join('')}
+                        </div>
+                    ` : '';
+
                     html += `
                         <div class="timeline-task ${task.status}" onclick="showEntityDetails('${task.id}')">
                             <div class="timeline-task-name">${task.name}</div>
                             ${role ? `<div class="timeline-task-role">${role.name}</div>` : ''}
+                            ${aminoTagsHtml}
                         </div>
                     `;
                 });
@@ -53566,6 +53759,22 @@ Options:
                 const statusClass = task.status === 'completed' ? 'completed' :
                                    task.status === 'in_progress' ? 'in-progress' : 'pending';
 
+                // Render amino tags for gantt row
+                const aminoTags = task.airtableTags || [];
+                const aminoTagsHtml = aminoTags.length > 0 ? `
+                    <div class="gantt-amino-tags">
+                        ${aminoTags.map(tag => {
+                            const config = AirtableAPI.getTableConfig(tag.type);
+                            const icon = config?.icon || 'ph-tag';
+                            return `<div class="gantt-amino-tag tag-${tag.type}"
+                                         onclick="event.stopPropagation(); openAirtableTagInAmino('${encodeURIComponent(JSON.stringify(tag))}')"
+                                         title="Open in Amino: ${tag.label}">
+                                <i class="ph ${icon}"></i>
+                            </div>`;
+                        }).join('')}
+                    </div>
+                ` : '';
+
                 // Calculate bar position
                 let barHtml = '';
                 if (task.dueDate) {
@@ -53603,6 +53812,7 @@ Options:
                         <div class="gantt-task-cell" onclick="openTaskModal('${task.id}')" style="cursor: pointer;">
                             <div class="gantt-task-status ${statusClass}"></div>
                             <span style="overflow: hidden; text-overflow: ellipsis; white-space: nowrap;">${task.name}</span>
+                            ${aminoTagsHtml}
                         </div>
                         <div class="gantt-bar-area">
                             ${barHtml}
@@ -53704,9 +53914,27 @@ Options:
                     const statusClass = isOverdue ? 'overdue' :
                                        task.status === 'completed' ? 'completed' :
                                        task.status === 'in_progress' ? 'in-progress' : 'pending';
+
+                    // Render amino tags for calendar task
+                    const aminoTags = task.airtableTags || [];
+                    const aminoTagsHtml = aminoTags.length > 0 ? `
+                        <span class="calendar-amino-tags">
+                            ${aminoTags.slice(0, 2).map(tag => {
+                                const config = AirtableAPI.getTableConfig(tag.type);
+                                const icon = config?.icon || 'ph-tag';
+                                return `<span class="calendar-amino-tag tag-${tag.type}"
+                                             onclick="event.stopPropagation(); openAirtableTagInAmino('${encodeURIComponent(JSON.stringify(tag))}')"
+                                             title="Open in Amino: ${tag.label}">
+                                    <i class="ph ${icon}"></i>
+                                </span>`;
+                            }).join('')}${aminoTags.length > 2 ? `<span class="calendar-amino-more">+${aminoTags.length - 2}</span>` : ''}
+                        </span>
+                    ` : '';
+
                     tasksHtml += `
                         <div class="calendar-task ${statusClass}" onclick="event.stopPropagation(); openTaskModal('${task.id}')" title="${task.name}">
-                            ${task.name}
+                            <span class="calendar-task-name">${task.name}</span>
+                            ${aminoTagsHtml}
                         </div>
                     `;
                 });
