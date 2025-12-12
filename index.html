@@ -26005,7 +26005,6 @@ John Doe,Engineering,john@example.com"
                     console.log(`📝 Adding user to history: ${user.name} (${user.id})`);
 
                     await logActivityToXano({
-                        event_verb: 'INS',
                         eo_operator: 'INS',
                         k_frame: 'User Import',
                         object_type: 'person',
@@ -26013,7 +26012,6 @@ John Doe,Engineering,john@example.com"
                         object_label: user.name,
                         data_json: {
                             entity_type: 'person',
-                            entity_name: user.name,
                             email: user.email || '',
                             airtableId: user.airtableId,
                             source: 'airtable_sync',
@@ -26029,12 +26027,11 @@ John Doe,Engineering,john@example.com"
                         (a.object_id === removedId || a.entity_id === removedId) &&
                         a.object_type === 'person'
                     );
-                    const userName = userActivity?.object_label || userActivity?.entity_name || 'Unknown User';
+                    const userName = userActivity?.object_label || 'Unknown User';
 
                     console.log(`📝 Logging removal for user: ${userName} (${removedId})`);
 
                     await logActivityToXano({
-                        event_verb: 'NUL',
                         eo_operator: 'NUL',
                         k_frame: 'User Removal',
                         object_type: 'person',
@@ -26042,7 +26039,6 @@ John Doe,Engineering,john@example.com"
                         object_label: userName,
                         data_json: {
                             entity_type: 'person',
-                            entity_name: userName,
                             source: 'airtable_sync',
                             reason: 'User removed from Airtable Users table'
                         }
@@ -26188,7 +26184,6 @@ John Doe,Engineering,john@example.com"
 
             // Log activity
             logActivityToXano({
-                event_verb: 'CON',
                 eo_operator: 'CON',
                 k_frame: 'Task Connection',
                 object_type: 'task_link',
@@ -26245,7 +26240,6 @@ John Doe,Engineering,john@example.com"
 
                     // Log the cascading change
                     logActivityToXano({
-                        event_verb: 'ALT',
                         eo_operator: 'ALT',
                         k_frame: 'Cascade Date',
                         object_type: 'task',
@@ -26464,7 +26458,6 @@ John Doe,Engineering,john@example.com"
 
             // Log activity
             logActivityToXano({
-                event_verb: 'INS',
                 eo_operator: 'INS',
                 k_frame: 'Workflow Template',
                 object_type: 'workflow_template',
@@ -26511,7 +26504,6 @@ John Doe,Engineering,john@example.com"
             saveToLocalStorage();
 
             logActivityToXano({
-                event_verb: 'CON',
                 eo_operator: 'CON',
                 k_frame: 'Workflow Instance',
                 object_type: 'workflow_instance',
@@ -26632,7 +26624,6 @@ John Doe,Engineering,john@example.com"
             saveToLocalStorage();
 
             logActivityToXano({
-                event_verb: 'ALT',
                 eo_operator: 'ALT',
                 k_frame: 'Violation Resolution',
                 object_type: 'workflow_violation',
@@ -27364,7 +27355,7 @@ John Doe,Engineering,john@example.com"
         }
 
         function getHistoryItemIcon(activity) {
-            const operator = (activity.eo_operator || activity.event_verb || '').toUpperCase();
+            const operator = (activity.eo_operator || '').toUpperCase();
             const kFrame = (activity.k_frame || '').toLowerCase();
 
             // Base icons by EO operator
@@ -27447,7 +27438,7 @@ John Doe,Engineering,john@example.com"
         }
 
         function formatHistoryItemAction(activity) {
-            const eventVerb = (activity.event_verb || activity.event_type || '').toUpperCase();
+            const eventVerb = (activity.eo_operator || activity.event_type || '').toUpperCase();
             const kFrame = activity.k_frame || '';
 
             // EO operator labels
@@ -28553,7 +28544,7 @@ John Doe,Engineering,john@example.com"
 
             // Log activity
             logActivityToXano({
-                event_verb: 'Add Entity',
+                eo_operator: 'INS',
                 object_type: type,
                 object_label: name
             });
@@ -29576,7 +29567,6 @@ Cmd/Ctrl + K - Command palette
 
                 // Log removal
                 logActivityToXano({
-                    event_verb: 'NUL',
                     eo_operator: 'NUL',
                     k_frame: 'Parent Removal',
                     object_type: 'relationship',
@@ -29584,7 +29574,6 @@ Cmd/Ctrl + K - Command palette
                     object_label: `Removed parent from ${currentModalEntity.name}`,
                     data_json: {
                         entity_id: entityId,
-                        entity_name: currentModalEntity.name,
                         old_parent_id: oldRel.subject
                     }
                 });
@@ -29604,7 +29593,6 @@ Cmd/Ctrl + K - Command palette
 
             // Log to Xano
             logActivityToXano({
-                event_verb: 'DES',
                 eo_operator: 'DES',
                 k_frame: 'Parent Assignment',
                 object_type: 'relationship',
@@ -29649,7 +29637,6 @@ Cmd/Ctrl + K - Command palette
 
                 // Log removal
                 logActivityToXano({
-                    event_verb: 'NUL',
                     eo_operator: 'NUL',
                     k_frame: 'Parent Removal',
                     object_type: 'relationship',
@@ -29657,7 +29644,6 @@ Cmd/Ctrl + K - Command palette
                     object_label: `Removed ${currentModalEntity.name} from ${oldParent?.name || 'parent'}`,
                     data_json: {
                         entity_id: entityId,
-                        entity_name: currentModalEntity.name,
                         old_parent_id: oldRel.subject,
                         old_parent_name: oldParent?.name
                     }
@@ -29961,7 +29947,6 @@ Cmd/Ctrl + K - Command palette
 
             // Log to Xano
             logActivityToXano({
-                event_verb: 'DES',
                 eo_operator: 'DES',
                 k_frame: 'Quick Create',
                 object_type: 'work_product',
@@ -29969,7 +29954,6 @@ Cmd/Ctrl + K - Command palette
                 object_label: newWorkProduct.name,
                 data_json: {
                     entity_type: 'work_product',
-                    entity_name: newWorkProduct.name,
                     created_from: 'connection_panel'
                 }
             });
@@ -30029,7 +30013,6 @@ Cmd/Ctrl + K - Command palette
 
             // Log to Xano
             logActivityToXano({
-                event_verb: operatorCode,
                 eo_operator: operatorCode,
                 k_frame: 'Connection',
                 object_type: 'relationship',
@@ -30879,7 +30862,6 @@ Cmd/Ctrl + K - Command palette
 
             // Log to Xano
             logActivityToXano({
-                event_verb: operatorCode,
                 eo_operator: operatorCode,
                 k_frame: 'Connection',
                 object_type: 'relationship',
@@ -31045,7 +31027,6 @@ Cmd/Ctrl + K - Command palette
             // Log to Xano
             const operatorData = eoOperators['DES'];
             logActivityToXano({
-                event_verb: 'DES',
                 eo_operator: 'DES',
                 k_frame: 'Entity Nesting',
                 object_type: 'relationship',
@@ -31196,7 +31177,6 @@ Cmd/Ctrl + K - Command palette
             // Log to Xano
             const operatorData = eoOperators['DES'];
             logActivityToXano({
-                event_verb: 'DES',
                 eo_operator: 'DES',
                 k_frame: 'Entity Nesting',
                 object_type: 'relationship',
@@ -31263,7 +31243,6 @@ Cmd/Ctrl + K - Command palette
             });
 
             logActivityToXano({
-                event_verb: operatorCode,
                 eo_operator: operatorCode,
                 k_frame: 'Relationship',
                 object_type: 'relationship',
@@ -31327,7 +31306,6 @@ Cmd/Ctrl + K - Command palette
             // Log to Xano
             const operatorData = eoOperators['DES'];
             logActivityToXano({
-                event_verb: 'DES',
                 eo_operator: 'DES',
                 k_frame: 'Entity Nesting',
                 object_type: 'relationship',
@@ -31417,7 +31395,6 @@ Cmd/Ctrl + K - Command palette
 
             // Log to Xano
             logActivityToXano({
-                event_verb: operatorCode,
                 eo_operator: operatorCode,
                 k_frame: 'Activity',
                 object_type: 'relationship',
@@ -31654,7 +31631,6 @@ Cmd/Ctrl + K - Command palette
 
             // Log to Xano
             logActivityToXano({
-                event_verb: 'INS',
                 eo_operator: 'INS',
                 k_frame: 'Role Assignment',
                 object_type: 'relationship',
@@ -31783,7 +31759,6 @@ Cmd/Ctrl + K - Command palette
 
             // Log to Xano
             logActivityToXano({
-                event_verb: 'INS',
                 eo_operator: 'INS',
                 k_frame: 'Role Assignment',
                 object_type: 'relationship',
@@ -31849,7 +31824,6 @@ Cmd/Ctrl + K - Command palette
 
             // Log to Xano
             logActivityToXano({
-                event_verb: 'NUL',
                 eo_operator: 'NUL',
                 k_frame: 'Role Removal',
                 object_type: 'relationship',
@@ -31940,7 +31914,6 @@ Cmd/Ctrl + K - Command palette
 
             // Log to Xano
             logActivityToXano({
-                event_verb: 'DES',
                 eo_operator: 'DES',
                 k_frame: 'Role to ' + (parentEntity.type === 'team' ? 'Team' : 'Unit'),
                 object_type: 'relationship',
@@ -32006,7 +31979,6 @@ Cmd/Ctrl + K - Command palette
 
             // Log to Xano
             logActivityToXano({
-                event_verb: 'NUL',
                 eo_operator: 'NUL',
                 k_frame: 'Role from ' + (parent?.type === 'team' ? 'Team' : 'Unit'),
                 object_type: 'relationship',
@@ -32095,7 +32067,6 @@ Cmd/Ctrl + K - Command palette
 
             // Log to Xano
             logActivityToXano({
-                event_verb: 'DES',
                 eo_operator: 'DES',
                 k_frame: 'Team to ' + (parentEntity.type === 'unit' ? 'Unit' : 'Team'),
                 object_type: 'relationship',
@@ -32161,7 +32132,6 @@ Cmd/Ctrl + K - Command palette
 
             // Log to Xano
             logActivityToXano({
-                event_verb: 'NUL',
                 eo_operator: 'NUL',
                 k_frame: 'Team from ' + (parent?.type === 'unit' ? 'Unit' : 'Team'),
                 object_type: 'relationship',
@@ -32250,7 +32220,6 @@ Cmd/Ctrl + K - Command palette
 
             // Log to Xano
             logActivityToXano({
-                event_verb: 'DES',
                 eo_operator: 'DES',
                 k_frame: 'Role to Team',
                 object_type: 'relationship',
@@ -32363,7 +32332,6 @@ Cmd/Ctrl + K - Command palette
 
             // Log to Xano
             logActivityToXano({
-                event_verb: 'DES',
                 eo_operator: 'DES',
                 k_frame: 'Sub-Team to Team',
                 object_type: 'relationship',
@@ -32429,7 +32397,6 @@ Cmd/Ctrl + K - Command palette
 
             // Log to Xano
             logActivityToXano({
-                event_verb: 'NUL',
                 eo_operator: 'NUL',
                 k_frame: 'Sub-Team from Team',
                 object_type: 'relationship',
@@ -32524,7 +32491,6 @@ Cmd/Ctrl + K - Command palette
             });
 
             logActivityToXano({
-                event_verb: 'DES',
                 eo_operator: 'DES',
                 k_frame: 'Unit to Parent',
                 object_type: 'relationship',
@@ -32570,7 +32536,6 @@ Cmd/Ctrl + K - Command palette
             });
 
             logActivityToXano({
-                event_verb: 'NUL',
                 eo_operator: 'NUL',
                 k_frame: 'Unit from Parent',
                 object_type: 'relationship',
@@ -32646,7 +32611,6 @@ Cmd/Ctrl + K - Command palette
             });
 
             logActivityToXano({
-                event_verb: 'DES',
                 eo_operator: 'DES',
                 k_frame: 'Sub-Unit',
                 object_type: 'relationship',
@@ -32692,7 +32656,6 @@ Cmd/Ctrl + K - Command palette
             });
 
             logActivityToXano({
-                event_verb: 'NUL',
                 eo_operator: 'NUL',
                 k_frame: 'Sub-Unit Removal',
                 object_type: 'relationship',
@@ -32763,7 +32726,6 @@ Cmd/Ctrl + K - Command palette
             });
 
             logActivityToXano({
-                event_verb: 'DES',
                 eo_operator: 'DES',
                 k_frame: 'Team to Unit',
                 object_type: 'relationship',
@@ -32809,7 +32771,6 @@ Cmd/Ctrl + K - Command palette
             });
 
             logActivityToXano({
-                event_verb: 'NUL',
                 eo_operator: 'NUL',
                 k_frame: 'Team from Unit',
                 object_type: 'relationship',
@@ -32880,7 +32841,6 @@ Cmd/Ctrl + K - Command palette
             });
 
             logActivityToXano({
-                event_verb: 'DES',
                 eo_operator: 'DES',
                 k_frame: 'Role to Unit',
                 object_type: 'relationship',
@@ -32926,7 +32886,6 @@ Cmd/Ctrl + K - Command palette
             });
 
             logActivityToXano({
-                event_verb: 'NUL',
                 eo_operator: 'NUL',
                 k_frame: 'Role from Unit',
                 object_type: 'relationship',
@@ -33022,7 +32981,6 @@ Cmd/Ctrl + K - Command palette
 
             // Log to Xano
             logActivityToXano({
-                event_verb: 'ALT',
                 eo_operator: 'ALT',
                 k_frame: 'Entity Modification',
                 object_type: currentModalEntityType,
@@ -33105,14 +33063,12 @@ Cmd/Ctrl + K - Command palette
 
             // Log to Xano
             logActivityToXano({
-                event_verb: 'ALT',
                 eo_operator: 'ALT',
                 k_frame: 'Description Change',
                 object_type: currentModalEntityType,
                 object_id: currentModalEntity.id,
                 object_label: `Updated description for ${currentModalEntity.name}`,
                 data_json: {
-                    entity_name: currentModalEntity.name,
                     old_description: currentDesc,
                     new_description: newDesc,
                     entity_type: currentModalEntityType
@@ -33218,7 +33174,6 @@ Cmd/Ctrl + K - Command palette
             // Log to Xano with consistent field tracking
             if (nameChanged) {
                 logActivityToXano({
-                    event_verb: 'ALT',
                     eo_operator: 'ALT',
                     k_frame: 'Name Change',
                     object_type: currentModalEntityType,
@@ -33234,7 +33189,6 @@ Cmd/Ctrl + K - Command palette
 
             if (descChanged) {
                 logActivityToXano({
-                    event_verb: 'ALT',
                     eo_operator: 'ALT',
                     k_frame: 'Description Change',
                     object_type: currentModalEntityType,
@@ -33400,14 +33354,12 @@ Cmd/Ctrl + K - Command palette
 
             // Log to Xano
             logActivityToXano({
-                event_verb: 'NUL',
                 eo_operator: 'NUL',
                 k_frame: 'Entity Nullification',
                 object_type: entityType,
                 object_id: entityId,
                 object_label: entityName,
                 data_json: {
-                    entity_name: entityName,
                     entity_type: entityType,
                     removed_relationships: removedRelationships.length
                 }
@@ -33626,7 +33578,6 @@ Cmd/Ctrl + K - Command palette
 
             // Log to Xano
             logActivityToXano({
-                event_verb: 'ALT',
                 eo_operator: 'ALT',
                 k_frame: 'Connection Modification',
                 object_type: 'relationship',
@@ -33701,7 +33652,6 @@ Cmd/Ctrl + K - Command palette
 
             // Log deletion to Xano
             logActivityToXano({
-                event_verb: 'NUL',
                 eo_operator: 'NUL',
                 k_frame: 'Removal',
                 object_type: 'relationship',
@@ -34534,7 +34484,6 @@ Cmd/Ctrl + K - Command palette
                         entity_id: agentId,
                         event_type: 'AGENT_DECLARED',
                         data: {
-                            event_verb: 'DES',
                             eo_operator: 'DES',
                             k_frame: 'Agent Declaration',
                             agent_type: aminoUser ? 'amino_user' : 'anonymous',
@@ -34577,7 +34526,7 @@ Cmd/Ctrl + K - Command palette
 
         async function logActivityToXano(activity, showToast = true) {
             const activityLabel = activity.object_label || activity.object_type || 'item';
-            const eventType = activity.eo_operator || activity.event_verb || 'action';
+            const eventType = activity.eo_operator || 'action';
 
             // Get Amino user info if available
             const aminoUser = AminoIdentity.getUser();
@@ -34606,7 +34555,6 @@ Cmd/Ctrl + K - Command palette
                     entity_id: activity.object_id || '',
                     event_type: eventType,
                     data: {
-                        event_verb: activity.event_verb,
                         eo_operator: activity.eo_operator,
                         agent_type: agentType,
                         agent_id: agentId,
@@ -34815,7 +34763,7 @@ Cmd/Ctrl + K - Command palette
             }
 
             const items = history.map(h => {
-                const operator = (h.eo_operator || h.event_verb || '').toLowerCase();
+                const operator = (h.eo_operator || '').toLowerCase();
                 const iconClass = ['alt', 'des', 'con', 'nul', 'ins', 'seg', 'syn', 'sup', 'rec'].includes(operator) ? operator : 'alt';
                 const icon = getHistoryIcon(h);
                 const action = formatHistoryAction(h);
@@ -34849,9 +34797,8 @@ Cmd/Ctrl + K - Command palette
         // Get icon for history action type - supports literal EO operators with k_frame
         function getHistoryIcon(activity) {
             // Handle both object and string input for backwards compatibility
-            const eventVerb = typeof activity === 'string' ? activity : (activity.event_verb || '');
+            const operator = (typeof activity === 'string' ? activity : (activity.eo_operator || '')).toUpperCase();
             const kFrame = typeof activity === 'object' ? (activity.k_frame || '').toLowerCase() : '';
-            const operator = (typeof activity === 'object' ? (activity.eo_operator || eventVerb) : eventVerb).toUpperCase();
 
             // Base icons by EO operator
             const operatorIcons = {
@@ -34912,7 +34859,7 @@ Cmd/Ctrl + K - Command palette
 
         // Format the action text for history
         function formatHistoryAction(h) {
-            const verb = (h.event_verb || h.event_type || '').toUpperCase();
+            const verb = (h.eo_operator || h.event_type || '').toUpperCase();
             const kFrame = h.k_frame || '';
 
             // EO operator labels
@@ -35038,7 +34985,7 @@ Cmd/Ctrl + K - Command palette
                     // Create new entity
                     const entity = {
                         id: objectId,
-                        name: objectLabel || activity.entity_name || 'Untitled',
+                        name: objectLabel || 'Untitled',
                         type: objectType,
                         description: activity.description || '',
                         createdAt: activity.created_at
@@ -35266,7 +35213,7 @@ Cmd/Ctrl + K - Command palette
                     payload.data = updates.data;
                 } else {
                     // Check for individual data fields and merge them
-                    const dataFields = ['event_verb', 'eo_operator', 'agent_type', 'agent_id',
+                    const dataFields = ['eo_operator', 'agent_type', 'agent_id',
                                        'agent_name', 'object_type', 'object_id', 'object_label'];
                     const dataUpdates = {};
                     let hasDataUpdates = false;
@@ -35526,15 +35473,13 @@ Cmd/Ctrl + K - Command palette
 
             // Log to Xano activity store
             logActivityToXano({
-                event_verb: 'INS',
                 eo_operator: 'INS',
                 k_frame: 'Entity Creation',
                 object_type: selectedEntityType,
                 object_id: id,
                 object_label: name,
                 data_json: {
-                    entity_type: selectedEntityType,
-                    entity_name: name
+                    entity_type: selectedEntityType
                 }
             });
 
@@ -35563,7 +35508,6 @@ Cmd/Ctrl + K - Command palette
 
                 // Log parent relationship to Xano
                 logActivityToXano({
-                    event_verb: 'DES',
                     eo_operator: 'DES',
                     k_frame: 'Connection Definition',
                     object_type: 'relationship',
@@ -35733,7 +35677,6 @@ Cmd/Ctrl + K - Command palette
 
             // Log to Xano activity store
             logActivityToXano({
-                event_verb: 'NUL', // NUL = Nullification
                 k_frame: 'Removal',
                 eo_operator: 'NUL',
                 object_type: type,
@@ -35741,7 +35684,6 @@ Cmd/Ctrl + K - Command palette
                 object_label: entity.name,
                 data_json: {
                     entity_type: type,
-                    entity_name: entity.name,
                     action: 'deleted'
                 }
             });
@@ -36496,7 +36438,6 @@ Cmd/Ctrl + K - Command palette
 
             // Log to Xano activity store (append-only)
             logActivityToXano({
-                event_verb: operatorCode, // Use the literal operator
                 k_frame: 'Connection',
                 eo_operator: selectedPredicate, // Store EO code (DES, INS, etc)
                 object_type: 'relationship',
@@ -36730,7 +36671,6 @@ Cmd/Ctrl + K - Command palette
 
             // Log to Xano
             logActivityToXano({
-                event_verb: 'INS',
                 eo_operator: 'INS',
                 k_frame: 'Entity Creation',
                 object_type: 'product',
@@ -36738,7 +36678,6 @@ Cmd/Ctrl + K - Command palette
                 object_label: name,
                 data_json: {
                     entity_type: 'product',
-                    entity_name: name,
                     created_from: 'quick_create_product'
                 }
             });
@@ -36961,7 +36900,6 @@ Cmd/Ctrl + K - Command palette
 
             // Log to Xano
             logActivityToXano({
-                event_verb: 'INS',
                 eo_operator: 'INS',
                 k_frame: 'Entity Creation',
                 object_type: 'product',
@@ -36969,7 +36907,6 @@ Cmd/Ctrl + K - Command palette
                 object_label: name,
                 data_json: {
                     entity_type: 'product',
-                    entity_name: name,
                     created_from: 'work_product_modal'
                 }
             });
@@ -37062,7 +36999,6 @@ Cmd/Ctrl + K - Command palette
             // Log to Xano
             const operatorData = eoOperators[operatorCode];
             logActivityToXano({
-                event_verb: operatorCode,
                 eo_operator: operatorCode,
                 k_frame: 'Activity',
                 object_type: 'relationship',
@@ -41489,7 +41425,6 @@ Cmd/Ctrl + K - Command palette
 
                     // Log workspace import to Xano API
                     logActivityToXano({
-                        event_verb: 'INS',
                         eo_operator: 'INS',
                         k_frame: 'Workspace (JSON Import)',
                         object_type: 'workspace',
@@ -41507,7 +41442,6 @@ Cmd/Ctrl + K - Command palette
                     for (const entityType of Object.keys(data.entities)) {
                         for (const entity of data.entities[entityType]) {
                             logActivityToXano({
-                                event_verb: 'INS',
                                 eo_operator: 'INS',
                                 k_frame: 'Entity (JSON Import)',
                                 object_type: entityType,
@@ -41515,7 +41449,6 @@ Cmd/Ctrl + K - Command palette
                                 object_label: entity.name,
                                 data_json: {
                                     entity_type: entityType,
-                                    entity_name: entity.name,
                                     workspace_id: wsId,
                                     import_source: 'json_import'
                                 }
@@ -41528,7 +41461,6 @@ Cmd/Ctrl + K - Command palette
                         const subjectEntity = findEntity(rel.subject);
                         const objectEntity = findEntity(rel.object);
                         logActivityToXano({
-                            event_verb: rel.predicate || 'CON',
                             eo_operator: rel.predicate || 'CON',
                             k_frame: 'Connection (JSON Import)',
                             object_type: 'relationship',
@@ -42489,7 +42421,6 @@ Cmd/Ctrl + K - Command palette
 
                 // Log to Xano (suppress individual toasts for bulk operations)
                 logActivityToXano({
-                    event_verb: 'INS',
                     eo_operator: 'INS',
                     k_frame: 'Entity (Bulk Import)',
                     object_type: entityType,
@@ -42497,7 +42428,6 @@ Cmd/Ctrl + K - Command palette
                     object_label: name,
                     data_json: {
                         entity_type: entityType,
-                        entity_name: name,
                         import_source: 'bulk_import'
                     }
                 }, false);
@@ -42538,7 +42468,6 @@ Cmd/Ctrl + K - Command palette
 
                             // Log relationship (suppress individual toasts for bulk operations)
                             logActivityToXano({
-                                event_verb: predicate,
                                 eo_operator: predicate,
                                 k_frame: 'Connection (Bulk Import)',
                                 object_type: 'relationship',
@@ -44315,7 +44244,6 @@ Cmd/Ctrl + K - Command palette
 
             // Log activity (non-blocking)
             logActivityToXano({
-                event_verb: 'CON',
                 eo_operator: 'CON',
                 k_frame: 'Airtable Record Link',
                 object_type: 'task',
@@ -44356,7 +44284,6 @@ Cmd/Ctrl + K - Command palette
 
             // Log activity
             logActivityToXano({
-                event_verb: 'NUL',
                 eo_operator: 'NUL',
                 k_frame: 'Airtable Record Unlink',
                 object_type: 'task',
@@ -44638,7 +44565,6 @@ Cmd/Ctrl + K - Command palette
 
                 // Log to Xano with full history tracking
                 logActivityToXano({
-                    event_verb: 'ALT',
                     eo_operator: 'ALT',
                     k_frame: 'Description Change',
                     object_type: 'task',
@@ -44779,7 +44705,6 @@ Options:
 
             // Log activity with full history tracking
             logActivityToXano({
-                event_verb: 'ALT',
                 eo_operator: 'ALT',
                 k_frame: 'Status Change',
                 object_type: 'task',
@@ -45634,7 +45559,7 @@ Options:
             entities.role.push(role);
 
             logActivityToXano({
-                event_verb: 'INS',
+                eo_operator: 'INS',
                 k_frame: 'Entity Creation',
                 object_type: 'role',
                 object_label: name
@@ -45967,7 +45892,6 @@ Options:
                 // Log role-task relationship
                 const role = entities.role.find(r => r.id === roleId);
                 logActivityToXano({
-                    event_verb: 'CON',
                     eo_operator: 'CON',
                     k_frame: 'Connection',
                     object_type: 'relationship',
@@ -45983,14 +45907,12 @@ Options:
 
             // Log task creation activity
             logActivityToXano({
-                event_verb: 'INS',
                 eo_operator: 'INS',
                 k_frame: 'Entity Creation',
                 object_type: 'task',
                 object_id: taskId,
                 object_label: taskName,
                 data_json: {
-                    entity_name: taskName,
                     description: description,
                     dueDate: quickAddModalState.dueDate,
                     status: 'pending',
@@ -46647,7 +46569,7 @@ Options:
 
             // Log activity
             logActivityToXano({
-                event_verb: 'INS',
+                eo_operator: 'INS',
                 k_frame: 'Entity Creation',
                 object_type: 'task',
                 object_label: taskName
@@ -46987,7 +46909,6 @@ Options:
 
             // Log to Xano with full history tracking
             logActivityToXano({
-                event_verb: 'ALT',
                 eo_operator: 'ALT',
                 k_frame: 'Due Date Change',
                 object_type: 'task',
@@ -47043,7 +46964,6 @@ Options:
 
             // Log to Xano with full history tracking
             logActivityToXano({
-                event_verb: 'ALT',
                 eo_operator: 'ALT',
                 k_frame: 'Priority Change',
                 object_type: 'task',
@@ -47612,7 +47532,6 @@ Options:
             // Log activity to Xano (non-blocking)
             const task = entities.task.find(t => t.id === taskId);
             logActivityToXano({
-                event_verb: 'CON',
                 eo_operator: 'CON',
                 k_frame: 'Comment Addition',
                 object_type: 'task',
@@ -48438,7 +48357,6 @@ Options:
             // Log activity to Xano (non-blocking)
             const task = entities.task.find(t => t.id === taskId);
             logActivityToXano({
-                event_verb: reactionAction === 'add' ? 'CON' : 'NUL',
                 eo_operator: reactionAction === 'add' ? 'CON' : 'NUL',
                 k_frame: reactionAction === 'add' ? 'Reaction Addition' : 'Reaction Removal',
                 object_type: 'task',
@@ -48470,7 +48388,6 @@ Options:
             // Log activity to Xano (non-blocking)
             const task = entities.task.find(t => t.id === taskId);
             logActivityToXano({
-                event_verb: 'ALT',
                 eo_operator: 'ALT',
                 k_frame: 'Comment Resolution',
                 object_type: 'task',
@@ -48500,7 +48417,6 @@ Options:
             // Log activity to Xano (non-blocking)
             const task = entities.task.find(t => t.id === taskId);
             logActivityToXano({
-                event_verb: 'ALT',
                 eo_operator: 'ALT',
                 k_frame: 'Comment Unresolve',
                 object_type: 'task',
@@ -48541,7 +48457,6 @@ Options:
                 // Log activity to Xano (non-blocking)
                 const task = entities.task.find(t => t.id === taskId);
                 logActivityToXano({
-                    event_verb: 'ALT',
                     eo_operator: 'ALT',
                     k_frame: 'Comment Edit',
                     object_type: 'task',
@@ -48576,7 +48491,6 @@ Options:
             // Log activity to Xano (non-blocking)
             const task = entities.task.find(t => t.id === taskId);
             logActivityToXano({
-                event_verb: 'NUL',
                 eo_operator: 'NUL',
                 k_frame: 'Comment Deletion',
                 object_type: 'task',
@@ -48950,7 +48864,6 @@ Options:
             saveToLocalStorage();
 
             logActivityToXano({
-                event_verb: 'DES',
                 eo_operator: 'DES',
                 k_frame: 'Subtask Definition',
                 object_type: 'task',
@@ -49161,7 +49074,7 @@ Options:
             entities.role.push(role);
 
             logActivityToXano({
-                event_verb: 'INS',
+                eo_operator: 'INS',
                 k_frame: 'Entity Creation',
                 object_type: 'role',
                 object_label: name
@@ -49194,7 +49107,7 @@ Options:
             entities.person.push(person);
 
             logActivityToXano({
-                event_verb: 'INS',
+                eo_operator: 'INS',
                 k_frame: 'Entity Creation',
                 object_type: 'person',
                 object_label: name
@@ -49236,7 +49149,7 @@ Options:
             entities.workflow.push(workflow);
 
             logActivityToXano({
-                event_verb: 'INS',
+                eo_operator: 'INS',
                 k_frame: 'Entity Creation',
                 object_type: 'workflow',
                 object_label: name
@@ -49425,14 +49338,12 @@ Options:
                 entities.task.push(taskObject);
 
                 logActivityToXano({
-                    event_verb: 'INS',
-                k_frame: 'Entity Creation',
                     eo_operator: 'INS',
+                    k_frame: 'Entity Creation',
                     object_type: 'task',
                     object_id: taskId,
                     object_label: taskName,
                     data_json: {
-                        entity_name: taskName,
                         description: description,
                         dueDate: dueDate || null,
                         status: 'pending',
@@ -49461,9 +49372,8 @@ Options:
                     relationships.push(workflowTaskRel);
 
                     logActivityToXano({
-                        event_verb: 'CON',
-                        k_frame: 'Connection',
                         eo_operator: 'CON',
+                        k_frame: 'Connection',
                         object_type: 'relationship',
                         object_id: workflowTaskRelId,
                         object_label: `${workflow.name} → ${taskName}`,
@@ -49488,9 +49398,8 @@ Options:
                     relationships.push(entityTaskRel);
 
                     logActivityToXano({
-                        event_verb: 'CON',
-                        k_frame: 'Connection',
                         eo_operator: 'CON',
+                        k_frame: 'Connection',
                         object_type: 'relationship',
                         object_id: entityTaskRelId,
                         object_label: `${assignedEntity.name} → ${taskName}`,
@@ -49533,7 +49442,6 @@ Options:
                         relationships.push(personRoleRel);
 
                         logActivityToXano({
-                            event_verb: 'INS',
                             eo_operator: 'INS',
                             k_frame: 'Assignment',
                             object_type: 'relationship',
@@ -50474,7 +50382,7 @@ Options:
                 saveToLocalStorage();
 
                 logActivityToXano({
-                    event_verb: 'ALT',
+                    eo_operator: 'ALT',
                     k_frame: 'Status Change',
                     object_type: 'task',
                     object_label: `${t.name} → ${newStatus}`
@@ -51419,7 +51327,6 @@ Options:
 
             // Log activity
             logActivityToXano({
-                event_verb: 'ALT',
                 eo_operator: 'ALT',
                 k_frame: 'Company Rules Change',
                 object_type: 'company_rules',
@@ -51891,7 +51798,6 @@ Options:
 
             // Log activity to Xano
             await logActivityToXano({
-                event_verb: 'SYN',
                 eo_operator: 'SYN',
                 k_frame: 'Workflow Instantiation',
                 object_type: 'workflow',
