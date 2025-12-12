@@ -43801,7 +43801,7 @@ Cmd/Ctrl + K - Command palette
         }
 
         // Select a record and add it as a tag
-        function selectAirtableRecord(recordId, label, recordCategory = null) {
+        async function selectAirtableRecord(recordId, label, recordCategory = null) {
             const taskId = airtablePickerState.taskId;
             // Use passed category (from 'all' mode) or fall back to selected category
             const category = recordCategory || airtablePickerState.selectedCategory;
@@ -43836,18 +43836,32 @@ Cmd/Ctrl + K - Command palette
                 type: category,
                 table: config.tableId,
                 label: label,
-                clientId: null  // Will be resolved for cases/applications
+                clientId: null
             };
+
+            // For cases and applications, resolve the parent client ID before adding
+            if (category === 'cases' || category === 'applications') {
+                try {
+                    const result = await AirtableAPI.getRecordWithParents(category, recordId);
+                    if (result.clientId) {
+                        tag.clientId = result.clientId;
+                    } else if (result.parents?.client?.id) {
+                        tag.clientId = result.parents.client.id;
+                    }
+                } catch (e) {
+                    console.warn('Could not resolve parent client:', e);
+                }
+            }
 
             // For clients, clientId is the record itself
             if (category === 'clients') {
                 tag.clientId = recordId;
             }
 
-            // Add the tag immediately for instant feedback
+            // Add the tag with resolved clientId
             task.airtableTags.push(tag);
 
-            // Close modal and update UI instantly
+            // Close modal and update UI
             closeAirtableTagPicker();
             showToast(`Linked ${label} to task`, 'success');
 
@@ -43859,7 +43873,7 @@ Cmd/Ctrl + K - Command palette
                 }
             }
 
-            // Save immediately
+            // Save with resolved clientId
             saveToLocalStorage();
 
             // Log activity (non-blocking)
@@ -43875,21 +43889,6 @@ Cmd/Ctrl + K - Command palette
                     airtable_label: label
                 }
             });
-
-            // For cases and applications, resolve the parent client ID in the background
-            if (category === 'cases' || category === 'applications') {
-                AirtableAPI.getRecordWithParents(category, recordId).then(result => {
-                    if (result.clientId) {
-                        tag.clientId = result.clientId;
-                    } else if (result.parents?.client?.id) {
-                        tag.clientId = result.parents.client.id;
-                    }
-                    // Save again with the resolved clientId
-                    saveToLocalStorage();
-                }).catch(e => {
-                    console.warn('Could not resolve parent client:', e);
-                });
-            }
         }
 
         // Remove an Airtable tag from a task
