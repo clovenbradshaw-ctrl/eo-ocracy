@@ -13486,6 +13486,27 @@
             border-left: 3px solid #F57F17;
         }
 
+        /* New task highlight animation */
+        @keyframes taskHighlightPulse {
+            0% {
+                box-shadow: 0 0 0 0 rgba(75, 109, 82, 0.5);
+                background-color: rgba(75, 109, 82, 0.15);
+            }
+            50% {
+                box-shadow: 0 0 0 8px rgba(75, 109, 82, 0);
+                background-color: rgba(75, 109, 82, 0.08);
+            }
+            100% {
+                box-shadow: 0 0 0 0 rgba(75, 109, 82, 0);
+                background-color: transparent;
+            }
+        }
+
+        .task-highlight-new {
+            animation: taskHighlightPulse 1s ease-out 2;
+            border-left: 3px solid #4B6D52 !important;
+        }
+
         /* View dropdown divider */
         .view-dropdown-divider {
             height: 1px;
@@ -48217,10 +48238,7 @@ Options:
                 console.error('Error creating task:', error);
             }
 
-            // Always close modal, even if there was an error
-            closeHeroTaskModal();
-
-            // Refresh UI in a try-catch to prevent errors from blocking
+            // Refresh UI FIRST so task appears instantly before modal closes
             try {
                 renderEntityList();
                 renderActivityList();
@@ -48241,6 +48259,18 @@ Options:
                 }
             } catch (renderError) {
                 console.error('Error refreshing UI after task creation:', renderError);
+            }
+
+            // Close modal AFTER UI is updated so user sees task instantly
+            closeHeroTaskModal();
+
+            // Show success toast and highlight the new task
+            if (taskId) {
+                showToast(`Task "${taskName}" created`, 'success');
+                // Scroll to and highlight the new task after a brief delay for DOM update
+                setTimeout(() => {
+                    scrollToAndHighlightTask(taskId);
+                }, 100);
             }
 
             // Check for pattern emergence (similar tasks or linked chains)
@@ -48480,7 +48510,7 @@ Options:
             const dueDateStatus = getTaskDueDateStatus(task);
 
             return `
-                <div class="task-board-card ${dueDateStatus}" onclick="showEntityDetails('${task.id}')">
+                <div class="task-board-card ${dueDateStatus}" data-task-id="${task.id}" onclick="showEntityDetails('${task.id}')">
                     <div class="task-board-card-header">
                         <div class="task-board-card-title">
                             <i class="ph ph-file-text"></i>
@@ -48691,6 +48721,22 @@ Options:
         // Filter task board
         function filterTaskBoard() {
             renderTaskBoardView();
+        }
+
+        // Scroll to and highlight a newly created task
+        function scrollToAndHighlightTask(taskId) {
+            // Find the task card in any view (board uses data-task-id, kanban uses data-id)
+            const taskCard = document.querySelector(`[data-task-id="${taskId}"], [data-id="${taskId}"]`);
+            if (taskCard) {
+                // Scroll the task into view
+                taskCard.scrollIntoView({ behavior: 'smooth', block: 'center' });
+                // Add highlight animation
+                taskCard.classList.add('task-highlight-new');
+                // Remove highlight after animation completes
+                setTimeout(() => {
+                    taskCard.classList.remove('task-highlight-new');
+                }, 2000);
+            }
         }
 
         // Update task count badge
