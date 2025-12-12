@@ -50294,7 +50294,7 @@ Options:
                     </div>
                     <div class="collapsible-content">
                         ${subtasks.map(subtask => {
-                            const roleRel = relationships.find(r => r.object === subtask.id && r.predicate === 'CON');
+                            const roleRel = relationships.find(r => r.object === subtask.id && r.predicate === 'CON' && r.subject.startsWith('r'));
                             const role = roleRel ? entities.role?.find(r => r.id === roleRel.subject) : null;
 
                             return `
@@ -51115,7 +51115,7 @@ Options:
         function renderBoardTaskCard(task, isInSequence = false) {
             // Find connected role
             const roleRel = relationships.find(r =>
-                r.object === task.id && r.predicate === 'CON'
+                r.object === task.id && r.predicate === 'CON' && r.subject.startsWith('r')
             );
             const role = roleRel ? entities.role.find(r => r.id === roleRel.subject) : null;
 
@@ -51251,7 +51251,7 @@ Options:
                 // Role filter
                 if (filterValue === 'unassigned') {
                     const hasRole = relationships.some(r =>
-                        r.object === task.id && r.predicate === 'CON'
+                        r.object === task.id && r.predicate === 'CON' && r.subject.startsWith('r')
                     );
                     if (hasRole) return false;
                 }
@@ -51463,7 +51463,7 @@ Options:
         // Render a single kanban card
         function renderKanbanCard(task) {
             // Get role and person info
-            const roleRel = relationships.find(r => r.object === task.id && r.predicate === 'CON');
+            const roleRel = relationships.find(r => r.object === task.id && r.predicate === 'CON' && r.subject.startsWith('r'));
             const role = roleRel ? entities.role.find(r => r.id === roleRel.subject) : null;
             let person = null;
             if (role) {
@@ -51933,9 +51933,9 @@ Options:
                         bVal = b.dueDate || '9999-12-31';
                         break;
                     case 'role':
-                        const roleRelA = relationships.find(r => r.object === a.id && r.predicate === 'CON');
+                        const roleRelA = relationships.find(r => r.object === a.id && r.predicate === 'CON' && r.subject.startsWith('r'));
                         const roleA = roleRelA ? entities.role.find(r => r.id === roleRelA.subject) : null;
-                        const roleRelB = relationships.find(r => r.object === b.id && r.predicate === 'CON');
+                        const roleRelB = relationships.find(r => r.object === b.id && r.predicate === 'CON' && r.subject.startsWith('r'));
                         const roleB = roleRelB ? entities.role.find(r => r.id === roleRelB.subject) : null;
                         aVal = roleA ? roleA.name.toLowerCase() : 'zzz';
                         bVal = roleB ? roleB.name.toLowerCase() : 'zzz';
@@ -51984,7 +51984,7 @@ Options:
             `;
 
             sortedTasks.forEach(task => {
-                const roleRel = relationships.find(r => r.object === task.id && r.predicate === 'CON');
+                const roleRel = relationships.find(r => r.object === task.id && r.predicate === 'CON' && r.subject.startsWith('r'));
                 const role = roleRel ? entities.role.find(r => r.id === roleRel.subject) : null;
                 let person = null;
                 if (role) {
@@ -52180,7 +52180,7 @@ Options:
                 `;
 
                 dayTasks.forEach(task => {
-                    const roleRel = relationships.find(r => r.object === task.id && r.predicate === 'CON');
+                    const roleRel = relationships.find(r => r.object === task.id && r.predicate === 'CON' && r.subject.startsWith('r'));
                     const role = roleRel ? entities.role.find(r => r.id === roleRel.subject) : null;
 
                     // Render amino tags for timeline task
