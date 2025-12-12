@@ -21488,6 +21488,42 @@
             text-transform: uppercase;
         }
 
+        /* Event-specific styles for better visibility */
+        .airtable-picker-item .item-info-event {
+            flex: 1;
+            min-width: 0;
+        }
+
+        .airtable-picker-item .item-name-event {
+            font-size: 14px;
+            font-weight: 500;
+            color: #111827;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            margin-bottom: 2px;
+        }
+
+        .airtable-picker-item .item-event-details {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            flex-wrap: wrap;
+        }
+
+        .airtable-picker-item .item-event-status {
+            font-size: 12px;
+            color: #374151;
+        }
+
+        .airtable-picker-item .item-event-type {
+            font-size: 11px;
+            color: #6B7280;
+            background: #F3F4F6;
+            padding: 1px 6px;
+            border-radius: 4px;
+        }
+
         .airtable-picker-footer {
             padding: 12px 20px;
             border-top: 1px solid #E5E7EB;
@@ -43775,6 +43811,50 @@ Cmd/Ctrl + K - Command palette
                 const config = AirtableAPI.getTableConfig(recordCategory);
                 const displayField = config?.displayField || 'Name';
                 const name = record.fields?.[displayField] || record.label || 'Unnamed';
+
+                // Special handling for events to show more details
+                if (recordCategory === 'events') {
+                    // Parse event title format: "⚠️ Reset 🟠 Master | Client Name..."
+                    const eventTitle = name;
+                    let statusInfo = '';
+                    let clientName = eventTitle;
+                    let eventType = '';
+
+                    // Extract client name (after the |)
+                    if (eventTitle.includes('|')) {
+                        const parts = eventTitle.split('|');
+                        statusInfo = parts[0].trim();
+                        clientName = parts.slice(1).join('|').trim();
+                    }
+
+                    // Extract status and type from the first part
+                    // Format: "✅ Completed 🟢 Individual" or "⚠️ Reset 🟠 Master"
+                    const statusMatch = statusInfo.match(/^(.*?)(🟢|🟠|🔵|🔴)\s*(Master|Individual|Group|Virtual|Other)?/i);
+                    let statusText = statusInfo;
+                    if (statusMatch) {
+                        statusText = statusMatch[1].trim();
+                        eventType = statusMatch[3] || '';
+                        const typeEmoji = statusMatch[2];
+                        if (eventType) {
+                            eventType = typeEmoji + ' ' + eventType;
+                        }
+                    }
+
+                    return `
+                        <div class="airtable-picker-item type-${recordCategory}" onclick="${selectFn}('${record.id}', '${escapeHtml(name)}', '${recordCategory}')">
+                            <div class="item-icon" style="background: ${config?.color || '#6B7280'}20; color: ${config?.color || '#6B7280'};">
+                                <i class="ph ${config?.icon || 'ph-tag'}"></i>
+                            </div>
+                            <div class="item-info item-info-event">
+                                <div class="item-name-event">${escapeHtml(clientName)}</div>
+                                <div class="item-event-details">
+                                    <span class="item-event-status">${escapeHtml(statusText)}</span>
+                                    ${eventType ? `<span class="item-event-type">${escapeHtml(eventType)}</span>` : ''}
+                                </div>
+                            </div>
+                        </div>
+                    `;
+                }
 
                 return `
                     <div class="airtable-picker-item type-${recordCategory}" onclick="${selectFn}('${record.id}', '${escapeHtml(name)}', '${recordCategory}')">
