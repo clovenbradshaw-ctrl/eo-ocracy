@@ -23695,7 +23695,7 @@
                     </button>
                     <button class="command-palette-item" data-action="restore" onclick="executeCommand('restore')">
                         <i class="ph ph-cloud-arrow-down"></i>
-                        <span>Restore from Xano</span>
+                        <span>Restore from Cloud</span>
                     </button>
                 </div>
             </div>
@@ -34500,16 +34500,16 @@ Cmd/Ctrl + K - Command palette
             if (statusText) {
                 switch (status) {
                     case 'connected':
-                        statusText.textContent = 'Xano Connected';
-                        indicator.title = `Connected to Xano database. Last sync: ${new Date().toLocaleTimeString()}`;
+                        statusText.textContent = 'Connected';
+                        indicator.title = `Connected to database. Last sync: ${new Date().toLocaleTimeString()}`;
                         break;
                     case 'disconnected':
-                        statusText.textContent = 'Xano Offline';
-                        indicator.title = 'Unable to connect to Xano database. Changes saved locally only.';
+                        statusText.textContent = 'Offline';
+                        indicator.title = 'Unable to connect to database. Changes saved locally only.';
                         break;
                     case 'checking':
                         statusText.textContent = 'Checking...';
-                        indicator.title = 'Checking Xano database connection...';
+                        indicator.title = 'Checking database connection...';
                         break;
                 }
             }
@@ -34958,7 +34958,7 @@ Cmd/Ctrl + K - Command palette
 
         // Check for updates immediately (manual trigger)
         async function checkForUpdatesNow() {
-            showActivityToast('syncing', 'Checking for Updates', 'Contacting Xano...');
+            showActivityToast('syncing', 'Checking for Updates', 'Checking server...');
             await performUpdateCheck();
         }
 
@@ -35169,7 +35169,7 @@ Cmd/Ctrl + K - Command palette
                     console.error('❌ Failed to log activity:', response.statusText);
                     updateXanoStatusIndicator('disconnected');
                     if (showToast) {
-                        showActivityToast('error', 'Sync Failed', `Could not save "${activityLabel}" to Xano`);
+                        showActivityToast('error', 'Sync Failed', `Could not save "${activityLabel}"`);
                     }
                     return null;
                 }
@@ -35182,7 +35182,7 @@ Cmd/Ctrl + K - Command palette
                 updateXanoStatusIndicator('connected', xanoActivityUploadCount);
 
                 if (showToast) {
-                    showActivityToast('success', 'Saved to Xano', `${eventType}: ${activityLabel}`);
+                    showActivityToast('success', 'Saved', `${eventType}: ${activityLabel}`);
                 }
 
                 return result;
@@ -35695,7 +35695,7 @@ Cmd/Ctrl + K - Command palette
             const loadingStatus = document.getElementById('loadingStatus');
             if (loadingStatus) {
                 loadingStatus.style.display = 'block';
-                loadingStatus.innerHTML = '<i class="ph ph-spinner"></i> Restoring from Xano...';
+                loadingStatus.innerHTML = '<i class="ph ph-spinner"></i> Restoring...';
                 loadingStatus.style.background = 'rgba(200, 143, 74, 0.3)';
             }
 
@@ -35703,7 +35703,7 @@ Cmd/Ctrl + K - Command palette
                 const xanoActivities = await getActivitiesFromXano();
 
                 if (!xanoActivities || xanoActivities.length === 0) {
-                    showActivityToast('warning', 'No Data Found', 'No activities found in Xano to restore');
+                    showActivityToast('warning', 'No Data Found', 'No activities found to restore');
                     if (loadingStatus) {
                         loadingStatus.innerHTML = '<i class="ph ph-warning-circle"></i> No data to restore';
                         loadingStatus.style.background = 'rgba(244, 67, 54, 0.3)';
@@ -35767,7 +35767,7 @@ Cmd/Ctrl + K - Command palette
                 else if (currentView === 'card') renderCardView();
                 else if (currentView === 'tasks') renderTasksView();
 
-                showActivityToast('success', 'Data Restored', `Restored ${totalEntities} entities from Xano`);
+                showActivityToast('success', 'Data Restored', `Restored ${totalEntities} entities`);
 
                 if (loadingStatus) {
                     loadingStatus.innerHTML = `<i class="ph ph-check-circle"></i> Restored ${totalEntities} entities`;
@@ -35778,7 +35778,7 @@ Cmd/Ctrl + K - Command palette
                 return true;
             } catch (error) {
                 console.error('Error restoring from Xano:', error);
-                showActivityToast('error', 'Restore Failed', 'Could not restore data from Xano');
+                showActivityToast('error', 'Restore Failed', 'Could not restore data');
                 if (loadingStatus) {
                     loadingStatus.innerHTML = '<i class="ph ph-warning-circle"></i> Restore failed';
                     loadingStatus.style.background = 'rgba(244, 67, 54, 0.3)';
@@ -42429,7 +42429,7 @@ Cmd/Ctrl + K - Command palette
                     }
 
                     // Show summary toast for the import
-                    showActivityToast('success', 'JSON Import Complete', `${totalEntities} entities and ${totalRelationships} relationships synced to Xano`);
+                    showActivityToast('success', 'JSON Import Complete', `${totalEntities} entities and ${totalRelationships} relationships saved`);
 
                     alert(`Successfully imported "${data.workspaceName}" with ${totalEntities} entities and ${totalRelationships} relationships.`);
 
@@ -43465,7 +43465,7 @@ Cmd/Ctrl + K - Command palette
 
             // Show summary toast for bulk import
             if (importedCount > 0) {
-                showActivityToast('success', 'Bulk Import Complete', `${importedCount} ${bulkImportState.entityType}${importedCount !== 1 ? 's' : ''} synced to Xano`);
+                showActivityToast('success', 'Bulk Import Complete', `${importedCount} ${bulkImportState.entityType}${importedCount !== 1 ? 's' : ''} saved`);
             }
 
             // Update footer
@@ -54139,13 +54139,13 @@ Options:
 
             // If no stored data, try to restore from Xano first
             if (!hasStoredData) {
-                updateStatus('Checking Xano for existing data...');
+                updateStatus('Checking for existing data...');
                 console.log('📡 No localStorage data - checking Xano for existing data...');
 
                 getActivitiesFromXano().then(xanoActivities => {
                     if (xanoActivities && xanoActivities.length > 0) {
                         console.log('✅ Found', xanoActivities.length, 'activities in Xano');
-                        updateStatus('Restoring data from Xano...');
+                        updateStatus('Restoring data...');
 
                         // Try to reconstruct entities from activities
                         const reconstructed = reconstructEntitiesFromActivities(xanoActivities);
@@ -54172,7 +54172,7 @@ Options:
                             saveWorkspaces();
 
                             console.log('✅ Restored', totalEntities, 'entities from Xano');
-                            updateStatus(`Restored ${totalEntities} entities from Xano`);
+                            updateStatus(`Restored ${totalEntities} entities`);
 
                             // Update UI
                             const nameEl = document.getElementById('workspaceNameText');
@@ -54196,7 +54196,7 @@ Options:
                     }
                 }).catch(err => {
                     console.error('❌ Xano connection failed:', err);
-                    updateStatus('Xano unavailable - loading sample data', false);
+                    updateStatus('Server unavailable - loading sample data', false);
                     loadSampleDataFallback();
                     completeInitialization();
                 });
