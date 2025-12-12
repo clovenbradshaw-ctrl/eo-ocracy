@@ -34164,7 +34164,7 @@ Cmd/Ctrl + K - Command palette
             }
         }
 
-        function confirmDeleteEntity() {
+        async function confirmDeleteEntity() {
             if (!currentModalEntity || !currentModalEntityType) return;
 
             const entityId = currentModalEntity.id;
@@ -34198,8 +34198,8 @@ Cmd/Ctrl + K - Command palette
                 r.subject !== entityId && r.object !== entityId
             );
 
-            // Log to Xano
-            logActivityToXano({
+            // Log to Xano - await to ensure deletion is persisted before continuing
+            const result = await logActivityToXano({
                 event_verb: 'NUL',
                 eo_operator: 'NUL',
                 k_frame: 'Entity Nullification',
@@ -34212,6 +34212,11 @@ Cmd/Ctrl + K - Command palette
                     removed_relationships: removedRelationships.length
                 }
             });
+
+            // Warn if sync failed (deletion still happened locally)
+            if (!result) {
+                console.warn('⚠️ Deletion may not have synced to server');
+            }
 
             // Close modals and refresh
             closeDeleteConfirmModal();
