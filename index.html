@@ -28887,12 +28887,20 @@ Cmd/Ctrl + K - Command palette
                 tabsContainer.style.display = 'none';
                 document.querySelectorAll('.modal-tab-content').forEach(content => {
                     content.classList.remove('active');
+                    content.style.display = 'none';
                 });
                 // Show the Connect tab content for "Assign to Role" form
-                document.getElementById('tabConnect').classList.add('active');
+                const tabConnect = document.getElementById('tabConnect');
+                tabConnect.classList.add('active');
+                tabConnect.style.display = '';
             } else {
                 // Show tabs for other entity types
                 tabsContainer.style.display = 'flex';
+
+                // Reset tab content visibility (may have been hidden by task view)
+                document.querySelectorAll('.modal-tab-content').forEach(content => {
+                    content.style.display = '';
+                });
 
                 // WORK-FIRST: Set tab labels based on entity type
                 if (entityType === 'role') {
@@ -28916,10 +28924,11 @@ Cmd/Ctrl + K - Command palette
                     if (connectionsIcon) connectionsIcon.className = 'ph ph-flow-arrow';
                     switchModalTab('connections');
                 } else if (entityType === 'task') {
-                    // Tasks: hide all tabs - simplified modal has everything inline
+                    // Tasks: hide all tabs and tab content - simplified modal has everything inline
                     tabsContainer.style.display = 'none';
                     document.querySelectorAll('.modal-tab-content').forEach(content => {
                         content.classList.remove('active');
+                        content.style.display = 'none';
                     });
                 } else if (entityType === 'product') {
                     // Products: hide structure, show Usage
