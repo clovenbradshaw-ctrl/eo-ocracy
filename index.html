@@ -28213,8 +28213,8 @@ John Doe,Engineering,john@example.com"
             // Filter tasks based on their assignments
             return filteredTasks.filter(task => {
                 // Get task's role assignment
-                const taskRoleRel = relationships.find(r => r.object === task.id && r.predicate === 'CON' && r.subject.startsWith('r'));
-                const taskRole = taskRoleRel ? (entities.role || []).find(e => e.id === taskRoleRel.subject) : null;
+                const taskRoleRel = relationships.find(r => r.subject === task.id && r.predicate === 'CON' && r.object.startsWith('r'));
+                const taskRole = taskRoleRel ? (entities.role || []).find(e => e.id === taskRoleRel.object) : null;
 
                 // Get person assigned to role
                 const personRel = taskRole ? relationships.find(r => r.object === taskRole.id && r.predicate === 'INS' && r.subject.startsWith('p')) : null;
@@ -29154,13 +29154,13 @@ John Doe,Engineering,john@example.com"
                 tasks = tasks.filter(task => {
                     // Find role assigned to task
                     const taskRoleRel = relationships.find(r =>
-                        r.object === task.id && r.predicate === 'CON' && r.subject.startsWith('r')
+                        r.subject === task.id && r.predicate === 'CON' && r.object.startsWith('r')
                     );
                     if (!taskRoleRel) return false;
 
                     // Find person in that role
                     const personRel = relationships.find(r =>
-                        r.object === taskRoleRel.subject && r.predicate === 'INS' && r.subject.startsWith('p')
+                        r.object === taskRoleRel.object && r.predicate === 'INS' && r.subject.startsWith('p')
                     );
                     if (!personRel) return false;
 
@@ -29197,11 +29197,11 @@ John Doe,Engineering,john@example.com"
 
                     // Check if task is assigned to current user's role
                     const taskRoleRel = relationships.find(r =>
-                        r.object === task.id && r.predicate === 'CON' && r.subject.startsWith('r')
+                        r.subject === task.id && r.predicate === 'CON' && r.object.startsWith('r')
                     );
                     if (taskRoleRel) {
                         const personRel = relationships.find(r =>
-                            r.object === taskRoleRel.subject && r.predicate === 'INS' && r.subject.startsWith('p')
+                            r.object === taskRoleRel.object && r.predicate === 'INS' && r.subject.startsWith('p')
                         );
                         if (personRel && myPersonIds.includes(personRel.subject)) return true;
                     }
@@ -29221,13 +29221,13 @@ John Doe,Engineering,john@example.com"
 
                         // Check if task is assigned to a role within user's teams
                         const taskRoleRel = relationships.find(r =>
-                            r.object === task.id && r.predicate === 'CON' && r.subject.startsWith('r')
+                            r.subject === task.id && r.predicate === 'CON' && r.object.startsWith('r')
                         );
                         if (taskRoleRel) {
                             // Find the team this role belongs to
                             const teamRel = relationships.find(r =>
                                 r.predicate === 'DES' &&
-                                r.object === taskRoleRel.subject &&
+                                r.object === taskRoleRel.object &&
                                 (entities.team || []).some(t => t.id === r.subject)
                             );
                             if (teamRel && userTeamIds.includes(teamRel.subject)) return true;
@@ -51310,9 +51310,9 @@ Options:
         function renderBoardTaskCard(task, isInSequence = false) {
             // Find connected role
             const roleRel = relationships.find(r =>
-                r.object === task.id && r.predicate === 'CON' && r.subject.startsWith('r')
+                r.subject === task.id && r.predicate === 'CON' && r.object.startsWith('r')
             );
-            const role = roleRel ? entities.role.find(r => r.id === roleRel.subject) : null;
+            const role = roleRel ? entities.role.find(r => r.id === roleRel.object) : null;
 
             // Find person assigned to role
             let person = null;
@@ -51457,7 +51457,7 @@ Options:
                 // Role filter
                 if (filterValue === 'unassigned') {
                     const hasRole = relationships.some(r =>
-                        r.object === task.id && r.predicate === 'CON' && r.subject.startsWith('r')
+                        r.subject === task.id && r.predicate === 'CON' && r.object.startsWith('r')
                     );
                     if (hasRole) return false;
                 }
@@ -51669,8 +51669,8 @@ Options:
         // Render a single kanban card
         function renderKanbanCard(task) {
             // Get role and person info
-            const roleRel = relationships.find(r => r.object === task.id && r.predicate === 'CON' && r.subject.startsWith('r'));
-            const role = roleRel ? entities.role.find(r => r.id === roleRel.subject) : null;
+            const roleRel = relationships.find(r => r.subject === task.id && r.predicate === 'CON' && r.object.startsWith('r'));
+            const role = roleRel ? entities.role.find(r => r.id === roleRel.object) : null;
             let person = null;
             if (role) {
                 const personRel = relationships.find(r => r.object === role.id && r.predicate === 'INS');
@@ -52204,8 +52204,8 @@ Options:
             `;
 
             sortedTasks.forEach(task => {
-                const roleRel = relationships.find(r => r.object === task.id && r.predicate === 'CON' && r.subject.startsWith('r'));
-                const role = roleRel ? entities.role.find(r => r.id === roleRel.subject) : null;
+                const roleRel = relationships.find(r => r.subject === task.id && r.predicate === 'CON' && r.object.startsWith('r'));
+                const role = roleRel ? entities.role.find(r => r.id === roleRel.object) : null;
                 let person = null;
                 if (role) {
                     const personRel = relationships.find(r => r.object === role.id && r.predicate === 'INS');
@@ -52400,8 +52400,8 @@ Options:
                 `;
 
                 dayTasks.forEach(task => {
-                    const roleRel = relationships.find(r => r.object === task.id && r.predicate === 'CON' && r.subject.startsWith('r'));
-                    const role = roleRel ? entities.role.find(r => r.id === roleRel.subject) : null;
+                    const roleRel = relationships.find(r => r.subject === task.id && r.predicate === 'CON' && r.object.startsWith('r'));
+                    const role = roleRel ? entities.role.find(r => r.id === roleRel.object) : null;
 
                     // Render amino tags for timeline task
                     const aminoTags = task.airtableTags || [];
