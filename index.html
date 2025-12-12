@@ -20851,6 +20851,92 @@
             background: #FDF8F3;
         }
 
+        /* Compact Amino tags for Kanban cards */
+        .kanban-card-amino-tags {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 4px;
+            margin-top: 8px;
+        }
+
+        .kanban-card-amino-tag {
+            display: inline-flex;
+            align-items: center;
+            gap: 4px;
+            padding: 3px 8px;
+            border-radius: 4px;
+            font-size: 11px;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.15s;
+            border: 1px solid;
+            text-decoration: none;
+            max-width: 150px;
+        }
+
+        .kanban-card-amino-tag:hover {
+            transform: translateY(-1px);
+            box-shadow: 0 2px 6px rgba(0,0,0,0.12);
+        }
+
+        .kanban-card-amino-tag .tag-icon {
+            font-size: 12px;
+            flex-shrink: 0;
+        }
+
+        .kanban-card-amino-tag .tag-label {
+            overflow: hidden;
+            text-overflow: ellipsis;
+            white-space: nowrap;
+        }
+
+        .kanban-card-amino-tag .tag-link-icon {
+            font-size: 10px;
+            opacity: 0.6;
+            flex-shrink: 0;
+        }
+
+        .kanban-card-amino-tag:hover .tag-link-icon {
+            opacity: 1;
+        }
+
+        /* Compact tag type colors */
+        .kanban-card-amino-tag.tag-client {
+            background: #EFF6FF;
+            color: #1D4ED8;
+            border-color: #BFDBFE;
+        }
+
+        .kanban-card-amino-tag.tag-case {
+            background: #F5F3FF;
+            color: #6D28D9;
+            border-color: #DDD6FE;
+        }
+
+        .kanban-card-amino-tag.tag-event {
+            background: #FFF7ED;
+            color: #C2410C;
+            border-color: #FED7AA;
+        }
+
+        .kanban-card-amino-tag.tag-application {
+            background: #F0FDF4;
+            color: #15803D;
+            border-color: #BBF7D0;
+        }
+
+        .kanban-card-amino-tag.tag-user {
+            background: #F0FDFA;
+            color: #0F766E;
+            border-color: #99F6E4;
+        }
+
+        .kanban-card-amino-tag.tag-custom {
+            background: #F9FAFB;
+            color: #4B5563;
+            border-color: #E5E7EB;
+        }
+
         /* Hero Task Modal - Airtable Linked Records */
         .hero-airtable-tags-container {
             background: #FAFAFA;
@@ -48518,6 +48604,24 @@ Options:
             // Check date status
             const dueDateStatus = getTaskDueDateStatus(task);
 
+            // Render Amino tags for the card
+            const aminoTags = task.airtableTags || [];
+            const aminoTagsHtml = aminoTags.length > 0 ? `
+                <div class="kanban-card-amino-tags">
+                    ${aminoTags.map(tag => {
+                        const config = AirtableAPI.getTableConfig(tag.type);
+                        const icon = config?.icon || 'ph-tag';
+                        return `<div class="kanban-card-amino-tag tag-${tag.type}"
+                                     onclick="event.stopPropagation(); openAirtableTagInAmino('${encodeURIComponent(JSON.stringify(tag))}')"
+                                     title="Open in Amino: ${tag.label}">
+                            <i class="ph ${icon} tag-icon"></i>
+                            <span class="tag-label">${tag.label}</span>
+                            <i class="ph ph-arrow-square-out tag-link-icon"></i>
+                        </div>`;
+                    }).join('')}
+                </div>
+            ` : '';
+
             return `
                 <div class="task-board-card ${dueDateStatus}" data-task-id="${task.id}" onclick="showEntityDetails('${task.id}')">
                     <div class="task-board-card-header">
@@ -48549,6 +48653,7 @@ Options:
                             ${roleParent.name}
                         </div>
                     ` : ''}
+                    ${aminoTagsHtml}
                 </div>
             `;
         }
@@ -48846,6 +48951,24 @@ Options:
                 }
             }
 
+            // Render Amino tags for the card
+            const aminoTags = task.airtableTags || [];
+            const aminoTagsHtml = aminoTags.length > 0 ? `
+                <div class="kanban-card-amino-tags">
+                    ${aminoTags.map(tag => {
+                        const config = AirtableAPI.getTableConfig(tag.type);
+                        const icon = config?.icon || 'ph-tag';
+                        return `<div class="kanban-card-amino-tag tag-${tag.type}"
+                                     onclick="event.stopPropagation(); openAirtableTagInAmino('${encodeURIComponent(JSON.stringify(tag))}')"
+                                     title="Open in Amino: ${tag.label}">
+                            <i class="ph ${icon} tag-icon"></i>
+                            <span class="tag-label">${tag.label}</span>
+                            <i class="ph ph-arrow-square-out tag-link-icon"></i>
+                        </div>`;
+                    }).join('')}
+                </div>
+            ` : '';
+
             return `
                 <div class="${cardClasses}"
                      draggable="true"
@@ -48863,6 +48986,7 @@ Options:
                           (role ? `<span class="kanban-card-assignee kanban-card-role-only" title="No person assigned to this role"><i class="ph ph-briefcase"></i> ${role.name}</span>` : '')}
                         ${task.dueDate ? `<span class="kanban-card-due ${dueDateStatus}"><i class="ph ph-calendar"></i> ${formatDateShort(task.dueDate)}</span>` : ''}
                     </div>
+                    ${aminoTagsHtml}
                 </div>
             `;
         }
