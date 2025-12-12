@@ -17808,6 +17808,195 @@
         }
 
         /* ============================================
+           COMPANY RULES VIEW STYLES
+           ============================================ */
+
+        .company-rules-view {
+            display: none;
+            flex-direction: column;
+            height: 100%;
+            background: #FAF7F5;
+        }
+
+        .company-rules-view.active {
+            display: flex;
+        }
+
+        .company-rules-view-header {
+            padding: 1.5rem;
+            background: white;
+            border-bottom: 1px solid #E5DDD1;
+        }
+
+        .company-rules-view-title {
+            font-size: 1.25rem;
+            font-weight: 600;
+            color: #3D2E1F;
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+        }
+
+        .company-rules-view-title i {
+            color: #C88F4A;
+        }
+
+        .company-rules-view-subtitle {
+            font-size: 0.875rem;
+            color: #8B6F47;
+            margin-top: 0.25rem;
+        }
+
+        .company-rules-view-content {
+            flex: 1;
+            overflow-y: auto;
+            padding: 1.5rem;
+        }
+
+        .company-rules-section {
+            background: white;
+            border-radius: 12px;
+            border: 1px solid #E5DDD1;
+            margin-bottom: 1.5rem;
+            overflow: hidden;
+        }
+
+        .company-rules-section-header {
+            padding: 1rem 1.5rem;
+            background: linear-gradient(135deg, #FAF7F5 0%, #F5F0E8 100%);
+            border-bottom: 1px solid #E5DDD1;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+
+        .company-rules-section-title {
+            font-size: 1rem;
+            font-weight: 600;
+            color: #3D2E1F;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .company-rules-section-title i {
+            color: #C88F4A;
+        }
+
+        .company-rules-section-body {
+            padding: 1.5rem;
+        }
+
+        .company-rules-option {
+            display: flex;
+            align-items: flex-start;
+            gap: 1rem;
+            padding: 1rem;
+            border: 1px solid #E5DDD1;
+            border-radius: 8px;
+            margin-bottom: 0.75rem;
+            cursor: pointer;
+            transition: all 0.2s;
+            background: white;
+        }
+
+        .company-rules-option:hover {
+            border-color: #C88F4A;
+            background: #FAF7F5;
+        }
+
+        .company-rules-option.selected {
+            border-color: #C88F4A;
+            background: rgba(200, 143, 74, 0.08);
+        }
+
+        .company-rules-option:last-child {
+            margin-bottom: 0;
+        }
+
+        .company-rules-option-radio {
+            width: 20px;
+            height: 20px;
+            border: 2px solid #D5C4B0;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            flex-shrink: 0;
+            margin-top: 2px;
+            transition: all 0.2s;
+        }
+
+        .company-rules-option.selected .company-rules-option-radio {
+            border-color: #C88F4A;
+        }
+
+        .company-rules-option.selected .company-rules-option-radio::after {
+            content: '';
+            width: 10px;
+            height: 10px;
+            border-radius: 50%;
+            background: #C88F4A;
+        }
+
+        .company-rules-option-content {
+            flex: 1;
+        }
+
+        .company-rules-option-content h4 {
+            font-size: 0.95rem;
+            font-weight: 600;
+            color: #3D2E1F;
+            margin-bottom: 0.25rem;
+        }
+
+        .company-rules-option-content p {
+            font-size: 0.85rem;
+            color: #8B6F47;
+            margin: 0;
+        }
+
+        .company-rules-status {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+            padding: 0.375rem 0.75rem;
+            background: rgba(200, 143, 74, 0.15);
+            color: #8B6F47;
+            border-radius: 20px;
+            font-size: 0.8rem;
+            font-weight: 500;
+        }
+
+        .company-rules-status i {
+            color: #C88F4A;
+        }
+
+        .company-rules-info {
+            background: #FAF7F5;
+            border: 1px solid #E5DDD1;
+            border-radius: 8px;
+            padding: 1rem;
+            margin-top: 1rem;
+            display: flex;
+            align-items: flex-start;
+            gap: 0.75rem;
+        }
+
+        .company-rules-info i {
+            color: #C88F4A;
+            font-size: 1.25rem;
+            flex-shrink: 0;
+        }
+
+        .company-rules-info p {
+            font-size: 0.85rem;
+            color: #8B6F47;
+            margin: 0;
+            line-height: 1.5;
+        }
+
+        /* ============================================
            SHAPE VIEW STYLES
            ============================================ */
 
@@ -21598,6 +21787,10 @@
                     <i class="ph ph-git-branch"></i>
                     <span>Workflows</span>
                 </button>
+                <button class="view-tab" data-view="company-rules" onclick="switchView('company-rules')">
+                    <i class="ph ph-scales"></i>
+                    <span>Rules</span>
+                </button>
             </div>
         </div>
 
@@ -22272,6 +22465,20 @@
                 </div>
                 <div class="workflows-view-content" id="workflowsViewContent">
                     <!-- Populated dynamically by renderWorkflowsView() -->
+                </div>
+            </div>
+
+            <!-- Company Rules View -->
+            <div id="companyRulesView" class="company-rules-view">
+                <div class="company-rules-view-header">
+                    <div class="company-rules-view-title">
+                        <i class="ph ph-scales"></i>
+                        <span>Company Rules</span>
+                    </div>
+                    <div class="company-rules-view-subtitle">Define permissions and governance rules for your organization</div>
+                </div>
+                <div class="company-rules-view-content" id="companyRulesViewContent">
+                    <!-- Populated dynamically by renderCompanyRulesView() -->
                 </div>
             </div>
         </div>
@@ -26222,6 +26429,7 @@ John Doe,Engineering,john@example.com"
             document.getElementById('ganttView').classList.remove('active');
             document.getElementById('calendarView').classList.remove('active');
             document.getElementById('workflowsView').classList.remove('active');
+            document.getElementById('companyRulesView').classList.remove('active');
 
             if (view === 'tree') {
                 document.getElementById('treeView').classList.add('active');
@@ -26265,6 +26473,9 @@ John Doe,Engineering,john@example.com"
             } else if (view === 'workflows') {
                 document.getElementById('workflowsView').classList.add('active');
                 renderWorkflowsView();
+            } else if (view === 'company-rules') {
+                document.getElementById('companyRulesView').classList.add('active');
+                renderCompanyRulesView();
             } else {
                 document.getElementById('graphView').classList.add('active');
                 setTimeout(() => updateGraph(), 100);
@@ -49595,6 +49806,169 @@ Options:
         // Filter workflows view by search
         function filterWorkflowsView() {
             renderWorkflowsView();
+        }
+
+        // ============================================
+        // COMPANY RULES VIEW FUNCTIONS
+        // ============================================
+
+        // Get company rules from current workspace (with defaults)
+        function getCompanyRules() {
+            const ws = workspaces[currentWorkspaceId];
+            if (!ws) return { taskAssignment: 'everyone', rulesManagement: 'everyone' };
+
+            // Initialize company rules if not present
+            if (!ws.companyRules) {
+                ws.companyRules = {
+                    taskAssignment: 'everyone',
+                    rulesManagement: 'everyone',
+                    createdAt: Date.now(),
+                    updatedAt: Date.now()
+                };
+                saveWorkspaces();
+            }
+
+            return ws.companyRules;
+        }
+
+        // Save company rules to current workspace
+        function saveCompanyRules(rules) {
+            const ws = workspaces[currentWorkspaceId];
+            if (!ws) return;
+
+            ws.companyRules = {
+                ...rules,
+                updatedAt: Date.now()
+            };
+
+            if (!ws.companyRules.createdAt) {
+                ws.companyRules.createdAt = Date.now();
+            }
+
+            saveWorkspaces();
+
+            // Log activity
+            logActivityToXano({
+                event_verb: 'Update Company Rules',
+                eo_operator: 'ALT',
+                object_type: 'company_rules',
+                object_id: currentWorkspaceId,
+                object_label: 'Company Rules',
+                data_json: {
+                    taskAssignment: rules.taskAssignment,
+                    rulesManagement: rules.rulesManagement,
+                    workspace: ws.name
+                }
+            });
+        }
+
+        // Update a specific company rule
+        function updateCompanyRule(ruleName, value) {
+            const rules = getCompanyRules();
+            rules[ruleName] = value;
+            saveCompanyRules(rules);
+            renderCompanyRulesView();
+            showToast('Rule updated successfully', 'success');
+        }
+
+        // Render the Company Rules view
+        function renderCompanyRulesView() {
+            const content = document.getElementById('companyRulesViewContent');
+            if (!content) return;
+
+            const rules = getCompanyRules();
+
+            content.innerHTML = `
+                <!-- Task Assignment Rule -->
+                <div class="company-rules-section">
+                    <div class="company-rules-section-header">
+                        <div class="company-rules-section-title">
+                            <i class="ph ph-user-switch"></i>
+                            Who Can Assign Tasks
+                        </div>
+                        <div class="company-rules-status">
+                            <i class="ph ph-check-circle"></i>
+                            ${rules.taskAssignment === 'everyone' ? 'Everyone' : 'Restricted'}
+                        </div>
+                    </div>
+                    <div class="company-rules-section-body">
+                        <div class="company-rules-option ${rules.taskAssignment === 'everyone' ? 'selected' : ''}"
+                             onclick="updateCompanyRule('taskAssignment', 'everyone')">
+                            <div class="company-rules-option-radio"></div>
+                            <div class="company-rules-option-content">
+                                <h4>Everyone</h4>
+                                <p>Any member of the organization can assign tasks to any other member. This promotes flexibility and collaboration.</p>
+                            </div>
+                        </div>
+                        <div class="company-rules-option ${rules.taskAssignment === 'managers' ? 'selected' : ''}"
+                             onclick="updateCompanyRule('taskAssignment', 'managers')">
+                            <div class="company-rules-option-radio"></div>
+                            <div class="company-rules-option-content">
+                                <h4>Managers Only</h4>
+                                <p>Only users with manager roles can assign tasks to team members. Team members can still create tasks for themselves.</p>
+                            </div>
+                        </div>
+                        <div class="company-rules-option ${rules.taskAssignment === 'hierarchy' ? 'selected' : ''}"
+                             onclick="updateCompanyRule('taskAssignment', 'hierarchy')">
+                            <div class="company-rules-option-radio"></div>
+                            <div class="company-rules-option-content">
+                                <h4>Based on Hierarchy</h4>
+                                <p>Task assignment follows the organizational hierarchy. Users can only assign tasks to their direct reports or within their scope.</p>
+                            </div>
+                        </div>
+
+                        <div class="company-rules-info">
+                            <i class="ph ph-info"></i>
+                            <p>This rule determines who has permission to assign tasks to other members. Regardless of this setting, users can always create and assign tasks to themselves.</p>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Rules Management Rule -->
+                <div class="company-rules-section">
+                    <div class="company-rules-section-header">
+                        <div class="company-rules-section-title">
+                            <i class="ph ph-shield-check"></i>
+                            Who Can Manage Rules
+                        </div>
+                        <div class="company-rules-status">
+                            <i class="ph ph-check-circle"></i>
+                            ${rules.rulesManagement === 'everyone' ? 'Everyone' : 'Restricted'}
+                        </div>
+                    </div>
+                    <div class="company-rules-section-body">
+                        <div class="company-rules-option ${rules.rulesManagement === 'everyone' ? 'selected' : ''}"
+                             onclick="updateCompanyRule('rulesManagement', 'everyone')">
+                            <div class="company-rules-option-radio"></div>
+                            <div class="company-rules-option-content">
+                                <h4>Everyone</h4>
+                                <p>Any member of the organization can view and modify company rules. Best for flat organizations or small teams.</p>
+                            </div>
+                        </div>
+                        <div class="company-rules-option ${rules.rulesManagement === 'admins' ? 'selected' : ''}"
+                             onclick="updateCompanyRule('rulesManagement', 'admins')">
+                            <div class="company-rules-option-radio"></div>
+                            <div class="company-rules-option-content">
+                                <h4>Administrators Only</h4>
+                                <p>Only designated administrators can modify company rules. Other members can view but not change the settings.</p>
+                            </div>
+                        </div>
+                        <div class="company-rules-option ${rules.rulesManagement === 'owner' ? 'selected' : ''}"
+                             onclick="updateCompanyRule('rulesManagement', 'owner')">
+                            <div class="company-rules-option-radio"></div>
+                            <div class="company-rules-option-content">
+                                <h4>Workspace Owner Only</h4>
+                                <p>Only the workspace owner can modify company rules. Provides maximum control over governance settings.</p>
+                            </div>
+                        </div>
+
+                        <div class="company-rules-info">
+                            <i class="ph ph-info"></i>
+                            <p>This rule determines who has permission to view and modify the company rules on this page. Changes take effect immediately for all workspace members.</p>
+                        </div>
+                    </div>
+                </div>
+            `;
         }
 
         // Render the workflows view
