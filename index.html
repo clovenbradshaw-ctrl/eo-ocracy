@@ -13083,6 +13083,106 @@
             color: #666;
         }
 
+        /* Kanban Card Date Picker */
+        .kanban-card-date-trigger {
+            cursor: pointer;
+            position: relative;
+            transition: all 0.15s;
+        }
+
+        .kanban-card-date-trigger:hover {
+            background: rgba(200, 143, 74, 0.2) !important;
+            transform: scale(1.02);
+        }
+
+        .kanban-card-date-trigger.empty {
+            opacity: 0;
+            transition: opacity 0.15s;
+        }
+
+        .kanban-card:hover .kanban-card-date-trigger.empty {
+            opacity: 0.5;
+        }
+
+        .kanban-card:hover .kanban-card-date-trigger.empty:hover {
+            opacity: 1;
+        }
+
+        .kanban-date-popup {
+            position: absolute;
+            top: calc(100% + 4px);
+            right: 0;
+            background: white;
+            border: 1px solid #E5DDD1;
+            border-radius: 8px;
+            padding: 8px;
+            box-shadow: 0 4px 16px rgba(0,0,0,0.15);
+            display: none;
+            z-index: 1000;
+            min-width: 160px;
+        }
+
+        .kanban-date-popup.show {
+            display: block;
+            animation: slideDown 0.15s ease-out;
+        }
+
+        .kanban-date-options {
+            display: flex;
+            flex-direction: column;
+            gap: 2px;
+        }
+
+        .kanban-date-option {
+            padding: 8px 10px;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 12px;
+            color: #555;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            transition: background 0.1s;
+            white-space: nowrap;
+        }
+
+        .kanban-date-option:hover {
+            background: #FAF7F5;
+            color: #3D2E1F;
+        }
+
+        .kanban-date-option i {
+            font-size: 14px;
+            color: #888;
+            width: 18px;
+        }
+
+        .kanban-date-option:hover i {
+            color: #C88F4A;
+        }
+
+        .kanban-date-option.clear {
+            border-top: 1px solid #eee;
+            margin-top: 4px;
+            padding-top: 10px;
+            color: #999;
+        }
+
+        .kanban-date-option.clear:hover {
+            color: #dc2626;
+        }
+
+        .kanban-date-option.clear:hover i {
+            color: #dc2626;
+        }
+
+        .kanban-date-option.calendar {
+            border-top: 1px solid #eee;
+            margin-top: 4px;
+            padding-top: 10px;
+            color: #666;
+        }
+
         /* Quick Date Buttons in Modal */
         .quick-date-section {
             margin-bottom: 12px;
@@ -48143,6 +48243,142 @@ Options:
             `;
         }
 
+        // Render clickable date picker for kanban cards
+        function renderKanbanCardDatePicker(taskId, currentDate, dueDateStatus) {
+            const displayDate = currentDate ? formatDateShort(currentDate) : '';
+
+            // If no date, show a small "add date" trigger
+            if (!currentDate) {
+                return `
+                    <span class="kanban-card-due kanban-card-date-trigger empty"
+                          onclick="event.stopPropagation(); showKanbanDatePicker('${taskId}', event)"
+                          title="Set due date">
+                        <i class="ph ph-calendar-plus"></i>
+                        <div class="kanban-date-popup" id="kanbanDatePicker_${taskId}">
+                            <div class="kanban-date-options">
+                                <div class="kanban-date-option" onclick="setKanbanTaskDate('${taskId}', 'today', event)">
+                                    <i class="ph ph-sun"></i> Today
+                                </div>
+                                <div class="kanban-date-option" onclick="setKanbanTaskDate('${taskId}', 'tomorrow', event)">
+                                    <i class="ph ph-sun-horizon"></i> Tomorrow
+                                </div>
+                                <div class="kanban-date-option" onclick="setKanbanTaskDate('${taskId}', 'nextweek', event)">
+                                    <i class="ph ph-calendar-plus"></i> Next week
+                                </div>
+                                <div class="kanban-date-option calendar" onclick="openKanbanFlatpickr('${taskId}', event)">
+                                    <i class="ph ph-calendar-blank"></i> Pick date...
+                                </div>
+                            </div>
+                        </div>
+                    </span>
+                `;
+            }
+
+            return `
+                <span class="kanban-card-due kanban-card-date-trigger ${dueDateStatus}"
+                      onclick="event.stopPropagation(); showKanbanDatePicker('${taskId}', event)"
+                      title="Click to change date">
+                    <i class="ph ph-calendar"></i> ${displayDate}
+                    <div class="kanban-date-popup" id="kanbanDatePicker_${taskId}">
+                        <div class="kanban-date-options">
+                            <div class="kanban-date-option" onclick="setKanbanTaskDate('${taskId}', 'today', event)">
+                                <i class="ph ph-sun"></i> Today
+                            </div>
+                            <div class="kanban-date-option" onclick="setKanbanTaskDate('${taskId}', 'tomorrow', event)">
+                                <i class="ph ph-sun-horizon"></i> Tomorrow
+                            </div>
+                            <div class="kanban-date-option" onclick="setKanbanTaskDate('${taskId}', 'nextweek', event)">
+                                <i class="ph ph-calendar-plus"></i> Next week
+                            </div>
+                            <div class="kanban-date-option calendar" onclick="openKanbanFlatpickr('${taskId}', event)">
+                                <i class="ph ph-calendar-blank"></i> Pick date...
+                            </div>
+                            <div class="kanban-date-option clear" onclick="setKanbanTaskDate('${taskId}', 'none', event)">
+                                <i class="ph ph-x"></i> Clear date
+                            </div>
+                        </div>
+                    </div>
+                </span>
+            `;
+        }
+
+        // Kanban-specific date picker functions
+        let activeKanbanDatePicker = null;
+
+        function showKanbanDatePicker(taskId, event) {
+            event.stopPropagation();
+
+            // Close any existing picker
+            closeAllKanbanDatePickers();
+
+            const picker = document.getElementById(`kanbanDatePicker_${taskId}`);
+            if (picker) {
+                picker.classList.add('show');
+                activeKanbanDatePicker = taskId;
+
+                // Close when clicking outside
+                setTimeout(() => {
+                    document.addEventListener('click', closeKanbanDatePickerOnOutsideClick);
+                }, 10);
+            }
+        }
+
+        function closeAllKanbanDatePickers() {
+            document.querySelectorAll('.kanban-date-popup.show').forEach(p => p.classList.remove('show'));
+            document.removeEventListener('click', closeKanbanDatePickerOnOutsideClick);
+            activeKanbanDatePicker = null;
+        }
+
+        function closeKanbanDatePickerOnOutsideClick(event) {
+            if (!event.target.closest('.kanban-date-popup') && !event.target.closest('.kanban-card-date-trigger')) {
+                closeAllKanbanDatePickers();
+            }
+        }
+
+        function setKanbanTaskDate(taskId, dateOption, event) {
+            if (event) event.stopPropagation();
+            closeAllKanbanDatePickers();
+            setTaskDueDate(taskId, dateOption);
+
+            // Refresh the kanban view
+            renderKanbanBoard();
+        }
+
+        function openKanbanFlatpickr(taskId, event) {
+            if (event) event.stopPropagation();
+            closeAllKanbanDatePickers();
+
+            const task = entities.task.find(t => t.id === taskId);
+
+            // Create a temporary input for flatpickr
+            const tempInput = document.createElement('input');
+            tempInput.style.position = 'absolute';
+            tempInput.style.opacity = '0';
+            tempInput.style.pointerEvents = 'none';
+            document.body.appendChild(tempInput);
+
+            const fp = flatpickr(tempInput, {
+                dateFormat: 'Y-m-d',
+                defaultDate: task?.dueDate || null,
+                allowInput: false,
+                onChange: function(selectedDates, dateStr) {
+                    if (dateStr) {
+                        setTaskDueDate(taskId, dateStr);
+                        // Refresh the kanban view
+                        renderKanbanBoard();
+                    }
+                },
+                onClose: function() {
+                    setTimeout(() => {
+                        fp.destroy();
+                        tempInput.remove();
+                    }, 100);
+                }
+            });
+
+            fp.open();
+        }
+
         // Store flatpickr instances to avoid multiple initializations
         const taskDatePickers = {};
 
@@ -51487,7 +51723,7 @@ Options:
                     <div class="kanban-card-meta">
                         ${person ? `<span class="kanban-card-assignee" ${role ? `title="Role: ${role.name}"` : ''}><i class="ph ph-user-circle"></i> ${person.name}</span>` :
                           (role ? `<span class="kanban-card-assignee kanban-card-role-only" title="No person assigned to this role"><i class="ph ph-briefcase"></i> ${role.name}</span>` : '')}
-                        ${task.dueDate ? `<span class="kanban-card-due ${dueDateStatus}"><i class="ph ph-calendar"></i> ${formatDateShort(task.dueDate)}</span>` : ''}
+                        ${renderKanbanCardDatePicker(task.id, task.dueDate, dueDateStatus)}
                     </div>
                     ${aminoTagsHtml}
                     <div class="task-card-creator">
