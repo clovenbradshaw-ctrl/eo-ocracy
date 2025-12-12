@@ -17853,8 +17853,31 @@
         /* Icon picker */
         .workflow-icon-picker {
             display: flex;
+            flex-direction: column;
+            gap: 0.5rem;
+        }
+
+        .workflow-icon-search {
+            width: 100%;
+            padding: 0.5rem 0.75rem;
+            border: 1px solid #E5DDD1;
+            border-radius: 6px;
+            font-size: 0.875rem;
+            outline: none;
+            transition: border-color 0.2s;
+        }
+
+        .workflow-icon-search:focus {
+            border-color: #C88F4A;
+        }
+
+        .workflow-icon-grid {
+            display: flex;
             flex-wrap: wrap;
             gap: 0.5rem;
+            max-height: 200px;
+            overflow-y: auto;
+            padding: 0.25rem;
         }
 
         .workflow-icon-option {
@@ -17883,6 +17906,13 @@
 
         .workflow-icon-option i {
             font-size: 1.25rem;
+        }
+
+        .workflow-icon-no-results {
+            padding: 1rem;
+            text-align: center;
+            color: #8B7355;
+            font-size: 0.875rem;
         }
 
         /* Task list builder */
@@ -52018,12 +52048,114 @@ Options:
         let workflowBuilderSelectedIcon = 'ph-git-branch';
         let editingWorkflowId = null;
 
-        // Available icons for workflow templates
+        // Available icons for workflow templates - comprehensive Phosphor icons list
         const workflowIconOptions = [
+            // Common/Popular
             'ph-git-branch', 'ph-rocket-launch', 'ph-calendar-check', 'ph-handshake',
             'ph-users', 'ph-lightbulb', 'ph-chart-line', 'ph-clipboard-text',
             'ph-star', 'ph-flag', 'ph-megaphone', 'ph-package',
-            'ph-gear', 'ph-wrench', 'ph-check-circle', 'ph-briefcase'
+            'ph-gear', 'ph-wrench', 'ph-check-circle', 'ph-briefcase',
+            // Arrows & Navigation
+            'ph-arrow-right', 'ph-arrow-left', 'ph-arrow-up', 'ph-arrow-down',
+            'ph-arrows-clockwise', 'ph-arrows-counter-clockwise', 'ph-arrow-bend-up-right',
+            'ph-caret-right', 'ph-caret-left', 'ph-caret-up', 'ph-caret-down',
+            'ph-compass', 'ph-navigation-arrow', 'ph-signpost',
+            // Business & Finance
+            'ph-bank', 'ph-building', 'ph-buildings', 'ph-currency-dollar',
+            'ph-currency-circle-dollar', 'ph-money', 'ph-wallet', 'ph-credit-card',
+            'ph-receipt', 'ph-invoice', 'ph-chart-bar', 'ph-chart-pie',
+            'ph-presentation-chart', 'ph-trend-up', 'ph-trend-down',
+            // Communication
+            'ph-chat', 'ph-chat-circle', 'ph-chat-dots', 'ph-chat-text',
+            'ph-chats', 'ph-chats-circle', 'ph-envelope', 'ph-envelope-open',
+            'ph-paper-plane', 'ph-paper-plane-tilt', 'ph-phone', 'ph-phone-call',
+            'ph-video-camera', 'ph-microphone', 'ph-speaker-high',
+            // Files & Documents
+            'ph-file', 'ph-file-text', 'ph-file-doc', 'ph-file-pdf',
+            'ph-file-xls', 'ph-file-ppt', 'ph-file-zip', 'ph-file-code',
+            'ph-files', 'ph-folder', 'ph-folder-open', 'ph-folder-plus',
+            'ph-clipboard', 'ph-clipboard-text', 'ph-note', 'ph-notebook',
+            'ph-article', 'ph-newspaper', 'ph-scroll',
+            // People & Users
+            'ph-user', 'ph-user-circle', 'ph-user-plus', 'ph-user-minus',
+            'ph-user-check', 'ph-users-three', 'ph-users-four',
+            'ph-identification-card', 'ph-identification-badge', 'ph-address-book',
+            // Time & Calendar
+            'ph-calendar', 'ph-calendar-blank', 'ph-calendar-plus',
+            'ph-clock', 'ph-clock-countdown', 'ph-timer', 'ph-alarm',
+            'ph-hourglass', 'ph-hourglass-low', 'ph-stopwatch',
+            // Tasks & Productivity
+            'ph-check', 'ph-check-square', 'ph-checks', 'ph-x', 'ph-x-circle',
+            'ph-list', 'ph-list-checks', 'ph-list-numbers', 'ph-list-bullets',
+            'ph-kanban', 'ph-columns', 'ph-rows', 'ph-squares-four',
+            'ph-target', 'ph-crosshair', 'ph-flag-banner', 'ph-flag-checkered',
+            // Technology & Development
+            'ph-code', 'ph-code-simple', 'ph-brackets-curly', 'ph-brackets-angle',
+            'ph-terminal', 'ph-command', 'ph-database', 'ph-cloud',
+            'ph-cloud-arrow-up', 'ph-cloud-arrow-down', 'ph-server',
+            'ph-cpu', 'ph-memory', 'ph-hard-drive', 'ph-desktop',
+            'ph-laptop', 'ph-device-mobile', 'ph-devices', 'ph-globe',
+            'ph-wifi-high', 'ph-bluetooth', 'ph-usb', 'ph-plug',
+            // Design & Creative
+            'ph-palette', 'ph-paint-brush', 'ph-pencil', 'ph-pen',
+            'ph-highlighter', 'ph-eraser', 'ph-ruler', 'ph-scissors',
+            'ph-crop', 'ph-selection', 'ph-frame-corners', 'ph-stack',
+            'ph-image', 'ph-images', 'ph-camera', 'ph-aperture',
+            'ph-film-strip', 'ph-video', 'ph-music-note', 'ph-music-notes',
+            // Security & Privacy
+            'ph-lock', 'ph-lock-open', 'ph-key', 'ph-password',
+            'ph-shield', 'ph-shield-check', 'ph-shield-warning',
+            'ph-fingerprint', 'ph-eye', 'ph-eye-slash',
+            // E-commerce & Shopping
+            'ph-shopping-cart', 'ph-shopping-bag', 'ph-storefront',
+            'ph-tag', 'ph-barcode', 'ph-qr-code', 'ph-gift',
+            'ph-percent', 'ph-ticket',
+            // Health & Medical
+            'ph-heart', 'ph-heartbeat', 'ph-first-aid', 'ph-first-aid-kit',
+            'ph-pill', 'ph-syringe', 'ph-stethoscope', 'ph-thermometer',
+            // Nature & Environment
+            'ph-tree', 'ph-leaf', 'ph-flower', 'ph-plant',
+            'ph-sun', 'ph-moon', 'ph-cloud-sun', 'ph-cloud-rain',
+            'ph-lightning', 'ph-snowflake', 'ph-drop', 'ph-fire',
+            'ph-mountains', 'ph-wave',
+            // Travel & Transport
+            'ph-car', 'ph-taxi', 'ph-bus', 'ph-train',
+            'ph-airplane', 'ph-airplane-takeoff', 'ph-airplane-landing',
+            'ph-boat', 'ph-bicycle', 'ph-map-pin', 'ph-map-trifold',
+            // Food & Drink
+            'ph-coffee', 'ph-tea', 'ph-wine', 'ph-beer-bottle',
+            'ph-hamburger', 'ph-pizza', 'ph-cookie', 'ph-cake',
+            'ph-fork-knife', 'ph-cooking-pot',
+            // Education & Learning
+            'ph-book', 'ph-book-open', 'ph-books', 'ph-graduation-cap',
+            'ph-student', 'ph-chalkboard-teacher', 'ph-exam', 'ph-certificate',
+            'ph-brain', 'ph-atom',
+            // Sports & Games
+            'ph-trophy', 'ph-medal', 'ph-crown', 'ph-basketball',
+            'ph-football', 'ph-soccer-ball', 'ph-tennis-ball',
+            'ph-game-controller', 'ph-puzzle-piece',
+            // Social & Media
+            'ph-thumbs-up', 'ph-thumbs-down', 'ph-share', 'ph-share-network',
+            'ph-link', 'ph-link-simple', 'ph-at', 'ph-hash',
+            'ph-broadcast', 'ph-rss', 'ph-bell', 'ph-bell-ringing',
+            // Shapes & Symbols
+            'ph-circle', 'ph-square', 'ph-triangle', 'ph-diamond',
+            'ph-hexagon', 'ph-octagon', 'ph-infinity', 'ph-asterisk',
+            'ph-plus', 'ph-minus', 'ph-equals', 'ph-divide',
+            // Status & Feedback
+            'ph-check-circle', 'ph-x-circle', 'ph-warning', 'ph-warning-circle',
+            'ph-info', 'ph-question', 'ph-prohibit', 'ph-smiley',
+            'ph-smiley-sad', 'ph-smiley-meh',
+            // Tools & Hardware
+            'ph-hammer', 'ph-screwdriver', 'ph-toolbox', 'ph-nut',
+            'ph-faders', 'ph-sliders', 'ph-funnel', 'ph-magnet',
+            'ph-flashlight', 'ph-plug', 'ph-battery-full',
+            // Misc & Objects
+            'ph-house', 'ph-house-line', 'ph-door', 'ph-chair',
+            'ph-lamp', 'ph-bed', 'ph-bathtub', 'ph-desk',
+            'ph-printer', 'ph-archive', 'ph-trash', 'ph-recycle',
+            'ph-download', 'ph-upload', 'ph-export', 'ph-import',
+            'ph-magnifying-glass', 'ph-binoculars', 'ph-anchor', 'ph-lifebuoy'
         ];
 
         // Create new custom workflow template
@@ -52054,13 +52186,21 @@ Options:
             const modalSubtitle = isEditing ? 'Modify this workflow template' : 'Build a reusable workflow template';
             const saveButtonText = isEditing ? 'Save Changes' : 'Create Workflow';
 
-            // Build icon picker HTML
-            const iconPickerHtml = workflowIconOptions.map(icon => `
+            // Build icon picker HTML with search
+            const iconGridHtml = workflowIconOptions.map(icon => `
                 <div class="workflow-icon-option ${icon === workflowBuilderSelectedIcon ? 'selected' : ''}"
-                     onclick="selectWorkflowIcon('${icon}')" data-icon="${icon}">
+                     onclick="selectWorkflowIcon('${icon}')" data-icon="${icon}" title="${icon.replace('ph-', '').replace(/-/g, ' ')}">
                     <i class="ph ${icon}"></i>
                 </div>
             `).join('');
+
+            const iconPickerHtml = `
+                <input type="text" class="workflow-icon-search" id="workflowIconSearch"
+                       placeholder="Search icons..." oninput="filterWorkflowIcons(this.value)">
+                <div class="workflow-icon-grid" id="workflowIconGrid">
+                    ${iconGridHtml}
+                </div>
+            `;
 
             let modalHtml = `
                 <div id="createWorkflowModal" class="modal-overlay active" onclick="if(event.target === this) closeCreateWorkflowModal()">
@@ -52153,6 +52293,43 @@ Options:
             document.querySelectorAll('.workflow-icon-option').forEach(el => {
                 el.classList.toggle('selected', el.dataset.icon === icon);
             });
+        }
+
+        // Filter icons based on search query
+        function filterWorkflowIcons(query) {
+            const grid = document.getElementById('workflowIconGrid');
+            if (!grid) return;
+
+            const searchTerm = query.toLowerCase().trim();
+
+            if (!searchTerm) {
+                // Show all icons
+                grid.innerHTML = workflowIconOptions.map(icon => `
+                    <div class="workflow-icon-option ${icon === workflowBuilderSelectedIcon ? 'selected' : ''}"
+                         onclick="selectWorkflowIcon('${icon}')" data-icon="${icon}" title="${icon.replace('ph-', '').replace(/-/g, ' ')}">
+                        <i class="ph ${icon}"></i>
+                    </div>
+                `).join('');
+                return;
+            }
+
+            // Filter icons that match the search term
+            const filteredIcons = workflowIconOptions.filter(icon => {
+                const iconName = icon.replace('ph-', '').replace(/-/g, ' ');
+                return iconName.includes(searchTerm) || icon.includes(searchTerm);
+            });
+
+            if (filteredIcons.length === 0) {
+                grid.innerHTML = '<div class="workflow-icon-no-results">No icons found</div>';
+                return;
+            }
+
+            grid.innerHTML = filteredIcons.map(icon => `
+                <div class="workflow-icon-option ${icon === workflowBuilderSelectedIcon ? 'selected' : ''}"
+                     onclick="selectWorkflowIcon('${icon}')" data-icon="${icon}" title="${icon.replace('ph-', '').replace(/-/g, ' ')}">
+                    <i class="ph ${icon}"></i>
+                </div>
+            `).join('');
         }
 
         // Render tasks in the workflow builder
