@@ -9429,6 +9429,7 @@
             flex: 1;
             overflow-y: auto;
             min-height: 0;
+            height: 0;
         }
 
         /* People tab specific styles */
@@ -26469,7 +26470,6 @@ John Doe,Engineering,john@example.com"
             // Refresh views
             renderEntityList();
             renderCurrentView();
-            populateSelects();
 
             showToast(`Workflow "${name}" created from ${tasks.length} tasks!`, 'success');
 
@@ -45827,13 +45827,21 @@ Options:
             }
         }
 
+        // Guard to prevent multiple saves
+        let isSavingQuickAdd = false;
+
         function saveQuickAddModal() {
+            // Prevent multiple saves if button is clicked rapidly
+            if (isSavingQuickAdd) return;
+            isSavingQuickAdd = true;
+
             // Get values from form
             const taskName = document.getElementById('quickAddModalTitle').value.trim();
             const description = document.getElementById('quickAddModalDescription').value.trim();
 
             if (!taskName) {
                 showToast('Task name is required', 'error');
+                isSavingQuickAdd = false;
                 return;
             }
 
@@ -45842,122 +45850,129 @@ Options:
             if (roles.length === 0) {
                 // Close modal and redirect to hero modal for role creation
                 closeQuickAddModal();
+                isSavingQuickAdd = false;
                 showToast('Create a role first to assign this task', 'info');
                 document.getElementById('heroTaskName').value = taskName;
                 openHeroTaskModal();
                 return;
             }
 
-            // Role is optional - users can assign later
-            const roleId = quickAddModalState.roleId;
+            try {
+                // Role is optional - users can assign later
+                const roleId = quickAddModalState.roleId;
 
-            // Create the task
-            const taskId = 'task' + Date.now();
-            const currentUserId = AminoIdentity.currentUser?.id || AminoIdentity.currentUser?.email || null;
-            const taskObject = {
-                id: taskId,
-                name: taskName,
-                type: 'task',
-                description: description,
-                dueDate: quickAddModalState.dueDate,
-                predecessorId: null,
-                status: 'pending',
-                priority: quickAddModalState.priority,
-                tags: quickAddModalState.tags,
-                collaborators: [],
-                recurring: null,
-                producesProductId: null,
-                followsWorkflowId: null,
-                airtableTags: [...quickAddModalState.airtableTags],  // Airtable record tags (clients, cases, events, apps)
-                createdAt: new Date().toISOString(),
-                createdBy: currentUserId,
-                visibility: quickAddModalState.visibility,
-                visibilityTeamId: quickAddModalState.visibilityTeamId
-            };
-            if (!entities.task) entities.task = [];
-            entities.task.push(taskObject);
-
-            // Connect role to task (Role CON Task) - only if role is selected
-            if (roleId) {
-                const roleTaskRelId = 'rel' + (Date.now() + 1);
-                const roleTaskRel = {
-                    id: roleTaskRelId,
-                    subject: roleId,
-                    predicate: 'CON',
-                    object: taskId,
-                    description: ''
-                };
-                relationships.push(roleTaskRel);
-
-                // Log role-task relationship
-                const role = entities.role.find(r => r.id === roleId);
-                logActivityToXano({
-                    eo_operator: 'CON',
-                    k_frame: 'Connection',
-                    object_type: 'relationship',
-                    object_id: roleTaskRelId,
-                    object_label: `${role?.name || 'Role'} → ${taskName}`,
-                    data_json: {
-                        subject_id: roleId,
-                        predicate: 'CON',
-                        target_id: taskId
-                    }
-                });
-            }
-
-            // Log task creation activity
-            logActivityToXano({
-                eo_operator: 'INS',
-                k_frame: 'Entity Creation',
-                object_type: 'task',
-                object_id: taskId,
-                object_label: taskName,
-                data_json: {
+                // Create the task
+                const taskId = 'task' + Date.now();
+                const currentUserId = AminoIdentity.currentUser?.id || AminoIdentity.currentUser?.email || null;
+                const taskObject = {
+                    id: taskId,
+                    name: taskName,
+                    type: 'task',
                     description: description,
                     dueDate: quickAddModalState.dueDate,
+                    predecessorId: null,
                     status: 'pending',
                     priority: quickAddModalState.priority,
                     tags: quickAddModalState.tags,
+                    collaborators: [],
+                    recurring: null,
+                    producesProductId: null,
+                    followsWorkflowId: null,
+                    airtableTags: [...quickAddModalState.airtableTags],  // Airtable record tags (clients, cases, events, apps)
+                    createdAt: new Date().toISOString(),
+                    createdBy: currentUserId,
                     visibility: quickAddModalState.visibility,
-                    visibilityTeamId: quickAddModalState.visibilityTeamId,
-                    createdBy: currentUserId
+                    visibilityTeamId: quickAddModalState.visibilityTeamId
+                };
+                if (!entities.task) entities.task = [];
+                entities.task.push(taskObject);
+
+                // Connect role to task (Role CON Task) - only if role is selected
+                if (roleId) {
+                    const roleTaskRelId = 'rel' + (Date.now() + 1);
+                    const roleTaskRel = {
+                        id: roleTaskRelId,
+                        subject: roleId,
+                        predicate: 'CON',
+                        object: taskId,
+                        description: ''
+                    };
+                    relationships.push(roleTaskRel);
+
+                    // Log role-task relationship
+                    const role = entities.role.find(r => r.id === roleId);
+                    logActivityToXano({
+                        eo_operator: 'CON',
+                        k_frame: 'Connection',
+                        object_type: 'relationship',
+                        object_id: roleTaskRelId,
+                        object_label: `${role?.name || 'Role'} → ${taskName}`,
+                        data_json: {
+                            subject_id: roleId,
+                            predicate: 'CON',
+                            target_id: taskId
+                        }
+                    });
                 }
-            });
 
-            // Save to local storage
-            saveToLocalStorage();
+                // Log task creation activity
+                logActivityToXano({
+                    eo_operator: 'INS',
+                    k_frame: 'Entity Creation',
+                    object_type: 'task',
+                    object_id: taskId,
+                    object_label: taskName,
+                    data_json: {
+                        description: description,
+                        dueDate: quickAddModalState.dueDate,
+                        status: 'pending',
+                        priority: quickAddModalState.priority,
+                        tags: quickAddModalState.tags,
+                        visibility: quickAddModalState.visibility,
+                        visibilityTeamId: quickAddModalState.visibilityTeamId,
+                        createdBy: currentUserId
+                    }
+                });
 
-            // Update UI instantly - always refresh regardless of active view
-            renderTaskBoardView();
-            renderEntityList();
-            updateTaskCountBadge();
+                // Save to local storage
+                saveToLocalStorage();
 
-            // Also refresh the current view (kanban, table, timeline, etc.)
-            if (currentView === 'kanban') {
-                renderKanbanBoard();
-            } else if (currentView === 'table') {
-                renderTaskTable();
-            } else if (currentView === 'timeline') {
-                renderTimeline();
-            } else if (currentView === 'gantt') {
-                renderGanttView();
-            } else if (currentView === 'calendar') {
-                renderCalendarView();
+                // Update UI instantly - always refresh regardless of active view
+                renderTaskBoardView();
+                renderEntityList();
+                updateTaskCountBadge();
+
+                // Also refresh the current view (kanban, table, timeline, etc.)
+                if (currentView === 'kanban') {
+                    renderKanbanBoard();
+                } else if (currentView === 'table') {
+                    renderTaskTable();
+                } else if (currentView === 'timeline') {
+                    renderTimeline();
+                } else if (currentView === 'gantt') {
+                    renderGanttView();
+                } else if (currentView === 'calendar') {
+                    renderCalendarView();
+                }
+
+                // Add animation to the new card
+                setTimeout(() => {
+                    const newCard = document.querySelector(`.kanban-card[data-id="${taskId}"]`);
+                    if (newCard) {
+                        newCard.classList.add('new-task');
+                        setTimeout(() => newCard.classList.remove('new-task'), 300);
+                    }
+                }, 50);
+
+                showToast('✓ Task saved!', 'success');
+            } catch (error) {
+                console.error('Error saving task:', error);
+                showToast('Task saved but there was an issue', 'warning');
+            } finally {
+                // Always close modal and reset guard
+                closeQuickAddModal();
+                isSavingQuickAdd = false;
             }
-
-            // Close modal after UI is updated so user sees task instantly
-            closeQuickAddModal();
-
-            // Add animation to the new card
-            setTimeout(() => {
-                const newCard = document.querySelector(`.kanban-card[data-id="${taskId}"]`);
-                if (newCard) {
-                    newCard.classList.add('new-task');
-                    setTimeout(() => newCard.classList.remove('new-task'), 300);
-                }
-            }, 50);
-
-            showToast('✓ Task saved!', 'success');
         }
 
         function updateQuickAddModalChips() {
@@ -49478,7 +49493,6 @@ Options:
             try {
                 renderEntityList();
                 renderActivityList();
-                populateSelects();
                 updateTaskCountBadge();
                 renderTaskBoardView();
                 // Also refresh the current view (kanban, table, timeline, etc.)
