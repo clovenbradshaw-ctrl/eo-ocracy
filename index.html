@@ -13987,6 +13987,167 @@
             color: #F57F17;
         }
 
+        /* Kanban Quick Date Picker */
+        .kanban-card-date-wrapper {
+            position: relative;
+            display: inline-block;
+        }
+
+        .kanban-card-date-trigger {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.25rem;
+            padding: 0.2rem 0.4rem;
+            border-radius: 4px;
+            cursor: pointer;
+            transition: all 0.15s;
+            font-size: 0.8rem;
+            font-weight: 500;
+        }
+
+        .kanban-card-date-trigger:hover {
+            background: rgba(200, 143, 74, 0.15);
+        }
+
+        .kanban-card-date-trigger.overdue {
+            color: #C62828;
+        }
+
+        .kanban-card-date-trigger.overdue:hover {
+            background: rgba(198, 40, 40, 0.1);
+        }
+
+        .kanban-card-date-trigger.due-today {
+            color: #E65100;
+        }
+
+        .kanban-card-date-trigger.due-today:hover {
+            background: rgba(230, 81, 0, 0.1);
+        }
+
+        .kanban-card-date-trigger.due-soon {
+            color: #F57F17;
+        }
+
+        .kanban-card-date-trigger.due-soon:hover {
+            background: rgba(245, 127, 23, 0.1);
+        }
+
+        .kanban-card-date-trigger i {
+            font-size: 0.9rem;
+            color: inherit;
+        }
+
+        /* Add date button for cards without dates */
+        .kanban-card-add-date {
+            display: none;
+            align-items: center;
+            gap: 0.25rem;
+            padding: 0.2rem 0.4rem;
+            border-radius: 4px;
+            cursor: pointer;
+            transition: all 0.15s;
+            font-size: 0.75rem;
+            color: #999;
+            border: 1px dashed #ccc;
+        }
+
+        .kanban-card:hover .kanban-card-add-date {
+            display: inline-flex;
+        }
+
+        .kanban-card-add-date:hover {
+            border-color: #C88F4A;
+            color: #C88F4A;
+            background: rgba(200, 143, 74, 0.08);
+        }
+
+        .kanban-card-add-date i {
+            font-size: 0.85rem;
+        }
+
+        /* Kanban Quick Date Popup */
+        .kanban-quick-date-popup {
+            position: absolute;
+            top: calc(100% + 4px);
+            left: 0;
+            background: white;
+            border: 1px solid #E5DDD1;
+            border-radius: 10px;
+            padding: 10px;
+            box-shadow: 0 6px 20px rgba(0,0,0,0.15);
+            display: none;
+            z-index: 1000;
+            min-width: 220px;
+        }
+
+        .kanban-quick-date-popup.show {
+            display: block;
+            animation: slideDown 0.15s ease-out;
+        }
+
+        .kanban-quick-date-options {
+            display: flex;
+            flex-direction: column;
+            gap: 2px;
+        }
+
+        .kanban-quick-date-option {
+            padding: 8px 12px;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 13px;
+            color: #555;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            transition: all 0.1s;
+        }
+
+        .kanban-quick-date-option:hover {
+            background: #FAF7F5;
+            color: #3D2E1F;
+        }
+
+        .kanban-quick-date-option i {
+            font-size: 15px;
+            color: #888;
+            width: 20px;
+            text-align: center;
+        }
+
+        .kanban-quick-date-option:hover i {
+            color: #C88F4A;
+        }
+
+        .kanban-quick-date-option.calendar {
+            border-top: 1px solid #eee;
+            margin-top: 6px;
+            padding-top: 10px;
+        }
+
+        .kanban-quick-date-option.clear {
+            border-top: 1px solid #eee;
+            margin-top: 6px;
+            padding-top: 10px;
+            color: #999;
+        }
+
+        .kanban-quick-date-option.clear:hover {
+            color: #dc2626;
+            background: #fef2f2;
+        }
+
+        .kanban-quick-date-option.clear:hover i {
+            color: #dc2626;
+        }
+
+        .kanban-quick-date-option .date-preview {
+            margin-left: auto;
+            font-size: 11px;
+            color: #999;
+        }
+
         /* Parent-Subtask Kanban Styling - Clean, minimal */
         .kanban-card.has-subtasks {
             border-left: 3px solid #94a3b8;
@@ -48381,6 +48542,196 @@ Options:
 
         // Store flatpickr instances to avoid multiple initializations
         const taskDatePickers = {};
+        const kanbanDatePickers = {};
+
+        // Get preview date text for quick date options
+        function getQuickDatePreview(option) {
+            const today = new Date();
+            today.setHours(0, 0, 0, 0);
+            let targetDate;
+
+            switch (option) {
+                case 'today':
+                    targetDate = today;
+                    break;
+                case 'tomorrow':
+                    targetDate = new Date(today);
+                    targetDate.setDate(targetDate.getDate() + 1);
+                    break;
+                case 'nextweek':
+                    targetDate = new Date(today);
+                    targetDate.setDate(targetDate.getDate() + 7);
+                    break;
+                default:
+                    return '';
+            }
+
+            return targetDate.toLocaleDateString('en-US', { weekday: 'short', month: 'short', day: 'numeric' });
+        }
+
+        // Toggle kanban quick date picker popup
+        function toggleKanbanQuickDatePicker(taskId, event) {
+            event.stopPropagation();
+
+            // Close all other kanban date pickers first
+            closeAllKanbanDatePickers();
+
+            const popup = document.getElementById(`kanbanDatePicker_${taskId}`);
+            if (popup) {
+                popup.classList.toggle('show');
+            }
+        }
+
+        // Close all kanban date picker popups
+        function closeAllKanbanDatePickers() {
+            document.querySelectorAll('.kanban-quick-date-popup.show').forEach(popup => {
+                popup.classList.remove('show');
+            });
+            // Also destroy any open flatpickr instances for kanban
+            Object.keys(kanbanDatePickers).forEach(key => {
+                if (kanbanDatePickers[key]) {
+                    kanbanDatePickers[key].destroy();
+                    delete kanbanDatePickers[key];
+                }
+            });
+        }
+
+        // Set task date from kanban card and refresh the board
+        function setKanbanTaskDate(taskId, dateOption) {
+            const task = entities.task.find(t => t.id === taskId);
+            if (!task) return;
+
+            // Capture old value for history tracking
+            const oldDate = task.dueDate || null;
+
+            let newDate = null;
+            const today = new Date();
+            today.setHours(0, 0, 0, 0);
+
+            switch (dateOption) {
+                case 'today':
+                    newDate = formatDateForInput(today);
+                    break;
+                case 'tomorrow':
+                    const tomorrow = new Date(today);
+                    tomorrow.setDate(tomorrow.getDate() + 1);
+                    newDate = formatDateForInput(tomorrow);
+                    break;
+                case 'nextweek':
+                    const nextWeek = new Date(today);
+                    nextWeek.setDate(nextWeek.getDate() + 7);
+                    newDate = formatDateForInput(nextWeek);
+                    break;
+                case 'none':
+                    newDate = null;
+                    break;
+                default:
+                    // Handle custom date string (YYYY-MM-DD format)
+                    if (dateOption && /^\d{4}-\d{2}-\d{2}$/.test(dateOption)) {
+                        newDate = dateOption;
+                    }
+                    break;
+            }
+
+            // Only proceed if date actually changed
+            if (oldDate === newDate) {
+                closeAllKanbanDatePickers();
+                return;
+            }
+
+            // Track in undo history before making changes
+            pushToUndoHistory({
+                type: 'update_entity',
+                entityType: 'task',
+                data: { id: task.id },
+                oldData: { dueDate: oldDate },
+                description: `Change due date: ${task.name}`
+            });
+
+            task.dueDate = newDate;
+            saveToLocalStorage();
+
+            // Log to Xano with full history tracking
+            logActivityToXano({
+                event_verb: 'ALT',
+                eo_operator: 'ALT',
+                k_frame: 'Due Date Change',
+                object_type: 'task',
+                object_id: taskId,
+                object_label: task.name,
+                data_json: {
+                    field: 'dueDate',
+                    old_value: oldDate,
+                    new_value: newDate,
+                    old_display: oldDate ? formatDateShort(oldDate) : 'No date',
+                    new_display: newDate ? formatDateShort(newDate) : 'No date'
+                }
+            });
+
+            // Close the kanban date picker
+            closeAllKanbanDatePickers();
+
+            // Refresh kanban board
+            if (document.getElementById('taskBoardView')?.classList.contains('active')) {
+                renderTaskBoard();
+            }
+
+            showToast(newDate ? `Due date: ${formatDateShort(newDate)}` : 'Due date cleared', 'success');
+        }
+
+        // Open flatpickr calendar for kanban card date selection
+        function openKanbanDateCalendar(taskId, event) {
+            event.stopPropagation();
+
+            const task = entities.task.find(t => t.id === taskId);
+            if (!task) return;
+
+            // Close the quick options popup
+            const popup = document.getElementById(`kanbanDatePicker_${taskId}`);
+            if (popup) popup.classList.remove('show');
+
+            // Destroy existing picker if any
+            if (kanbanDatePickers[taskId]) {
+                kanbanDatePickers[taskId].destroy();
+                delete kanbanDatePickers[taskId];
+            }
+
+            // Create a temporary input element for flatpickr
+            const tempInput = document.createElement('input');
+            tempInput.type = 'text';
+            tempInput.style.position = 'fixed';
+            tempInput.style.opacity = '0';
+            tempInput.style.pointerEvents = 'none';
+            tempInput.style.top = event.clientY + 'px';
+            tempInput.style.left = event.clientX + 'px';
+            document.body.appendChild(tempInput);
+
+            kanbanDatePickers[taskId] = flatpickr(tempInput, {
+                dateFormat: 'Y-m-d',
+                defaultDate: task.dueDate || null,
+                allowInput: false,
+                onChange: function(selectedDates, dateStr) {
+                    if (dateStr) {
+                        setKanbanTaskDate(taskId, dateStr);
+                    }
+                },
+                onClose: function() {
+                    // Clean up picker instance after closing
+                    setTimeout(() => {
+                        if (kanbanDatePickers[taskId]) {
+                            kanbanDatePickers[taskId].destroy();
+                            delete kanbanDatePickers[taskId];
+                        }
+                        if (tempInput && tempInput.parentNode) {
+                            tempInput.parentNode.removeChild(tempInput);
+                        }
+                    }, 100);
+                }
+            });
+
+            // Open the picker immediately
+            kanbanDatePickers[taskId].open();
+        }
 
         function initTaskDatePicker(taskId) {
             const inputEl = document.getElementById(`customDate_${taskId}`);
@@ -48567,6 +48918,13 @@ Options:
                 document.querySelectorAll('.date-picker-popup.show').forEach(picker => {
                     picker.classList.remove('show');
                 });
+            }
+        });
+
+        // Close kanban quick date picker when clicking outside
+        document.addEventListener('click', function(event) {
+            if (!event.target.closest('.kanban-card-date-wrapper') && !event.target.closest('.flatpickr-calendar')) {
+                closeAllKanbanDatePickers();
             }
         });
 
@@ -51748,7 +52106,50 @@ Options:
                         `)}
                     </div>
                     <div class="kanban-card-meta">
-                        ${task.dueDate ? `<span class="kanban-card-due ${dueDateStatus}"><i class="ph ph-calendar"></i> ${formatDateShort(task.dueDate)}</span>` : ''}
+                        <div class="kanban-card-date-wrapper">
+                            ${task.dueDate ? `
+                                <span class="kanban-card-date-trigger ${dueDateStatus}"
+                                      onclick="event.stopPropagation(); toggleKanbanQuickDatePicker('${task.id}', event)"
+                                      title="Click to change due date">
+                                    <i class="ph ph-calendar"></i> ${formatDateShort(task.dueDate)}
+                                </span>
+                            ` : `
+                                <span class="kanban-card-add-date"
+                                      onclick="event.stopPropagation(); toggleKanbanQuickDatePicker('${task.id}', event)"
+                                      title="Add due date">
+                                    <i class="ph ph-calendar-plus"></i> Add date
+                                </span>
+                            `}
+                            <div class="kanban-quick-date-popup" id="kanbanDatePicker_${task.id}" onclick="event.stopPropagation()">
+                                <div class="kanban-quick-date-options">
+                                    <div class="kanban-quick-date-option" onclick="setKanbanTaskDate('${task.id}', 'today')">
+                                        <i class="ph ph-sun"></i>
+                                        <span>Today</span>
+                                        <span class="date-preview">${getQuickDatePreview('today')}</span>
+                                    </div>
+                                    <div class="kanban-quick-date-option" onclick="setKanbanTaskDate('${task.id}', 'tomorrow')">
+                                        <i class="ph ph-sun-horizon"></i>
+                                        <span>Tomorrow</span>
+                                        <span class="date-preview">${getQuickDatePreview('tomorrow')}</span>
+                                    </div>
+                                    <div class="kanban-quick-date-option" onclick="setKanbanTaskDate('${task.id}', 'nextweek')">
+                                        <i class="ph ph-calendar-blank"></i>
+                                        <span>Next week</span>
+                                        <span class="date-preview">${getQuickDatePreview('nextweek')}</span>
+                                    </div>
+                                    <div class="kanban-quick-date-option calendar" onclick="openKanbanDateCalendar('${task.id}', event)">
+                                        <i class="ph ph-calendar-dots"></i>
+                                        <span>Pick a date...</span>
+                                    </div>
+                                    ${task.dueDate ? `
+                                    <div class="kanban-quick-date-option clear" onclick="setKanbanTaskDate('${task.id}', 'none')">
+                                        <i class="ph ph-x-circle"></i>
+                                        <span>Remove date</span>
+                                    </div>
+                                    ` : ''}
+                                </div>
+                            </div>
+                        </div>
                     </div>
                     ${aminoTagsHtml}
                     <div class="task-card-creator">
