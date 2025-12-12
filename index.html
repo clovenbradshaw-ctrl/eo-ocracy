@@ -315,6 +315,54 @@
             color: #9A6B3A;
         }
 
+        /* Always-Visible Settings Subbar */
+        .settings-subbar {
+            display: none;
+            background: #f8f6f4;
+            border-bottom: 1px solid #e5e0db;
+            padding: 8px 24px;
+        }
+
+        .settings-subbar.visible {
+            display: flex;
+        }
+
+        .settings-subbar-tabs {
+            display: flex;
+            gap: 4px;
+        }
+
+        .settings-subbar-tab {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            padding: 0.5rem 1rem;
+            border: none;
+            background: transparent;
+            color: #666;
+            font-size: 0.8125rem;
+            font-weight: 500;
+            border-radius: 6px;
+            cursor: pointer;
+            transition: all 0.15s ease;
+        }
+
+        .settings-subbar-tab i {
+            font-size: 1rem;
+            color: #9A6B3A;
+        }
+
+        .settings-subbar-tab:hover {
+            background: #ede8e3;
+            color: #444;
+        }
+
+        .settings-subbar-tab.active {
+            background: white;
+            color: #9A6B3A;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.08);
+        }
+
         /* Header Icon Buttons */
         .header-icon-btn {
             display: flex;
@@ -22082,6 +22130,24 @@
         </div>
     </div>
 
+    <!-- Settings Subbar - Always visible when Settings is active -->
+    <div class="settings-subbar" id="settingsSubbar">
+        <div class="settings-subbar-tabs">
+            <button class="settings-subbar-tab" data-view="structure" onclick="switchView('structure')">
+                <i class="ph ph-tree-structure"></i>
+                <span>Structure</span>
+            </button>
+            <button class="settings-subbar-tab" data-view="workflows" onclick="switchView('workflows')">
+                <i class="ph ph-git-branch"></i>
+                <span>Workflows</span>
+            </button>
+            <button class="settings-subbar-tab" data-view="company-rules" onclick="switchView('company-rules')">
+                <i class="ph ph-scales"></i>
+                <span>Rules</span>
+            </button>
+        </div>
+    </div>
+
     <!-- Time Travel Bar -->
     <div class="time-travel-bar" id="timeTravelBar">
         <div class="time-travel-icon">
@@ -26566,11 +26632,28 @@ John Doe,Engineering,john@example.com"
             // Update settings dropdown trigger active state
             const settingsViews = ['structure', 'workflows', 'company-rules'];
             const settingsTrigger = document.getElementById('settingsDropdownTrigger');
+            const settingsSubbar = document.getElementById('settingsSubbar');
             if (settingsTrigger) {
                 if (settingsViews.includes(view)) {
                     settingsTrigger.classList.add('active');
                 } else {
                     settingsTrigger.classList.remove('active');
+                }
+            }
+
+            // Show/hide settings subbar and update active tab
+            if (settingsSubbar) {
+                if (settingsViews.includes(view)) {
+                    settingsSubbar.classList.add('visible');
+                    // Update subbar tab active states
+                    document.querySelectorAll('.settings-subbar-tab').forEach(tab => {
+                        tab.classList.remove('active');
+                        if (tab.dataset.view === view) {
+                            tab.classList.add('active');
+                        }
+                    });
+                } else {
+                    settingsSubbar.classList.remove('visible');
                 }
             }
 
