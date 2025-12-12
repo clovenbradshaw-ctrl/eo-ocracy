@@ -25387,6 +25387,8 @@ John Doe,Engineering,john@example.com"
             updateParentOptions();
             renderActivityList();
             renderRecycleBin();
+            updateTaskCountBadge();
+            updateFilterStatus();
 
             if (currentView === 'graph') {
                 updateGraph();
@@ -25396,6 +25398,13 @@ John Doe,Engineering,john@example.com"
                 renderCardView();
             } else if (currentView === 'venn') {
                 renderVennView();
+            } else if (currentView === 'kanban') {
+                renderKanbanBoard();
+            }
+
+            // Also refresh task board if visible
+            if (document.getElementById('taskBoardView')?.classList.contains('active')) {
+                renderTaskBoard();
             }
         }
 
@@ -30398,17 +30407,12 @@ Cmd/Ctrl + K - Command palette
                 }
             });
 
+            // Save and refresh all views for instant visibility
             saveToLocalStorage();
+            refreshAllViews();
 
             // Refresh modal
             openEntityModal(currentModalEntity.id, currentModalEntityType);
-
-            // Refresh views
-            if (currentView === 'graph') updateGraph();
-            else if (currentView === 'tree') renderTreeView();
-            else if (currentView === 'card') renderCardView();
-
-            renderActivityList();
         }
 
         // Orbital visualization for connections
@@ -33389,21 +33393,9 @@ Cmd/Ctrl + K - Command palette
             document.getElementById('modalEntityName').textContent = newName;
             cancelInlineNameEdit();
 
-            // Save and refresh views
+            // Save and refresh all views for instant visibility
             saveToLocalStorage();
-            renderEntityList();
-            updateSelects();
-            renderActivityList();
-
-            if (currentView === 'graph') {
-                updateGraph();
-            } else if (currentView === 'tree') {
-                renderTreeView();
-            } else if (currentView === 'card') {
-                renderCardView();
-            } else if (currentView === 'kanban') {
-                renderKanbanBoard();
-            }
+            refreshAllViews();
         }
 
         function startInlineDescEdit() {
@@ -33488,21 +33480,9 @@ Cmd/Ctrl + K - Command palette
             }
             cancelInlineDescEdit();
 
-            // Save and refresh views
+            // Save and refresh all views for instant visibility
             saveToLocalStorage();
-            renderEntityList();
-            updateSelects();
-            renderActivityList();
-
-            if (currentView === 'graph') {
-                updateGraph();
-            } else if (currentView === 'tree') {
-                renderTreeView();
-            } else if (currentView === 'card') {
-                renderCardView();
-            } else if (currentView === 'kanban') {
-                renderKanbanBoard();
-            }
+            refreshAllViews();
         }
 
         // Entity Edit Modal Functions
@@ -33633,21 +33613,9 @@ Cmd/Ctrl + K - Command palette
                 </div>
             `;
 
-            // Save and refresh views
+            // Save and refresh all views for instant visibility
             saveToLocalStorage();
-            renderEntityList();
-            updateSelects();
-            renderActivityList();
-
-            if (currentView === 'graph') {
-                updateGraph();
-            } else if (currentView === 'tree') {
-                renderTreeView();
-            } else if (currentView === 'card') {
-                renderCardView();
-            } else if (currentView === 'kanban') {
-                renderKanbanBoard();
-            }
+            refreshAllViews();
         }
 
         // Handle keyboard shortcuts
@@ -33998,19 +33966,10 @@ Cmd/Ctrl + K - Command palette
                 }
             });
 
-            // Save and refresh
+            // Save and refresh all views for instant visibility
             saveToLocalStorage();
+            refreshAllViews();
             closeEntityModal();
-
-            if (currentView === 'graph') {
-                updateGraph();
-            } else if (currentView === 'tree') {
-                renderTreeView();
-            } else if (currentView === 'card') {
-                renderCardView();
-            }
-
-            renderActivityList();
         }
 
         let relationshipToDelete = null;
@@ -34074,11 +34033,10 @@ Cmd/Ctrl + K - Command palette
             relationshipToDelete = null;
             closeDeleteConfirmModal();
             closeEntityModal();
-            saveToLocalStorage();
-            renderActivityList();
 
-            // Refresh current view (handles all view types including kanban, table, etc.)
-            renderCurrentView();
+            // Save and refresh all views for instant visibility
+            saveToLocalStorage();
+            refreshAllViews();
         }
 
         // Sentence Preview
@@ -34603,12 +34561,13 @@ Cmd/Ctrl + K - Command palette
             });
         }
 
-        // Restore auto-refresh preference from localStorage
+        // Restore auto-refresh preference from localStorage (defaults to ON for instant visibility)
         function restoreAutoRefreshPreference() {
             try {
                 const savedPref = localStorage.getItem('autoRefreshEnabled');
-                if (savedPref === 'true') {
-                    // Restore the enabled state
+                // Default to ON unless explicitly disabled by user
+                if (savedPref !== 'false') {
+                    // Enable auto-refresh by default for instant visibility
                     autoRefreshEnabled = true;
                     const toggle = document.getElementById('autoRefreshToggle');
                     const status = document.getElementById('autoRefreshStatus');
@@ -34617,7 +34576,7 @@ Cmd/Ctrl + K - Command palette
                         status.textContent = 'On';
                         toggle.title = 'Auto-refresh: ON - Syncing every 10 seconds';
                         startAutoRefresh();
-                        console.log('🔄 Auto-refresh restored from preferences');
+                        console.log('🔄 Auto-refresh enabled by default for instant visibility');
                     }
                 }
             } catch (e) {
@@ -35942,19 +35901,10 @@ Cmd/Ctrl + K - Command palette
             document.getElementById('entityName').value = '';
             document.getElementById('parentEntitySelect').value = '';
 
+            // Save and refresh all views for instant visibility
             saveToLocalStorage();
-            renderEntityList();
-            updateSelects();
-            updateParentOptions();
+            refreshAllViews();
             updateStructureSectionVisibility();
-
-            if (currentView === 'graph') {
-                updateGraph();
-            } else if (currentView === 'tree') {
-                renderTreeView();
-            } else if (currentView === 'card') {
-                renderCardView();
-            }
         }
 
         // Add structure entity (team/unit) - separate from regular entity creation
@@ -36009,20 +35959,9 @@ Cmd/Ctrl + K - Command palette
             document.getElementById('structureName').value = '';
             document.getElementById('parentEntitySelect').value = '';
 
+            // Save and refresh all views for instant visibility
             saveToLocalStorage();
-            renderEntityList();
-            updateSelects();
-            updateParentOptions();
-
-            if (currentView === 'graph') {
-                updateGraph();
-            } else if (currentView === 'tree') {
-                renderTreeView();
-            } else if (currentView === 'card') {
-                renderCardView();
-            } else if (currentView === 'shape') {
-                renderShapeView();
-            }
+            refreshAllViews();
         }
 
         // Show/hide structure section based on whether roles exist
@@ -36102,13 +36041,9 @@ Cmd/Ctrl + K - Command palette
                 }
             });
 
+            // Save and refresh all views for instant visibility
             saveToLocalStorage();
-            renderEntityList();
-            updateSelects();
-            renderActivityList();
-
-            // Refresh current view (handles all view types including kanban, table, etc.)
-            renderCurrentView();
+            refreshAllViews();
         }
 
         function renderEntityList() {
@@ -43378,6 +43313,12 @@ Cmd/Ctrl + K - Command palette
             saveWorkspaces();
         }
 
+        // saveData - save and refresh all views for instant visibility
+        function saveData() {
+            saveToLocalStorage();
+            refreshAllViews();
+        }
+
         function loadFromLocalStorage() {
             // Delegate to workspace-aware load
             const hasWorkspaces = loadWorkspaces();
@@ -45510,11 +45451,6 @@ Options:
             if (refreshModal) {
                 openEntityModal(taskId, 'task');
             }
-
-            // Update task board if visible
-            if (document.getElementById('taskBoardView')?.classList.contains('active')) {
-                renderTaskBoard();
-            }
         }
 
         // Update task status (with confirmation if needed)
@@ -46724,26 +46660,9 @@ Options:
                     }
                 });
 
-                // Save to local storage
+                // Save and refresh all views for instant visibility
                 saveToLocalStorage();
-
-                // Update UI instantly - always refresh regardless of active view
-                renderTaskBoardView();
-                renderEntityList();
-                updateTaskCountBadge();
-
-                // Also refresh the current view (kanban, table, timeline, etc.)
-                if (currentView === 'kanban') {
-                    renderKanbanBoard();
-                } else if (currentView === 'table') {
-                    renderTaskTable();
-                } else if (currentView === 'timeline') {
-                    renderTimeline();
-                } else if (currentView === 'gantt') {
-                    renderGanttView();
-                } else if (currentView === 'calendar') {
-                    renderCalendarView();
-                }
+                refreshAllViews();
 
                 // Add animation to the new card
                 setTimeout(() => {
@@ -47381,29 +47300,12 @@ Options:
                 object_label: taskName
             });
 
-            // Save to local storage
+            // Save and refresh all views for instant visibility
             saveToLocalStorage();
+            refreshAllViews();
 
             // Reset quick add priority to medium
             selectQuickAddPriority('medium');
-
-            // Update UI instantly - always refresh regardless of active view
-            renderTaskBoardView();
-            renderEntityList();
-            updateTaskCountBadge();
-
-            // Also refresh the current view (kanban, table, timeline, etc.)
-            if (currentView === 'kanban') {
-                renderKanbanBoard();
-            } else if (currentView === 'table') {
-                renderTaskTable();
-            } else if (currentView === 'timeline') {
-                renderTimeline();
-            } else if (currentView === 'gantt') {
-                renderGanttView();
-            } else if (currentView === 'calendar') {
-                renderCalendarView();
-            }
 
             // Add animation to the new card
             setTimeout(() => {
@@ -49678,7 +49580,9 @@ Options:
                 relationships.push(roleTaskRel);
             }
 
+            // Save and refresh all views for instant visibility
             saveToLocalStorage();
+            refreshAllViews();
 
             logActivityToXano({
                 event_verb: 'DES',
