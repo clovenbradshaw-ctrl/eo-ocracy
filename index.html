@@ -12226,6 +12226,178 @@
             color: #9A6B3A;
         }
 
+        /* Clickable orphan items for assignment */
+        .structure-orphan-item.clickable {
+            cursor: pointer;
+            transition: all 0.2s ease;
+            position: relative;
+        }
+
+        .structure-orphan-item.clickable:hover {
+            background: #E5DDD1;
+            transform: translateY(-1px);
+            box-shadow: 0 2px 4px rgba(0,0,0,0.08);
+        }
+
+        .structure-orphan-item.clickable .assign-hint {
+            display: none;
+            font-size: 0.6875rem;
+            color: #8B7B6B;
+            margin-left: auto;
+        }
+
+        .structure-orphan-item.clickable:hover .assign-hint {
+            display: flex;
+            align-items: center;
+            gap: 0.25rem;
+        }
+
+        /* Assignment dropdown */
+        .structure-assign-dropdown {
+            position: absolute;
+            top: 100%;
+            left: 0;
+            min-width: 200px;
+            max-width: 280px;
+            background: white;
+            border: 1px solid #E5DDD1;
+            border-radius: 8px;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+            z-index: 1000;
+            padding: 0.5rem;
+            margin-top: 0.25rem;
+        }
+
+        .structure-assign-dropdown-header {
+            font-size: 0.75rem;
+            font-weight: 600;
+            color: #8B7B6B;
+            padding: 0.25rem 0.5rem 0.5rem;
+            border-bottom: 1px solid #F0EBE5;
+            margin-bottom: 0.25rem;
+        }
+
+        .structure-assign-option {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            padding: 0.5rem 0.75rem;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 0.8125rem;
+            color: #4A3F35;
+            transition: background 0.15s ease;
+        }
+
+        .structure-assign-option:hover {
+            background: #F5F0EB;
+        }
+
+        .structure-assign-option i {
+            font-size: 0.875rem;
+            color: #9A6B3A;
+        }
+
+        .structure-assign-option.unit i { color: #9A6B3A; }
+        .structure-assign-option.team i { color: #7B6B5F; }
+        .structure-assign-option.role i { color: #6B8B7B; }
+
+        .structure-assign-option-group {
+            padding: 0.25rem 0;
+        }
+
+        .structure-assign-option-group-label {
+            font-size: 0.6875rem;
+            font-weight: 600;
+            color: #A89A8C;
+            padding: 0.5rem 0.75rem 0.25rem;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+        }
+
+        .structure-assign-empty {
+            padding: 0.75rem;
+            text-align: center;
+            font-size: 0.75rem;
+            color: #A89A8C;
+        }
+
+        /* Nested teams support */
+        .structure-subteam {
+            margin-left: 1.5rem;
+        }
+
+        .structure-subteam-header {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            padding: 0.5rem 0.75rem;
+            cursor: pointer;
+            border-radius: 6px;
+            transition: background 0.15s ease;
+        }
+
+        .structure-subteam-header:hover {
+            background: rgba(155, 135, 115, 0.08);
+        }
+
+        .structure-subteam-header .toggle {
+            font-size: 0.875rem;
+            color: #9B8773;
+            transition: transform 0.2s ease;
+        }
+
+        .structure-subteam-header.collapsed .toggle {
+            transform: rotate(-90deg);
+        }
+
+        .structure-subteam-header .subteam-icon {
+            width: 24px;
+            height: 24px;
+            background: linear-gradient(135deg, #E5DDD1 0%, #D5CCC0 100%);
+            border-radius: 4px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .structure-subteam-header .subteam-icon i {
+            font-size: 0.75rem;
+            color: #7B6B5F;
+        }
+
+        .structure-subteam-header .subteam-name {
+            font-weight: 500;
+            color: #5B4A3F;
+            font-size: 0.875rem;
+        }
+
+        .structure-subteam-header .subteam-count {
+            margin-left: auto;
+            font-size: 0.75rem;
+            color: #A89A8C;
+            background: rgba(168, 154, 140, 0.15);
+            padding: 0.125rem 0.5rem;
+            border-radius: 10px;
+        }
+
+        .structure-subteam-content {
+            padding-left: 0.5rem;
+        }
+
+        .structure-subteam-content.collapsed {
+            display: none;
+        }
+
+        /* Unassigned people section */
+        .structure-orphan-item.person {
+            background: linear-gradient(135deg, #F5F0EB 0%, #EDE5DB 100%);
+        }
+
+        .structure-orphan-item.person i {
+            color: #7B8B6B;
+        }
+
         /* ============================================
            TASK BOARD VIEW STYLES
            ============================================ */
@@ -38538,12 +38710,90 @@ Cmd/Ctrl + K - Command palette
                     .filter(e => e !== null && e.type === 'person');
             }
 
+            // Helper: get people without any role assignment
+            function getUnassignedPeople() {
+                const assignedPersonIds = new Set(
+                    relationships
+                        .filter(r => r.predicate === 'INS')
+                        .map(r => r.subject)
+                );
+                return entities.person.filter(p => !assignedPersonIds.has(p.id));
+            }
+
+            // Recursive function to render teams with nested sub-teams
+            function renderTeamRecursive(team, depth = 0) {
+                const subTeams = getChildren(team.id).filter(e => e.type === 'team');
+                const roles = getChildren(team.id).filter(e => e.type === 'role');
+                const itemCount = subTeams.length + roles.length;
+
+                let teamHtml = '';
+
+                if (depth === 0) {
+                    // Top-level team (direct child of unit)
+                    teamHtml += `
+                        <div class="structure-team">
+                            <div class="structure-team-header" onclick="toggleStructureTeam(this)">
+                                <i class="ph ph-caret-down toggle"></i>
+                                <div class="team-icon"><i class="ph ph-users-three"></i></div>
+                                <span class="team-name">${escapeHtml(team.name)}</span>
+                                <span class="team-count">${itemCount} item${itemCount !== 1 ? 's' : ''}</span>
+                            </div>
+                            <div class="structure-team-content">
+                    `;
+                } else {
+                    // Nested sub-team
+                    teamHtml += `
+                        <div class="structure-subteam">
+                            <div class="structure-subteam-header" onclick="toggleStructureSubteam(this)">
+                                <i class="ph ph-caret-down toggle"></i>
+                                <div class="subteam-icon"><i class="ph ph-users-three"></i></div>
+                                <span class="subteam-name">${escapeHtml(team.name)}</span>
+                                <span class="subteam-count">${itemCount} item${itemCount !== 1 ? 's' : ''}</span>
+                            </div>
+                            <div class="structure-subteam-content">
+                    `;
+                }
+
+                // Render nested sub-teams first
+                subTeams.forEach(subTeam => {
+                    teamHtml += renderTeamRecursive(subTeam, depth + 1);
+                });
+
+                // Render roles within team
+                roles.forEach(role => {
+                    const people = getPeopleInRole(role.id);
+                    const peopleCount = people.length;
+                    teamHtml += `
+                        <div class="structure-role" onclick="openEntityModal('${role.id}', 'role')" style="cursor: pointer;">
+                            <i class="ph ph-briefcase"></i>
+                            <span class="role-name">${escapeHtml(role.name)}</span>
+                            ${peopleCount > 0 ? `<span class="role-people">${peopleCount} person${peopleCount !== 1 ? 's' : ''}</span>` : ''}
+                        </div>
+                    `;
+                });
+
+                if (depth === 0) {
+                    teamHtml += `
+                            </div>
+                        </div>
+                    `;
+                } else {
+                    teamHtml += `
+                            </div>
+                        </div>
+                    `;
+                }
+
+                return teamHtml;
+            }
+
             // Get top-level units (units without parents)
             const topLevelUnits = entities.unit.filter(u => !entitiesWithParents.has(u.id));
 
             // Get orphaned teams and roles (no parent)
             const orphanedTeams = entities.team.filter(t => !entitiesWithParents.has(t.id));
             const orphanedRoles = entities.role.filter(r => !entitiesWithParents.has(r.id));
+            const orphanedPeople = getUnassignedPeople();
 
             // Count totals
             const unitCount = entities.unit.length;
@@ -38591,39 +38841,9 @@ Cmd/Ctrl + K - Command palette
                             <div class="structure-unit-content">
                     `;
 
-                    // Render teams within unit
+                    // Render teams within unit (with recursive sub-team support)
                     teams.forEach(team => {
-                        const roles = getChildren(team.id).filter(e => e.type === 'role');
-                        const roleCount = roles.length;
-
-                        html += `
-                            <div class="structure-team">
-                                <div class="structure-team-header" onclick="toggleStructureTeam(this)">
-                                    <i class="ph ph-caret-down toggle"></i>
-                                    <div class="team-icon"><i class="ph ph-users-three"></i></div>
-                                    <span class="team-name">${escapeHtml(team.name)}</span>
-                                    <span class="team-count">${roleCount} role${roleCount !== 1 ? 's' : ''}</span>
-                                </div>
-                                <div class="structure-team-content">
-                        `;
-
-                        // Render roles within team
-                        roles.forEach(role => {
-                            const people = getPeopleInRole(role.id);
-                            const peopleCount = people.length;
-                            html += `
-                                <div class="structure-role">
-                                    <i class="ph ph-briefcase"></i>
-                                    <span class="role-name">${escapeHtml(role.name)}</span>
-                                    ${peopleCount > 0 ? `<span class="role-people">${peopleCount} person${peopleCount !== 1 ? 's' : ''}</span>` : ''}
-                                </div>
-                            `;
-                        });
-
-                        html += `
-                                </div>
-                            </div>
-                        `;
+                        html += renderTeamRecursive(team, 0);
                     });
 
                     // Render roles directly under unit (not in a team)
@@ -38631,7 +38851,7 @@ Cmd/Ctrl + K - Command palette
                         const people = getPeopleInRole(role.id);
                         const peopleCount = people.length;
                         html += `
-                            <div class="structure-role" style="margin-left: 0; padding-left: 1rem;">
+                            <div class="structure-role" style="margin-left: 0; padding-left: 1rem;" onclick="openEntityModal('${role.id}', 'role')">
                                 <i class="ph ph-briefcase"></i>
                                 <span class="role-name">${escapeHtml(role.name)}</span>
                                 ${peopleCount > 0 ? `<span class="role-people">${peopleCount} person${peopleCount !== 1 ? 's' : ''}</span>` : ''}
@@ -38648,10 +38868,11 @@ Cmd/Ctrl + K - Command palette
                 html += '</div>';
             }
 
-            // Show orphaned teams and roles
-            if (orphanedTeams.length > 0 || orphanedRoles.length > 0) {
+            // Show orphaned teams, roles, and people
+            if (orphanedTeams.length > 0 || orphanedRoles.length > 0 || orphanedPeople.length > 0) {
                 html += '<div class="structure-orphans">';
 
+                // Unassigned Teams - clickable to assign to units or other teams
                 if (orphanedTeams.length > 0) {
                     html += `
                         <div class="structure-orphans-header">
@@ -38661,15 +38882,17 @@ Cmd/Ctrl + K - Command palette
                     `;
                     orphanedTeams.forEach(team => {
                         html += `
-                            <div class="structure-orphan-item">
+                            <div class="structure-orphan-item clickable" onclick="showStructureAssignDropdown(event, '${team.id}', 'team')">
                                 <i class="ph ph-users-three"></i>
                                 ${escapeHtml(team.name)}
+                                <span class="assign-hint"><i class="ph ph-plus-circle"></i> assign</span>
                             </div>
                         `;
                     });
                     html += '</div>';
                 }
 
+                // Unassigned Roles - clickable to assign to teams or units
                 if (orphanedRoles.length > 0) {
                     html += `
                         <div class="structure-orphans-header" style="margin-top: 1rem;">
@@ -38679,9 +38902,30 @@ Cmd/Ctrl + K - Command palette
                     `;
                     orphanedRoles.forEach(role => {
                         html += `
-                            <div class="structure-orphan-item">
+                            <div class="structure-orphan-item clickable" onclick="showStructureAssignDropdown(event, '${role.id}', 'role')">
                                 <i class="ph ph-briefcase"></i>
                                 ${escapeHtml(role.name)}
+                                <span class="assign-hint"><i class="ph ph-plus-circle"></i> assign</span>
+                            </div>
+                        `;
+                    });
+                    html += '</div>';
+                }
+
+                // Unassigned People - clickable to assign to roles
+                if (orphanedPeople.length > 0) {
+                    html += `
+                        <div class="structure-orphans-header" style="margin-top: 1rem;">
+                            <i class="ph ph-warning-circle"></i> Unassigned People
+                        </div>
+                        <div class="structure-orphan-list">
+                    `;
+                    orphanedPeople.forEach(person => {
+                        html += `
+                            <div class="structure-orphan-item person clickable" onclick="showStructureAssignDropdown(event, '${person.id}', 'person')">
+                                <i class="ph ph-user"></i>
+                                ${escapeHtml(person.name)}
+                                <span class="assign-hint"><i class="ph ph-plus-circle"></i> assign</span>
                             </div>
                         `;
                     });
@@ -38711,6 +38955,269 @@ Cmd/Ctrl + K - Command palette
             if (content) {
                 content.classList.toggle('collapsed');
             }
+        }
+
+        // Toggle sub-team expansion
+        function toggleStructureSubteam(header) {
+            header.classList.toggle('collapsed');
+            const content = header.nextElementSibling;
+            if (content) {
+                content.classList.toggle('collapsed');
+            }
+        }
+
+        // Current dropdown state
+        let currentStructureDropdown = null;
+
+        // Show assignment dropdown for structure view
+        function showStructureAssignDropdown(event, entityId, entityType) {
+            event.stopPropagation();
+
+            // Close any existing dropdown
+            hideStructureAssignDropdown();
+
+            const targetEl = event.currentTarget;
+            const entity = findEntity(entityId);
+            if (!entity) return;
+
+            // Build dropdown options based on entity type
+            let optionsHtml = '';
+
+            if (entityType === 'team') {
+                // Teams can be assigned to units or other teams
+                const units = entities.unit || [];
+                const teams = (entities.team || []).filter(t => t.id !== entityId);
+
+                if (units.length > 0) {
+                    optionsHtml += `<div class="structure-assign-option-group-label">Units</div>`;
+                    units.forEach(u => {
+                        optionsHtml += `
+                            <div class="structure-assign-option unit" onclick="assignFromStructure('${entityId}', '${u.id}', 'team')">
+                                <i class="ph ph-buildings"></i>
+                                ${escapeHtml(u.name)}
+                            </div>
+                        `;
+                    });
+                }
+
+                if (teams.length > 0) {
+                    optionsHtml += `<div class="structure-assign-option-group-label">Teams</div>`;
+                    teams.forEach(t => {
+                        optionsHtml += `
+                            <div class="structure-assign-option team" onclick="assignFromStructure('${entityId}', '${t.id}', 'team')">
+                                <i class="ph ph-users-three"></i>
+                                ${escapeHtml(t.name)}
+                            </div>
+                        `;
+                    });
+                }
+            } else if (entityType === 'role') {
+                // Roles can be assigned to teams or units
+                const teams = entities.team || [];
+                const units = entities.unit || [];
+
+                if (teams.length > 0) {
+                    optionsHtml += `<div class="structure-assign-option-group-label">Teams</div>`;
+                    teams.forEach(t => {
+                        optionsHtml += `
+                            <div class="structure-assign-option team" onclick="assignFromStructure('${entityId}', '${t.id}', 'role')">
+                                <i class="ph ph-users-three"></i>
+                                ${escapeHtml(t.name)}
+                            </div>
+                        `;
+                    });
+                }
+
+                if (units.length > 0) {
+                    optionsHtml += `<div class="structure-assign-option-group-label">Units</div>`;
+                    units.forEach(u => {
+                        optionsHtml += `
+                            <div class="structure-assign-option unit" onclick="assignFromStructure('${entityId}', '${u.id}', 'role')">
+                                <i class="ph ph-buildings"></i>
+                                ${escapeHtml(u.name)}
+                            </div>
+                        `;
+                    });
+                }
+            } else if (entityType === 'person') {
+                // People can be assigned to roles
+                const roles = entities.role || [];
+
+                // Get roles this person is already assigned to
+                const assignedRoleIds = new Set(
+                    relationships
+                        .filter(r => r.predicate === 'INS' && r.subject === entityId)
+                        .map(r => r.object)
+                );
+
+                const availableRoles = roles.filter(r => !assignedRoleIds.has(r.id));
+
+                if (availableRoles.length > 0) {
+                    optionsHtml += `<div class="structure-assign-option-group-label">Roles</div>`;
+                    availableRoles.forEach(r => {
+                        optionsHtml += `
+                            <div class="structure-assign-option role" onclick="assignFromStructure('${entityId}', '${r.id}', 'person')">
+                                <i class="ph ph-briefcase"></i>
+                                ${escapeHtml(r.name)}
+                            </div>
+                        `;
+                    });
+                }
+            }
+
+            if (!optionsHtml) {
+                optionsHtml = `<div class="structure-assign-empty">No available options</div>`;
+            }
+
+            // Create dropdown element
+            const dropdown = document.createElement('div');
+            dropdown.className = 'structure-assign-dropdown';
+            dropdown.innerHTML = `
+                <div class="structure-assign-dropdown-header">Assign ${entity.name} to:</div>
+                ${optionsHtml}
+            `;
+
+            // Position dropdown
+            targetEl.style.position = 'relative';
+            targetEl.appendChild(dropdown);
+            currentStructureDropdown = { element: dropdown, parent: targetEl };
+
+            // Close on outside click
+            setTimeout(() => {
+                document.addEventListener('click', hideStructureAssignDropdown, { once: true });
+            }, 0);
+        }
+
+        // Hide assignment dropdown
+        function hideStructureAssignDropdown() {
+            if (currentStructureDropdown) {
+                currentStructureDropdown.element.remove();
+                currentStructureDropdown = null;
+            }
+        }
+
+        // Perform assignment from structure view
+        function assignFromStructure(childId, parentId, childType) {
+            hideStructureAssignDropdown();
+
+            const child = findEntity(childId);
+            const parent = findEntity(parentId);
+
+            if (!child || !parent) {
+                console.error('Entity not found');
+                return;
+            }
+
+            if (childType === 'person') {
+                // Person to Role assignment uses INS relationship
+                const relId = 'rel' + Date.now();
+                const relationship = {
+                    id: relId,
+                    subject: childId,
+                    predicate: 'INS',
+                    object: parentId,
+                    description: ''
+                };
+
+                relationships.push(relationship);
+
+                // Track in undo history
+                pushToUndoHistory({
+                    type: 'create_relationship',
+                    data: JSON.parse(JSON.stringify(relationship)),
+                    description: `Assigned person: ${child.name} to role ${parent.name}`
+                });
+
+                // Log to Xano
+                logActivityToXano({
+                    event_verb: 'INS',
+                    eo_operator: 'INS',
+                    k_frame: 'Person to Role',
+                    object_type: 'relationship',
+                    object_id: relId,
+                    object_label: `${child.name} assigned to ${parent.name}`,
+                    data_json: {
+                        subject_id: childId,
+                        subject_type: 'person',
+                        subject_name: child.name,
+                        predicate: 'INS',
+                        predicate_label: 'Assigned to',
+                        object_id: parentId,
+                        object_type: 'role',
+                        object_name: parent.name,
+                        connection_type: 'person_role_assignment'
+                    }
+                });
+            } else {
+                // Team/Role to parent uses DES relationship
+                // Remove any existing parent relationship
+                const existingParentRel = relationships.find(r =>
+                    r.predicate === 'DES' && r.object === childId
+                );
+                if (existingParentRel) {
+                    const index = relationships.findIndex(r => r.id === existingParentRel.id);
+                    if (index !== -1) {
+                        relationships.splice(index, 1);
+                    }
+                }
+
+                // Create new DES relationship (parent contains child)
+                const relId = 'rel' + Date.now();
+                const relationship = {
+                    id: relId,
+                    subject: parentId,
+                    predicate: 'DES',
+                    object: childId,
+                    description: ''
+                };
+
+                relationships.push(relationship);
+
+                // Track in undo history
+                pushToUndoHistory({
+                    type: 'create_relationship',
+                    data: JSON.parse(JSON.stringify(relationship)),
+                    description: `Assigned ${childType}: ${child.name} to ${parent.name}`
+                });
+
+                // Log to Xano
+                logActivityToXano({
+                    event_verb: 'DES',
+                    eo_operator: 'DES',
+                    k_frame: `${childType.charAt(0).toUpperCase() + childType.slice(1)} to ${parent.type.charAt(0).toUpperCase() + parent.type.slice(1)}`,
+                    object_type: 'relationship',
+                    object_id: relId,
+                    object_label: `${child.name} assigned to ${parent.name}`,
+                    data_json: {
+                        subject_id: parentId,
+                        subject_type: parent.type,
+                        subject_name: parent.name,
+                        predicate: 'DES',
+                        predicate_label: 'Contains',
+                        object_id: childId,
+                        object_type: childType,
+                        object_name: child.name,
+                        connection_type: `${childType}_${parent.type}_assignment`
+                    }
+                });
+            }
+
+            // Save and refresh
+            saveToLocalStorage();
+            renderStructureView();
+
+            // Refresh other views if active
+            if (currentView === 'graph') {
+                updateGraph();
+            } else if (currentView === 'tree') {
+                renderTreeView();
+            } else if (currentView === 'card') {
+                renderCardView();
+            } else if (currentView === 'orgchart') {
+                renderOrgChartView();
+            }
+
+            renderActivityList();
         }
 
         // Card View Rendering
