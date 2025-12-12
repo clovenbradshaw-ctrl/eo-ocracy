@@ -18,14 +18,14 @@
                 script.onload = function() {
                     if (typeof d3 !== 'undefined') {
                         loaded = true;
-                        console.log('✅ D3.js loaded from:', src);
+                        debug.log('✅ D3.js loaded from:', src);
                         callback(true);
                     } else {
                         callback(false);
                     }
                 };
                 script.onerror = function() {
-                    console.warn('⚠️ Failed to load D3.js from:', src);
+                    debug.warn('⚠️ Failed to load D3.js from:', src);
                     callback(false);
                 };
                 document.head.appendChild(script);
@@ -327,50 +327,6 @@
             color: #9A6B3A;
         }
 
-        /* Always-Visible Settings Subbar */
-        .settings-subbar {
-            display: flex;
-            background: #f8f6f4;
-            border-bottom: 1px solid #e5e0db;
-            padding: 8px 24px;
-        }
-
-        .settings-subbar-tabs {
-            display: flex;
-            gap: 4px;
-        }
-
-        .settings-subbar-tab {
-            display: flex;
-            align-items: center;
-            gap: 0.5rem;
-            padding: 0.5rem 1rem;
-            border: none;
-            background: transparent;
-            color: #666;
-            font-size: 0.8125rem;
-            font-weight: 500;
-            border-radius: 6px;
-            cursor: pointer;
-            transition: all 0.15s ease;
-        }
-
-        .settings-subbar-tab i {
-            font-size: 1rem;
-            color: #9A6B3A;
-        }
-
-        .settings-subbar-tab:hover {
-            background: #ede8e3;
-            color: #444;
-        }
-
-        .settings-subbar-tab.active {
-            background: white;
-            color: #9A6B3A;
-            box-shadow: 0 1px 3px rgba(0,0,0,0.08);
-        }
-
         /* Header Icon Buttons */
         .header-icon-btn {
             display: flex;
@@ -662,90 +618,6 @@
         @keyframes pulse-dot {
             0%, 100% { opacity: 1; }
             50% { opacity: 0.4; }
-        }
-
-        /* View Filter Dropdown */
-        .view-filter-dropdown {
-            position: relative;
-        }
-
-        .view-filter-btn {
-            position: relative;
-        }
-
-        .filter-active-badge {
-            position: absolute;
-            top: -2px;
-            right: -2px;
-            width: 8px;
-            height: 8px;
-            background: #C88F4A;
-            border-radius: 50%;
-        }
-
-        .view-filter-menu {
-            position: absolute;
-            top: calc(100% + 0.5rem);
-            right: 0;
-            background: white;
-            border-radius: 8px;
-            box-shadow: 0 4px 20px rgba(0,0,0,0.2);
-            min-width: 180px;
-            z-index: 100;
-            display: none;
-            overflow: hidden;
-            padding: 0.5rem 0;
-        }
-
-        .view-filter-menu.open {
-            display: block;
-        }
-
-        .view-filter-section {
-            padding: 0.5rem 0;
-        }
-
-        .view-filter-section-title {
-            padding: 0.25rem 1rem 0.5rem;
-            font-size: 0.75rem;
-            font-weight: 600;
-            color: #8B6F47;
-            text-transform: uppercase;
-            letter-spacing: 0.5px;
-        }
-
-        .view-filter-item {
-            display: flex;
-            align-items: center;
-            gap: 0.5rem;
-            padding: 0.5rem 1rem;
-            cursor: pointer;
-            color: #3D2E1F;
-            font-size: 0.875rem;
-            transition: background 0.15s;
-        }
-
-        .view-filter-item:hover {
-            background: #FAF7F5;
-        }
-
-        .view-filter-item input[type="checkbox"] {
-            accent-color: #C88F4A;
-            width: 16px;
-            height: 16px;
-        }
-
-        .view-filter-item i {
-            color: #8B6F47;
-            font-size: 1rem;
-        }
-
-        .view-filter-actions {
-            display: flex;
-            gap: 0.5rem;
-            padding: 0.5rem 1rem;
-            border-top: 1px solid #E5DDD1;
-            margin-top: 0.25rem;
         }
 
         /* Advanced Filter Panel Styles */
@@ -1679,136 +1551,6 @@
         .amino-user-indicator .user-email {
             font-size: 0.7rem;
             opacity: 0.8;
-        }
-
-        /* Xano Connection Status Indicator - Hidden (shows only on error via JS) */
-        .xano-status-indicator {
-            display: none !important; /* Hidden by default - implementation detail */
-            /* Previously: display: flex; */
-            align-items: center;
-            gap: 0.4rem;
-            background: rgba(255,255,255,0.1);
-            border: 1px solid rgba(255,255,255,0.2);
-            border-radius: 6px;
-            padding: 0.35rem 0.6rem;
-            color: white;
-            font-size: 0.75rem;
-            margin-right: 0.5rem;
-            transition: all 0.3s ease;
-        }
-
-        .xano-status-indicator.connected {
-            background: rgba(76, 175, 80, 0.25);
-            border-color: rgba(76, 175, 80, 0.5);
-        }
-
-        .xano-status-indicator.disconnected {
-            background: rgba(244, 67, 54, 0.25);
-            border-color: rgba(244, 67, 54, 0.5);
-        }
-
-        .xano-status-indicator.checking {
-            background: rgba(255, 193, 7, 0.25);
-            border-color: rgba(255, 193, 7, 0.5);
-        }
-
-        .xano-status-indicator .status-dot {
-            width: 8px;
-            height: 8px;
-            border-radius: 50%;
-            background: rgba(255,255,255,0.5);
-            transition: background 0.3s ease;
-        }
-
-        .xano-status-indicator.connected .status-dot {
-            background: #4CAF50;
-            box-shadow: 0 0 6px rgba(76, 175, 80, 0.6);
-        }
-
-        .xano-status-indicator.disconnected .status-dot {
-            background: #F44336;
-            box-shadow: 0 0 6px rgba(244, 67, 54, 0.6);
-        }
-
-        .xano-status-indicator.checking .status-dot {
-            background: #FFC107;
-            animation: pulse 1s ease-in-out infinite;
-        }
-
-        @keyframes pulse {
-            0%, 100% { opacity: 1; }
-            50% { opacity: 0.4; }
-        }
-
-        .xano-status-indicator .status-text {
-            white-space: nowrap;
-        }
-
-        .xano-status-indicator .activity-count {
-            background: rgba(255,255,255,0.2);
-            padding: 0.1rem 0.4rem;
-            border-radius: 10px;
-            font-size: 0.65rem;
-            font-weight: 600;
-        }
-
-        .xano-status-indicator.connected .activity-count {
-            background: rgba(76, 175, 80, 0.3);
-        }
-
-        /* Auto-Refresh Toggle */
-        .auto-refresh-toggle {
-            display: flex;
-            align-items: center;
-            gap: 0.4rem;
-            background: rgba(255,255,255,0.1);
-            border: 1px solid rgba(255,255,255,0.2);
-            border-radius: 6px;
-            padding: 0.35rem 0.6rem;
-            color: white;
-            font-size: 0.75rem;
-            margin-right: 0.5rem;
-            cursor: pointer;
-            transition: all 0.3s ease;
-            user-select: none;
-        }
-
-        .auto-refresh-toggle:hover {
-            background: rgba(255,255,255,0.15);
-            border-color: rgba(255,255,255,0.3);
-        }
-
-        .auto-refresh-toggle.active {
-            background: rgba(76, 175, 80, 0.25);
-            border-color: rgba(76, 175, 80, 0.5);
-        }
-
-        .auto-refresh-toggle .refresh-icon {
-            width: 14px;
-            height: 14px;
-            transition: transform 0.3s ease;
-        }
-
-        .auto-refresh-toggle.active .refresh-icon {
-            animation: spin-slow 2s linear infinite;
-        }
-
-        .auto-refresh-toggle.refreshing .refresh-icon {
-            animation: spin 0.5s linear infinite;
-        }
-
-        @keyframes spin-slow {
-            from { transform: rotate(0deg); }
-            to { transform: rotate(360deg); }
-        }
-
-        .auto-refresh-toggle .refresh-status {
-            font-size: 0.65rem;
-            opacity: 0.8;
-        }
-
-        .auto-refresh-toggle.active .refresh-status {
-            color: #81C784;
         }
 
         /* Activity Upload Toast */
@@ -2835,9 +2577,7 @@
             padding: 2rem;
         }
 
-        .modal-section {
-            margin-bottom: 2rem;
-        }
+        /* .modal-section is defined later with more complete styling */
 
         .modal-section-title {
             font-size: 1rem;
@@ -22922,34 +22662,6 @@
                 <i class="ph ph-clock-counter-clockwise"></i>
             </button>
 
-            <!-- Legacy Filter Dropdown (hidden, kept for compatibility) -->
-            <div class="view-filter-dropdown" style="display: none;">
-                <div class="view-filter-menu" id="viewFilterMenu">
-                    <div class="view-filter-section">
-                        <div class="view-filter-section-title">Filter by</div>
-                        <label class="view-filter-item">
-                            <input type="checkbox" id="viewFilterRole" checked onchange="applyViewFilters()">
-                            <i class="ph ph-briefcase"></i> Roles
-                        </label>
-                        <label class="view-filter-item">
-                            <input type="checkbox" id="viewFilterPerson" checked onchange="applyViewFilters()">
-                            <i class="ph ph-user"></i> People
-                        </label>
-                        <label class="view-filter-item">
-                            <input type="checkbox" id="viewFilterTeam" checked onchange="applyViewFilters()">
-                            <i class="ph ph-users"></i> Teams
-                        </label>
-                        <label class="view-filter-item">
-                            <input type="checkbox" id="viewFilterUnit" checked onchange="applyViewFilters()">
-                            <i class="ph ph-buildings"></i> Units
-                        </label>
-                    </div>
-                    <div class="view-filter-actions">
-                        <button class="btn btn-small" onclick="selectAllViewFilters()">All</button>
-                        <button class="btn btn-small btn-outline" onclick="clearViewFilters()">None</button>
-                    </div>
-                </div>
-            </div>
 
             <!-- Undo/Redo -->
             <div class="header-undo-group">
@@ -23035,44 +22747,6 @@
             <!-- User Menu -->
             <div class="user-menu-container" id="userMenuContainer"></div>
 
-            <!-- Hidden elements for backwards compatibility -->
-            <div class="xano-status-indicator checking" id="xanoStatusIndicator" style="display: none !important;">
-                <span class="status-dot"></span>
-                <span class="status-text">Checking...</span>
-                <span class="activity-count" id="xanoActivityCount" style="display: none;">0</span>
-            </div>
-            <div class="auto-refresh-toggle" id="autoRefreshToggle" style="display: none !important;">
-                <span class="refresh-status" id="autoRefreshStatus">Off</span>
-            </div>
-            <div class="amino-user-indicator no-user" id="aminoUserIndicator" style="display: none !important;">
-                <div class="user-avatar"><i class="ph ph-user"></i></div>
-                <div class="user-info">
-                    <span class="user-name">No user detected</span>
-                    <span class="user-email">Embed on Amino to see user</span>
-                </div>
-            </div>
-            <!-- Old header menu kept for compatibility -->
-            <div class="header-more-menu" style="display: none !important;">
-                <div class="header-dropdown" id="headerDropdown"></div>
-            </div>
-        </div>
-    </div>
-
-    <!-- Settings Subbar - Hidden since tabs are now in main header -->
-    <div class="settings-subbar" id="settingsSubbar" style="display: none !important;">
-        <div class="settings-subbar-tabs">
-            <button class="settings-subbar-tab" data-view="structure" onclick="switchView('structure')">
-                <i class="ph ph-tree-structure"></i>
-                <span>Structure</span>
-            </button>
-            <button class="settings-subbar-tab" data-view="workflows" onclick="switchView('workflows')">
-                <i class="ph ph-git-branch"></i>
-                <span>Workflows</span>
-            </button>
-            <button class="settings-subbar-tab" data-view="company-rules" onclick="switchView('company-rules')">
-                <i class="ph ph-scales"></i>
-                <span>Rules</span>
-            </button>
         </div>
     </div>
 
@@ -24345,6 +24019,18 @@ John Doe,Engineering,john@example.com"
 
     <script>
         // ==========================================
+        // DEBUG MODE - Set to true to enable verbose logging
+        // ==========================================
+        const DEBUG_MODE = false;
+
+        // Debug utility - only logs when DEBUG_MODE is true
+        const debug = {
+            log: (...args) => DEBUG_MODE && console.log(...args),
+            warn: (...args) => DEBUG_MODE && console.warn(...args),
+            error: (...args) => console.error(...args) // Always log errors
+        };
+
+        // ==========================================
         // AUTHENTICATION MANAGER
         // ==========================================
 
@@ -24364,18 +24050,18 @@ John Doe,Engineering,john@example.com"
 
             // Initialize auth - check if user is already logged in
             init() {
-                console.log('🔐 AuthManager: Initializing...');
+                debug.log('🔐 AuthManager: Initializing...');
 
                 // Check for existing session
                 const session = this.getSession();
                 if (session && session.email) {
-                    console.log('🔐 AuthManager: Found existing session for', session.email);
+                    debug.log('🔐 AuthManager: Found existing session for', session.email);
                     this.onAuthSuccess(session.email, false);
                     return true;
                 }
 
                 // No session - show login overlay
-                console.log('🔐 AuthManager: No session found, showing login');
+                debug.log('🔐 AuthManager: No session found, showing login');
                 this.showLoginOverlay();
                 return false;
             },
@@ -24407,14 +24093,14 @@ John Doe,Engineering,john@example.com"
                     expiresAt: new Date(Date.now() + 30 * 24 * 60 * 60 * 1000).toISOString() // 30 days
                 };
                 localStorage.setItem(this.sessionKey, JSON.stringify(session));
-                console.log('🔐 AuthManager: Session saved for', email);
+                debug.log('🔐 AuthManager: Session saved for', email);
             },
 
             // Clear session (logout)
             clearSession() {
                 localStorage.removeItem(this.sessionKey);
                 localStorage.removeItem(this.pendingCodeKey);
-                console.log('🔐 AuthManager: Session cleared');
+                debug.log('🔐 AuthManager: Session cleared');
             },
 
             // Generate a 6-digit code
@@ -24599,7 +24285,7 @@ John Doe,Engineering,john@example.com"
                 const code = this.generateCode();
                 this.storePendingCode(email, code);
 
-                console.log('🔐 AuthManager: Sending code to', email);
+                debug.log('🔐 AuthManager: Sending code to', email);
 
                 const response = await fetch(this.webhookUrl, {
                     method: 'POST',
@@ -24618,7 +24304,7 @@ John Doe,Engineering,john@example.com"
                     throw new Error('Webhook request failed: ' + response.status);
                 }
 
-                console.log('🔐 AuthManager: Code sent successfully');
+                debug.log('🔐 AuthManager: Code sent successfully');
                 return true;
             },
 
@@ -24627,17 +24313,17 @@ John Doe,Engineering,john@example.com"
                 const pending = this.getPendingCode();
 
                 if (!pending) {
-                    console.log('🔐 AuthManager: No pending code found');
+                    debug.log('🔐 AuthManager: No pending code found');
                     return false;
                 }
 
                 if (pending.code === enteredCode) {
-                    console.log('🔐 AuthManager: Code verified successfully');
+                    debug.log('🔐 AuthManager: Code verified successfully');
                     localStorage.removeItem(this.pendingCodeKey);
                     return true;
                 }
 
-                console.log('🔐 AuthManager: Code mismatch');
+                debug.log('🔐 AuthManager: Code mismatch');
                 return false;
             },
 
@@ -24695,7 +24381,7 @@ John Doe,Engineering,john@example.com"
 
             // Called when authentication is successful
             onAuthSuccess(email, isNewLogin) {
-                console.log('🔐 AuthManager: Auth success for', email);
+                debug.log('🔐 AuthManager: Auth success for', email);
 
                 // Save session
                 if (isNewLogin) {
@@ -24824,7 +24510,7 @@ John Doe,Engineering,john@example.com"
                 if (this.isInitialized) return;
                 this.isInitialized = true;
 
-                console.log('🔐 AminoIdentity: Initializing...');
+                debug.log('🔐 AminoIdentity: Initializing...');
 
                 // Method 1: Check window.logged_in_user immediately (Amino's primary method)
                 this.checkAminoGlobalUser();
@@ -24837,7 +24523,7 @@ John Doe,Engineering,john@example.com"
 
                 // Method 4: Request user info from Amino parent (if in iframe)
                 if (window.parent !== window) {
-                    console.log('🔐 AminoIdentity: Running in iframe, requesting user from parent...');
+                    debug.log('🔐 AminoIdentity: Running in iframe, requesting user from parent...');
                     this.requestUserFromParent();
                     // Also try to access parent's logged_in_user after a short delay
                     this.checkParentAminoUser();
@@ -24848,11 +24534,11 @@ John Doe,Engineering,john@example.com"
                 // Method 5: Check again on window load (Amino may inject user data late)
                 window.addEventListener('load', () => {
                     if (!this.currentUser) {
-                        console.log('🔐 AminoIdentity: Window loaded, checking for user again...');
+                        debug.log('🔐 AminoIdentity: Window loaded, checking for user again...');
                         if (this.checkAminoGlobalUser()) {
-                            console.log('🔐 AminoIdentity: Found user on window load');
+                            debug.log('🔐 AminoIdentity: Found user on window load');
                         } else if (this.checkParentAminoUser()) {
-                            console.log('🔐 AminoIdentity: Found user in parent on window load');
+                            debug.log('🔐 AminoIdentity: Found user in parent on window load');
                         }
                     }
                     // Signal ready to parent regardless of user detection
@@ -24879,12 +24565,12 @@ John Doe,Engineering,john@example.com"
                     if (this.currentUser || this.retryCount >= this.maxRetries) {
                         clearInterval(retryInterval);
                         if (!this.currentUser) {
-                            console.log('🔐 AminoIdentity: Max retries reached, no user from parent');
+                            debug.log('🔐 AminoIdentity: Max retries reached, no user from parent');
                         }
                         return;
                     }
 
-                    console.log(`🔐 AminoIdentity: Retry ${this.retryCount}/${this.maxRetries} - requesting user from parent`);
+                    debug.log(`🔐 AminoIdentity: Retry ${this.retryCount}/${this.maxRetries} - requesting user from parent`);
                     this.requestUserFromParent();
                 }, 2000); // Retry every 2 seconds
             },
@@ -24904,9 +24590,9 @@ John Doe,Engineering,john@example.com"
                             user: this.currentUser
                         };
                         window.parent.postMessage(readyMessage, '*');
-                        console.log('🔐 AminoIdentity: Sent ready signal to parent', readyMessage);
+                        debug.log('🔐 AminoIdentity: Sent ready signal to parent', readyMessage);
                     } catch (e) {
-                        console.log('🔐 AminoIdentity: Could not signal ready to parent', e);
+                        debug.log('🔐 AminoIdentity: Could not signal ready to parent', e);
                     }
                 }
 
@@ -24929,13 +24615,13 @@ John Doe,Engineering,john@example.com"
             checkAminoGlobalUser() {
                 // Amino exposes logged-in user data on window.logged_in_user
                 if (window.logged_in_user) {
-                    console.log('🔐 AminoIdentity: Found window.logged_in_user', window.logged_in_user);
+                    debug.log('🔐 AminoIdentity: Found window.logged_in_user', window.logged_in_user);
                     this.setUser(window.logged_in_user);
                     return true;
                 }
                 // Also check alternative Amino global variables
                 if (window.softr && window.softr.user) {
-                    console.log('🔐 AminoIdentity: Found window.softr.user', window.softr.user);
+                    debug.log('🔐 AminoIdentity: Found window.softr.user', window.softr.user);
                     this.setUser(window.softr.user);
                     return true;
                 }
@@ -24947,19 +24633,19 @@ John Doe,Engineering,john@example.com"
                 try {
                     if (window.parent && window.parent !== window) {
                         if (window.parent.logged_in_user) {
-                            console.log('🔐 AminoIdentity: Found parent.logged_in_user', window.parent.logged_in_user);
+                            debug.log('🔐 AminoIdentity: Found parent.logged_in_user', window.parent.logged_in_user);
                             this.setUser(window.parent.logged_in_user);
                             return true;
                         }
                         if (window.parent.softr && window.parent.softr.user) {
-                            console.log('🔐 AminoIdentity: Found parent.softr.user', window.parent.softr.user);
+                            debug.log('🔐 AminoIdentity: Found parent.softr.user', window.parent.softr.user);
                             this.setUser(window.parent.softr.user);
                             return true;
                         }
                     }
                 } catch (e) {
                     // Cross-origin access blocked - this is expected for cross-origin iframes
-                    console.log('🔐 AminoIdentity: Cannot access parent (cross-origin)', e.message);
+                    debug.log('🔐 AminoIdentity: Cannot access parent (cross-origin)', e.message);
                 }
                 return false;
             },
@@ -24981,21 +24667,21 @@ John Doe,Engineering,john@example.com"
 
                     // Check global variables again
                     if (this.checkAminoGlobalUser()) {
-                        console.log(`🔐 AminoIdentity: Found user after ${attempts} polling attempt(s)`);
+                        debug.log(`🔐 AminoIdentity: Found user after ${attempts} polling attempt(s)`);
                         clearInterval(pollInterval);
                         return;
                     }
 
                     // Try parent again (same-origin only)
                     if (this.checkParentAminoUser()) {
-                        console.log(`🔐 AminoIdentity: Found user in parent after ${attempts} polling attempt(s)`);
+                        debug.log(`🔐 AminoIdentity: Found user in parent after ${attempts} polling attempt(s)`);
                         clearInterval(pollInterval);
                         return;
                     }
 
                     if (attempts >= maxAttempts) {
                         clearInterval(pollInterval);
-                        console.log('🔐 AminoIdentity: User polling complete, no user found after 3 seconds');
+                        debug.log('🔐 AminoIdentity: User polling complete, no user found after 3 seconds');
                     }
                 }, 100); // Check every 100ms (fast polling like Amino's patterns)
             },
@@ -25008,12 +24694,12 @@ John Doe,Engineering,john@example.com"
                 // Log all messages for debugging (in debug mode)
                 const urlParams = new URLSearchParams(window.location.search);
                 if (urlParams.get('debug') === 'true') {
-                    console.log('🔐 AminoIdentity: Received postMessage:', data);
+                    debug.log('🔐 AminoIdentity: Received postMessage:', data);
                 }
 
                 // Handle bridge-specific messages
                 if (data.type === 'softr-bridge:user' || data.type === 'bridge:user') {
-                    console.log('🔐 AminoIdentity: Received user from Amino bridge', data);
+                    debug.log('🔐 AminoIdentity: Received user from Amino bridge', data);
                     const userData = data.user || data.userData || data;
                     this.setUser(userData);
                     // Acknowledge receipt
@@ -25029,7 +24715,7 @@ John Doe,Engineering,john@example.com"
 
                 // Handle Amino user data (various formats Amino might use)
                 if (data.type === 'softr:user' || data.type === 'user' || data.aminoUser || data.user) {
-                    console.log('🔐 AminoIdentity: Received user data via postMessage', data);
+                    debug.log('🔐 AminoIdentity: Received user data via postMessage', data);
                     const userData = data.user || data.aminoUser || data;
                     this.setUser(userData);
                     return;
@@ -25037,14 +24723,14 @@ John Doe,Engineering,john@example.com"
 
                 // Handle Amino's logged_in_user format
                 if (data.logged_in_user) {
-                    console.log('🔐 AminoIdentity: Received logged_in_user via postMessage', data);
+                    debug.log('🔐 AminoIdentity: Received logged_in_user via postMessage', data);
                     this.setUser(data.logged_in_user);
                     return;
                 }
 
                 // Handle request for status from parent
                 if (data.type === 'softr-bridge:request-status' || data.type === 'request:status') {
-                    console.log('🔐 AminoIdentity: Parent requesting status');
+                    debug.log('🔐 AminoIdentity: Parent requesting status');
                     if (window.parent !== window) {
                         window.parent.postMessage({
                             type: 'taskflow:status',
@@ -25068,7 +24754,7 @@ John Doe,Engineering,john@example.com"
                 const userName = params.get('softr_user_name') || params.get('user_name') || params.get('name');
 
                 if (userId || userEmail || userName) {
-                    console.log('🔐 AminoIdentity: Found user in URL params');
+                    debug.log('🔐 AminoIdentity: Found user in URL params');
                     this.setUser({
                         id: userId,
                         email: userEmail,
@@ -25084,7 +24770,7 @@ John Doe,Engineering,john@example.com"
                     window.parent.postMessage({ type: 'request:user', source: 'taskflow-app' }, '*');
                     window.parent.postMessage({ type: 'softr:request-user', source: 'taskflow-app' }, '*');
                 } catch (e) {
-                    console.log('🔐 AminoIdentity: Could not request user from parent', e);
+                    debug.log('🔐 AminoIdentity: Could not request user from parent', e);
                 }
             },
 
@@ -25103,7 +24789,7 @@ John Doe,Engineering,john@example.com"
                     _detectedAt: new Date().toISOString()
                 };
 
-                console.log('🔐 AminoIdentity: User set:', this.currentUser);
+                debug.log('🔐 AminoIdentity: User set:', this.currentUser);
 
                 // Update UI
                 this.updateUI();
@@ -26283,14 +25969,14 @@ John Doe,Engineering,john@example.com"
                         maxRecords: 10000  // Get all records
                     };
 
-                    console.log(`📡 Loading all ${category} records...`);
+                    debug.log(`📡 Loading all ${category} records...`);
                     const result = await this.request('getRecords', params);
 
                     // Normalize response to handle both flat and nested field formats
                     const normalized = this.normalizeResponse(result);
                     cache.records = normalized.records || [];
                     cache.lastFetch = Date.now();
-                    console.log(`✅ Loaded ${cache.records.length} ${category} records`);
+                    debug.log(`✅ Loaded ${cache.records.length} ${category} records`);
                     return cache.records;
                 } catch (error) {
                     console.error(`Error loading ${category}:`, error);
@@ -26302,7 +25988,7 @@ John Doe,Engineering,john@example.com"
 
             // Load all data for all categories (called on page load)
             async preloadAllData() {
-                console.log('🚀 Preloading all Airtable data...');
+                debug.log('🚀 Preloading all Airtable data...');
                 const startTime = Date.now();
 
                 // Load all categories in parallel
@@ -26310,7 +25996,7 @@ John Doe,Engineering,john@example.com"
                 await Promise.all(categories.map(category => this.loadAllRecords(category)));
 
                 const duration = Date.now() - startTime;
-                console.log(`✅ All Airtable data preloaded in ${duration}ms`);
+                debug.log(`✅ All Airtable data preloaded in ${duration}ms`);
 
                 // Return summary
                 const summary = {};
@@ -26322,16 +26008,16 @@ John Doe,Engineering,john@example.com"
 
             // Refresh cache for a specific category
             async refreshCategory(category) {
-                console.log(`🔄 Refreshing ${category} cache...`);
+                debug.log(`🔄 Refreshing ${category} cache...`);
                 return this.loadAllRecords(category, true);
             },
 
             // Refresh all caches
             async refreshAllData() {
-                console.log('🔄 Refreshing all Airtable data...');
+                debug.log('🔄 Refreshing all Airtable data...');
                 const categories = Object.keys(this.tables);
                 await Promise.all(categories.map(category => this.loadAllRecords(category, true)));
-                console.log('✅ All caches refreshed');
+                debug.log('✅ All caches refreshed');
             },
 
             // Local search across any category
@@ -26573,7 +26259,7 @@ John Doe,Engineering,john@example.com"
 
         // Load users from Airtable and add them as person entities
         async function loadUsersFromAPI() {
-            console.log('📡 Loading users from Airtable API...');
+            debug.log('📡 Loading users from Airtable API...');
             try {
                 const result = await AirtableAPI.getRecords('users', {
                     fields: ['User Name', 'Email', 'Activity Status'],
@@ -26581,7 +26267,7 @@ John Doe,Engineering,john@example.com"
                 });
 
                 const records = result.records || [];
-                console.log(`📥 Received ${records.length} users from API`);
+                debug.log(`📥 Received ${records.length} users from API`);
 
                 // Clear existing people to avoid duplicates
                 entities.person = [];
@@ -26618,7 +26304,7 @@ John Doe,Engineering,john@example.com"
                     });
                 });
 
-                console.log(`✅ Created ${entities.person.length} Active person entities from API users (filtered from ${records.length} total)`);
+                debug.log(`✅ Created ${entities.person.length} Active person entities from API users (filtered from ${records.length} total)`);
 
                 // Re-render the UI to show the new people
                 if (typeof renderEntityList === 'function') {
@@ -26646,14 +26332,14 @@ John Doe,Engineering,john@example.com"
         // - If a user exists in Airtable but not in history, add them
         // - If a user was in history but removed from Airtable, log removal
         async function syncUsersToActivityHistory(airtableUsers) {
-            console.log('🔄 Syncing users to activity history...');
+            debug.log('🔄 Syncing users to activity history...');
 
             try {
                 // Get all activities from Xano to see which users are already tracked
                 const activities = await getActivitiesFromXano();
 
                 if (!activities) {
-                    console.warn('⚠️ Could not fetch activities for user sync');
+                    debug.warn('⚠️ Could not fetch activities for user sync');
                     return;
                 }
 
@@ -26680,7 +26366,7 @@ John Doe,Engineering,john@example.com"
                     existingPersonIds.delete(removedId);
                 }
 
-                console.log(`📊 Found ${existingPersonIds.size} existing users in activity history`);
+                debug.log(`📊 Found ${existingPersonIds.size} existing users in activity history`);
 
                 // Build a set of current Airtable user IDs
                 const airtableUserIds = new Set(airtableUsers.map(u => u.id));
@@ -26691,12 +26377,12 @@ John Doe,Engineering,john@example.com"
                 // Find users in activity history that aren't in Airtable anymore (removed users)
                 const usersToRemove = [...existingPersonIds].filter(id => !airtableUserIds.has(id));
 
-                console.log(`➕ Users to add to history: ${usersToAdd.length}`);
-                console.log(`➖ Users removed from Airtable: ${usersToRemove.length}`);
+                debug.log(`➕ Users to add to history: ${usersToAdd.length}`);
+                debug.log(`➖ Users removed from Airtable: ${usersToRemove.length}`);
 
                 // Add new users to activity history
                 for (const user of usersToAdd) {
-                    console.log(`📝 Adding user to history: ${user.name} (${user.id})`);
+                    debug.log(`📝 Adding user to history: ${user.name} (${user.id})`);
 
                     await logActivityToXano({
                         event_verb: 'INS',
@@ -26725,7 +26411,7 @@ John Doe,Engineering,john@example.com"
                     );
                     const userName = userActivity?.object_label || userActivity?.entity_name || 'Unknown User';
 
-                    console.log(`📝 Logging removal for user: ${userName} (${removedId})`);
+                    debug.log(`📝 Logging removal for user: ${userName} (${removedId})`);
 
                     await logActivityToXano({
                         event_verb: 'NUL',
@@ -26744,14 +26430,14 @@ John Doe,Engineering,john@example.com"
                 }
 
                 if (usersToAdd.length > 0 || usersToRemove.length > 0) {
-                    console.log(`✅ User sync complete: ${usersToAdd.length} added, ${usersToRemove.length} removed`);
+                    debug.log(`✅ User sync complete: ${usersToAdd.length} added, ${usersToRemove.length} removed`);
 
                     // Show a single toast summarizing the sync
                     if (usersToAdd.length > 0) {
                         showActivityToast('success', 'Users Synced', `${usersToAdd.length} user(s) imported from Airtable`);
                     }
                 } else {
-                    console.log('✅ User sync complete: No changes needed');
+                    debug.log('✅ User sync complete: No changes needed');
                 }
 
             } catch (error) {
@@ -27602,15 +27288,6 @@ John Doe,Engineering,john@example.com"
                 }
             });
 
-            // Update settings subbar active tab state
-            const settingsViews = ['structure', 'workflows', 'company-rules'];
-            document.querySelectorAll('.settings-subbar-tab').forEach(tab => {
-                tab.classList.remove('active');
-                if (tab.dataset.view === view) {
-                    tab.classList.add('active');
-                }
-            });
-
             // Hide all views
             document.getElementById('treeView').classList.remove('active');
             document.getElementById('cardView').classList.remove('active');
@@ -27697,58 +27374,6 @@ John Doe,Engineering,john@example.com"
             team: true,
             unit: true
         };
-
-        function toggleViewFilter(event) {
-            event.stopPropagation();
-            const menu = document.getElementById('viewFilterMenu');
-            menu.classList.toggle('open');
-        }
-
-        function closeViewFilter() {
-            const menu = document.getElementById('viewFilterMenu');
-            if (menu) menu.classList.remove('open');
-        }
-
-        function applyViewFilters() {
-            viewFilters.role = document.getElementById('viewFilterRole').checked;
-            viewFilters.person = document.getElementById('viewFilterPerson').checked;
-            viewFilters.team = document.getElementById('viewFilterTeam').checked;
-            viewFilters.unit = document.getElementById('viewFilterUnit').checked;
-
-            // Update badge visibility
-            const badge = document.getElementById('viewFilterBadge');
-            const allChecked = viewFilters.role && viewFilters.person && viewFilters.team && viewFilters.unit;
-            badge.style.display = allChecked ? 'none' : 'block';
-
-            // Re-render current view with filters
-            if (currentView === 'kanban') {
-                renderKanbanBoard();
-            } else if (currentView === 'table') {
-                renderTaskTable();
-            } else if (currentView === 'timeline') {
-                renderTimeline();
-            } else if (currentView === 'gantt') {
-                renderGanttView();
-            } else if (currentView === 'calendar') {
-                renderCalendarView();
-            }
-        }
-
-        function selectAllViewFilters() {
-            document.getElementById('viewFilterRole').checked = true;
-            document.getElementById('viewFilterPerson').checked = true;
-            document.getElementById('viewFilterTeam').checked = true;
-            document.getElementById('viewFilterUnit').checked = true;
-            applyViewFilters();
-        }
-
-        function clearViewFilters() {
-            document.getElementById('viewFilterRole').checked = false;
-            document.getElementById('viewFilterPerson').checked = false;
-            document.getElementById('viewFilterTeam').checked = false;
-            document.getElementById('viewFilterUnit').checked = false;
-            applyViewFilters();
-        }
 
         // ============================================
         // VISIBILITY ACCESS CONTROL FUNCTIONS
@@ -29226,9 +28851,6 @@ John Doe,Engineering,john@example.com"
             }
             if (!e.target.closest('.header-actions-menu')) {
                 closeActionsMenu();
-            }
-            if (!e.target.closest('.view-filter-dropdown')) {
-                closeViewFilter();
             }
         });
 
@@ -34845,7 +34467,7 @@ Cmd/Ctrl + K - Command palette
 
                 if (attempt < maxRetries - 1) {
                     const delay = baseDelay * Math.pow(2, attempt);
-                    console.log(`⏳ Xano retry ${attempt + 1}/${maxRetries} in ${delay}ms...`);
+                    debug.log(`⏳ Xano retry ${attempt + 1}/${maxRetries} in ${delay}ms...`);
                     await new Promise(resolve => setTimeout(resolve, delay));
                 }
             }
@@ -34868,7 +34490,7 @@ Cmd/Ctrl + K - Command palette
                 if (response.ok) {
                     xanoLastSuccessfulConnection = new Date();
                     updateXanoStatusIndicator('connected', xanoActivityUploadCount);
-                    console.log('✅ Xano connection verified');
+                    debug.log('✅ Xano connection verified');
                     // Notify parent frame of Xano status
                     if (window.parent !== window) {
                         window.parent.postMessage({
@@ -34881,7 +34503,7 @@ Cmd/Ctrl + K - Command palette
                     return true;
                 } else {
                     updateXanoStatusIndicator('disconnected');
-                    console.warn('⚠️ Xano connection failed:', response.status);
+                    debug.warn('⚠️ Xano connection failed:', response.status);
                     return false;
                 }
             } catch (error) {
@@ -34925,13 +34547,13 @@ Cmd/Ctrl + K - Command palette
                 status.textContent = 'On';
                 toggle.title = 'Auto-refresh: ON - Syncing every 10 seconds';
                 startAutoRefresh();
-                console.log('🔄 Auto-refresh enabled');
+                debug.log('🔄 Auto-refresh enabled');
             } else {
                 toggle.classList.remove('active');
                 status.textContent = 'Off';
                 toggle.title = 'Auto-refresh: Click to enable automatic syncing of new data';
                 stopAutoRefresh();
-                console.log('⏹️ Auto-refresh disabled');
+                debug.log('⏹️ Auto-refresh disabled');
             }
 
             // Save preference to localStorage
@@ -34981,7 +34603,7 @@ Cmd/Ctrl + K - Command palette
                 if (activities && activities.length > 0) {
                     // Check if there are new activities
                     if (activities.length !== lastActivityCount) {
-                        console.log('🔄 Auto-refresh: Detected change (' + lastActivityCount + ' -> ' + activities.length + ' activities)');
+                        debug.log('🔄 Auto-refresh: Detected change (' + lastActivityCount + ' -> ' + activities.length + ' activities)');
                         lastActivityCount = activities.length;
 
                         // Reconstruct entities from activities
@@ -35010,7 +34632,7 @@ Cmd/Ctrl + K - Command palette
                             updateFilterStatus();
                             updateTaskCountBadge();
 
-                            console.log('✅ Auto-refresh: Updated with ' + totalEntities + ' entities');
+                            debug.log('✅ Auto-refresh: Updated with ' + totalEntities + ' entities');
                         }
                     }
                 }
@@ -35028,11 +34650,11 @@ Cmd/Ctrl + K - Command palette
                 isTabVisible = !document.hidden;
 
                 if (isTabVisible && autoRefreshEnabled) {
-                    console.log('👁️ Tab visible - resuming auto-refresh');
+                    debug.log('👁️ Tab visible - resuming auto-refresh');
                     // Immediate refresh when tab becomes visible
                     performAutoRefresh();
                 } else if (!isTabVisible) {
-                    console.log('👁️ Tab hidden - pausing auto-refresh');
+                    debug.log('👁️ Tab hidden - pausing auto-refresh');
                 }
             });
         }
@@ -35052,7 +34674,7 @@ Cmd/Ctrl + K - Command palette
                         status.textContent = 'On';
                         toggle.title = 'Auto-refresh: ON - Syncing every 10 seconds';
                         startAutoRefresh();
-                        console.log('🔄 Auto-refresh enabled by default for instant visibility');
+                        debug.log('🔄 Auto-refresh enabled by default for instant visibility');
                     }
                 }
             } catch (e) {
@@ -35090,7 +34712,7 @@ Cmd/Ctrl + K - Command palette
                     params.append('since', lastUpdateTimestamp);
                 }
 
-                console.log('🔄 Checking for updates from Xano...');
+                debug.log('🔄 Checking for updates from Xano...');
                 const response = await fetchWithRetry(
                     `${XANO_BASE_URL}/activity_store_updates?${params.toString()}`,
                     {
@@ -35105,12 +34727,12 @@ Cmd/Ctrl + K - Command palette
                 );
 
                 if (!response.ok) {
-                    console.warn('⚠️ Failed to fetch updates:', response.status);
+                    debug.warn('⚠️ Failed to fetch updates:', response.status);
                     return null;
                 }
 
                 const data = await response.json();
-                console.log('📥 Updates received:', data);
+                debug.log('📥 Updates received:', data);
 
                 // Update the last timestamp if we got data
                 if (data && data.length > 0) {
@@ -35131,11 +34753,11 @@ Cmd/Ctrl + K - Command palette
         // Process updates and apply them to the local state
         async function processUpdates(updates) {
             if (!updates || updates.length === 0) {
-                console.log('✓ No new updates');
+                debug.log('✓ No new updates');
                 return false;
             }
 
-            console.log(`📥 Processing ${updates.length} update(s)...`);
+            debug.log(`📥 Processing ${updates.length} update(s)...`);
 
             try {
                 // Get full activity list to reconstruct state
@@ -35168,7 +34790,7 @@ Cmd/Ctrl + K - Command palette
                         updateFilterStatus();
                         updateTaskCountBadge();
 
-                        console.log(`✅ Applied ${updates.length} update(s), now have ${totalEntities} entities`);
+                        debug.log(`✅ Applied ${updates.length} update(s), now have ${totalEntities} entities`);
                         showActivityToast('success', 'Updates Applied', `${updates.length} change(s) synced`);
                         return true;
                     }
@@ -35242,7 +34864,7 @@ Cmd/Ctrl + K - Command palette
                 updatePollingEnabled = false;
                 if (statusIndicator) statusIndicator.classList.remove('active');
                 if (statusText) statusText.textContent = 'Updates disabled';
-                console.log('⏹️ Update polling disabled');
+                debug.log('⏹️ Update polling disabled');
             } else {
                 updatePollingEnabled = true;
                 if (statusIndicator) statusIndicator.classList.add('active');
@@ -35265,7 +34887,7 @@ Cmd/Ctrl + K - Command palette
                     }
                 }, intervalMs);
 
-                console.log(`🔄 Update polling enabled: every ${intervalMs / 1000}s`);
+                debug.log(`🔄 Update polling enabled: every ${intervalMs / 1000}s`);
             }
 
             // Save preference to localStorage
@@ -35284,7 +34906,7 @@ Cmd/Ctrl + K - Command palette
                     const intervalMs = parseInt(savedInterval, 10);
                     if ([0, 30000, 60000].includes(intervalMs)) {
                         setUpdateInterval(intervalMs);
-                        console.log('🔄 Update polling preference restored:', intervalMs);
+                        debug.log('🔄 Update polling preference restored:', intervalMs);
                     }
                 } else {
                     // Default to off
@@ -35338,7 +34960,7 @@ Cmd/Ctrl + K - Command palette
                         }
                     };
 
-                    console.log('📝 Declaring agent to Xano:', agentId, agentName);
+                    debug.log('📝 Declaring agent to Xano:', agentId, agentName);
 
                     const response = await fetch(`${XANO_BASE_URL}/activity_store`, {
                         method: 'POST',
@@ -35353,7 +34975,7 @@ Cmd/Ctrl + K - Command palette
                             email: agentEmail,
                             declaredAt: new Date().toISOString()
                         });
-                        console.log('✅ Agent declared:', agentId);
+                        debug.log('✅ Agent declared:', agentId);
                         xanoActivityUploadCount++;
                         updateXanoStatusIndicator('connected', xanoActivityUploadCount);
                     }
@@ -35409,7 +35031,7 @@ Cmd/Ctrl + K - Command palette
                     }
                 };
 
-                console.log('📝 Logging activity to Xano:', payload);
+                debug.log('📝 Logging activity to Xano:', payload);
 
                 const response = await fetch(`${XANO_BASE_URL}/activity_store`, {
                     method: 'POST',
@@ -35430,7 +35052,7 @@ Cmd/Ctrl + K - Command palette
                 }
 
                 const result = await response.json();
-                console.log('✅ Activity logged:', result);
+                debug.log('✅ Activity logged:', result);
 
                 // Update status and count on success
                 xanoActivityUploadCount++;
@@ -35453,7 +35075,7 @@ Cmd/Ctrl + K - Command palette
 
         async function getActivitiesFromXano() {
             try {
-                console.log('🔄 Fetching activities from Xano...');
+                debug.log('🔄 Fetching activities from Xano...');
                 const response = await fetchWithRetry(`${XANO_BASE_URL}/activity_store`, {
                     method: 'GET',
                     mode: 'cors',
@@ -35469,7 +35091,7 @@ Cmd/Ctrl + K - Command palette
                 }
 
                 const activities = await response.json();
-                console.log('📥 Fetched activities from Xano:', activities.length, 'records');
+                debug.log('📥 Fetched activities from Xano:', activities.length, 'records');
 
                 // Update connection status on successful fetch
                 updateXanoStatusIndicator('connected', xanoActivityUploadCount);
@@ -35518,7 +35140,7 @@ Cmd/Ctrl + K - Command palette
                     }
                 }
 
-                console.log('📋 Loaded', declaredAgents.size, 'agents from activity history');
+                debug.log('📋 Loaded', declaredAgents.size, 'agents from activity history');
 
                 // Enrich activities with agent info from registry (for display purposes)
                 return parsedActivities.map(a => {
@@ -35778,7 +35400,7 @@ Cmd/Ctrl + K - Command palette
         // Reconstruct entities from Xano activity history
         // This enables data recovery when localStorage is empty or cleared
         function reconstructEntitiesFromActivities(activities) {
-            console.log('🔄 Reconstructing entities from', activities.length, 'activities...');
+            debug.log('🔄 Reconstructing entities from', activities.length, 'activities...');
 
             const reconstructedEntities = {
                 unit: [],
@@ -35937,7 +35559,7 @@ Cmd/Ctrl + K - Command palette
                 (sum, arr) => sum + arr.length, 0
             );
 
-            console.log('✅ Reconstructed', totalEntities, 'entities and', finalRelationships.length, 'relationships from Xano activities');
+            debug.log('✅ Reconstructed', totalEntities, 'entities and', finalRelationships.length, 'relationships from Xano activities');
 
             return {
                 entities: reconstructedEntities,
@@ -36074,7 +35696,7 @@ Cmd/Ctrl + K - Command palette
                     }
                 }
 
-                console.log('📝 Updating activity in Xano:', activityId, payload);
+                debug.log('📝 Updating activity in Xano:', activityId, payload);
 
                 const response = await fetch(`${XANO_BASE_URL}/activity_store/${activityId}`, {
                     method: 'PUT',
@@ -36092,7 +35714,7 @@ Cmd/Ctrl + K - Command palette
                 }
 
                 const result = await response.json();
-                console.log('✅ Activity updated:', result);
+                debug.log('✅ Activity updated:', result);
                 updateXanoStatusIndicator('connected', xanoActivityUploadCount);
                 return result;
             } catch (error) {
@@ -43840,7 +43462,7 @@ Cmd/Ctrl + K - Command palette
                     btnText.textContent = hasSampleData ? 'Clear Sample Data' : 'Load Sample Data';
                 }
 
-                console.log('📦 Loaded workspace:', ws.name);
+                debug.log('📦 Loaded workspace:', ws.name);
                 return true;
             }
 
@@ -52565,7 +52187,7 @@ Options:
             if (workflowTemplates.length === 0) {
                 workflowTemplates = JSON.parse(JSON.stringify(defaultWorkflowTemplates));
                 saveWorkspaces();
-                console.log('✅ Seeded default workflow templates');
+                debug.log('✅ Seeded default workflow templates');
             } else {
                 // Ensure all default templates exist (for existing workspaces)
                 defaultWorkflowTemplates.forEach(defaultTemplate => {
@@ -54221,19 +53843,19 @@ Options:
                 console.log(success ? '✅' : '❌', message);
             }
 
-            console.log('🔧 Initializing Taskflow...');
-            console.log('📍 Loading from:', window.location.protocol);
-            console.log('🌐 D3.js loaded:', typeof d3 !== 'undefined');
+            debug.log('🔧 Initializing Taskflow...');
+            debug.log('📍 Loading from:', window.location.protocol);
+            debug.log('🌐 D3.js loaded:', typeof d3 !== 'undefined');
 
             // Initialize Authentication Manager - this gates access to the app
-            console.log('🔐 Checking authentication...');
+            debug.log('🔐 Checking authentication...');
             AuthManager.init();
 
             // Detect iframe/embed context
             const isInIframe = window.parent !== window;
             const isAminoEmbed = isInIframe || window.location.hostname.includes('softr');
-            console.log('🖼️ Running in iframe:', isInIframe);
-            console.log('🔗 Amino embed detected:', isAminoEmbed);
+            debug.log('🖼️ Running in iframe:', isInIframe);
+            debug.log('🔗 Amino embed detected:', isAminoEmbed);
 
             // Initialize Amino user identity detection
             AminoIdentity.init();
@@ -54262,10 +53884,10 @@ Options:
                 const testKey = '__storage_test__';
                 localStorage.setItem(testKey, testKey);
                 localStorage.removeItem(testKey);
-                console.log('💾 localStorage available: true');
+                debug.log('💾 localStorage available: true');
             } catch (e) {
                 localStorageAvailable = false;
-                console.warn('⚠️ localStorage not available (possibly blocked in iframe):', e.message);
+                debug.warn('⚠️ localStorage not available (possibly blocked in iframe):', e.message);
                 if (isInIframe) {
                     updateStatus('Storage limited in embed mode', false);
                 }
@@ -54277,12 +53899,12 @@ Options:
             if (localStorageAvailable) {
                 try {
                     hasStoredData = loadFromLocalStorage();
-                    console.log('📦 Has stored data:', hasStoredData);
+                    debug.log('📦 Has stored data:', hasStoredData);
                 } catch (e) {
                     console.error('❌ localStorage error:', e);
                     if (window.location.protocol === 'file:') {
                         updateStatus('localStorage restricted (file:// URL)', false);
-                        console.warn('⚠️ Note: Some browsers restrict localStorage for file:// URLs');
+                        debug.warn('⚠️ Note: Some browsers restrict localStorage for file:// URLs');
                     }
                 }
             }
@@ -54290,7 +53912,7 @@ Options:
             // Function to create default workspace (formerly loaded sample data)
             function loadSampleDataFallback() {
                 updateStatus('Creating default workspace...');
-                console.log('📝 Creating default workspace...');
+                debug.log('📝 Creating default workspace...');
                 try {
                     // Create default workspace
                     const wsId = generateWorkspaceId();
@@ -54316,16 +53938,16 @@ Options:
                         // Update workspace with loaded users
                         workspaces[wsId].entities = JSON.parse(JSON.stringify(entities));
                         saveWorkspaces();
-                        console.log('✅ Users loaded from API');
+                        debug.log('✅ Users loaded from API');
                     }).catch(err => {
-                        console.warn('⚠️ Could not load users from API:', err);
+                        debug.warn('⚠️ Could not load users from API:', err);
                     });
 
                     const btnText = document.getElementById('sampleDataText');
                     if (btnText) {
                         btnText.textContent = 'Load Sample Data';
                     }
-                    console.log('✅ Default workspace created. Entities:', {
+                    debug.log('✅ Default workspace created. Entities:', {
                         units: entities.unit.length,
                         teams: entities.team.length,
                         roles: entities.role.length,
@@ -54334,7 +53956,7 @@ Options:
                         products: entities.product.length,
                         workflows: entities.workflow.length
                     });
-                    console.log('✅ Relationships:', relationships.length);
+                    debug.log('✅ Relationships:', relationships.length);
                     updateStatus('Workspace ready');
                 } catch (e) {
                     console.error('❌ Error creating workspace:', e);
@@ -54355,9 +53977,9 @@ Options:
 
                 // Preload all Airtable data for fast linking (runs in background)
                 AirtableAPI.preloadAllData().then(summary => {
-                    console.log('📊 Airtable data preloaded:', summary);
+                    debug.log('📊 Airtable data preloaded:', summary);
                 }).catch(err => {
-                    console.warn('⚠️ Could not preload Airtable data:', err);
+                    debug.warn('⚠️ Could not preload Airtable data:', err);
                 });
 
                 // Always sync users from Airtable (ensures people list is up to date)
@@ -54367,7 +53989,7 @@ Options:
                         workspaces[currentWorkspaceId].entities = JSON.parse(JSON.stringify(entities));
                         saveWorkspaces();
                     }
-                    console.log('✅ Users synced from Airtable');
+                    debug.log('✅ Users synced from Airtable');
                     // Re-render UI to show updated people
                     if (typeof renderPeopleList === 'function') {
                         renderPeopleList();
@@ -54376,13 +53998,13 @@ Options:
                         populateAssigneeList();
                     }
                 }).catch(err => {
-                    console.warn('⚠️ Could not sync users from Airtable:', err);
+                    debug.warn('⚠️ Could not sync users from Airtable:', err);
                 });
 
                 // Render everything
                 try {
                     updateStatus('Rendering interface...');
-                    console.log('🎨 Rendering UI...');
+                    debug.log('🎨 Rendering UI...');
                     renderEntityList();
                     updateSelects();
                     updateParentOptions();
@@ -54390,7 +54012,7 @@ Options:
                     updateFilterStatus();
                     updateTaskCountBadge();
                     updateNotificationBadge();
-                    console.log('✅ UI rendered');
+                    debug.log('✅ UI rendered');
                     updateStatus('Ready');
 
                     // Initialize simplified UX
@@ -54416,7 +54038,7 @@ Options:
                 // Show kanban view by default
                 try {
                     switchView('kanban');
-                    console.log('✅ Kanban view activated');
+                    debug.log('✅ Kanban view activated');
                 } catch (e) {
                     console.error('❌ Error switching to kanban view:', e);
                     updateStatus('Error loading view', false);
@@ -54424,14 +54046,14 @@ Options:
 
                 // Initialize auto-refresh system
                 initAutoRefresh();
-                console.log('🔄 Auto-refresh system initialized');
+                debug.log('🔄 Auto-refresh system initialized');
 
                 // Initialize update polling system
                 initUpdatePolling();
-                console.log('🔄 Update polling system initialized');
+                debug.log('🔄 Update polling system initialized');
 
-                console.log('🎉 Initialization complete!');
-                console.log('📊 Current state:', {
+                debug.log('🎉 Initialization complete!');
+                debug.log('📊 Current state:', {
                     entities: {
                         units: entities.unit.length,
                         teams: entities.team.length,
@@ -54456,11 +54078,11 @@ Options:
             // If no stored data, try to restore from Xano first
             if (!hasStoredData) {
                 updateStatus('Checking for existing data...');
-                console.log('📡 No localStorage data - checking Xano for existing data...');
+                debug.log('📡 No localStorage data - checking Xano for existing data...');
 
                 getActivitiesFromXano().then(xanoActivities => {
                     if (xanoActivities && xanoActivities.length > 0) {
-                        console.log('✅ Found', xanoActivities.length, 'activities in Xano');
+                        debug.log('✅ Found', xanoActivities.length, 'activities in Xano');
                         updateStatus('Restoring data...');
 
                         // Try to reconstruct entities from activities
@@ -54487,7 +54109,7 @@ Options:
                             hasSampleData = false;
                             saveWorkspaces();
 
-                            console.log('✅ Restored', totalEntities, 'entities from Xano');
+                            debug.log('✅ Restored', totalEntities, 'entities from Xano');
                             updateStatus(`Restored ${totalEntities} entities`);
 
                             // Update UI
@@ -54500,13 +54122,13 @@ Options:
                             completeInitialization();
                         } else {
                             // Activities exist but no entities could be reconstructed
-                            console.log('⚠️ Activities found but no entities to restore - loading sample data');
+                            debug.log('⚠️ Activities found but no entities to restore - loading sample data');
                             loadSampleDataFallback();
                             completeInitialization();
                         }
                     } else {
                         // No Xano data - load sample data
-                        console.log('ℹ️ No existing data in Xano - loading sample data');
+                        debug.log('ℹ️ No existing data in Xano - loading sample data');
                         loadSampleDataFallback();
                         completeInitialization();
                     }
@@ -54518,14 +54140,14 @@ Options:
                 });
             } else {
                 updateStatus('Loaded from storage');
-                console.log('✅ Loaded data from localStorage');
+                debug.log('✅ Loaded data from localStorage');
 
                 // Still connect to Xano for activity logging
                 getActivitiesFromXano().then(xanoActivities => {
                     if (xanoActivities && xanoActivities.length > 0) {
-                        console.log('✅ Connected to Xano. Found', xanoActivities.length, 'activities');
+                        debug.log('✅ Connected to Xano. Found', xanoActivities.length, 'activities');
                     } else {
-                        console.log('ℹ️ Xano connected but no activities found for this app');
+                        debug.log('ℹ️ Xano connected but no activities found for this app');
                     }
                 }).catch(err => {
                     console.error('⚠️ Xano connection failed (data loaded from localStorage):', err);
