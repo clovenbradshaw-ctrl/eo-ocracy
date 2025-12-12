@@ -26489,7 +26489,7 @@ John Doe,Engineering,john@example.com"
             // Refresh views
             renderEntityList();
             renderCurrentView();
-            populateSelects();
+            populateHeroSelects();
 
             showToast(`Workflow "${name}" created from ${tasks.length} tasks!`, 'success');
 
@@ -49378,7 +49378,7 @@ Options:
             try {
                 renderEntityList();
                 renderActivityList();
-                populateSelects();
+                populateHeroSelects();
                 updateTaskCountBadge();
                 renderTaskBoardView();
                 // Also refresh the current view (kanban, table, timeline, etc.)
