@@ -52477,9 +52477,6 @@ Options:
             const instanceId = 'wfi_' + Date.now();
             const createdTaskIds = [];
 
-            // Save undo state before bulk creation
-            saveUndoState('instantiate_workflow');
-
             // Create tasks from template
             for (let i = 0; i < tasks.length; i++) {
                 const taskTemplate = tasks[i];
