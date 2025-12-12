@@ -213,6 +213,108 @@
             opacity: 1;
         }
 
+        /* View Tabs Divider */
+        .view-tabs-divider {
+            width: 1px;
+            height: 24px;
+            background: rgba(255,255,255,0.25);
+            margin: 0 4px;
+        }
+
+        /* Secondary Views Dropdown */
+        .view-tab-dropdown {
+            position: relative;
+        }
+
+        .view-tab-dropdown-trigger {
+            display: flex;
+            align-items: center;
+            gap: 0.4rem;
+            background: transparent;
+            color: rgba(255,255,255,0.85);
+            border: none;
+            padding: 0.5rem 0.875rem;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 0.8125rem;
+            font-weight: 500;
+            transition: all 0.2s ease;
+            white-space: nowrap;
+        }
+
+        .view-tab-dropdown-trigger i {
+            font-size: 1rem;
+            opacity: 0.9;
+        }
+
+        .view-tab-dropdown-trigger:hover {
+            background: rgba(255,255,255,0.15);
+            color: white;
+        }
+
+        .view-tab-dropdown-trigger.active {
+            background: white;
+            color: #9A6B3A;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+        }
+
+        .view-tab-dropdown-trigger .dropdown-arrow {
+            font-size: 0.75rem;
+            transition: transform 0.2s ease;
+        }
+
+        .view-tab-dropdown.open .dropdown-arrow {
+            transform: rotate(180deg);
+        }
+
+        .view-tab-dropdown-menu {
+            position: absolute;
+            top: calc(100% + 8px);
+            left: 0;
+            min-width: 160px;
+            background: white;
+            border-radius: 8px;
+            box-shadow: 0 4px 16px rgba(0,0,0,0.15);
+            padding: 4px;
+            display: none;
+            z-index: 1000;
+        }
+
+        .view-tab-dropdown.open .view-tab-dropdown-menu {
+            display: block;
+        }
+
+        .view-tab-dropdown-item {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            width: 100%;
+            padding: 0.625rem 0.875rem;
+            border: none;
+            background: transparent;
+            color: #444;
+            font-size: 0.8125rem;
+            font-weight: 500;
+            border-radius: 6px;
+            cursor: pointer;
+            transition: all 0.15s ease;
+            text-align: left;
+        }
+
+        .view-tab-dropdown-item i {
+            font-size: 1rem;
+            color: #9A6B3A;
+        }
+
+        .view-tab-dropdown-item:hover {
+            background: #f5f0eb;
+        }
+
+        .view-tab-dropdown-item.active {
+            background: #f5f0eb;
+            color: #9A6B3A;
+        }
+
         /* Header Icon Buttons */
         .header-icon-btn {
             display: flex;
@@ -21780,18 +21882,28 @@
                     <i class="ph ph-calendar"></i>
                     <span>Calendar</span>
                 </button>
-                <button class="view-tab" data-view="structure" onclick="switchView('structure')">
-                    <i class="ph ph-tree-structure"></i>
-                    <span>Structure</span>
-                </button>
-                <button class="view-tab" data-view="workflows" onclick="switchView('workflows')">
-                    <i class="ph ph-git-branch"></i>
-                    <span>Workflows</span>
-                </button>
-                <button class="view-tab" data-view="company-rules" onclick="switchView('company-rules')">
-                    <i class="ph ph-scales"></i>
-                    <span>Rules</span>
-                </button>
+                <div class="view-tabs-divider"></div>
+                <div class="view-tab-dropdown" id="settingsViewDropdown">
+                    <button class="view-tab-dropdown-trigger" id="settingsDropdownTrigger" onclick="toggleSettingsDropdown(event)">
+                        <i class="ph ph-gear-six"></i>
+                        <span>Settings</span>
+                        <i class="ph ph-caret-down dropdown-arrow"></i>
+                    </button>
+                    <div class="view-tab-dropdown-menu">
+                        <button class="view-tab-dropdown-item" data-view="structure" onclick="switchView('structure'); closeSettingsDropdown();">
+                            <i class="ph ph-tree-structure"></i>
+                            <span>Structure</span>
+                        </button>
+                        <button class="view-tab-dropdown-item" data-view="workflows" onclick="switchView('workflows'); closeSettingsDropdown();">
+                            <i class="ph ph-git-branch"></i>
+                            <span>Workflows</span>
+                        </button>
+                        <button class="view-tab-dropdown-item" data-view="company-rules" onclick="switchView('company-rules'); closeSettingsDropdown();">
+                            <i class="ph ph-scales"></i>
+                            <span>Rules</span>
+                        </button>
+                    </div>
+                </div>
             </div>
         </div>
 
@@ -26417,6 +26529,25 @@ John Doe,Engineering,john@example.com"
                 }
             });
 
+            // Update settings dropdown items active state
+            document.querySelectorAll('.view-tab-dropdown-item').forEach(btn => {
+                btn.classList.remove('active');
+                if (btn.dataset.view === view) {
+                    btn.classList.add('active');
+                }
+            });
+
+            // Update settings dropdown trigger active state
+            const settingsViews = ['structure', 'workflows', 'company-rules'];
+            const settingsTrigger = document.getElementById('settingsDropdownTrigger');
+            if (settingsTrigger) {
+                if (settingsViews.includes(view)) {
+                    settingsTrigger.classList.add('active');
+                } else {
+                    settingsTrigger.classList.remove('active');
+                }
+            }
+
             // Hide all views
             document.getElementById('treeView').classList.remove('active');
             document.getElementById('cardView').classList.remove('active');
@@ -26495,6 +26626,26 @@ John Doe,Engineering,john@example.com"
             const dropdown = document.getElementById('viewToggleDropdown');
             if (dropdown) dropdown.classList.remove('open');
         }
+
+        // Settings views dropdown toggle
+        function toggleSettingsDropdown(event) {
+            event.stopPropagation();
+            const dropdown = document.getElementById('settingsViewDropdown');
+            dropdown.classList.toggle('open');
+        }
+
+        function closeSettingsDropdown() {
+            const dropdown = document.getElementById('settingsViewDropdown');
+            if (dropdown) dropdown.classList.remove('open');
+        }
+
+        // Close settings dropdown when clicking outside
+        document.addEventListener('click', function(event) {
+            const dropdown = document.getElementById('settingsViewDropdown');
+            if (dropdown && !dropdown.contains(event.target)) {
+                dropdown.classList.remove('open');
+            }
+        });
 
         // View filter state
         let viewFilters = {
