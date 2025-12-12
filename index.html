@@ -13550,6 +13550,74 @@
             opacity: 0.6;
         }
 
+        .task-card-creator .creator-label {
+            font-weight: 600;
+            color: #888;
+        }
+
+        /* Assignment display for task board cards */
+        .task-board-card-assignment {
+            display: flex;
+            align-items: center;
+            gap: 0.4rem;
+            margin-bottom: 0.5rem;
+            padding: 0.5rem 0.6rem;
+            background: #f8f6f3;
+            border-radius: 6px;
+            border: 1px solid #e8e4de;
+        }
+
+        .task-board-card-assignment-label {
+            font-size: 0.75rem;
+            font-weight: 600;
+            color: #6B5642;
+            text-transform: uppercase;
+            letter-spacing: 0.02em;
+        }
+
+        .task-board-card-assignee-value {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.3rem;
+            font-size: 0.85rem;
+            font-weight: 500;
+            color: #3D2E1F;
+        }
+
+        .task-board-card-assignee-value i {
+            font-size: 1rem;
+            color: #4A7EC8;
+        }
+
+        .task-board-card-assignee-value .role-context {
+            font-size: 0.75rem;
+            color: #8B6F47;
+            font-weight: 400;
+        }
+
+        .task-board-card-assignee-value.role-only {
+            color: #8B6F47;
+        }
+
+        .task-board-card-assignee-value.role-only i {
+            color: #C88F4A;
+        }
+
+        .task-board-card-assignee-value .no-person-indicator {
+            font-size: 0.7rem;
+            color: #999;
+            font-style: italic;
+        }
+
+        .task-board-card-assignee-value.unassigned {
+            color: #999;
+            font-style: italic;
+        }
+
+        .task-board-card-assignee-value.unassigned i {
+            color: #bbb;
+        }
+
         .task-board-card-deps {
             margin-top: 0.5rem;
             display: flex;
@@ -13760,6 +13828,63 @@
 
         .kanban-card-role-only i {
             color: #C88F4A;
+        }
+
+        /* Assignment display for kanban cards */
+        .kanban-card-assignment {
+            display: flex;
+            align-items: center;
+            gap: 0.35rem;
+            margin-bottom: 0.4rem;
+            padding: 0.35rem 0.5rem;
+            background: #f8f6f3;
+            border-radius: 5px;
+            border: 1px solid #e8e4de;
+        }
+
+        .kanban-card-assignment-label {
+            font-size: 0.7rem;
+            font-weight: 600;
+            color: #6B5642;
+            text-transform: uppercase;
+            letter-spacing: 0.02em;
+        }
+
+        .kanban-card-assignee-value {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.25rem;
+            font-size: 0.8rem;
+            font-weight: 500;
+            color: #3D2E1F;
+        }
+
+        .kanban-card-assignee-value i {
+            font-size: 0.9rem;
+            color: #4A7EC8;
+        }
+
+        .kanban-card-assignee-value.role-only {
+            color: #8B6F47;
+        }
+
+        .kanban-card-assignee-value.role-only i {
+            color: #C88F4A;
+        }
+
+        .kanban-card-assignee-value .no-person-indicator {
+            font-size: 0.65rem;
+            color: #999;
+            font-style: italic;
+        }
+
+        .kanban-card-assignee-value.unassigned {
+            color: #999;
+            font-style: italic;
+        }
+
+        .kanban-card-assignee-value.unassigned i {
+            color: #bbb;
         }
 
         .kanban-card-parent-link {
@@ -51239,13 +51364,24 @@ Options:
                             <i class="ph ph-dots-three-vertical"></i>
                         </button>
                     </div>
-                    <div class="task-board-card-meta">
-                        ${role ? `
-                            <span class="task-board-card-tag role">
-                                <i class="ph ph-briefcase"></i>
-                                ${role.name}${person ? ` <i class="ph ph-arrow-right" style="font-size: 0.7rem; opacity: 0.5; margin: 0 0.15rem;"></i> ${person.name}` : ''}
+                    <div class="task-board-card-assignment">
+                        <span class="task-board-card-assignment-label">Assigned to:</span>
+                        ${person ? `
+                            <span class="task-board-card-assignee-value" title="Role: ${role ? role.name : 'N/A'}">
+                                <i class="ph ph-user-circle"></i> ${person.name}
+                                ${role ? `<span class="role-context">(${role.name})</span>` : ''}
                             </span>
-                        ` : ''}
+                        ` : (role ? `
+                            <span class="task-board-card-assignee-value role-only" title="No person assigned to this role">
+                                <i class="ph ph-briefcase"></i> ${role.name} <span class="no-person-indicator">(no person)</span>
+                            </span>
+                        ` : `
+                            <span class="task-board-card-assignee-value unassigned">
+                                <i class="ph ph-user-circle-dashed"></i> Unassigned
+                            </span>
+                        `)}
+                    </div>
+                    <div class="task-board-card-meta">
                         ${task.dueDate ? `
                             <span class="task-board-card-tag due-date ${dueDateStatus}">
                                 <i class="ph ph-calendar"></i>
@@ -51261,7 +51397,7 @@ Options:
                     ` : ''}
                     ${aminoTagsHtml}
                     <div class="task-card-creator">
-                        <i class="ph ph-user-circle"></i>
+                        <span class="creator-label">Created by:</span>
                         ${getCreatorDisplayName(task.createdBy)} · ${formatTimeAgo(task.createdAt)}
                     </div>
                 </div>
@@ -51595,14 +51731,28 @@ Options:
                         ${task.name}
                         ${hasSubtasks ? `<span class="kanban-card-subtask-badge" title="${completedSubtasks} of ${subtasks.length} subtasks complete${movementNote ? ' - ' + movementNote : ''}"><i class="ph ph-list-checks"></i> ${completedSubtasks}/${subtasks.length}</span>` : ''}
                     </div>
+                    <div class="kanban-card-assignment">
+                        <span class="kanban-card-assignment-label">Assigned to:</span>
+                        ${person ? `
+                            <span class="kanban-card-assignee-value" title="Role: ${role ? role.name : 'N/A'}">
+                                <i class="ph ph-user-circle"></i> ${person.name}
+                            </span>
+                        ` : (role ? `
+                            <span class="kanban-card-assignee-value role-only" title="No person assigned to this role">
+                                <i class="ph ph-briefcase"></i> ${role.name} <span class="no-person-indicator">(no person)</span>
+                            </span>
+                        ` : `
+                            <span class="kanban-card-assignee-value unassigned">
+                                <i class="ph ph-user-circle-dashed"></i> Unassigned
+                            </span>
+                        `)}
+                    </div>
                     <div class="kanban-card-meta">
-                        ${person ? `<span class="kanban-card-assignee" ${role ? `title="Role: ${role.name}"` : ''}><i class="ph ph-user-circle"></i> ${person.name}</span>` :
-                          (role ? `<span class="kanban-card-assignee kanban-card-role-only" title="No person assigned to this role"><i class="ph ph-briefcase"></i> ${role.name}</span>` : '')}
                         ${task.dueDate ? `<span class="kanban-card-due ${dueDateStatus}"><i class="ph ph-calendar"></i> ${formatDateShort(task.dueDate)}</span>` : ''}
                     </div>
                     ${aminoTagsHtml}
                     <div class="task-card-creator">
-                        <i class="ph ph-user-circle"></i>
+                        <span class="creator-label">Created by:</span>
                         ${getCreatorDisplayName(task.createdBy)} · ${formatTimeAgo(task.createdAt)}
                     </div>
                 </div>
