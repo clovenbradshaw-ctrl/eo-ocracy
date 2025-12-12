@@ -317,14 +317,10 @@
 
         /* Always-Visible Settings Subbar */
         .settings-subbar {
-            display: none;
+            display: flex;
             background: #f8f6f4;
             border-bottom: 1px solid #e5e0db;
             padding: 8px 24px;
-        }
-
-        .settings-subbar.visible {
-            display: flex;
         }
 
         .settings-subbar-tabs {
@@ -22247,28 +22243,6 @@
                     <i class="ph ph-calendar"></i>
                     <span>Calendar</span>
                 </button>
-                <div class="view-tabs-divider"></div>
-                <div class="view-tab-dropdown" id="settingsViewDropdown">
-                    <button class="view-tab-dropdown-trigger" id="settingsDropdownTrigger" onclick="toggleSettingsDropdown(event)">
-                        <i class="ph ph-gear-six"></i>
-                        <span>Settings</span>
-                        <i class="ph ph-caret-down dropdown-arrow"></i>
-                    </button>
-                    <div class="view-tab-dropdown-menu">
-                        <button class="view-tab-dropdown-item" data-view="structure" onclick="switchView('structure'); closeSettingsDropdown();">
-                            <i class="ph ph-tree-structure"></i>
-                            <span>Structure</span>
-                        </button>
-                        <button class="view-tab-dropdown-item" data-view="workflows" onclick="switchView('workflows'); closeSettingsDropdown();">
-                            <i class="ph ph-git-branch"></i>
-                            <span>Workflows</span>
-                        </button>
-                        <button class="view-tab-dropdown-item" data-view="company-rules" onclick="switchView('company-rules'); closeSettingsDropdown();">
-                            <i class="ph ph-scales"></i>
-                            <span>Rules</span>
-                        </button>
-                    </div>
-                </div>
             </div>
         </div>
 
@@ -26935,33 +26909,14 @@ John Doe,Engineering,john@example.com"
                 }
             });
 
-            // Update settings dropdown trigger active state
+            // Update settings subbar active tab state
             const settingsViews = ['structure', 'workflows', 'company-rules'];
-            const settingsTrigger = document.getElementById('settingsDropdownTrigger');
-            const settingsSubbar = document.getElementById('settingsSubbar');
-            if (settingsTrigger) {
-                if (settingsViews.includes(view)) {
-                    settingsTrigger.classList.add('active');
-                } else {
-                    settingsTrigger.classList.remove('active');
+            document.querySelectorAll('.settings-subbar-tab').forEach(tab => {
+                tab.classList.remove('active');
+                if (tab.dataset.view === view) {
+                    tab.classList.add('active');
                 }
-            }
-
-            // Show/hide settings subbar and update active tab
-            if (settingsSubbar) {
-                if (settingsViews.includes(view)) {
-                    settingsSubbar.classList.add('visible');
-                    // Update subbar tab active states
-                    document.querySelectorAll('.settings-subbar-tab').forEach(tab => {
-                        tab.classList.remove('active');
-                        if (tab.dataset.view === view) {
-                            tab.classList.add('active');
-                        }
-                    });
-                } else {
-                    settingsSubbar.classList.remove('visible');
-                }
-            }
+            });
 
             // Hide all views
             document.getElementById('treeView').classList.remove('active');
@@ -27041,26 +26996,6 @@ John Doe,Engineering,john@example.com"
             const dropdown = document.getElementById('viewToggleDropdown');
             if (dropdown) dropdown.classList.remove('open');
         }
-
-        // Settings views dropdown toggle
-        function toggleSettingsDropdown(event) {
-            event.stopPropagation();
-            const dropdown = document.getElementById('settingsViewDropdown');
-            dropdown.classList.toggle('open');
-        }
-
-        function closeSettingsDropdown() {
-            const dropdown = document.getElementById('settingsViewDropdown');
-            if (dropdown) dropdown.classList.remove('open');
-        }
-
-        // Close settings dropdown when clicking outside
-        document.addEventListener('click', function(event) {
-            const dropdown = document.getElementById('settingsViewDropdown');
-            if (dropdown && !dropdown.contains(event.target)) {
-                dropdown.classList.remove('open');
-            }
-        });
 
         // View filter state
         let viewFilters = {
