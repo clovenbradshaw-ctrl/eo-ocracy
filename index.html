@@ -47432,6 +47432,22 @@ Options:
                 addMentionNotifications(taskId, comment, mentions);
             }
 
+            // Log activity to Xano (non-blocking)
+            const task = entities.task.find(t => t.id === taskId);
+            logActivityToXano({
+                event_verb: 'Add Comment',
+                eo_operator: 'COMMENT_ADD',
+                object_type: 'task',
+                object_id: taskId,
+                object_label: task?.name || taskId,
+                data_json: {
+                    comment_id: comment.id,
+                    comment_text: text,
+                    comment_author: authorName,
+                    mentions: mentions
+                }
+            });
+
             return comment;
         }
 
@@ -48222,12 +48238,15 @@ Options:
                 comment.reactions[emoji] = [];
             }
 
-            // Toggle user's reaction
+            // Toggle user's reaction and track action
             const userIndex = comment.reactions[emoji].indexOf('You');
+            let reactionAction;
             if (userIndex === -1) {
                 comment.reactions[emoji].push('You');
+                reactionAction = 'add';
             } else {
                 comment.reactions[emoji].splice(userIndex, 1);
+                reactionAction = 'remove';
             }
 
             // Clean up empty reaction arrays
@@ -48237,6 +48256,21 @@ Options:
 
             saveTaskComments();
             openEntityModal(taskId, 'task');
+
+            // Log activity to Xano (non-blocking)
+            const task = entities.task.find(t => t.id === taskId);
+            logActivityToXano({
+                event_verb: reactionAction === 'add' ? 'Add Reaction' : 'Remove Reaction',
+                eo_operator: reactionAction === 'add' ? 'REACTION_ADD' : 'REACTION_REMOVE',
+                object_type: 'task',
+                object_id: taskId,
+                object_label: task?.name || taskId,
+                data_json: {
+                    comment_id: commentId,
+                    emoji: emoji,
+                    action: reactionAction
+                }
+            });
         }
 
         function resolveComment(taskId, commentId) {
@@ -48253,6 +48287,20 @@ Options:
             saveTaskComments();
             openEntityModal(taskId, 'task');
             showToast('Comment marked as resolved', 'success');
+
+            // Log activity to Xano (non-blocking)
+            const task = entities.task.find(t => t.id === taskId);
+            logActivityToXano({
+                event_verb: 'Resolve Comment',
+                eo_operator: 'COMMENT_RESOLVE',
+                object_type: 'task',
+                object_id: taskId,
+                object_label: task?.name || taskId,
+                data_json: {
+                    comment_id: commentId,
+                    comment_text: comment.text
+                }
+            });
         }
 
         function unresolveComment(taskId, commentId) {
@@ -48268,6 +48316,20 @@ Options:
 
             saveTaskComments();
             openEntityModal(taskId, 'task');
+
+            // Log activity to Xano (non-blocking)
+            const task = entities.task.find(t => t.id === taskId);
+            logActivityToXano({
+                event_verb: 'Unresolve Comment',
+                eo_operator: 'COMMENT_UNRESOLVE',
+                object_type: 'task',
+                object_id: taskId,
+                object_label: task?.name || taskId,
+                data_json: {
+                    comment_id: commentId,
+                    comment_text: comment.text
+                }
+            });
         }
 
         function editComment(taskId, commentId) {
@@ -48294,6 +48356,21 @@ Options:
                 saveTaskComments();
                 openEntityModal(taskId, 'task');
                 showToast('Comment updated', 'success');
+
+                // Log activity to Xano (non-blocking)
+                const task = entities.task.find(t => t.id === taskId);
+                logActivityToXano({
+                    event_verb: 'Edit Comment',
+                    eo_operator: 'COMMENT_EDIT',
+                    object_type: 'task',
+                    object_id: taskId,
+                    object_label: task?.name || taskId,
+                    data_json: {
+                        comment_id: commentId,
+                        comment_text: newText.trim(),
+                        mentions: mentions
+                    }
+                });
             }
         }
 
@@ -48306,10 +48383,28 @@ Options:
             const index = comments.findIndex(c => c.id === commentId);
             if (index === -1) return;
 
+            // Store comment info before deletion for logging
+            const deletedComment = comments[index];
+
             comments.splice(index, 1);
             saveTaskComments();
             openEntityModal(taskId, 'task');
             showToast('Comment deleted', 'info');
+
+            // Log activity to Xano (non-blocking)
+            const task = entities.task.find(t => t.id === taskId);
+            logActivityToXano({
+                event_verb: 'Delete Comment',
+                eo_operator: 'COMMENT_DELETE',
+                object_type: 'task',
+                object_id: taskId,
+                object_label: task?.name || taskId,
+                data_json: {
+                    comment_id: commentId,
+                    comment_text: deletedComment?.text || '',
+                    comment_author: deletedComment?.author || ''
+                }
+            });
         }
 
         function handleMentionClick(mentionName) {
