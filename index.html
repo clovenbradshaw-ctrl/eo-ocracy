@@ -19488,7 +19488,7 @@
 
         /* Emoji Picker */
         .emoji-picker {
-            position: absolute;
+            position: fixed;
             background: white;
             border-radius: 12px;
             box-shadow: 0 4px 24px rgba(0,0,0,0.2);
@@ -48043,20 +48043,23 @@ Options:
                 btn.classList.toggle('active', index === 0);
             });
 
-            // Position the picker near the button
+            // Position the picker near the button using fixed positioning (viewport coordinates)
             const rect = event.target.getBoundingClientRect();
-            const modal = document.querySelector('.modal-dialog');
-            const modalRect = modal ? modal.getBoundingClientRect() : { left: 0, top: 0 };
 
-            // Calculate position - ensure picker stays within modal bounds
-            let left = rect.left - modalRect.left;
-            let top = rect.bottom - modalRect.top + 5;
+            // Calculate position in viewport coordinates
+            let left = rect.left;
+            let top = rect.bottom + 5;
 
-            // Adjust if picker would overflow right edge
+            // Adjust if picker would overflow right edge of viewport
             const pickerWidth = 320;
-            const modalWidth = modalRect.width || window.innerWidth;
-            if (left + pickerWidth > modalWidth - 20) {
-                left = Math.max(10, modalWidth - pickerWidth - 20);
+            const pickerHeight = 400;
+            if (left + pickerWidth > window.innerWidth - 20) {
+                left = Math.max(10, window.innerWidth - pickerWidth - 20);
+            }
+
+            // Adjust if picker would overflow bottom of viewport
+            if (top + pickerHeight > window.innerHeight - 20) {
+                top = Math.max(10, rect.top - pickerHeight - 5);
             }
 
             picker.style.left = left + 'px';
