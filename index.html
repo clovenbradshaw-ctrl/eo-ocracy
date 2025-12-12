@@ -2,7 +2,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Taskflow - Work Shapes Structure</title>
     <script>
-        // D3.js loader with fallback CDNs for Softr iframe compatibility
+        // D3.js loader with fallback CDNs for Amino iframe compatibility
         (function() {
             var d3Sources = [
                 'https://cdnjs.cloudflare.com/ajax/libs/d3/7.8.5/d3.min.js',
@@ -54,14 +54,14 @@
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flatpickr/dist/flatpickr.min.css">
     <script src="https://cdn.jsdelivr.net/npm/flatpickr"></script>
     <style>
-        /* CSS Reset - Softr Embed Compatible */
+        /* CSS Reset - Amino Embed Compatible */
         *, *::before, *::after {
             margin: 0;
             padding: 0;
             box-sizing: border-box;
         }
 
-        /* Iframe isolation - prevent Softr parent styles from affecting us */
+        /* Iframe isolation - prevent Amino parent styles from affecting us */
         html {
             font-size: 16px;
             -webkit-text-size-adjust: 100%;
@@ -77,7 +77,7 @@
             min-height: 100vh;
             width: 100%;
             position: relative;
-            /* Prevent inherited styles from Softr */
+            /* Prevent inherited styles from Amino */
             text-align: left;
             direction: ltr;
             text-transform: none;
@@ -1572,8 +1572,8 @@
             font-size: 0.7rem;
         }
 
-        /* Softr User Identity Indicator */
-        .softr-user-indicator {
+        /* Amino User Identity Indicator */
+        .amino-user-indicator {
             display: flex;
             align-items: center;
             gap: 0.5rem;
@@ -1586,14 +1586,14 @@
             margin-right: 0.5rem;
         }
 
-        .softr-user-indicator.no-user {
+        .amino-user-indicator.no-user {
             background: rgba(255,255,255,0.08);
             border-color: rgba(255,255,255,0.15);
             color: rgba(255,255,255,0.6);
             font-style: italic;
         }
 
-        .softr-user-indicator .user-avatar {
+        .amino-user-indicator .user-avatar {
             width: 22px;
             height: 22px;
             border-radius: 50%;
@@ -1606,21 +1606,21 @@
             text-transform: uppercase;
         }
 
-        .softr-user-indicator.no-user .user-avatar {
+        .amino-user-indicator.no-user .user-avatar {
             background: rgba(255,255,255,0.1);
         }
 
-        .softr-user-indicator .user-info {
+        .amino-user-indicator .user-info {
             display: flex;
             flex-direction: column;
             line-height: 1.2;
         }
 
-        .softr-user-indicator .user-name {
+        .amino-user-indicator .user-name {
             font-weight: 500;
         }
 
-        .softr-user-indicator .user-email {
+        .amino-user-indicator .user-email {
             font-size: 0.7rem;
             opacity: 0.8;
         }
@@ -22047,11 +22047,11 @@
             <div class="auto-refresh-toggle" id="autoRefreshToggle" style="display: none !important;">
                 <span class="refresh-status" id="autoRefreshStatus">Off</span>
             </div>
-            <div class="softr-user-indicator no-user" id="softrUserIndicator" style="display: none !important;">
+            <div class="amino-user-indicator no-user" id="aminoUserIndicator" style="display: none !important;">
                 <div class="user-avatar"><i class="ph ph-user"></i></div>
                 <div class="user-info">
                     <span class="user-name">No user detected</span>
-                    <span class="user-email">Embed on Softr to see user</span>
+                    <span class="user-email">Embed on Amino to see user</span>
                 </div>
             </div>
             <!-- Old header menu kept for compatibility -->
@@ -23657,9 +23657,9 @@ John Doe,Engineering,john@example.com"
                     this.saveSession(email);
                 }
 
-                // Update SoftrIdentity with the authenticated user
-                if (typeof SoftrIdentity !== 'undefined') {
-                    SoftrIdentity.setUser({
+                // Update AminoIdentity with the authenticated user
+                if (typeof AminoIdentity !== 'undefined') {
+                    AminoIdentity.setUser({
                         email: email,
                         name: email.split('@')[0],
                         id: 'email_' + email.replace(/[^a-zA-Z0-9]/g, '_'),
@@ -23763,11 +23763,11 @@ John Doe,Engineering,john@example.com"
         };
 
         // ==========================================
-        // SOFTR USER IDENTITY
+        // AMINO USER IDENTITY
         // ==========================================
 
-        // Softr Identity Service - detects and tracks user identity when embedded in Softr
-        const SoftrIdentity = {
+        // Amino Identity Service - detects and tracks user identity when embedded in Amino
+        const AminoIdentity = {
             currentUser: null,
             isInitialized: false,
             isReady: false,
@@ -23779,42 +23779,42 @@ John Doe,Engineering,john@example.com"
                 if (this.isInitialized) return;
                 this.isInitialized = true;
 
-                console.log('🔐 SoftrIdentity: Initializing...');
+                console.log('🔐 AminoIdentity: Initializing...');
 
-                // Method 1: Check window.logged_in_user immediately (Softr's primary method)
-                this.checkSoftrGlobalUser();
+                // Method 1: Check window.logged_in_user immediately (Amino's primary method)
+                this.checkAminoGlobalUser();
 
-                // Method 2: Listen for postMessage from Softr parent (enhanced bridge)
+                // Method 2: Listen for postMessage from Amino parent (enhanced bridge)
                 window.addEventListener('message', this.handleMessage.bind(this));
 
                 // Method 3: Check URL parameters (fallback)
                 this.checkUrlParams();
 
-                // Method 4: Request user info from Softr parent (if in iframe)
+                // Method 4: Request user info from Amino parent (if in iframe)
                 if (window.parent !== window) {
-                    console.log('🔐 SoftrIdentity: Running in iframe, requesting user from parent...');
+                    console.log('🔐 AminoIdentity: Running in iframe, requesting user from parent...');
                     this.requestUserFromParent();
                     // Also try to access parent's logged_in_user after a short delay
-                    this.checkParentSoftrUser();
+                    this.checkParentAminoUser();
                     // Start retry loop for requesting user from parent
                     this.startParentRetryLoop();
                 }
 
-                // Method 5: Check again on window load (Softr may inject user data late)
+                // Method 5: Check again on window load (Amino may inject user data late)
                 window.addEventListener('load', () => {
                     if (!this.currentUser) {
-                        console.log('🔐 SoftrIdentity: Window loaded, checking for user again...');
-                        if (this.checkSoftrGlobalUser()) {
-                            console.log('🔐 SoftrIdentity: Found user on window load');
-                        } else if (this.checkParentSoftrUser()) {
-                            console.log('🔐 SoftrIdentity: Found user in parent on window load');
+                        console.log('🔐 AminoIdentity: Window loaded, checking for user again...');
+                        if (this.checkAminoGlobalUser()) {
+                            console.log('🔐 AminoIdentity: Found user on window load');
+                        } else if (this.checkParentAminoUser()) {
+                            console.log('🔐 AminoIdentity: Found user in parent on window load');
                         }
                     }
                     // Signal ready to parent regardless of user detection
                     this.signalReadyToParent();
                 });
 
-                // Method 6: Poll for Softr user (it may load async)
+                // Method 6: Poll for Amino user (it may load async)
                 this.startUserPolling();
 
                 // Update UI immediately with current state
@@ -23834,12 +23834,12 @@ John Doe,Engineering,john@example.com"
                     if (this.currentUser || this.retryCount >= this.maxRetries) {
                         clearInterval(retryInterval);
                         if (!this.currentUser) {
-                            console.log('🔐 SoftrIdentity: Max retries reached, no user from parent');
+                            console.log('🔐 AminoIdentity: Max retries reached, no user from parent');
                         }
                         return;
                     }
 
-                    console.log(`🔐 SoftrIdentity: Retry ${this.retryCount}/${this.maxRetries} - requesting user from parent`);
+                    console.log(`🔐 AminoIdentity: Retry ${this.retryCount}/${this.maxRetries} - requesting user from parent`);
                     this.requestUserFromParent();
                 }, 2000); // Retry every 2 seconds
             },
@@ -23859,9 +23859,9 @@ John Doe,Engineering,john@example.com"
                             user: this.currentUser
                         };
                         window.parent.postMessage(readyMessage, '*');
-                        console.log('🔐 SoftrIdentity: Sent ready signal to parent', readyMessage);
+                        console.log('🔐 AminoIdentity: Sent ready signal to parent', readyMessage);
                     } catch (e) {
-                        console.log('🔐 SoftrIdentity: Could not signal ready to parent', e);
+                        console.log('🔐 AminoIdentity: Could not signal ready to parent', e);
                     }
                 }
 
@@ -23881,47 +23881,47 @@ John Doe,Engineering,john@example.com"
                 }
             },
 
-            checkSoftrGlobalUser() {
-                // Softr exposes logged-in user data on window.logged_in_user
+            checkAminoGlobalUser() {
+                // Amino exposes logged-in user data on window.logged_in_user
                 if (window.logged_in_user) {
-                    console.log('🔐 SoftrIdentity: Found window.logged_in_user', window.logged_in_user);
+                    console.log('🔐 AminoIdentity: Found window.logged_in_user', window.logged_in_user);
                     this.setUser(window.logged_in_user);
                     return true;
                 }
-                // Also check alternative Softr global variables
+                // Also check alternative Amino global variables
                 if (window.softr && window.softr.user) {
-                    console.log('🔐 SoftrIdentity: Found window.softr.user', window.softr.user);
+                    console.log('🔐 AminoIdentity: Found window.softr.user', window.softr.user);
                     this.setUser(window.softr.user);
                     return true;
                 }
                 return false;
             },
 
-            checkParentSoftrUser() {
+            checkParentAminoUser() {
                 // Try to access parent window's logged_in_user (same-origin only)
                 try {
                     if (window.parent && window.parent !== window) {
                         if (window.parent.logged_in_user) {
-                            console.log('🔐 SoftrIdentity: Found parent.logged_in_user', window.parent.logged_in_user);
+                            console.log('🔐 AminoIdentity: Found parent.logged_in_user', window.parent.logged_in_user);
                             this.setUser(window.parent.logged_in_user);
                             return true;
                         }
                         if (window.parent.softr && window.parent.softr.user) {
-                            console.log('🔐 SoftrIdentity: Found parent.softr.user', window.parent.softr.user);
+                            console.log('🔐 AminoIdentity: Found parent.softr.user', window.parent.softr.user);
                             this.setUser(window.parent.softr.user);
                             return true;
                         }
                     }
                 } catch (e) {
                     // Cross-origin access blocked - this is expected for cross-origin iframes
-                    console.log('🔐 SoftrIdentity: Cannot access parent (cross-origin)', e.message);
+                    console.log('🔐 AminoIdentity: Cannot access parent (cross-origin)', e.message);
                 }
                 return false;
             },
 
             startUserPolling() {
-                // Softr user data may load asynchronously, poll for it
-                // Use fast polling (100ms) like Softr's own detection patterns
+                // Amino user data may load asynchronously, poll for it
+                // Use fast polling (100ms) like Amino's own detection patterns
                 if (this.currentUser) return; // Already have user
 
                 let attempts = 0;
@@ -23935,40 +23935,40 @@ John Doe,Engineering,john@example.com"
                     }
 
                     // Check global variables again
-                    if (this.checkSoftrGlobalUser()) {
-                        console.log(`🔐 SoftrIdentity: Found user after ${attempts} polling attempt(s)`);
+                    if (this.checkAminoGlobalUser()) {
+                        console.log(`🔐 AminoIdentity: Found user after ${attempts} polling attempt(s)`);
                         clearInterval(pollInterval);
                         return;
                     }
 
                     // Try parent again (same-origin only)
-                    if (this.checkParentSoftrUser()) {
-                        console.log(`🔐 SoftrIdentity: Found user in parent after ${attempts} polling attempt(s)`);
+                    if (this.checkParentAminoUser()) {
+                        console.log(`🔐 AminoIdentity: Found user in parent after ${attempts} polling attempt(s)`);
                         clearInterval(pollInterval);
                         return;
                     }
 
                     if (attempts >= maxAttempts) {
                         clearInterval(pollInterval);
-                        console.log('🔐 SoftrIdentity: User polling complete, no user found after 3 seconds');
+                        console.log('🔐 AminoIdentity: User polling complete, no user found after 3 seconds');
                     }
-                }, 100); // Check every 100ms (fast polling like Softr's patterns)
+                }, 100); // Check every 100ms (fast polling like Amino's patterns)
             },
 
             handleMessage(event) {
-                // Accept messages from any Softr domain or parent
+                // Accept messages from any Amino domain or parent
                 const data = event.data;
                 if (!data) return;
 
                 // Log all messages for debugging (in debug mode)
                 const urlParams = new URLSearchParams(window.location.search);
                 if (urlParams.get('debug') === 'true') {
-                    console.log('🔐 SoftrIdentity: Received postMessage:', data);
+                    console.log('🔐 AminoIdentity: Received postMessage:', data);
                 }
 
                 // Handle bridge-specific messages
                 if (data.type === 'softr-bridge:user' || data.type === 'bridge:user') {
-                    console.log('🔐 SoftrIdentity: Received user from Softr bridge', data);
+                    console.log('🔐 AminoIdentity: Received user from Amino bridge', data);
                     const userData = data.user || data.userData || data;
                     this.setUser(userData);
                     // Acknowledge receipt
@@ -23982,24 +23982,24 @@ John Doe,Engineering,john@example.com"
                     return;
                 }
 
-                // Handle Softr user data (various formats Softr might use)
-                if (data.type === 'softr:user' || data.type === 'user' || data.softrUser || data.user) {
-                    console.log('🔐 SoftrIdentity: Received user data via postMessage', data);
-                    const userData = data.user || data.softrUser || data;
+                // Handle Amino user data (various formats Amino might use)
+                if (data.type === 'softr:user' || data.type === 'user' || data.aminoUser || data.user) {
+                    console.log('🔐 AminoIdentity: Received user data via postMessage', data);
+                    const userData = data.user || data.aminoUser || data;
                     this.setUser(userData);
                     return;
                 }
 
-                // Handle Softr's logged_in_user format
+                // Handle Amino's logged_in_user format
                 if (data.logged_in_user) {
-                    console.log('🔐 SoftrIdentity: Received logged_in_user via postMessage', data);
+                    console.log('🔐 AminoIdentity: Received logged_in_user via postMessage', data);
                     this.setUser(data.logged_in_user);
                     return;
                 }
 
                 // Handle request for status from parent
                 if (data.type === 'softr-bridge:request-status' || data.type === 'request:status') {
-                    console.log('🔐 SoftrIdentity: Parent requesting status');
+                    console.log('🔐 AminoIdentity: Parent requesting status');
                     if (window.parent !== window) {
                         window.parent.postMessage({
                             type: 'taskflow:status',
@@ -24017,13 +24017,13 @@ John Doe,Engineering,john@example.com"
             checkUrlParams() {
                 const params = new URLSearchParams(window.location.search);
 
-                // Check for Softr user params
+                // Check for Amino user params
                 const userId = params.get('softr_user_id') || params.get('user_id');
                 const userEmail = params.get('softr_user_email') || params.get('user_email') || params.get('email');
                 const userName = params.get('softr_user_name') || params.get('user_name') || params.get('name');
 
                 if (userId || userEmail || userName) {
-                    console.log('🔐 SoftrIdentity: Found user in URL params');
+                    console.log('🔐 AminoIdentity: Found user in URL params');
                     this.setUser({
                         id: userId,
                         email: userEmail,
@@ -24034,19 +24034,19 @@ John Doe,Engineering,john@example.com"
             },
 
             requestUserFromParent() {
-                // Ask parent frame for user info (Softr should respond)
+                // Ask parent frame for user info (Amino should respond)
                 try {
                     window.parent.postMessage({ type: 'request:user', source: 'taskflow-app' }, '*');
                     window.parent.postMessage({ type: 'softr:request-user', source: 'taskflow-app' }, '*');
                 } catch (e) {
-                    console.log('🔐 SoftrIdentity: Could not request user from parent', e);
+                    console.log('🔐 AminoIdentity: Could not request user from parent', e);
                 }
             },
 
             setUser(userData) {
                 if (!userData) return;
 
-                // Prioritize Softr's standard fields (softr_user_*) over custom Airtable fields
+                // Prioritize Amino's standard fields (softr_user_*) over custom Airtable fields
                 // Note: userData.Name may contain role/group info, not the actual user name
                 this.currentUser = {
                     id: userData.id || userData.record_id || userData.user_id || userData.airtable_record_id || null,
@@ -24058,32 +24058,32 @@ John Doe,Engineering,john@example.com"
                     _detectedAt: new Date().toISOString()
                 };
 
-                console.log('🔐 SoftrIdentity: User set:', this.currentUser);
+                console.log('🔐 AminoIdentity: User set:', this.currentUser);
 
                 // Update UI
                 this.updateUI();
 
                 // Dispatch custom event for other parts of app
-                document.dispatchEvent(new CustomEvent('softr:user:ready', {
+                document.dispatchEvent(new CustomEvent('amino:user:ready', {
                     detail: this.currentUser
                 }));
             },
 
             updateUI() {
-                const indicator = document.getElementById('softrUserIndicator');
+                const indicator = document.getElementById('aminoUserIndicator');
                 if (!indicator) return;
 
-                // Hide indicator in standalone mode (not embedded in an iframe or no Softr detected)
+                // Hide indicator in standalone mode (not embedded in an iframe or no Amino detected)
                 const isInIframe = window.parent !== window;
-                const hasSoftr = !!(window.logged_in_user || window.softr || (isInIframe && this.currentUser));
+                const hasAmino = !!(window.logged_in_user || window.softr || (isInIframe && this.currentUser));
 
-                if (!isInIframe && !hasSoftr) {
+                if (!isInIframe && !hasAmino) {
                     // Running standalone - hide the indicator
                     indicator.style.display = 'none';
                     return;
                 }
 
-                // Show indicator when embedded or when Softr is detected
+                // Show indicator when embedded or when Amino is detected
                 indicator.style.display = '';
 
                 if (this.currentUser && (this.currentUser.name || this.currentUser.email)) {
@@ -24108,7 +24108,7 @@ John Doe,Engineering,john@example.com"
                         <div class="user-avatar"><i class="ph ph-user"></i></div>
                         <div class="user-info">
                             <span class="user-name">No user detected</span>
-                            <span class="user-email">Embed on Softr to see user</span>
+                            <span class="user-email">Embed on Amino to see user</span>
                         </div>
                     `;
                 }
@@ -24907,19 +24907,19 @@ John Doe,Engineering,john@example.com"
             // n8n webhook endpoint for Airtable operations
             webhookUrl: 'https://n8n.intelechia.com/webhook/b04bd460-fd56-4d55-8a01-6c47581789b9',
 
-            // Softr base URL for generating links
-            softrBaseUrl: 'https://rklacylaw.softr.app',
+            // Amino base URL for generating links
+            aminoBaseUrl: 'https://rklacylaw.softr.app',
 
             // Airtable base ID
             baseId: 'app1tsUyKa7F3sy0D',
 
-            // Table configurations with display fields and Softr paths
+            // Table configurations with display fields and Amino paths
             tables: {
                 clients: {
                     tableId: 'tbl0uHmtLkGyDnSP9',
                     displayField: 'Client Name',
                     searchField: 'name search 2.0',  // Field containing name variations for matching
-                    softrPath: '/client-info',
+                    aminoPath: '/client-info',
                     icon: 'ph-user',
                     color: '#1D4ED8',
                     label: 'CLIENT'
@@ -24928,7 +24928,7 @@ John Doe,Engineering,john@example.com"
                     tableId: 'tblgynOzESGvAXAsK',
                     displayField: 'Client Name',
                     parentField: 'Edit Client Info',  // Links to clients
-                    softrPath: '/client-info',  // Opens client page
+                    aminoPath: '/client-info',  // Opens client page
                     icon: 'ph-folder-open',
                     color: '#6D28D9',
                     label: 'CASE'
@@ -24936,7 +24936,7 @@ John Doe,Engineering,john@example.com"
                 events: {
                     tableId: 'tbl1GpkHMkjxZ1n7E',
                     displayField: 'Event Title',
-                    softrPath: '/events-details',
+                    aminoPath: '/events-details',
                     icon: 'ph-calendar',
                     color: '#C2410C',
                     label: 'EVENT'
@@ -24945,7 +24945,7 @@ John Doe,Engineering,john@example.com"
                     tableId: 'tbl6XtHs9g5iwd7qi',
                     displayField: 'Name',
                     parentField: 'case master recordId',  // Links to cases
-                    softrPath: '/client-info',  // Opens client page (via case -> client)
+                    aminoPath: '/client-info',  // Opens client page (via case -> client)
                     icon: 'ph-file-text',
                     color: '#15803D',
                     label: 'APP'
@@ -24954,7 +24954,7 @@ John Doe,Engineering,john@example.com"
                     tableId: 'tblIrtFCfeYdDCVgE',
                     displayField: 'User Name',
                     secondaryField: 'Email',
-                    softrPath: null,  // No Softr page for users
+                    aminoPath: null,  // No Amino page for users
                     icon: 'ph-user-circle',
                     color: '#0F766E',
                     label: 'USER'
@@ -25150,22 +25150,22 @@ John Doe,Engineering,john@example.com"
                 return this.normalizeResponse(result);
             },
 
-            // Get Softr URL for a tag
-            getSoftrUrl(tag) {
+            // Get Amino URL for a tag
+            getAminoUrl(tag) {
                 const config = this.getTableConfig(tag.type);
-                if (!config || !config.softrPath) {
+                if (!config || !config.aminoPath) {
                     // Fallback to Airtable direct link
                     return `https://airtable.com/${this.baseId}/${tag.table}/${tag.id}`;
                 }
 
                 // For cases and applications, use the clientId for navigation
                 const recordId = tag.clientId || tag.id;
-                return `${this.softrBaseUrl}${config.softrPath}?recordId=${recordId}`;
+                return `${this.aminoBaseUrl}${config.aminoPath}?recordId=${recordId}`;
             },
 
-            // Open tag in Softr (new tab)
-            openInSoftr(tag) {
-                const url = this.getSoftrUrl(tag);
+            // Open tag in Amino (new tab)
+            openInAmino(tag) {
+                const url = this.getAminoUrl(tag);
                 window.open(url, '_blank');
             },
 
@@ -26287,7 +26287,7 @@ John Doe,Engineering,john@example.com"
             return null;
         }
 
-        // Helper to get current user ID (from Softr context)
+        // Helper to get current user ID (from Amino context)
         function getCurrentUserId() {
             return window.loggedInUser?.softr_user_id || 'anonymous';
         }
@@ -26717,10 +26717,10 @@ John Doe,Engineering,john@example.com"
         // ============================================
 
         /**
-         * Get the current user's ID (from SoftrIdentity or email auth)
+         * Get the current user's ID (from AminoIdentity or email auth)
          */
         function getCurrentUserId() {
-            return SoftrIdentity.currentUser?.id || SoftrIdentity.currentUser?.email || null;
+            return AminoIdentity.currentUser?.id || AminoIdentity.currentUser?.email || null;
         }
 
         /**
@@ -26734,7 +26734,7 @@ John Doe,Engineering,john@example.com"
 
             // Find person entities that might match the current user
             // This could be by email match or by stored user ID
-            const currentUserEmail = SoftrIdentity.currentUser?.email;
+            const currentUserEmail = AminoIdentity.currentUser?.email;
             const persons = (entities.person || []).filter(p => {
                 // Match by ID if stored
                 if (p.userId === currentUserId) return true;
@@ -26808,7 +26808,7 @@ John Doe,Engineering,john@example.com"
                 if (!currentUserId) return false;
                 // Check if task was created by current user
                 return task.createdBy === currentUserId ||
-                       task.createdBy === SoftrIdentity.currentUser?.email;
+                       task.createdBy === AminoIdentity.currentUser?.email;
             }
 
             // Team tasks are visible to team members
@@ -27662,7 +27662,7 @@ John Doe,Engineering,john@example.com"
             // Quick filter: Only tasks related to me
             if (advancedFilters.onlyMe) {
                 const currentUserId = getCurrentUserId();
-                const currentUserEmail = SoftrIdentity.currentUser?.email;
+                const currentUserEmail = AminoIdentity.currentUser?.email;
 
                 // Find person entities matching current user
                 const myPersonIds = (entities.person || [])
@@ -34037,7 +34037,7 @@ Cmd/Ctrl + K - Command palette
         // ============================================
 
         // Ensure agent is declared in the activity store (user details stored once)
-        async function ensureAgentDeclared(softrUser, agentId, agentName, agentEmail) {
+        async function ensureAgentDeclared(aminoUser, agentId, agentName, agentEmail) {
             // Skip if already declared or anonymous
             if (declaredAgents.has(agentId) || agentId.startsWith('anon_')) {
                 return;
@@ -34059,7 +34059,7 @@ Cmd/Ctrl + K - Command palette
                         data: {
                             event_verb: 'Declare Agent',
                             eo_operator: 'AGENT_DECLARED',
-                            agent_type: softrUser ? 'softr_user' : 'anonymous',
+                            agent_type: aminoUser ? 'amino_user' : 'anonymous',
                             agent_id: agentId,
                             agent_name: agentName,
                             agent_email: agentEmail,
@@ -34101,23 +34101,23 @@ Cmd/Ctrl + K - Command palette
             const activityLabel = activity.object_label || activity.object_type || 'item';
             const eventType = activity.eo_operator || activity.event_verb || 'action';
 
-            // Get Softr user info if available
-            const softrUser = SoftrIdentity.getUser();
-            const agentId = softrUser?.id || softrUser?.email || ('anon_' + Date.now());
-            const agentName = softrUser?.name || softrUser?.email || 'Anonymous User';
-            const agentEmail = softrUser?.email || null;
+            // Get Amino user info if available
+            const aminoUser = AminoIdentity.getUser();
+            const agentId = aminoUser?.id || aminoUser?.email || ('anon_' + Date.now());
+            const agentName = aminoUser?.name || aminoUser?.email || 'Anonymous User';
+            const agentEmail = aminoUser?.email || null;
 
             try {
                 // Ensure agent is declared (user details stored once, not repeated in every activity)
-                await ensureAgentDeclared(softrUser, agentId, agentName, agentEmail);
+                await ensureAgentDeclared(aminoUser, agentId, agentName, agentEmail);
 
                 // Determine agent type based on authentication source
                 let agentType = 'anonymous';
-                if (softrUser) {
-                    if (softrUser.source === 'email_auth') {
+                if (aminoUser) {
+                    if (aminoUser.source === 'email_auth') {
                         agentType = 'email_auth_user';
                     } else {
-                        agentType = 'softr_user';
+                        agentType = 'amino_user';
                     }
                 }
 
@@ -43253,7 +43253,7 @@ Cmd/Ctrl + K - Command palette
                 <div class="simple-task-airtable-section">
                     <label class="simple-task-section-label">
                         <i class="ph ph-link"></i> Linked Records
-                        ${tags.length > 0 ? '<span class="section-label-hint">(click to open in Softr)</span>' : ''}
+                        ${tags.length > 0 ? '<span class="section-label-hint">(click to open in Amino)</span>' : ''}
                     </label>
                     <div class="simple-task-airtable-container">
                         <div class="simple-task-airtable-tags-list">
@@ -43264,7 +43264,7 @@ Cmd/Ctrl + K - Command palette
                         </button>
                     </div>
                     <div class="simple-task-airtable-hint">
-                        <i class="ph ph-info"></i> Link records to quickly navigate to client details in Softr
+                        <i class="ph ph-info"></i> Link records to quickly navigate to client details in Amino
                     </div>
                 </div>
             `;
@@ -43277,7 +43277,7 @@ Cmd/Ctrl + K - Command palette
             const label = config?.label || tag.type.toUpperCase();
 
             return `
-                <div class="airtable-tag tag-${tag.type}" onclick="event.stopPropagation(); openAirtableTagInSoftr('${encodeURIComponent(JSON.stringify(tag))}')" title="Click to open in Softr">
+                <div class="airtable-tag tag-${tag.type}" onclick="event.stopPropagation(); openAirtableTagInAmino('${encodeURIComponent(JSON.stringify(tag))}')" title="Click to open in Amino">
                     <i class="ph ${icon} tag-icon"></i>
                     <span class="tag-label">${tag.label}</span>
                     <span class="tag-type">${label}</span>
@@ -43289,11 +43289,11 @@ Cmd/Ctrl + K - Command palette
             `;
         }
 
-        // Open tag in Softr (new tab)
-        function openAirtableTagInSoftr(tagJson) {
+        // Open tag in Amino (new tab)
+        function openAirtableTagInAmino(tagJson) {
             try {
                 const tag = JSON.parse(decodeURIComponent(tagJson));
-                AirtableAPI.openInSoftr(tag);
+                AirtableAPI.openInAmino(tag);
             } catch (e) {
                 console.error('Error opening tag:', e);
             }
@@ -45137,7 +45137,7 @@ Options:
 
             // Create the task
             const taskId = 'task' + Date.now();
-            const currentUserId = SoftrIdentity.currentUser?.id || SoftrIdentity.currentUser?.email || null;
+            const currentUserId = AminoIdentity.currentUser?.id || AminoIdentity.currentUser?.email || null;
             const taskObject = {
                 id: taskId,
                 name: taskName,
@@ -47573,7 +47573,7 @@ Options:
 
             // Get parent task to inherit visibility settings
             const parentTask = (entities.task || []).find(t => t.id === parentTaskId);
-            const currentUserId = SoftrIdentity.currentUser?.id || SoftrIdentity.currentUser?.email || null;
+            const currentUserId = AminoIdentity.currentUser?.id || AminoIdentity.currentUser?.email || null;
 
             const subtask = {
                 id: subtaskId,
@@ -48049,7 +48049,7 @@ Options:
 
                 // 1. Create task entity with enhanced fields
                 taskId = 'task' + Date.now();
-                const currentUserId = SoftrIdentity.currentUser?.id || SoftrIdentity.currentUser?.email || null;
+                const currentUserId = AminoIdentity.currentUser?.id || AminoIdentity.currentUser?.email || null;
                 // Get visibility team ID from the select if team visibility is selected
                 const visibilityTeamIdValue = heroVisibility === 'team'
                     ? (document.getElementById('heroVisibilityTeam')?.value || null)
@@ -50451,7 +50451,7 @@ Options:
                     workflowTemplateId: templateId,
                     workflowInstanceName: instanceName,
                     createdAt: new Date().toISOString(),
-                    createdBy: SoftrIdentity.getUser()?.id || 'anonymous'
+                    createdBy: AminoIdentity.getUser()?.id || 'anonymous'
                 };
 
                 // Add task to entities
@@ -50811,7 +50811,7 @@ Options:
                     isDefault: false,
                     tasks: cleanedTasks,
                     createdAt: new Date().toISOString(),
-                    createdBy: SoftrIdentity.getUser()?.id || 'anonymous'
+                    createdBy: AminoIdentity.getUser()?.id || 'anonymous'
                 };
 
                 workflowTemplates.push(newWorkflow);
@@ -50866,7 +50866,7 @@ Options:
                 name: template.name + ' (Copy)',
                 isDefault: false,
                 createdAt: new Date().toISOString(),
-                createdBy: SoftrIdentity.getUser()?.id || 'anonymous'
+                createdBy: AminoIdentity.getUser()?.id || 'anonymous'
             };
 
             workflowTemplates.push(newWorkflow);
@@ -51525,12 +51525,12 @@ Options:
 
             // Detect iframe/embed context
             const isInIframe = window.parent !== window;
-            const isSoftrEmbed = isInIframe || window.location.hostname.includes('softr');
+            const isAminoEmbed = isInIframe || window.location.hostname.includes('softr');
             console.log('🖼️ Running in iframe:', isInIframe);
-            console.log('🔗 Softr embed detected:', isSoftrEmbed);
+            console.log('🔗 Amino embed detected:', isAminoEmbed);
 
-            // Initialize Softr user identity detection
-            SoftrIdentity.init();
+            // Initialize Amino user identity detection
+            AminoIdentity.init();
 
             // Initialize Xano connection status check
             initXanoConnectionCheck();
