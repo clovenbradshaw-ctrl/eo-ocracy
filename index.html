@@ -9560,6 +9560,8 @@
             display: flex;
             flex-direction: column;
             overflow: hidden;
+            height: 100%;
+            padding-bottom: 1rem;
         }
 
         .panel-left .entity-list {
@@ -9597,6 +9599,46 @@
             margin: 0;
             font-size: 0.85rem;
             opacity: 0.8;
+        }
+
+        .tab-empty-state-actions {
+            display: flex;
+            flex-direction: column;
+            gap: 0.5rem;
+            margin-top: 1rem;
+            width: 100%;
+        }
+
+        .tab-empty-state-btn {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 0.5rem;
+            padding: 0.625rem 1rem;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 0.85rem;
+            font-weight: 500;
+            transition: all 0.2s ease;
+        }
+
+        .tab-empty-state-btn.unit-btn {
+            background: #7C3AED;
+            color: white;
+        }
+
+        .tab-empty-state-btn.unit-btn:hover {
+            background: #6D28D9;
+        }
+
+        .tab-empty-state-btn.team-btn {
+            background: #16A34A;
+            color: white;
+        }
+
+        .tab-empty-state-btn.team-btn:hover {
+            background: #15803D;
         }
 
         /* Task Wizard Styles */
@@ -36104,7 +36146,20 @@ Cmd/Ctrl + K - Command palette
             // People are now in their own tab - removed from Org tab
 
             if (list.children.length === 0) {
-                list.innerHTML = '<div class="tab-empty-state"><i class="ph ph-tree-structure"></i><p>No units, teams, or roles yet</p></div>';
+                list.innerHTML = `<div class="tab-empty-state">
+                    <i class="ph ph-tree-structure"></i>
+                    <p>No units, teams, or roles yet</p>
+                    <div class="tab-empty-state-actions">
+                        <button class="tab-empty-state-btn unit-btn" onclick="executeCommand('create-unit')">
+                            <i class="ph ph-buildings"></i>
+                            Create Unit
+                        </button>
+                        <button class="tab-empty-state-btn team-btn" onclick="executeCommand('create-team')">
+                            <i class="ph ph-users-three"></i>
+                            Create Team
+                        </button>
+                    </div>
+                </div>`;
             }
 
             // Also update People tab if it exists
