@@ -25759,31 +25759,296 @@ John Doe,Engineering,john@example.com"
             return `${Math.floor(seconds / 86400)}d ago`;
         }
 
-        function refreshAllViews() {
-            renderEntityList();
-            updateSelects();
-            updateParentOptions();
-            renderActivityList();
-            renderRecycleBin();
-            updateTaskCountBadge();
-            updateFilterStatus();
+        // ==========================================
+        // UNIVERSAL REFRESH SYSTEM
+        // Ensures ALL views are updated after any data change
+        // ==========================================
 
+        // Track pending refresh requests to avoid redundant refreshes
+        let pendingRefreshTimeout = null;
+        let lastRefreshTimestamp = 0;
+        const REFRESH_DEBOUNCE_MS = 50; // Debounce rapid successive refreshes
+
+        // Refresh the current task-specific view (kanban, table, timeline, gantt, calendar)
+        function refreshCurrentTaskView() {
+            const taskBoardContent = document.getElementById('taskBoardContent');
+            const ganttContent = document.getElementById('ganttViewContent');
+            const calendarContent = document.getElementById('calendarViewContent');
+
+            // Determine which task view is active based on visible containers
+            if (currentView === 'kanban' || (taskBoardContent && currentView === 'tasks')) {
+                if (typeof renderKanbanBoard === 'function') renderKanbanBoard();
+            }
+            if (currentView === 'table') {
+                if (typeof renderTaskTable === 'function') renderTaskTable();
+            }
+            if (currentView === 'timeline') {
+                if (typeof renderTimeline === 'function') renderTimeline();
+            }
+            if (currentView === 'gantt' || ganttContent) {
+                if (typeof renderGanttView === 'function') renderGanttView();
+            }
+            if (currentView === 'calendar' || calendarContent) {
+                if (typeof renderCalendarView === 'function') renderCalendarView();
+            }
+
+            // Always update task-related UI elements
+            if (typeof updateTaskCountBadge === 'function') updateTaskCountBadge();
+            if (typeof updateFilterStatus === 'function') updateFilterStatus();
+        }
+
+        // Main refresh function - COMPREHENSIVE - covers ALL views
+        function refreshAllViews(options = {}) {
+            const { force = false, source = 'unknown' } = options;
+
+            // Debounce rapid refreshes unless forced
+            const now = Date.now();
+            if (!force && (now - lastRefreshTimestamp) < REFRESH_DEBOUNCE_MS) {
+                // Schedule a refresh if one isn't pending
+                if (!pendingRefreshTimeout) {
+                    pendingRefreshTimeout = setTimeout(() => {
+                        pendingRefreshTimeout = null;
+                        refreshAllViews({ force: true, source: 'debounced' });
+                    }, REFRESH_DEBOUNCE_MS);
+                }
+                return;
+            }
+            lastRefreshTimestamp = now;
+
+            // Clear any pending refresh
+            if (pendingRefreshTimeout) {
+                clearTimeout(pendingRefreshTimeout);
+                pendingRefreshTimeout = null;
+            }
+
+            // === ALWAYS REFRESH: Core UI elements ===
+            if (typeof renderEntityList === 'function') renderEntityList();
+            if (typeof updateSelects === 'function') updateSelects();
+            if (typeof updateParentOptions === 'function') updateParentOptions();
+            if (typeof renderActivityList === 'function') renderActivityList();
+            if (typeof renderRecycleBin === 'function') renderRecycleBin();
+            if (typeof updateTaskCountBadge === 'function') updateTaskCountBadge();
+            if (typeof updateFilterStatus === 'function') updateFilterStatus();
+
+            // === REFRESH: Current view based on view type ===
+            // Entity views
             if (currentView === 'graph') {
-                updateGraph();
+                if (typeof updateGraph === 'function') updateGraph();
             } else if (currentView === 'tree') {
-                renderTreeView();
-            } else if (currentView === 'card') {
-                renderCardView();
+                if (typeof renderTreeView === 'function') renderTreeView();
+            } else if (currentView === 'card' || currentView === 'cards') {
+                if (typeof renderCardView === 'function') renderCardView();
             } else if (currentView === 'venn') {
-                renderVennView();
+                if (typeof renderVennView === 'function') renderVennView();
+            } else if (currentView === 'orgchart') {
+                if (typeof renderOrgChartView === 'function') renderOrgChartView();
+            } else if (currentView === 'flow') {
+                if (typeof renderFlowView === 'function') renderFlowView();
+            } else if (currentView === 'shape') {
+                if (typeof renderShapeView === 'function') renderShapeView();
+            }
+            // Task views
+            else if (currentView === 'tasks') {
+                if (typeof renderTaskBoardView === 'function') renderTaskBoardView();
             } else if (currentView === 'kanban') {
-                renderKanbanBoard();
+                if (typeof renderKanbanBoard === 'function') renderKanbanBoard();
+            } else if (currentView === 'table') {
+                if (typeof renderTaskTable === 'function') renderTaskTable();
+            } else if (currentView === 'timeline') {
+                if (typeof renderTimeline === 'function') renderTimeline();
+            } else if (currentView === 'gantt') {
+                if (typeof renderGanttView === 'function') renderGanttView();
+            } else if (currentView === 'calendar') {
+                if (typeof renderCalendarView === 'function') renderCalendarView();
             }
 
-            // Also refresh task board if visible
-            if (document.getElementById('taskBoardView')?.classList.contains('active')) {
-                renderTaskBoard();
+            // Dispatch custom event for any listeners
+            window.dispatchEvent(new CustomEvent('eo-data-refreshed', {
+                detail: { source, timestamp: now }
+            }));
+        }
+
+        // Force refresh with guaranteed execution - use when normal refresh might be skipped
+        function forceRefreshAllViews(source = 'force') {
+            refreshAllViews({ force: true, source });
+        }
+
+        // Universal mutation wrapper - ensures UI is always updated after data changes
+        // Usage: withUIRefresh(() => { /* your mutation code */ }, 'operationName');
+        function withUIRefresh(mutationFn, operationName = 'mutation') {
+            return function(...args) {
+                try {
+                    // Execute the mutation
+                    const result = mutationFn.apply(this, args);
+
+                    // Handle async mutations
+                    if (result && typeof result.then === 'function') {
+                        return result.then(res => {
+                            scheduleRefresh(operationName);
+                            return res;
+                        }).catch(err => {
+                            console.error(`[withUIRefresh] Error in async ${operationName}:`, err);
+                            scheduleRefresh(operationName + '-error-recovery');
+                            throw err;
+                        });
+                    }
+
+                    // Sync mutation - schedule refresh
+                    scheduleRefresh(operationName);
+                    return result;
+                } catch (err) {
+                    console.error(`[withUIRefresh] Error in ${operationName}:`, err);
+                    // Still try to refresh on error to show consistent state
+                    scheduleRefresh(operationName + '-error-recovery');
+                    throw err;
+                }
+            };
+        }
+
+        // Schedule a refresh after microtask queue clears (allows batching)
+        function scheduleRefresh(source = 'scheduled') {
+            // Use queueMicrotask for faster execution than setTimeout
+            queueMicrotask(() => {
+                forceRefreshAllViews(source);
+            });
+        }
+
+        // Ensure data and UI are in sync - call after any suspicious operation
+        function ensureUISync() {
+            // Save current state to localStorage
+            if (typeof saveToLocalStorage === 'function') {
+                saveToLocalStorage();
             }
+            // Force full refresh
+            forceRefreshAllViews('ensureUISync');
+        }
+
+        // Fallback: Periodic sync check (disabled by default, can be enabled if issues persist)
+        let periodicSyncInterval = null;
+        function enablePeriodicSync(intervalMs = 5000) {
+            if (periodicSyncInterval) clearInterval(periodicSyncInterval);
+            periodicSyncInterval = setInterval(() => {
+                // Only sync if tab is visible
+                if (!document.hidden) {
+                    forceRefreshAllViews('periodic-sync');
+                }
+            }, intervalMs);
+        }
+        function disablePeriodicSync() {
+            if (periodicSyncInterval) {
+                clearInterval(periodicSyncInterval);
+                periodicSyncInterval = null;
+            }
+        }
+
+        // Listen for visibility changes - refresh when tab becomes visible
+        document.addEventListener('visibilitychange', () => {
+            if (!document.hidden) {
+                // Tab became visible - do a quick refresh to catch any missed updates
+                setTimeout(() => forceRefreshAllViews('visibility-change'), 100);
+            }
+        });
+
+        // Listen for focus events - refresh when window gains focus
+        window.addEventListener('focus', () => {
+            setTimeout(() => forceRefreshAllViews('window-focus'), 100);
+        });
+
+        // Initialize the universal refresh system with all fallback mechanisms
+        function initUniversalRefreshSystem() {
+            console.log('🔄 Setting up universal refresh system...');
+
+            // 1. Set up mutation observer to detect DOM changes that might indicate stale state
+            try {
+                const observer = new MutationObserver((mutations) => {
+                    // Check if any mutations indicate we need to sync
+                    const needsSync = mutations.some(mutation => {
+                        // Look for attributes that might indicate stale data
+                        if (mutation.type === 'attributes' && mutation.attributeName === 'data-needs-refresh') {
+                            return true;
+                        }
+                        return false;
+                    });
+
+                    if (needsSync) {
+                        scheduleRefresh('mutation-observer');
+                    }
+                });
+
+                // Observe the main content areas for changes
+                const appContainer = document.querySelector('.app-container, #app, body');
+                if (appContainer) {
+                    observer.observe(appContainer, {
+                        attributes: true,
+                        attributeFilter: ['data-needs-refresh'],
+                        subtree: true
+                    });
+                }
+                console.log('  ✅ MutationObserver set up');
+            } catch (e) {
+                console.warn('  ⚠️ MutationObserver not available:', e.message);
+            }
+
+            // 2. Set up storage event listener for cross-tab sync
+            try {
+                window.addEventListener('storage', (e) => {
+                    if (e.key === 'holonicWorkspaces' && e.newValue) {
+                        console.log('📦 Storage changed in another tab, refreshing...');
+                        // Reload data from localStorage
+                        if (typeof loadFromLocalStorage === 'function') {
+                            loadFromLocalStorage();
+                        }
+                        forceRefreshAllViews('cross-tab-sync');
+                    }
+                });
+                console.log('  ✅ Cross-tab sync listener set up');
+            } catch (e) {
+                console.warn('  ⚠️ Storage event listener not available:', e.message);
+            }
+
+            // 3. Set up custom event listener for programmatic refresh triggers
+            window.addEventListener('eo-trigger-refresh', (e) => {
+                const source = e.detail?.source || 'custom-event';
+                forceRefreshAllViews(source);
+            });
+            console.log('  ✅ Custom event listener set up');
+
+            // 4. Expose global refresh function for debugging and manual triggers
+            window.eoRefresh = forceRefreshAllViews;
+            window.eoEnsureSync = ensureUISync;
+            window.eoEnablePeriodicSync = enablePeriodicSync;
+            window.eoDisablePeriodicSync = disablePeriodicSync;
+            console.log('  ✅ Global refresh functions exposed (window.eoRefresh, window.eoEnsureSync)');
+
+            // 5. Set up error recovery - refresh after any unhandled errors
+            window.addEventListener('error', (e) => {
+                console.warn('🔄 Error detected, scheduling refresh for recovery');
+                setTimeout(() => forceRefreshAllViews('error-recovery'), 500);
+            });
+
+            // 6. Set up promise rejection handler for async error recovery
+            window.addEventListener('unhandledrejection', (e) => {
+                console.warn('🔄 Unhandled promise rejection, scheduling refresh for recovery');
+                setTimeout(() => forceRefreshAllViews('promise-rejection-recovery'), 500);
+            });
+
+            console.log('🔄 Universal refresh system ready');
+        }
+
+        // Helper to mark an element as needing refresh (triggers MutationObserver)
+        function markNeedsRefresh(element) {
+            if (element) {
+                element.setAttribute('data-needs-refresh', Date.now());
+                // Remove the attribute after a short delay
+                setTimeout(() => element.removeAttribute('data-needs-refresh'), 100);
+            }
+        }
+
+        // Trigger a refresh from anywhere using a custom event
+        function triggerRefresh(source = 'manual') {
+            window.dispatchEvent(new CustomEvent('eo-trigger-refresh', {
+                detail: { source, timestamp: Date.now() }
+            }));
         }
 
         function escapeHtml(text) {
@@ -30108,10 +30373,15 @@ Cmd/Ctrl + K - Command palette
             document.getElementById('entityModal').classList.add('active');
         }
 
-        function closeEntityModal() {
+        function closeEntityModal(options = {}) {
+            const { refresh = false } = options;
             document.getElementById('entityModal').classList.remove('active');
             // Close any open dropdowns
             closeModalParentDropdown();
+            // Optionally trigger a refresh when modal closes
+            if (refresh) {
+                scheduleRefresh('modal-close');
+            }
         }
 
         // Switch modal tabs
@@ -43799,9 +44069,32 @@ Cmd/Ctrl + K - Command palette
             }
         }
 
-        function saveToLocalStorage() {
+        // Flag to prevent recursive refresh loops
+        let isRefreshingFromSave = false;
+
+        function saveToLocalStorage(options = {}) {
+            const { skipRefresh = false } = options;
+
             // Delegate to workspace-aware save
             saveWorkspaces();
+
+            // Auto-refresh UI after save (unless explicitly skipped or already refreshing)
+            if (!skipRefresh && !isRefreshingFromSave) {
+                isRefreshingFromSave = true;
+                // Use microtask to batch multiple saves
+                queueMicrotask(() => {
+                    isRefreshingFromSave = false;
+                    if (typeof scheduleRefresh === 'function') {
+                        scheduleRefresh('saveToLocalStorage');
+                    }
+                });
+            }
+        }
+
+        // Wrapper for save operations that need immediate UI feedback
+        function saveAndRefresh(source = 'saveAndRefresh') {
+            saveToLocalStorage({ skipRefresh: true });
+            forceRefreshAllViews(source);
         }
 
         // saveData - save and refresh all views for instant visibility
@@ -54429,6 +54722,10 @@ Options:
                 // Initialize update polling system
                 initUpdatePolling();
                 console.log('🔄 Update polling system initialized');
+
+                // Initialize universal refresh system with fallback checks
+                initUniversalRefreshSystem();
+                console.log('🔄 Universal refresh system initialized');
 
                 console.log('🎉 Initialization complete!');
                 console.log('📊 Current state:', {
