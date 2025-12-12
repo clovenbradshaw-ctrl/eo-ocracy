@@ -23284,6 +23284,14 @@
                         <span>Create new task</span>
                         <span class="command-palette-item-hint">T</span>
                     </button>
+                    <button class="command-palette-item" data-action="create-unit" onclick="executeCommand('create-unit')">
+                        <i class="ph ph-buildings"></i>
+                        <span>Create new unit</span>
+                    </button>
+                    <button class="command-palette-item" data-action="create-team" onclick="executeCommand('create-team')">
+                        <i class="ph ph-users-three"></i>
+                        <span>Create new team</span>
+                    </button>
                     <button class="command-palette-item" data-action="create-role" onclick="executeCommand('create-role')">
                         <i class="ph ph-briefcase"></i>
                         <span>Create new role</span>
@@ -28472,11 +28480,22 @@ John Doe,Engineering,john@example.com"
                 case 'create-task':
                     openHeroTaskModal();
                     break;
+                case 'create-unit':
+                    const unitName = prompt('Enter unit name:');
+                    if (unitName && unitName.trim()) {
+                        const unitId = createEntityAndAutofill('unit', unitName.trim());
+                    }
+                    break;
+                case 'create-team':
+                    const teamName = prompt('Enter team name:');
+                    if (teamName && teamName.trim()) {
+                        const teamId = createEntityAndAutofill('team', teamName.trim());
+                    }
+                    break;
                 case 'create-role':
-                    // Simple inline creation
                     const roleName = prompt('Enter role name:');
                     if (roleName && roleName.trim()) {
-                        createEntity('role', roleName.trim());
+                        const roleId = createEntityAndAutofill('role', roleName.trim());
                     }
                     break;
                 case 'create-person':
@@ -28525,6 +28544,25 @@ John Doe,Engineering,john@example.com"
                 entityId: id,
                 description: `Create ${type}: ${name}`
             });
+
+            return id;
+        }
+
+        // Helper to create entity and open hero task modal with it pre-selected (autofill)
+        function createEntityAndAutofill(type, name) {
+            const id = createEntity(type, name);
+
+            // Log activity
+            logActivityToXano({
+                event_verb: 'Add Entity',
+                object_type: type,
+                object_label: name
+            });
+
+            // Open hero task modal with the newly created entity pre-selected
+            openHeroTaskModal(id, type);
+
+            return id;
         }
 
         // Keyboard shortcuts
@@ -36152,18 +36190,24 @@ Cmd/Ctrl + K - Command palette
 
         function handleSidebarAdd() {
             if (currentSidebarTab === 'org') {
-                // Open command palette with unit creation
+                // Open command palette filtered to show unit/team/role creation options
                 openCommandPalette();
                 setTimeout(() => {
                     const input = document.getElementById('commandPaletteInput');
-                    if (input) input.value = 'add unit ';
+                    if (input) {
+                        input.value = 'new unit';
+                        filterCommandPaletteItems();
+                    }
                 }, 100);
             } else if (currentSidebarTab === 'people') {
                 // Open command palette with person creation
                 openCommandPalette();
                 setTimeout(() => {
                     const input = document.getElementById('commandPaletteInput');
-                    if (input) input.value = 'add person ';
+                    if (input) {
+                        input.value = 'new person';
+                        filterCommandPaletteItems();
+                    }
                 }, 100);
             }
         }
