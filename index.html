@@ -45825,6 +45825,7 @@ Options:
                 visibility: quickAddModalState.visibility,
                 visibilityTeamId: quickAddModalState.visibilityTeamId
             };
+            if (!entities.task) entities.task = [];
             entities.task.push(taskObject);
 
             // Connect role to task (Role CON Task) - only if role is selected
@@ -46505,6 +46506,7 @@ Options:
                 airtableTags: [],  // Airtable record tags (clients, cases, events, apps)
                 createdAt: new Date().toISOString()
             };
+            if (!entities.task) entities.task = [];
             entities.task.push(taskObject);
 
             // Connect role to task (Role CON Task)
@@ -48795,6 +48797,7 @@ Options:
                 visibilityTeamId: parentTask?.visibilityTeamId || null
             };
 
+            if (!entities.task) entities.task = [];
             entities.task.push(subtask);
 
             // Connect to role if provided
@@ -49278,6 +49281,7 @@ Options:
                     assignedEntityId: assignedEntityId || null,
                     assignedEntityType: assignedEntityType || null
                 };
+                if (!entities.task) entities.task = [];
                 entities.task.push(taskObject);
 
                 logActivityToXano({
