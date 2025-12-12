@@ -50106,7 +50106,7 @@ Options:
             const icon = template.icon || 'ph-git-branch';
 
             let modalHtml = `
-                <div id="workflowPreviewModal" class="modal-overlay" onclick="if(event.target === this) closeWorkflowPreviewModal()">
+                <div id="workflowPreviewModal" class="modal-overlay active" onclick="if(event.target === this) closeWorkflowPreviewModal()">
                     <div class="workflow-preview-modal">
                         <div class="workflow-preview-header">
                             <h3><i class="ph ${icon}"></i> ${template.name}</h3>
@@ -50176,7 +50176,7 @@ Options:
             const roleOptions = roles.map(r => `<option value="${r.id}">${r.name}</option>`).join('');
 
             let modalHtml = `
-                <div id="useWorkflowModal" class="modal-overlay" onclick="if(event.target === this) closeUseWorkflowModal()">
+                <div id="useWorkflowModal" class="modal-overlay active" onclick="if(event.target === this) closeUseWorkflowModal()">
                     <div class="use-workflow-modal">
                         <div class="use-workflow-header">
                             <h3><i class="ph ${icon}"></i> Use: ${template.name}</h3>
@@ -50397,7 +50397,7 @@ Options:
             `).join('');
 
             let modalHtml = `
-                <div id="createWorkflowModal" class="modal-overlay" onclick="if(event.target === this) closeCreateWorkflowModal()">
+                <div id="createWorkflowModal" class="modal-overlay active" onclick="if(event.target === this) closeCreateWorkflowModal()">
                     <div class="create-workflow-modal">
                         <div class="create-workflow-header">
                             <h3><i class="ph ph-plus-circle"></i> ${modalTitle}</h3>
