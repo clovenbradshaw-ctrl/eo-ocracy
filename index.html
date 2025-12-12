@@ -168,6 +168,14 @@
             align-items: center;
         }
 
+        /* View Tabs Container - Two row layout */
+        .view-tabs-container {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 4px;
+        }
+
         /* View Tabs - Clean tab design */
         .view-tabs {
             display: flex;
@@ -175,6 +183,10 @@
             border-radius: 8px;
             padding: 4px;
             gap: 2px;
+        }
+
+        .view-tabs-secondary {
+            background: rgba(0,0,0,0.1);
         }
 
         .view-tab {
@@ -22567,51 +22579,48 @@
 
         <!-- CENTER ZONE: View Tabs -->
         <div class="header-center">
-            <div class="view-tabs">
-                <button class="view-tab active" data-view="kanban" onclick="switchView('kanban')">
-                    <i class="ph ph-columns"></i>
-                    <span>Kanban</span>
-                </button>
-                <button class="view-tab" data-view="table" onclick="switchView('table')">
-                    <i class="ph ph-table"></i>
-                    <span>Table</span>
-                </button>
-                <button class="view-tab" data-view="gantt" onclick="switchView('gantt')">
-                    <i class="ph ph-chart-bar-horizontal"></i>
-                    <span>Gantt</span>
-                </button>
-                <button class="view-tab" data-view="timeline" onclick="switchView('timeline')">
-                    <i class="ph ph-clock-countdown"></i>
-                    <span>Timeline</span>
-                </button>
-                <button class="view-tab" data-view="calendar" onclick="switchView('calendar')">
-                    <i class="ph ph-calendar"></i>
-                    <span>Calendar</span>
-                </button>
-                <div class="view-tabs-divider"></div>
-                <button class="view-tab" data-view="structure" onclick="switchView('structure')">
-                    <i class="ph ph-tree-structure"></i>
-                    <span>Structure</span>
-                </button>
-                <button class="view-tab" data-view="workflows" onclick="switchView('workflows')">
-                    <i class="ph ph-git-branch"></i>
-                    <span>Workflows</span>
-                </button>
-                <button class="view-tab" data-view="company-rules" onclick="switchView('company-rules')">
-                    <i class="ph ph-scales"></i>
-                    <span>Rules</span>
-                </button>
+            <div class="view-tabs-container">
+                <div class="view-tabs view-tabs-primary">
+                    <button class="view-tab active" data-view="kanban" onclick="switchView('kanban')">
+                        <i class="ph ph-columns"></i>
+                        <span>Kanban</span>
+                    </button>
+                    <button class="view-tab" data-view="table" onclick="switchView('table')">
+                        <i class="ph ph-table"></i>
+                        <span>Table</span>
+                    </button>
+                    <button class="view-tab" data-view="gantt" onclick="switchView('gantt')">
+                        <i class="ph ph-chart-bar-horizontal"></i>
+                        <span>Gantt</span>
+                    </button>
+                    <button class="view-tab" data-view="timeline" onclick="switchView('timeline')">
+                        <i class="ph ph-clock-countdown"></i>
+                        <span>Timeline</span>
+                    </button>
+                    <button class="view-tab" data-view="calendar" onclick="switchView('calendar')">
+                        <i class="ph ph-calendar"></i>
+                        <span>Calendar</span>
+                    </button>
+                </div>
+                <div class="view-tabs view-tabs-secondary">
+                    <button class="view-tab" data-view="structure" onclick="switchView('structure')">
+                        <i class="ph ph-tree-structure"></i>
+                        <span>Structure</span>
+                    </button>
+                    <button class="view-tab" data-view="workflows" onclick="switchView('workflows')">
+                        <i class="ph ph-git-branch"></i>
+                        <span>Workflows</span>
+                    </button>
+                    <button class="view-tab" data-view="company-rules" onclick="switchView('company-rules')">
+                        <i class="ph ph-scales"></i>
+                        <span>Rules</span>
+                    </button>
+                </div>
             </div>
         </div>
 
         <!-- RIGHT ZONE: Actions & User -->
         <div class="header-right">
-            <!-- Filter Button -->
-            <button class="header-icon-btn" onclick="openAdvancedFilterPanel()" title="Filters">
-                <i class="ph ph-funnel"></i>
-                <span class="filter-active-badge" id="viewFilterBadge" style="display: none;"></span>
-            </button>
-
             <!-- History Button -->
             <button class="header-icon-btn" onclick="openHistoryPanel()" title="History" id="historyBtn">
                 <i class="ph ph-clock-counter-clockwise"></i>
