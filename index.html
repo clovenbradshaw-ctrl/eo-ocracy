@@ -49910,8 +49910,12 @@ Options:
             const content = document.getElementById('taskBoardContent');
             const tasks = entities.task || [];
 
+            // Early return if task board view is not currently rendered
+            if (!content) return;
+
             // Update total count
-            document.getElementById('taskBoardTotal').textContent = tasks.length;
+            const totalEl = document.getElementById('taskBoardTotal');
+            if (totalEl) totalEl.textContent = tasks.length;
             updateTaskCountBadge();
 
             // Get the FAB element
@@ -49941,8 +49945,8 @@ Options:
             if (fab) fab.style.display = 'flex';
 
             // Get search/filter values
-            const searchTerm = (document.getElementById('taskBoardSearch').value || '').toLowerCase();
-            const filterValue = document.getElementById('taskBoardFilter').value;
+            const searchTerm = (document.getElementById('taskBoardSearch')?.value || '').toLowerCase();
+            const filterValue = document.getElementById('taskBoardFilter')?.value || '';
 
             // Filter tasks
             let filteredTasks = tasks.filter(task => {
