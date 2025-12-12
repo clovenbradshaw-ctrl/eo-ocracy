@@ -13520,6 +13520,23 @@
             opacity: 0.7;
         }
 
+        /* Task Card Creator Info */
+        .task-card-creator {
+            margin-top: 0.5rem;
+            padding-top: 0.5rem;
+            border-top: 1px solid #f0f0f0;
+            font-size: 0.7rem;
+            color: #999;
+            display: flex;
+            align-items: center;
+            gap: 0.35rem;
+        }
+
+        .task-card-creator i {
+            font-size: 0.8rem;
+            opacity: 0.6;
+        }
+
         .task-board-card-deps {
             margin-top: 0.5rem;
             display: flex;
@@ -19762,6 +19779,32 @@
 
         .more-details-content.show {
             display: block;
+        }
+
+        /* Task Metadata Footer */
+        .task-metadata-footer {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            padding: 12px 0;
+            margin-top: 16px;
+            border-top: 1px solid #f0f0f0;
+            font-size: 12px;
+            color: #888;
+        }
+
+        .task-metadata-footer i {
+            font-size: 14px;
+            color: #aaa;
+        }
+
+        .task-metadata-footer strong {
+            color: #666;
+            font-weight: 500;
+        }
+
+        .task-metadata-separator {
+            color: #ccc;
         }
 
         /* Collapsible Section Styles */
@@ -27121,6 +27164,46 @@ John Doe,Engineering,john@example.com"
          */
         function getCurrentUserId() {
             return AminoIdentity.currentUser?.id || AminoIdentity.currentUser?.email || null;
+        }
+
+        /**
+         * Get a display name for a creator ID (user ID or email).
+         * Tries to match against person entities, then falls back to email username or "Unknown".
+         */
+        function getCreatorDisplayName(creatorId) {
+            if (!creatorId) return 'Unknown';
+
+            // Try to find a matching person entity
+            const persons = entities.person || [];
+            const matchedPerson = persons.find(p => {
+                if (p.userId === creatorId) return true;
+                if (p.email && p.email.toLowerCase() === creatorId.toLowerCase()) return true;
+                return false;
+            });
+
+            if (matchedPerson) return matchedPerson.name;
+
+            // If creatorId looks like an email, extract the username part
+            if (creatorId.includes('@')) {
+                const username = creatorId.split('@')[0];
+                // Capitalize first letter of each word
+                return username.split(/[._-]/).map(word =>
+                    word.charAt(0).toUpperCase() + word.slice(1).toLowerCase()
+                ).join(' ');
+            }
+
+            return creatorId;
+        }
+
+        /**
+         * Format a date for task metadata display (e.g., "Dec 12, 2025 at 3:45 PM")
+         */
+        function formatCreatedDate(isoString) {
+            if (!isoString) return 'Unknown date';
+            const date = new Date(isoString);
+            const options = { month: 'short', day: 'numeric', year: 'numeric' };
+            const timeOptions = { hour: 'numeric', minute: '2-digit', hour12: true };
+            return date.toLocaleDateString('en-US', options) + ' at ' + date.toLocaleTimeString('en-US', timeOptions);
         }
 
         /**
@@ -43882,6 +43965,14 @@ Cmd/Ctrl + K - Command palette
                             </div>
                         </div>
                     </div>
+
+                    <!-- Task Metadata Footer -->
+                    <div class="task-metadata-footer">
+                        <i class="ph ph-user-circle"></i>
+                        <span>Created by <strong>${getCreatorDisplayName(task.createdBy)}</strong></span>
+                        <span class="task-metadata-separator">·</span>
+                        <span>${formatCreatedDate(task.createdAt)}</span>
+                    </div>
                 </div>
             `;
         }
@@ -46719,7 +46810,8 @@ Options:
                 producesProductId: null,
                 followsWorkflowId: null,
                 airtableTags: [],  // Airtable record tags (clients, cases, events, apps)
-                createdAt: new Date().toISOString()
+                createdAt: new Date().toISOString(),
+                createdBy: getCurrentUserId()
             };
             if (!entities.task) entities.task = [];
             entities.task.push(taskObject);
@@ -49978,6 +50070,10 @@ Options:
                         </div>
                     ` : ''}
                     ${aminoTagsHtml}
+                    <div class="task-card-creator">
+                        <i class="ph ph-user-circle"></i>
+                        ${getCreatorDisplayName(task.createdBy)} · ${formatTimeAgo(task.createdAt)}
+                    </div>
                 </div>
             `;
         }
@@ -50315,6 +50411,10 @@ Options:
                         ${task.dueDate ? `<span class="kanban-card-due ${dueDateStatus}"><i class="ph ph-calendar"></i> ${formatDateShort(task.dueDate)}</span>` : ''}
                     </div>
                     ${aminoTagsHtml}
+                    <div class="task-card-creator">
+                        <i class="ph ph-user-circle"></i>
+                        ${getCreatorDisplayName(task.createdBy)} · ${formatTimeAgo(task.createdAt)}
+                    </div>
                 </div>
             `;
         }
