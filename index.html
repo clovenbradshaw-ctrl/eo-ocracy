@@ -18,14 +18,14 @@
                 script.onload = function() {
                     if (typeof d3 !== 'undefined') {
                         loaded = true;
-                        debug.log('✅ D3.js loaded from:', src);
+                        console.log('✅ D3.js loaded from:', src);
                         callback(true);
                     } else {
                         callback(false);
                     }
                 };
                 script.onerror = function() {
-                    debug.warn('⚠️ Failed to load D3.js from:', src);
+                    console.warn('⚠️ Failed to load D3.js from:', src);
                     callback(false);
                 };
                 document.head.appendChild(script);
@@ -28860,12 +28860,12 @@ John Doe,Engineering,john@example.com"
         function toggleHeaderMenu(event) {
             event.stopPropagation();
             const dropdown = document.getElementById('headerDropdown');
-            dropdown.classList.toggle('open');
+            if (dropdown) dropdown.classList.toggle('open');
         }
 
         function closeHeaderMenu() {
             const dropdown = document.getElementById('headerDropdown');
-            dropdown.classList.remove('open');
+            if (dropdown) dropdown.classList.remove('open');
         }
 
         // Actions Menu (new consolidated menu)
