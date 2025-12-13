@@ -25271,6 +25271,900 @@ John Doe,Engineering,john@example.com"
         };
 
         // ==========================================
+        // USER DATA ENCRYPTION SYSTEM
+        // ==========================================
+        // Provides per-item encryption with keyring-based access control.
+        // Backwards compatible: reads both encrypted and plaintext data seamlessly.
+        // Encryption is opt-in per visibility level (private/team).
+
+        const UserDataEncryption = {
+            // Feature flag - can be toggled to disable encryption
+            ENABLED: true,
+
+            // localStorage keys for encryption data
+            PRIVATE_KEY_STORAGE: 'taskflow_user_private_key',
+            PUBLIC_KEYS_CACHE: 'taskflow_public_keys_cache',
+
+            // Xano endpoint for key backup/retrieval
+            KEYS_ENDPOINT: XANO_BASE_URL + '/user_encryption_keys',
+
+            // Track initialization state
+            isInitialized: false,
+            currentUserKeyPair: null,
+            publicKeysCache: {}, // { oderId: publicKeyJwk }
+
+            /**
+             * Initialize encryption system for current user.
+             * Generates keys if needed, backs up to cloud.
+             * BACKWARDS COMPATIBLE: If user has no keys, they're generated on first use.
+             */
+            async init() {
+                if (this.isInitialized) return;
+                if (!this.ENABLED) {
+                    console.log('🔐 UserDataEncryption: Disabled by feature flag');
+                    this.isInitialized = true;
+                    return;
+                }
+
+                const userId = this.getCurrentUserId();
+                if (!userId) {
+                    console.log('🔐 UserDataEncryption: No user logged in, skipping init');
+                    return;
+                }
+
+                console.log('🔐 UserDataEncryption: Initializing for user', userId);
+
+                try {
+                    // Try to load existing keys from localStorage
+                    let keyPair = await this.loadLocalKeys();
+
+                    if (!keyPair) {
+                        // No local keys - try to fetch from cloud backup
+                        keyPair = await this.fetchKeysFromCloud(userId);
+                    }
+
+                    if (!keyPair) {
+                        // No keys anywhere - generate new ones (first time user)
+                        console.log('🔐 UserDataEncryption: Generating new key pair for user');
+                        keyPair = await this.generateKeyPair();
+                        await this.saveLocalKeys(keyPair);
+                        await this.backupKeysToCloud(userId, keyPair);
+                    }
+
+                    this.currentUserKeyPair = keyPair;
+
+                    // Upload public key so others can share with us
+                    await this.publishPublicKey(userId, keyPair.publicKey);
+
+                    // Load cached public keys
+                    this.loadPublicKeysCache();
+
+                    this.isInitialized = true;
+                    console.log('🔐 UserDataEncryption: Initialized successfully');
+
+                } catch (error) {
+                    console.error('🔐 UserDataEncryption: Init failed', error);
+                    // Don't block app - encryption will be skipped
+                    this.isInitialized = true;
+                }
+            },
+
+            getCurrentUserId() {
+                return AminoIdentity.currentUser?.id ||
+                       AminoIdentity.currentUser?.email ||
+                       null;
+            },
+
+            // ==========================================
+            // KEY GENERATION (Web Crypto API)
+            // ==========================================
+
+            async generateKeyPair() {
+                // RSA-OAEP for key wrapping (asymmetric)
+                const keyPair = await crypto.subtle.generateKey(
+                    {
+                        name: 'RSA-OAEP',
+                        modulusLength: 2048,
+                        publicExponent: new Uint8Array([1, 0, 1]),
+                        hash: 'SHA-256'
+                    },
+                    true, // extractable
+                    ['wrapKey', 'unwrapKey']
+                );
+
+                // Export to JWK format for storage
+                const publicKeyJwk = await crypto.subtle.exportKey('jwk', keyPair.publicKey);
+                const privateKeyJwk = await crypto.subtle.exportKey('jwk', keyPair.privateKey);
+
+                return { publicKey: publicKeyJwk, privateKey: privateKeyJwk };
+            },
+
+            async generateDEK() {
+                // AES-GCM for data encryption (symmetric)
+                const key = await crypto.subtle.generateKey(
+                    { name: 'AES-GCM', length: 256 },
+                    true, // extractable for wrapping
+                    ['encrypt', 'decrypt']
+                );
+                return key;
+            },
+
+            // ==========================================
+            // KEY STORAGE (Local + Cloud Backup)
+            // ==========================================
+
+            async loadLocalKeys() {
+                try {
+                    const stored = localStorage.getItem(this.PRIVATE_KEY_STORAGE);
+                    if (!stored) return null;
+
+                    const data = JSON.parse(stored);
+                    // Verify it's valid by importing
+                    await crypto.subtle.importKey(
+                        'jwk', data.privateKey,
+                        { name: 'RSA-OAEP', hash: 'SHA-256' },
+                        true, ['unwrapKey']
+                    );
+
+                    return data;
+                } catch (e) {
+                    console.warn('🔐 UserDataEncryption: Failed to load local keys', e);
+                    return null;
+                }
+            },
+
+            async saveLocalKeys(keyPair) {
+                localStorage.setItem(this.PRIVATE_KEY_STORAGE, JSON.stringify(keyPair));
+            },
+
+            async fetchKeysFromCloud(userId) {
+                try {
+                    const response = await fetch(`${this.KEYS_ENDPOINT}?user_id=${encodeURIComponent(userId)}`);
+                    if (!response.ok) return null;
+
+                    const data = await response.json();
+                    if (data && data.private_key_jwk) {
+                        const keyPair = {
+                            publicKey: JSON.parse(data.public_key_jwk),
+                            privateKey: JSON.parse(data.private_key_jwk)
+                        };
+                        // Save locally for faster access
+                        await this.saveLocalKeys(keyPair);
+                        return keyPair;
+                    }
+                } catch (e) {
+                    console.warn('🔐 UserDataEncryption: Failed to fetch keys from cloud', e);
+                }
+                return null;
+            },
+
+            async backupKeysToCloud(userId, keyPair) {
+                try {
+                    await fetch(this.KEYS_ENDPOINT, {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({
+                            user_id: userId,
+                            public_key_jwk: JSON.stringify(keyPair.publicKey),
+                            private_key_jwk: JSON.stringify(keyPair.privateKey)
+                        })
+                    });
+                } catch (e) {
+                    console.warn('🔐 UserDataEncryption: Failed to backup keys to cloud', e);
+                }
+            },
+
+            async publishPublicKey(userId, publicKeyJwk) {
+                // Store public key separately so others can fetch it for sharing
+                try {
+                    await fetch(this.KEYS_ENDPOINT + '/public', {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({
+                            user_id: userId,
+                            public_key_jwk: JSON.stringify(publicKeyJwk)
+                        })
+                    });
+                } catch (e) {
+                    // Non-fatal - sharing will still work with cached keys
+                    console.warn('🔐 UserDataEncryption: Failed to publish public key', e);
+                }
+            },
+
+            loadPublicKeysCache() {
+                try {
+                    const cached = localStorage.getItem(this.PUBLIC_KEYS_CACHE);
+                    if (cached) {
+                        this.publicKeysCache = JSON.parse(cached);
+                    }
+                } catch (e) {
+                    this.publicKeysCache = {};
+                }
+            },
+
+            savePublicKeysCache() {
+                localStorage.setItem(this.PUBLIC_KEYS_CACHE, JSON.stringify(this.publicKeysCache));
+            },
+
+            async getPublicKeyFor(userId) {
+                // Check cache first
+                if (this.publicKeysCache[userId]) {
+                    return this.publicKeysCache[userId];
+                }
+
+                // Fetch from cloud
+                try {
+                    const response = await fetch(`${this.KEYS_ENDPOINT}/public?user_id=${encodeURIComponent(userId)}`);
+                    if (response.ok) {
+                        const data = await response.json();
+                        if (data && data.public_key_jwk) {
+                            const publicKey = JSON.parse(data.public_key_jwk);
+                            this.publicKeysCache[userId] = publicKey;
+                            this.savePublicKeysCache();
+                            return publicKey;
+                        }
+                    }
+                } catch (e) {
+                    console.warn('🔐 UserDataEncryption: Failed to fetch public key for', userId);
+                }
+                return null;
+            },
+
+            // ==========================================
+            // ENCRYPTION / DECRYPTION
+            // ==========================================
+
+            async encryptData(plaintext) {
+                const dek = await this.generateDEK();
+                const iv = crypto.getRandomValues(new Uint8Array(12));
+                const encodedData = new TextEncoder().encode(plaintext);
+
+                const encryptedBuffer = await crypto.subtle.encrypt(
+                    { name: 'AES-GCM', iv },
+                    dek,
+                    encodedData
+                );
+
+                return {
+                    blob: this.arrayBufferToBase64(encryptedBuffer),
+                    iv: this.arrayBufferToBase64(iv),
+                    dek // Return raw key for wrapping
+                };
+            },
+
+            async decryptData(blob, iv, dek) {
+                const encryptedBuffer = this.base64ToArrayBuffer(blob);
+                const ivBuffer = this.base64ToArrayBuffer(iv);
+
+                const decryptedBuffer = await crypto.subtle.decrypt(
+                    { name: 'AES-GCM', iv: ivBuffer },
+                    dek,
+                    encryptedBuffer
+                );
+
+                return new TextDecoder().decode(decryptedBuffer);
+            },
+
+            // ==========================================
+            // KEY WRAPPING (for keyring)
+            // ==========================================
+
+            async wrapDEK(dek, publicKeyJwk) {
+                const publicKey = await crypto.subtle.importKey(
+                    'jwk', publicKeyJwk,
+                    { name: 'RSA-OAEP', hash: 'SHA-256' },
+                    false, ['wrapKey']
+                );
+
+                const wrappedKey = await crypto.subtle.wrapKey(
+                    'raw', dek, publicKey, { name: 'RSA-OAEP' }
+                );
+
+                return this.arrayBufferToBase64(wrappedKey);
+            },
+
+            async unwrapDEK(wrappedKeyBase64, privateKeyJwk) {
+                const privateKey = await crypto.subtle.importKey(
+                    'jwk', privateKeyJwk,
+                    { name: 'RSA-OAEP', hash: 'SHA-256' },
+                    false, ['unwrapKey']
+                );
+
+                const wrappedKeyBuffer = this.base64ToArrayBuffer(wrappedKeyBase64);
+
+                const dek = await crypto.subtle.unwrapKey(
+                    'raw', wrappedKeyBuffer, privateKey,
+                    { name: 'RSA-OAEP' },
+                    { name: 'AES-GCM', length: 256 },
+                    true, ['encrypt', 'decrypt']
+                );
+
+                return dek;
+            },
+
+            // ==========================================
+            // HIGH-LEVEL API: Encrypt/Decrypt Entities
+            // ==========================================
+
+            /**
+             * Encrypt sensitive fields of an entity before saving.
+             * BACKWARDS COMPATIBLE: Only encrypts if visibility requires it.
+             * @param {Object} entity - The entity to encrypt (task, etc.)
+             * @returns {Object} - Entity with encrypted fields + keyring
+             */
+            async encryptEntity(entity) {
+                if (!this.ENABLED || !this.isInitialized || !this.currentUserKeyPair) {
+                    return entity; // Return as-is if encryption not available
+                }
+
+                const visibility = entity.visibility || 'public';
+
+                // Don't encrypt public items
+                if (visibility === 'public') {
+                    return entity;
+                }
+
+                const userId = this.getCurrentUserId();
+                if (!userId) return entity;
+
+                try {
+                    // Fields to encrypt (sensitive content)
+                    const sensitiveFields = ['name', 'description'];
+                    const encryptedEntity = { ...entity };
+
+                    // Generate one DEK for this entity
+                    const { blob: nameBlob, iv: nameIv, dek } = await this.encryptData(entity.name || '');
+
+                    // Encrypt name
+                    encryptedEntity.name = {
+                        _encrypted: true,
+                        blob: nameBlob,
+                        iv: nameIv
+                    };
+
+                    // Encrypt description with same DEK
+                    if (entity.description) {
+                        const descIv = crypto.getRandomValues(new Uint8Array(12));
+                        const descBuffer = await crypto.subtle.encrypt(
+                            { name: 'AES-GCM', iv: descIv },
+                            dek,
+                            new TextEncoder().encode(entity.description)
+                        );
+                        encryptedEntity.description = {
+                            _encrypted: true,
+                            blob: this.arrayBufferToBase64(descBuffer),
+                            iv: this.arrayBufferToBase64(descIv)
+                        };
+                    }
+
+                    // Build keyring based on visibility
+                    const keyring = [];
+
+                    // Always include creator
+                    const creatorWrappedDek = await this.wrapDEK(dek, this.currentUserKeyPair.publicKey);
+                    keyring.push({ userId, wrappedDek: creatorWrappedDek });
+
+                    // For team visibility, add all team members
+                    if (visibility === 'team' && entity.visibilityTeamId) {
+                        const teamMembers = this.getTeamMemberIds(entity.visibilityTeamId);
+                        for (const memberId of teamMembers) {
+                            if (memberId === userId) continue; // Already added
+                            const memberPublicKey = await this.getPublicKeyFor(memberId);
+                            if (memberPublicKey) {
+                                const memberWrappedDek = await this.wrapDEK(dek, memberPublicKey);
+                                keyring.push({ userId: memberId, wrappedDek: memberWrappedDek });
+                            }
+                        }
+                    }
+
+                    encryptedEntity.keyring = keyring;
+
+                    return encryptedEntity;
+
+                } catch (error) {
+                    console.error('🔐 UserDataEncryption: Failed to encrypt entity', error);
+                    return entity; // Return unencrypted on failure
+                }
+            },
+
+            /**
+             * Decrypt sensitive fields of an entity.
+             * BACKWARDS COMPATIBLE: Handles both encrypted and plaintext seamlessly.
+             * @param {Object} entity - The entity to decrypt
+             * @returns {Object} - Entity with decrypted fields (or original if not encrypted)
+             */
+            async decryptEntity(entity) {
+                if (!entity) return entity;
+
+                // Check if entity has encrypted fields
+                const hasEncryptedName = entity.name && entity.name._encrypted;
+                const hasEncryptedDesc = entity.description && entity.description._encrypted;
+
+                // BACKWARDS COMPATIBLE: If no encrypted fields, return as-is
+                if (!hasEncryptedName && !hasEncryptedDesc) {
+                    return entity;
+                }
+
+                // Need keyring to decrypt
+                if (!entity.keyring || !Array.isArray(entity.keyring)) {
+                    // Encrypted but no keyring - return with placeholders
+                    return this.entityWithPlaceholders(entity);
+                }
+
+                const userId = this.getCurrentUserId();
+                if (!userId || !this.currentUserKeyPair) {
+                    return this.entityWithPlaceholders(entity);
+                }
+
+                // Find our wrapped DEK in the keyring
+                const myKeyringEntry = entity.keyring.find(k => k.userId === userId);
+
+                // Check for public DEK (for public visibility items that were later made public)
+                const publicEntry = entity.keyring.find(k => k.public === true);
+
+                if (!myKeyringEntry && !publicEntry) {
+                    // We don't have access - return with placeholders
+                    return this.entityWithPlaceholders(entity);
+                }
+
+                try {
+                    let dek;
+
+                    if (publicEntry && publicEntry.dek) {
+                        // Public DEK - import directly
+                        dek = await crypto.subtle.importKey(
+                            'raw',
+                            this.base64ToArrayBuffer(publicEntry.dek),
+                            { name: 'AES-GCM', length: 256 },
+                            false, ['decrypt']
+                        );
+                    } else if (myKeyringEntry) {
+                        // Unwrap DEK with our private key
+                        dek = await this.unwrapDEK(myKeyringEntry.wrappedDek, this.currentUserKeyPair.privateKey);
+                    } else {
+                        return this.entityWithPlaceholders(entity);
+                    }
+
+                    const decryptedEntity = { ...entity };
+
+                    // Decrypt name
+                    if (hasEncryptedName) {
+                        decryptedEntity.name = await this.decryptData(
+                            entity.name.blob,
+                            entity.name.iv,
+                            dek
+                        );
+                    }
+
+                    // Decrypt description
+                    if (hasEncryptedDesc) {
+                        decryptedEntity.description = await this.decryptData(
+                            entity.description.blob,
+                            entity.description.iv,
+                            dek
+                        );
+                    }
+
+                    // Mark as decrypted for UI
+                    decryptedEntity._decrypted = true;
+
+                    return decryptedEntity;
+
+                } catch (error) {
+                    console.error('🔐 UserDataEncryption: Failed to decrypt entity', error);
+                    return this.entityWithPlaceholders(entity);
+                }
+            },
+
+            entityWithPlaceholders(entity) {
+                return {
+                    ...entity,
+                    name: typeof entity.name === 'object' ? '[Encrypted - No Access]' : entity.name,
+                    description: typeof entity.description === 'object' ? '[Encrypted - No Access]' : entity.description,
+                    _accessDenied: true
+                };
+            },
+
+            // ==========================================
+            // VISIBILITY CHANGE HANDLING
+            // ==========================================
+
+            /**
+             * Update keyring when visibility changes.
+             * NEVER decrypts to plaintext - only modifies who's in the keyring.
+             */
+            async updateKeyringForVisibilityChange(entity, newVisibility, newTeamId = null) {
+                if (!entity.keyring || !Array.isArray(entity.keyring) || entity.keyring.length === 0) {
+                    // Not encrypted - just update visibility fields
+                    return { ...entity, visibility: newVisibility, visibilityTeamId: newTeamId };
+                }
+
+                const userId = this.getCurrentUserId();
+                if (!userId || !this.currentUserKeyPair) {
+                    throw new Error('Cannot change visibility - no encryption keys');
+                }
+
+                // Find our keyring entry to get the DEK
+                const myEntry = entity.keyring.find(k => k.userId === userId);
+                if (!myEntry) {
+                    throw new Error('Cannot change visibility - no access to encryption key');
+                }
+
+                const dek = await this.unwrapDEK(myEntry.wrappedDek, this.currentUserKeyPair.privateKey);
+
+                const updatedEntity = { ...entity };
+                updatedEntity.visibility = newVisibility;
+                updatedEntity.visibilityTeamId = newTeamId;
+
+                // Rebuild keyring based on new visibility
+                const newKeyring = [];
+
+                if (newVisibility === 'public') {
+                    // Export DEK openly (anyone can decrypt)
+                    const rawDek = await crypto.subtle.exportKey('raw', dek);
+                    newKeyring.push({ public: true, dek: this.arrayBufferToBase64(rawDek) });
+
+                } else if (newVisibility === 'private') {
+                    // Only creator
+                    const creatorWrappedDek = await this.wrapDEK(dek, this.currentUserKeyPair.publicKey);
+                    newKeyring.push({ userId, wrappedDek: creatorWrappedDek });
+
+                } else if (newVisibility === 'team' && newTeamId) {
+                    // Creator + all team members
+                    const creatorWrappedDek = await this.wrapDEK(dek, this.currentUserKeyPair.publicKey);
+                    newKeyring.push({ userId, wrappedDek: creatorWrappedDek });
+
+                    const teamMembers = this.getTeamMemberIds(newTeamId);
+                    for (const memberId of teamMembers) {
+                        if (memberId === userId) continue;
+                        const memberPublicKey = await this.getPublicKeyFor(memberId);
+                        if (memberPublicKey) {
+                            const memberWrappedDek = await this.wrapDEK(dek, memberPublicKey);
+                            newKeyring.push({ userId: memberId, wrappedDek: memberWrappedDek });
+                        }
+                    }
+                }
+
+                updatedEntity.keyring = newKeyring;
+                return updatedEntity;
+            },
+
+            /**
+             * Share an encrypted entity with a specific user.
+             * Adds them to the keyring.
+             */
+            async shareWithUser(entity, targetUserId) {
+                if (!entity.keyring || !Array.isArray(entity.keyring)) {
+                    return entity; // Not encrypted
+                }
+
+                // Check if already shared
+                if (entity.keyring.some(k => k.userId === targetUserId)) {
+                    return entity; // Already has access
+                }
+
+                const userId = this.getCurrentUserId();
+                const myEntry = entity.keyring.find(k => k.userId === userId);
+                if (!myEntry) {
+                    throw new Error('Cannot share - no access to encryption key');
+                }
+
+                const dek = await this.unwrapDEK(myEntry.wrappedDek, this.currentUserKeyPair.privateKey);
+                const targetPublicKey = await this.getPublicKeyFor(targetUserId);
+
+                if (!targetPublicKey) {
+                    throw new Error('Cannot share - target user has no encryption keys');
+                }
+
+                const targetWrappedDek = await this.wrapDEK(dek, targetPublicKey);
+
+                const updatedEntity = { ...entity };
+                updatedEntity.keyring = [
+                    ...entity.keyring,
+                    { userId: targetUserId, wrappedDek: targetWrappedDek }
+                ];
+
+                return updatedEntity;
+            },
+
+            /**
+             * Revoke access from a user by removing them from keyring.
+             */
+            revokeFromUser(entity, targetUserId) {
+                if (!entity.keyring) return entity;
+
+                const updatedEntity = { ...entity };
+                updatedEntity.keyring = entity.keyring.filter(k => k.userId !== targetUserId);
+                return updatedEntity;
+            },
+
+            // ==========================================
+            // TEAM MEMBERSHIP HELPER
+            // ==========================================
+
+            getTeamMemberIds(teamId) {
+                // Get all person IDs in a team via Person -> Role -> Team relationships
+                const memberIds = new Set();
+
+                // Find roles in this team (Team DES Role)
+                const teamRoles = relationships.filter(r =>
+                    r.subject === teamId &&
+                    r.predicate === 'DES' &&
+                    r.object.startsWith('r')
+                );
+
+                teamRoles.forEach(teamRoleRel => {
+                    // Find persons assigned to this role (Person INS Role)
+                    const personRels = relationships.filter(r =>
+                        r.predicate === 'INS' &&
+                        r.object === teamRoleRel.object &&
+                        r.subject.startsWith('p')
+                    );
+
+                    personRels.forEach(personRel => {
+                        const person = (entities.person || []).find(p => p.id === personRel.subject);
+                        if (person) {
+                            // Use userId if available, otherwise email
+                            const personUserId = person.userId || person.email;
+                            if (personUserId) {
+                                memberIds.add(personUserId);
+                            }
+                        }
+                    });
+                });
+
+                return Array.from(memberIds);
+            },
+
+            // ==========================================
+            // UTILITY FUNCTIONS
+            // ==========================================
+
+            arrayBufferToBase64(buffer) {
+                const bytes = new Uint8Array(buffer);
+                let binary = '';
+                for (let i = 0; i < bytes.byteLength; i++) {
+                    binary += String.fromCharCode(bytes[i]);
+                }
+                return btoa(binary);
+            },
+
+            base64ToArrayBuffer(base64) {
+                const binary = atob(base64);
+                const bytes = new Uint8Array(binary.length);
+                for (let i = 0; i < binary.length; i++) {
+                    bytes[i] = binary.charCodeAt(i);
+                }
+                return bytes.buffer;
+            },
+
+            // ==========================================
+            // ROLLBACK / ADMIN UTILITIES
+            // ==========================================
+
+            /**
+             * Decrypt all encrypted entities and remove encryption.
+             * Use this to rollback encryption feature.
+             * ONLY works for entities the current user has access to.
+             */
+            async decryptAllEntities() {
+                if (!this.currentUserKeyPair) {
+                    throw new Error('No encryption keys - cannot decrypt');
+                }
+
+                const tasks = entities.task || [];
+                let decryptedCount = 0;
+                let failedCount = 0;
+
+                for (let i = 0; i < tasks.length; i++) {
+                    const task = tasks[i];
+                    if (task.keyring && Array.isArray(task.keyring)) {
+                        try {
+                            const decrypted = await this.decryptEntity(task);
+                            if (!decrypted._accessDenied) {
+                                // Remove encryption artifacts
+                                tasks[i] = {
+                                    ...decrypted,
+                                    keyring: undefined,
+                                    _decrypted: undefined
+                                };
+                                delete tasks[i].keyring;
+                                delete tasks[i]._decrypted;
+                                decryptedCount++;
+                            } else {
+                                failedCount++;
+                            }
+                        } catch (e) {
+                            console.error('Failed to decrypt task', task.id, e);
+                            failedCount++;
+                        }
+                    }
+                }
+
+                saveToLocalStorage();
+
+                return { decryptedCount, failedCount };
+            },
+
+            /**
+             * Check if an entity is encrypted
+             */
+            isEncrypted(entity) {
+                if (!entity) return false;
+                return (entity.name && entity.name._encrypted) ||
+                       (entity.description && entity.description._encrypted) ||
+                       (entity.keyring && Array.isArray(entity.keyring) && entity.keyring.length > 0);
+            }
+        };
+
+        // ==========================================
+        // FIELD READING HELPERS (Backwards Compatible)
+        // ==========================================
+
+        /**
+         * Read a field that may be encrypted or plaintext.
+         * BACKWARDS COMPATIBLE: Works with both formats seamlessly.
+         * @param {string|Object} value - The field value (string or encrypted object)
+         * @param {string} fallback - Fallback value if decryption fails
+         * @returns {string} - The plaintext value
+         */
+        function readField(value, fallback = '') {
+            // Plaintext string - return as-is (backwards compatible)
+            if (typeof value === 'string') {
+                return value;
+            }
+
+            // Null/undefined
+            if (value == null) {
+                return fallback;
+            }
+
+            // Encrypted field that was already decrypted in-memory
+            if (typeof value === 'object' && !value._encrypted) {
+                return value.toString();
+            }
+
+            // Encrypted field - return placeholder (actual decryption happens at entity level)
+            if (value && value._encrypted) {
+                return '[Encrypted]';
+            }
+
+            return fallback;
+        }
+
+        /**
+         * Check if a field is encrypted
+         */
+        function isFieldEncrypted(value) {
+            return value && typeof value === 'object' && value._encrypted === true;
+        }
+
+        /**
+         * Create a task with automatic encryption based on visibility.
+         * BACKWARDS COMPATIBLE: If encryption unavailable, creates plaintext task.
+         * @param {Object} taskData - The task object to create
+         * @returns {Object} - The created task (possibly encrypted)
+         */
+        async function createTaskWithEncryption(taskData) {
+            if (!entities.task) entities.task = [];
+
+            // Only encrypt private/team tasks
+            const shouldEncrypt = UserDataEncryption.ENABLED &&
+                                  UserDataEncryption.isInitialized &&
+                                  (taskData.visibility === 'private' || taskData.visibility === 'team');
+
+            let taskToStore = taskData;
+
+            if (shouldEncrypt) {
+                try {
+                    taskToStore = await UserDataEncryption.encryptEntity(taskData);
+                    debug.log('🔐 Task encrypted:', taskData.id, 'visibility:', taskData.visibility);
+                } catch (e) {
+                    console.warn('🔐 Task encryption failed, storing plaintext:', e);
+                    taskToStore = taskData;
+                }
+            }
+
+            entities.task.push(taskToStore);
+            return taskToStore;
+        }
+
+        /**
+         * Update a task with automatic re-encryption when visibility changes.
+         * @param {string} taskId - The task ID to update
+         * @param {Object} updates - Fields to update
+         * @returns {Object|null} - The updated task or null if not found
+         */
+        async function updateTaskWithEncryption(taskId, updates) {
+            const taskIndex = (entities.task || []).findIndex(t => t.id === taskId);
+            if (taskIndex === -1) return null;
+
+            const existingTask = entities.task[taskIndex];
+            let updatedTask = { ...existingTask, ...updates };
+
+            // Check if visibility changed
+            const visibilityChanged = updates.visibility !== undefined &&
+                                      updates.visibility !== existingTask.visibility;
+            const teamChanged = updates.visibilityTeamId !== undefined &&
+                               updates.visibilityTeamId !== existingTask.visibilityTeamId;
+
+            if ((visibilityChanged || teamChanged) && UserDataEncryption.ENABLED && UserDataEncryption.isInitialized) {
+                try {
+                    // If task was encrypted, update keyring
+                    if (UserDataEncryption.isEncrypted(existingTask)) {
+                        updatedTask = await UserDataEncryption.updateKeyringForVisibilityChange(
+                            updatedTask,
+                            updates.visibility || existingTask.visibility,
+                            updates.visibilityTeamId || existingTask.visibilityTeamId
+                        );
+                        debug.log('🔐 Task keyring updated for visibility change:', taskId);
+                    }
+                    // If becoming private/team and wasn't encrypted, encrypt now
+                    else if ((updates.visibility === 'private' || updates.visibility === 'team')) {
+                        updatedTask = await UserDataEncryption.encryptEntity(updatedTask);
+                        debug.log('🔐 Task encrypted on visibility change:', taskId);
+                    }
+                } catch (e) {
+                    console.warn('🔐 Failed to update encryption for visibility change:', e);
+                }
+            }
+
+            entities.task[taskIndex] = updatedTask;
+            return updatedTask;
+        }
+
+        /**
+         * Get a task with automatic decryption.
+         * BACKWARDS COMPATIBLE: Returns plaintext tasks as-is.
+         * @param {string} taskId - The task ID to get
+         * @returns {Object|null} - The decrypted task or null if not found
+         */
+        async function getDecryptedTask(taskId) {
+            const task = (entities.task || []).find(t => t.id === taskId);
+            if (!task) return null;
+
+            // If not encrypted, return as-is (backwards compatible)
+            if (!UserDataEncryption.isEncrypted(task)) {
+                return task;
+            }
+
+            // Decrypt
+            try {
+                return await UserDataEncryption.decryptEntity(task);
+            } catch (e) {
+                console.warn('🔐 Failed to decrypt task:', taskId, e);
+                return UserDataEncryption.entityWithPlaceholders(task);
+            }
+        }
+
+        /**
+         * Get all tasks with automatic decryption.
+         * BACKWARDS COMPATIBLE: Handles mixed encrypted/plaintext tasks.
+         * @returns {Array} - Array of decrypted tasks
+         */
+        async function getDecryptedTasks() {
+            const tasks = entities.task || [];
+            const decryptedTasks = [];
+
+            for (const task of tasks) {
+                if (UserDataEncryption.isEncrypted(task)) {
+                    try {
+                        const decrypted = await UserDataEncryption.decryptEntity(task);
+                        decryptedTasks.push(decrypted);
+                    } catch (e) {
+                        // Return with placeholder if can't decrypt
+                        decryptedTasks.push(UserDataEncryption.entityWithPlaceholders(task));
+                    }
+                } else {
+                    // Plaintext task - return as-is
+                    decryptedTasks.push(task);
+                }
+            }
+
+            return decryptedTasks;
+        }
+
+        // ==========================================
         // WORKSPACE MANAGEMENT
         // ==========================================
 
@@ -44304,6 +45198,76 @@ Cmd/Ctrl + K - Command palette
             };
         };
 
+        // ==========================================
+        // ENCRYPTION ADMIN UTILITIES
+        // ==========================================
+
+        /**
+         * Check encryption system status
+         * Usage: window.eoEncryptionStatus()
+         */
+        window.eoEncryptionStatus = function() {
+            return {
+                enabled: UserDataEncryption.ENABLED,
+                initialized: UserDataEncryption.isInitialized,
+                hasKeys: !!UserDataEncryption.currentUserKeyPair,
+                userId: UserDataEncryption.getCurrentUserId(),
+                cachedPublicKeys: Object.keys(UserDataEncryption.publicKeysCache).length
+            };
+        };
+
+        /**
+         * Toggle encryption on/off (for debugging)
+         * Usage: window.eoEncryptionToggle(false) to disable
+         */
+        window.eoEncryptionToggle = function(enable) {
+            UserDataEncryption.ENABLED = enable;
+            console.log('🔐 UserDataEncryption:', enable ? 'ENABLED' : 'DISABLED');
+            return { enabled: UserDataEncryption.ENABLED };
+        };
+
+        /**
+         * Decrypt all encrypted tasks (ROLLBACK)
+         * Usage: window.eoDecryptAll()
+         * WARNING: Only works for tasks you have access to decrypt
+         */
+        window.eoDecryptAll = async function() {
+            if (!confirm('⚠️ This will decrypt all tasks you have access to and remove encryption.\n\nContinue?')) {
+                return { cancelled: true };
+            }
+            const result = await UserDataEncryption.decryptAllEntities();
+            console.log('🔐 Decryption rollback complete:', result);
+            refreshAllViews();
+            return result;
+        };
+
+        /**
+         * List all encrypted tasks
+         * Usage: window.eoListEncrypted()
+         */
+        window.eoListEncrypted = function() {
+            const tasks = entities.task || [];
+            const encrypted = tasks.filter(t => UserDataEncryption.isEncrypted(t));
+            console.log(`🔐 Found ${encrypted.length} encrypted tasks out of ${tasks.length} total`);
+            return encrypted.map(t => ({
+                id: t.id,
+                visibility: t.visibility,
+                keyringSize: t.keyring?.length || 0,
+                hasAccess: t.keyring?.some(k => k.userId === UserDataEncryption.getCurrentUserId() || k.public)
+            }));
+        };
+
+        /**
+         * Force re-initialize encryption (useful after login)
+         * Usage: window.eoEncryptionInit()
+         */
+        window.eoEncryptionInit = async function() {
+            UserDataEncryption.isInitialized = false;
+            UserDataEncryption.currentUserKeyPair = null;
+            await UserDataEncryption.init();
+            return window.eoEncryptionStatus();
+        };
+
         // saveData - save and refresh all views for instant visibility
         // Now uses immediate refresh since saveToLocalStorage handles debounced refresh
         function saveData() {
@@ -47574,7 +48538,7 @@ Options:
         // Guard to prevent multiple saves
         let isSavingQuickAdd = false;
 
-        function saveQuickAddModal() {
+        async function saveQuickAddModal() {
             // Prevent multiple saves if button is clicked rapidly
             if (isSavingQuickAdd) return;
             isSavingQuickAdd = true;
@@ -47628,8 +48592,9 @@ Options:
                     visibility: quickAddModalState.visibility,
                     visibilityTeamId: quickAddModalState.visibilityTeamId
                 };
-                if (!entities.task) entities.task = [];
-                entities.task.push(taskObject);
+                // Create task with automatic encryption based on visibility
+                // BACKWARDS COMPATIBLE: Falls back to plaintext if encryption unavailable
+                await createTaskWithEncryption(taskObject);
 
                 // Connect role to task (Role CON Task) - only if role is selected
                 if (roleId) {
@@ -51214,7 +52179,7 @@ Options:
         }
 
         // Submit hero task
-        function submitHeroTask() {
+        async function submitHeroTask() {
             const taskName = document.getElementById('heroTaskName').value.trim();
             const description = document.getElementById('heroTaskDescription')?.value.trim() || '';
             // Use tracked entity selection (supports unit, team, or role)
@@ -51278,8 +52243,9 @@ Options:
                     assignedEntityId: assignedEntityId || null,
                     assignedEntityType: assignedEntityType || null
                 };
-                if (!entities.task) entities.task = [];
-                entities.task.push(taskObject);
+                // Create task with automatic encryption based on visibility
+                // BACKWARDS COMPATIBLE: Falls back to plaintext if encryption unavailable
+                await createTaskWithEncryption(taskObject);
 
                 logActivityToXano({
                     event_verb: 'INS',
@@ -55227,6 +56193,19 @@ Options:
 
             // Initialize Amino user identity detection
             AminoIdentity.init();
+
+            // Initialize User Data Encryption when user is detected
+            // BACKWARDS COMPATIBLE: Keys are generated on first use, existing data remains readable
+            AminoIdentity.onReady(async (user) => {
+                if (user) {
+                    try {
+                        await UserDataEncryption.init();
+                        debug.log('🔐 User data encryption initialized');
+                    } catch (e) {
+                        console.warn('🔐 Encryption init failed (non-fatal):', e);
+                    }
+                }
+            });
 
             // Initialize Xano connection status check
             initXanoConnectionCheck();
