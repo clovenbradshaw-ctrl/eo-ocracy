@@ -22915,6 +22915,504 @@
                 width: 100%;
             }
         }
+
+        /* ==========================================
+           EMAIL NOTIFICATION STYLES
+           ========================================== */
+
+        .email-notification-section {
+            margin-top: 16px;
+            padding: 16px;
+            background: linear-gradient(135deg, #f8f6f3 0%, #f5f3f0 100%);
+            border: 1px solid #e8e4dd;
+            border-radius: 12px;
+        }
+
+        .email-notification-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-bottom: 12px;
+        }
+
+        .email-notification-title {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            font-size: 14px;
+            font-weight: 600;
+            color: #5c4d3d;
+        }
+
+        .email-notification-title i {
+            font-size: 18px;
+            color: #8B6F47;
+        }
+
+        .email-notification-toggle {
+            position: relative;
+            width: 44px;
+            height: 24px;
+            background: #d1ccc4;
+            border-radius: 12px;
+            cursor: pointer;
+            transition: background 0.2s ease;
+        }
+
+        .email-notification-toggle.active {
+            background: #8B6F47;
+        }
+
+        .email-notification-toggle::after {
+            content: '';
+            position: absolute;
+            top: 2px;
+            left: 2px;
+            width: 20px;
+            height: 20px;
+            background: white;
+            border-radius: 50%;
+            transition: transform 0.2s ease;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.2);
+        }
+
+        .email-notification-toggle.active::after {
+            transform: translateX(20px);
+        }
+
+        .email-notification-recipient {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            padding: 10px 12px;
+            background: white;
+            border: 1px solid #e8e4dd;
+            border-radius: 8px;
+            margin-bottom: 12px;
+            font-size: 13px;
+            color: #666;
+        }
+
+        .email-notification-recipient i {
+            color: #8B6F47;
+        }
+
+        .email-notification-recipient-email {
+            font-weight: 500;
+            color: #333;
+        }
+
+        .email-notification-no-recipient {
+            padding: 10px 12px;
+            background: #FEF3C7;
+            border: 1px solid #F59E0B;
+            border-radius: 8px;
+            margin-bottom: 12px;
+            font-size: 13px;
+            color: #92400E;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .email-notification-preview-btn {
+            width: 100%;
+            padding: 10px 16px;
+            background: #8B6F47;
+            color: white;
+            border: none;
+            border-radius: 8px;
+            font-size: 13px;
+            font-weight: 500;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+            transition: background 0.2s ease;
+        }
+
+        .email-notification-preview-btn:hover {
+            background: #7a5f3a;
+        }
+
+        .email-notification-preview-btn:disabled {
+            background: #d1ccc4;
+            cursor: not-allowed;
+        }
+
+        .email-notification-preview-btn i {
+            font-size: 16px;
+        }
+
+        /* Email Preview Modal */
+        .email-preview-modal-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.5);
+            backdrop-filter: blur(2px);
+            z-index: 10000;
+            display: none;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+        }
+
+        .email-preview-modal-overlay.active {
+            display: flex;
+        }
+
+        .email-preview-modal {
+            background: white;
+            border-radius: 16px;
+            width: 100%;
+            max-width: 600px;
+            max-height: 90vh;
+            overflow: hidden;
+            display: flex;
+            flex-direction: column;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+        }
+
+        .email-preview-header {
+            padding: 20px 24px;
+            border-bottom: 1px solid #e8e4dd;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            background: #f8f6f3;
+        }
+
+        .email-preview-header h3 {
+            margin: 0;
+            font-size: 18px;
+            font-weight: 600;
+            color: #333;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .email-preview-header h3 i {
+            color: #8B6F47;
+        }
+
+        .email-preview-close {
+            width: 32px;
+            height: 32px;
+            border: none;
+            background: transparent;
+            cursor: pointer;
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: #666;
+            font-size: 20px;
+            transition: background 0.2s;
+        }
+
+        .email-preview-close:hover {
+            background: #e8e4dd;
+            color: #333;
+        }
+
+        .email-preview-meta {
+            padding: 16px 24px;
+            background: #fafaf9;
+            border-bottom: 1px solid #e8e4dd;
+            font-size: 13px;
+        }
+
+        .email-preview-meta-row {
+            display: flex;
+            gap: 8px;
+            margin-bottom: 6px;
+        }
+
+        .email-preview-meta-row:last-child {
+            margin-bottom: 0;
+        }
+
+        .email-preview-meta-label {
+            color: #888;
+            min-width: 60px;
+        }
+
+        .email-preview-meta-value {
+            color: #333;
+            font-weight: 500;
+        }
+
+        .email-preview-content {
+            flex: 1;
+            overflow-y: auto;
+            padding: 24px;
+        }
+
+        .email-preview-body {
+            background: #fafaf9;
+            border: 1px solid #e8e4dd;
+            border-radius: 12px;
+            padding: 24px;
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+            font-size: 14px;
+            line-height: 1.6;
+            color: #333;
+        }
+
+        .email-preview-greeting {
+            margin-bottom: 16px;
+        }
+
+        .email-preview-divider {
+            border: none;
+            border-top: 2px solid #e8e4dd;
+            margin: 20px 0;
+        }
+
+        .email-preview-section-title {
+            font-size: 12px;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            color: #8B6F47;
+            margin-bottom: 12px;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+        .email-preview-task-details {
+            margin-bottom: 16px;
+        }
+
+        .email-preview-task-field {
+            display: flex;
+            gap: 8px;
+            margin-bottom: 8px;
+        }
+
+        .email-preview-task-label {
+            color: #888;
+            min-width: 80px;
+        }
+
+        .email-preview-task-value {
+            color: #333;
+        }
+
+        .email-preview-status {
+            display: inline-flex;
+            align-items: center;
+            gap: 4px;
+            padding: 2px 8px;
+            border-radius: 4px;
+            font-size: 12px;
+            font-weight: 500;
+        }
+
+        .email-preview-status.pending {
+            background: #FEF3C7;
+            color: #92400E;
+        }
+
+        .email-preview-status.in_progress {
+            background: #DBEAFE;
+            color: #1E40AF;
+        }
+
+        .email-preview-status.completed {
+            background: #D1FAE5;
+            color: #065F46;
+        }
+
+        .email-preview-priority {
+            display: inline-flex;
+            align-items: center;
+            gap: 4px;
+            padding: 2px 8px;
+            border-radius: 4px;
+            font-size: 12px;
+            font-weight: 500;
+        }
+
+        .email-preview-priority.high {
+            background: #FEE2E2;
+            color: #991B1B;
+        }
+
+        .email-preview-priority.medium {
+            background: #FEF3C7;
+            color: #92400E;
+        }
+
+        .email-preview-priority.low {
+            background: #E0E7FF;
+            color: #3730A3;
+        }
+
+        .email-preview-context {
+            font-size: 13px;
+            color: #666;
+        }
+
+        .email-preview-context-item {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            margin-bottom: 4px;
+        }
+
+        .email-preview-context-item i {
+            color: #8B6F47;
+            font-size: 14px;
+        }
+
+        .email-preview-message-section {
+            margin-top: 20px;
+        }
+
+        .email-preview-message-input {
+            width: 100%;
+            min-height: 80px;
+            padding: 12px;
+            border: 1px dashed #ccc;
+            border-radius: 8px;
+            font-family: inherit;
+            font-size: 14px;
+            resize: vertical;
+            background: white;
+        }
+
+        .email-preview-message-input:focus {
+            outline: none;
+            border-color: #8B6F47;
+            border-style: solid;
+        }
+
+        .email-preview-message-input::placeholder {
+            color: #aaa;
+            font-style: italic;
+        }
+
+        .email-preview-cta {
+            display: inline-block;
+            margin-top: 20px;
+            padding: 10px 20px;
+            background: #8B6F47;
+            color: white;
+            text-decoration: none;
+            border-radius: 6px;
+            font-weight: 500;
+            font-size: 14px;
+        }
+
+        .email-preview-footer {
+            margin-top: 24px;
+            padding-top: 16px;
+            border-top: 1px solid #e8e4dd;
+            font-size: 12px;
+            color: #888;
+        }
+
+        .email-preview-actions {
+            padding: 20px 24px;
+            border-top: 1px solid #e8e4dd;
+            display: flex;
+            gap: 12px;
+            justify-content: flex-end;
+            background: #fafaf9;
+        }
+
+        .email-preview-cancel-btn {
+            padding: 10px 20px;
+            background: white;
+            color: #666;
+            border: 1px solid #ddd;
+            border-radius: 8px;
+            font-size: 14px;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .email-preview-cancel-btn:hover {
+            background: #f5f5f5;
+            border-color: #ccc;
+        }
+
+        .email-preview-send-btn {
+            padding: 10px 24px;
+            background: #8B6F47;
+            color: white;
+            border: none;
+            border-radius: 8px;
+            font-size: 14px;
+            font-weight: 500;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            transition: background 0.2s;
+        }
+
+        .email-preview-send-btn:hover {
+            background: #7a5f3a;
+        }
+
+        .email-preview-send-btn:disabled {
+            background: #d1ccc4;
+            cursor: not-allowed;
+        }
+
+        .email-preview-send-btn i {
+            font-size: 16px;
+        }
+
+        /* Person email input in person modal */
+        .person-email-section {
+            margin-top: 12px;
+            padding: 12px;
+            background: #f8f6f3;
+            border-radius: 8px;
+        }
+
+        .person-email-label {
+            font-size: 12px;
+            font-weight: 600;
+            color: #888;
+            text-transform: uppercase;
+            margin-bottom: 6px;
+        }
+
+        .person-email-input {
+            width: 100%;
+            padding: 8px 12px;
+            border: 1px solid #ddd;
+            border-radius: 6px;
+            font-size: 14px;
+        }
+
+        .person-email-input:focus {
+            outline: none;
+            border-color: #8B6F47;
+        }
+
+        .person-email-display {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            font-size: 14px;
+            color: #333;
+        }
+
+        .person-email-display i {
+            color: #8B6F47;
+        }
     </style>
 
     <!-- Login Overlay - gates app until authenticated -->
@@ -24693,8 +25191,11 @@ John Doe,Engineering,john@example.com"
                         'Content-Type': 'application/json'
                     },
                     body: JSON.stringify({
+                        type: 'login_code',
                         email: email,
                         code: code,
+                        subject: 'Your login code for TaskFlow',
+                        sender: 'TaskFlow',
                         app: 'taskflow',
                         timestamp: new Date().toISOString()
                     })
@@ -30191,9 +30692,28 @@ Cmd/Ctrl + K - Command palette
                     </div>
                 ` : '';
 
+                // Email section for person
+                const personEmailHtml = `
+                    <div class="person-email-section">
+                        <div class="person-email-label"><i class="ph ph-envelope"></i> Email Address</div>
+                        ${entity.email ? `
+                            <div class="person-email-display" onclick="openPersonEmailEditor('${entityId}')" style="cursor: pointer;" title="Click to edit email">
+                                <i class="ph ph-envelope"></i>
+                                <span>${entity.email}</span>
+                                <i class="ph ph-pencil-simple" style="color: #aaa; font-size: 12px; margin-left: auto;"></i>
+                            </div>
+                        ` : `
+                            <button onclick="openPersonEmailEditor('${entityId}')" style="width: 100%; padding: 8px 12px; background: #f5f5f5; border: 1px dashed #ccc; border-radius: 6px; font-size: 13px; color: #666; cursor: pointer; display: flex; align-items: center; gap: 6px;">
+                                <i class="ph ph-plus"></i> Add email address
+                            </button>
+                        `}
+                    </div>
+                `;
+
                 if (roleAssignments.length > 0) {
                     roleAssignmentEl.innerHTML = `
-                        <div class="role-assignment-header">
+                        ${personEmailHtml}
+                        <div class="role-assignment-header" style="margin-top: 16px;">
                             <div class="modal-section-title" style="margin-bottom: 0;"><i class="ph ph-identification-badge"></i> Assigned Roles</div>
                         </div>
                         <div class="role-assignment-list">
@@ -30215,7 +30735,8 @@ Cmd/Ctrl + K - Command palette
                     `;
                 } else {
                     roleAssignmentEl.innerHTML = `
-                        <div class="role-assignment-header">
+                        ${personEmailHtml}
+                        <div class="role-assignment-header" style="margin-top: 16px;">
                             <div class="modal-section-title" style="margin-bottom: 0;"><i class="ph ph-identification-badge"></i> Assigned Roles</div>
                         </div>
                         ${addFormHtml}
@@ -45342,6 +45863,9 @@ Cmd/Ctrl + K - Command palette
                     <!-- Airtable Linked Records - Always Visible -->
                     ${renderAirtableTags(task)}
 
+                    <!-- Email Notification Section -->
+                    ${renderTaskEmailNotificationSection(task, connectedRoles)}
+
                     <!-- ELEVATED COMMENTS SECTION - Always Visible -->
                     <div class="elevated-comments-section">
                         <div class="elevated-comments-header">
@@ -48910,6 +49434,468 @@ Options:
             }
 
             showToast(`Priority: ${newPriority.charAt(0).toUpperCase() + newPriority.slice(1)}`, 'success');
+        }
+
+        // ==========================================
+        // EMAIL NOTIFICATION SYSTEM
+        // ==========================================
+
+        // Store for current email preview data
+        let currentEmailPreviewData = null;
+
+        // Get people assigned to a task through roles (Task -> CON -> Role -> INS -> Person)
+        function getTaskAssignedPeople(taskId) {
+            // Find roles connected to this task
+            const connectedRoles = relationships
+                .filter(r => (r.subject === taskId || r.object === taskId) && r.predicate === 'CON')
+                .map(r => {
+                    const roleId = r.subject === taskId ? r.object : r.subject;
+                    return findEntity(roleId);
+                })
+                .filter(e => e && e.type === 'role');
+
+            // For each role, find assigned people
+            const assignedPeople = [];
+            connectedRoles.forEach(role => {
+                const peopleInRole = relationships
+                    .filter(r => r.predicate === 'INS' && r.object === role.id)
+                    .map(r => findEntity(r.subject))
+                    .filter(e => e && e.type === 'person');
+
+                peopleInRole.forEach(person => {
+                    if (!assignedPeople.find(p => p.person.id === person.id)) {
+                        assignedPeople.push({ person, role });
+                    }
+                });
+            });
+
+            return assignedPeople;
+        }
+
+        // Get notification recipient info for a task
+        function getTaskNotificationRecipient(taskId) {
+            const assignedPeople = getTaskAssignedPeople(taskId);
+
+            if (assignedPeople.length === 0) {
+                return { hasRecipient: false, reason: 'No role assigned to this task' };
+            }
+
+            // Get the first person with an email
+            for (const { person, role } of assignedPeople) {
+                if (person.email) {
+                    return {
+                        hasRecipient: true,
+                        person,
+                        role,
+                        email: person.email
+                    };
+                }
+            }
+
+            // People exist but none have email
+            return {
+                hasRecipient: false,
+                reason: `${assignedPeople[0].person.name} has no email address`,
+                person: assignedPeople[0].person,
+                role: assignedPeople[0].role
+            };
+        }
+
+        // Render the email notification section in task modal
+        function renderTaskEmailNotificationSection(task, connectedRoles) {
+            const recipient = getTaskNotificationRecipient(task.id);
+            const notifyEnabled = task.emailNotify !== false; // Default to enabled
+
+            let recipientHtml;
+            let buttonDisabled = false;
+            let buttonTitle = 'Preview and send email notification';
+
+            if (!recipient.hasRecipient) {
+                if (recipient.person) {
+                    // Person exists but no email - show prompt to add email
+                    recipientHtml = `
+                        <div class="email-notification-no-recipient">
+                            <i class="ph ph-warning"></i>
+                            <span>${recipient.person.name} has no email. <a href="#" onclick="event.preventDefault(); openPersonEmailEditor('${recipient.person.id}')" style="color: #D97706; text-decoration: underline;">Add email</a></span>
+                        </div>
+                    `;
+                    buttonDisabled = true;
+                    buttonTitle = 'Add an email address to the assigned person first';
+                } else {
+                    // No role/person assigned
+                    recipientHtml = `
+                        <div class="email-notification-no-recipient">
+                            <i class="ph ph-warning"></i>
+                            <span>${recipient.reason}. Assign a role with a person first.</span>
+                        </div>
+                    `;
+                    buttonDisabled = true;
+                    buttonTitle = 'Assign a role with a person first';
+                }
+            } else {
+                recipientHtml = `
+                    <div class="email-notification-recipient">
+                        <i class="ph ph-user"></i>
+                        <span>Will notify:</span>
+                        <span class="email-notification-recipient-email">${recipient.person.name} (${recipient.email})</span>
+                        <span style="color: #888; font-size: 12px;">via ${recipient.role.name}</span>
+                    </div>
+                `;
+            }
+
+            return `
+                <div class="email-notification-section">
+                    <div class="email-notification-header">
+                        <div class="email-notification-title">
+                            <i class="ph ph-envelope"></i>
+                            <span>Email Notification</span>
+                        </div>
+                        <div class="email-notification-toggle ${notifyEnabled ? 'active' : ''}"
+                             onclick="toggleTaskEmailNotify('${task.id}')"
+                             title="Toggle email notifications for this task"></div>
+                    </div>
+                    ${recipientHtml}
+                    <button class="email-notification-preview-btn"
+                            onclick="openEmailPreviewModal('${task.id}')"
+                            ${buttonDisabled ? 'disabled' : ''}
+                            title="${buttonTitle}">
+                        <i class="ph ph-eye"></i>
+                        Preview & Send Notification
+                    </button>
+                </div>
+            `;
+        }
+
+        // Toggle email notification setting for a task
+        function toggleTaskEmailNotify(taskId) {
+            const task = entities.task.find(t => t.id === taskId);
+            if (!task) return;
+
+            task.emailNotify = task.emailNotify === false ? true : false;
+            saveToLocalStorage();
+
+            // Refresh modal
+            openEntityModal(taskId, 'task');
+        }
+
+        // Open the email preview modal
+        function openEmailPreviewModal(taskId) {
+            const task = entities.task.find(t => t.id === taskId);
+            if (!task) return;
+
+            const recipient = getTaskNotificationRecipient(taskId);
+            if (!recipient.hasRecipient) {
+                showToast('Cannot send notification: ' + recipient.reason, 'error');
+                return;
+            }
+
+            // Get current user info
+            const session = AuthManager.getSession();
+            const senderEmail = session?.email || 'unknown';
+            const senderName = senderEmail.split('@')[0];
+
+            // Get parent task info
+            const parentTask = task.parentTaskId ? entities.task.find(t => t.id === task.parentTaskId) : null;
+
+            // Count subtasks and comments
+            const subtasks = entities.task.filter(t => t.parentTaskId === task.id);
+            const completedSubtasks = subtasks.filter(t => t.status === 'completed').length;
+            const comments = task.comments || [];
+
+            // Get team info from role
+            const teamRel = relationships.find(r => r.predicate === 'DES' && r.subject === recipient.role.id);
+            const team = teamRel ? findEntity(teamRel.object) : null;
+
+            // Get workspace name
+            const workspace = workspaces.find(w => w.id === currentWorkspaceId);
+            const workspaceName = workspace?.name || 'TaskFlow';
+
+            // Store preview data
+            currentEmailPreviewData = {
+                taskId,
+                task,
+                recipient,
+                senderName,
+                senderEmail,
+                parentTask,
+                subtasks,
+                completedSubtasks,
+                comments,
+                team,
+                workspaceName
+            };
+
+            // Populate modal
+            document.getElementById('emailPreviewTo').textContent = `${recipient.person.name} <${recipient.email}>`;
+            document.getElementById('emailPreviewFrom').textContent = `${senderName} via TaskFlow`;
+            document.getElementById('emailPreviewSubject').textContent = `You were tagged in: ${task.name}`;
+
+            // Build email body preview
+            const recipientFirstName = recipient.person.name.split(' ')[0];
+            const statusLabels = {
+                pending: 'To Do',
+                in_progress: 'In Progress',
+                completed: 'Done'
+            };
+            const priorityLabels = {
+                low: 'Low',
+                medium: 'Medium',
+                high: 'High'
+            };
+
+            let contextItems = '';
+            if (parentTask) {
+                contextItems += `<div class="email-preview-context-item"><i class="ph ph-folder"></i> Part of: "${parentTask.name}"</div>`;
+            }
+            if (subtasks.length > 0) {
+                contextItems += `<div class="email-preview-context-item"><i class="ph ph-list-checks"></i> ${completedSubtasks}/${subtasks.length} subtasks completed</div>`;
+            }
+            if (comments.length > 0) {
+                contextItems += `<div class="email-preview-context-item"><i class="ph ph-chat-circle"></i> ${comments.length} comment${comments.length !== 1 ? 's' : ''} on this task</div>`;
+            }
+
+            const emailBody = `
+                <div class="email-preview-greeting">
+                    Hi ${recipientFirstName},
+                </div>
+                <p><strong>${senderName}</strong> assigned you to a task in the "<strong>${workspaceName}</strong>" workspace.</p>
+
+                <hr class="email-preview-divider">
+
+                <div class="email-preview-section-title">
+                    <i class="ph ph-clipboard-text"></i> Task Details
+                </div>
+
+                <div class="email-preview-task-details">
+                    <div class="email-preview-task-field">
+                        <span class="email-preview-task-label">Task:</span>
+                        <span class="email-preview-task-value"><strong>${task.name}</strong></span>
+                    </div>
+                    <div class="email-preview-task-field">
+                        <span class="email-preview-task-label">Role:</span>
+                        <span class="email-preview-task-value">${recipient.role.name}</span>
+                    </div>
+                    ${team ? `
+                    <div class="email-preview-task-field">
+                        <span class="email-preview-task-label">Team:</span>
+                        <span class="email-preview-task-value">${team.name}</span>
+                    </div>
+                    ` : ''}
+                    <div class="email-preview-task-field">
+                        <span class="email-preview-task-label">Status:</span>
+                        <span class="email-preview-task-value">
+                            <span class="email-preview-status ${task.status || 'pending'}">${statusLabels[task.status] || 'To Do'}</span>
+                        </span>
+                    </div>
+                    <div class="email-preview-task-field">
+                        <span class="email-preview-task-label">Priority:</span>
+                        <span class="email-preview-task-value">
+                            <span class="email-preview-priority ${task.priority || 'medium'}">${priorityLabels[task.priority] || 'Medium'}</span>
+                        </span>
+                    </div>
+                    ${task.dueDate ? `
+                    <div class="email-preview-task-field">
+                        <span class="email-preview-task-label">Due Date:</span>
+                        <span class="email-preview-task-value">${formatDateLong(task.dueDate)}</span>
+                    </div>
+                    ` : ''}
+                </div>
+
+                ${task.description ? `
+                <div style="margin-top: 12px;">
+                    <div style="font-size: 12px; color: #888; margin-bottom: 6px;">Description:</div>
+                    <div style="background: white; padding: 12px; border-radius: 6px; border: 1px solid #e8e4dd;">${task.description}</div>
+                </div>
+                ` : ''}
+
+                ${contextItems ? `
+                <hr class="email-preview-divider">
+                <div class="email-preview-section-title">
+                    <i class="ph ph-info"></i> Context
+                </div>
+                <div class="email-preview-context">
+                    ${contextItems}
+                </div>
+                ` : ''}
+
+                <hr class="email-preview-divider">
+
+                <div class="email-preview-section-title" id="emailPreviewMessageTitle" style="display: none;">
+                    <i class="ph ph-chat-text"></i> Message from ${senderName}
+                </div>
+                <div id="emailPreviewMessageContent" style="display: none; background: #FEF3C7; padding: 12px; border-radius: 6px; border-left: 3px solid #F59E0B; margin-bottom: 16px; font-style: italic;">
+                </div>
+
+                <div class="email-preview-footer">
+                    This notification was sent from TaskFlow.<br>
+                    Workspace: ${workspaceName}
+                </div>
+            `;
+
+            document.getElementById('emailPreviewBody').innerHTML = emailBody;
+            document.getElementById('emailPreviewCustomMessage').value = '';
+
+            // Show modal
+            document.getElementById('emailPreviewModalOverlay').classList.add('active');
+
+            // Set up message preview update
+            document.getElementById('emailPreviewCustomMessage').addEventListener('input', updateEmailMessagePreview);
+        }
+
+        // Update the message preview section
+        function updateEmailMessagePreview() {
+            const message = document.getElementById('emailPreviewCustomMessage').value.trim();
+            const titleEl = document.getElementById('emailPreviewMessageTitle');
+            const contentEl = document.getElementById('emailPreviewMessageContent');
+
+            if (message) {
+                titleEl.style.display = 'flex';
+                contentEl.style.display = 'block';
+                contentEl.textContent = `"${message}"`;
+            } else {
+                titleEl.style.display = 'none';
+                contentEl.style.display = 'none';
+            }
+        }
+
+        // Close the email preview modal
+        function closeEmailPreviewModal() {
+            document.getElementById('emailPreviewModalOverlay').classList.remove('active');
+            document.getElementById('emailPreviewCustomMessage').removeEventListener('input', updateEmailMessagePreview);
+            currentEmailPreviewData = null;
+        }
+
+        // Format date for email display
+        function formatDateLong(dateStr) {
+            if (!dateStr) return 'No due date';
+            const date = parseLocalDate(dateStr);
+            const options = { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' };
+            return date.toLocaleDateString('en-US', options);
+        }
+
+        // Send the task notification email
+        async function sendTaskNotificationEmail() {
+            if (!currentEmailPreviewData) return;
+
+            const { task, recipient, senderName, senderEmail, parentTask, subtasks, completedSubtasks, comments, team, workspaceName } = currentEmailPreviewData;
+            const customMessage = document.getElementById('emailPreviewCustomMessage').value.trim();
+
+            const sendBtn = document.getElementById('emailPreviewSendBtn');
+            const originalText = sendBtn.innerHTML;
+            sendBtn.disabled = true;
+            sendBtn.innerHTML = '<i class="ph ph-spinner ph-spin"></i> Sending...';
+
+            try {
+                const response = await fetch(AuthManager.webhookUrl, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({
+                        type: 'task_notification',
+                        email: recipient.email,
+                        subject: `You were tagged in: ${task.name}`,
+                        sender: `${senderName} via TaskFlow`,
+                        app: 'taskflow',
+                        workspace: workspaceName,
+                        timestamp: new Date().toISOString(),
+                        notification: {
+                            recipientName: recipient.person.name,
+                            recipientEmail: recipient.email,
+                            assignerName: senderName,
+                            assignerEmail: senderEmail,
+                            taskId: task.id,
+                            taskName: task.name,
+                            taskDescription: task.description || '',
+                            taskStatus: task.status || 'pending',
+                            taskPriority: task.priority || 'medium',
+                            taskDueDate: task.dueDate || null,
+                            roleName: recipient.role.name,
+                            teamName: team?.name || null,
+                            parentTaskName: parentTask?.name || null,
+                            subtaskCount: subtasks.length,
+                            subtaskCompleted: completedSubtasks,
+                            commentCount: comments.length,
+                            customMessage: customMessage
+                        }
+                    })
+                });
+
+                if (!response.ok) {
+                    throw new Error('Failed to send notification');
+                }
+
+                // Log the notification
+                logActivityToXano({
+                    event_verb: 'CON',
+                    eo_operator: 'CON',
+                    k_frame: 'Email Notification Sent',
+                    object_type: 'task',
+                    object_id: task.id,
+                    object_label: task.name,
+                    data_json: {
+                        recipient_email: recipient.email,
+                        recipient_name: recipient.person.name,
+                        role_name: recipient.role.name,
+                        has_custom_message: !!customMessage
+                    }
+                });
+
+                closeEmailPreviewModal();
+                showToast(`Email sent to ${recipient.person.name}`, 'success');
+
+            } catch (error) {
+                console.error('Failed to send notification:', error);
+                showToast('Failed to send notification. Please try again.', 'error');
+                sendBtn.disabled = false;
+                sendBtn.innerHTML = originalText;
+            }
+        }
+
+        // Open person email editor (mini modal or inline edit)
+        function openPersonEmailEditor(personId) {
+            const person = entities.person.find(p => p.id === personId);
+            if (!person) return;
+
+            // Prompt for email
+            const email = prompt(`Enter email address for ${person.name}:`, person.email || '');
+
+            if (email !== null) {
+                // Validate email format
+                const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+                if (email && !emailRegex.test(email)) {
+                    showToast('Please enter a valid email address', 'error');
+                    return;
+                }
+
+                person.email = email || null;
+                saveToLocalStorage();
+
+                // Log the update
+                logActivityToXano({
+                    event_verb: 'ALT',
+                    eo_operator: 'ALT',
+                    k_frame: 'Person Email Updated',
+                    object_type: 'person',
+                    object_id: personId,
+                    object_label: person.name,
+                    data_json: {
+                        field: 'email',
+                        new_value: email || '(cleared)'
+                    }
+                });
+
+                showToast(email ? `Email saved for ${person.name}` : `Email cleared for ${person.name}`, 'success');
+
+                // Refresh current modal if open
+                if (currentModalEntity) {
+                    if (currentModalEntityType === 'task') {
+                        openEntityModal(currentModalEntity.id, 'task');
+                    } else if (currentModalEntityType === 'person' && currentModalEntity.id === personId) {
+                        openEntityModal(personId, 'person');
+                    }
+                }
+            }
         }
 
         // Close date picker when clicking outside
@@ -56087,6 +57073,55 @@ Options:
                         <i class="ph ph-link"></i> Create Link
                     </button>
                 </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Email Preview Modal -->
+    <div class="email-preview-modal-overlay" id="emailPreviewModalOverlay" onclick="if(event.target === this) closeEmailPreviewModal()">
+        <div class="email-preview-modal" onclick="event.stopPropagation()">
+            <div class="email-preview-header">
+                <h3><i class="ph ph-envelope"></i> Preview Email Notification</h3>
+                <button class="email-preview-close" onclick="closeEmailPreviewModal()">
+                    <i class="ph ph-x"></i>
+                </button>
+            </div>
+            <div class="email-preview-meta">
+                <div class="email-preview-meta-row">
+                    <span class="email-preview-meta-label">To:</span>
+                    <span class="email-preview-meta-value" id="emailPreviewTo">-</span>
+                </div>
+                <div class="email-preview-meta-row">
+                    <span class="email-preview-meta-label">From:</span>
+                    <span class="email-preview-meta-value" id="emailPreviewFrom">-</span>
+                </div>
+                <div class="email-preview-meta-row">
+                    <span class="email-preview-meta-label">Subject:</span>
+                    <span class="email-preview-meta-value" id="emailPreviewSubject">-</span>
+                </div>
+            </div>
+            <div class="email-preview-content">
+                <div class="email-preview-body" id="emailPreviewBody">
+                    <!-- Email body content rendered here -->
+                </div>
+                <div class="email-preview-message-section">
+                    <label style="font-size: 13px; font-weight: 600; color: #666; margin-bottom: 8px; display: block;">
+                        <i class="ph ph-chat-text"></i> Add a personal message (optional):
+                    </label>
+                    <textarea
+                        class="email-preview-message-input"
+                        id="emailPreviewCustomMessage"
+                        placeholder="Write a personal note to include in the email..."></textarea>
+                </div>
+            </div>
+            <div class="email-preview-actions">
+                <button class="email-preview-cancel-btn" onclick="closeEmailPreviewModal()">
+                    Cancel
+                </button>
+                <button class="email-preview-send-btn" id="emailPreviewSendBtn" onclick="sendTaskNotificationEmail()">
+                    <i class="ph ph-paper-plane-tilt"></i>
+                    Send Notification
+                </button>
             </div>
         </div>
     </div>
