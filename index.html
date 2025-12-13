@@ -95,6 +95,7 @@
             align-items: center;
             gap: 1rem;
             min-height: 100px;
+            position: relative;
         }
 
         .header-left {
@@ -105,10 +106,13 @@
         }
 
         .header-center {
+            position: absolute;
+            left: 50%;
+            top: 50%;
+            transform: translate(-50%, -50%);
             display: flex;
             align-items: center;
             justify-content: center;
-            flex: 1;
         }
 
         .header-right {
@@ -116,6 +120,7 @@
             align-items: center;
             gap: 0.5rem;
             flex-shrink: 0;
+            margin-left: auto;
         }
 
         .header h1 {
@@ -21711,6 +21716,286 @@
         }
 
         /* ==========================================
+           USER PROFILE MODAL STYLES
+           ========================================== */
+
+        .profile-modal-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(0,0,0,0.5);
+            z-index: 9999;
+            display: none;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .profile-modal-overlay.open {
+            display: flex;
+        }
+
+        .profile-modal {
+            background: white;
+            border-radius: 12px;
+            width: 100%;
+            max-width: 520px;
+            max-height: 85vh;
+            overflow: hidden;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.25);
+        }
+
+        .profile-modal-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 1.25rem 1.5rem;
+            border-bottom: 1px solid #E5DDD1;
+            background: linear-gradient(135deg, #C88F4A 0%, #B87B5B 100%);
+            color: white;
+        }
+
+        .profile-modal-title {
+            font-size: 1.1rem;
+            font-weight: 600;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .profile-modal-close {
+            background: rgba(255,255,255,0.2);
+            border: none;
+            color: white;
+            width: 32px;
+            height: 32px;
+            border-radius: 6px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: background 0.2s;
+        }
+
+        .profile-modal-close:hover {
+            background: rgba(255,255,255,0.3);
+        }
+
+        .profile-modal-body {
+            padding: 1.5rem;
+            overflow-y: auto;
+            max-height: calc(85vh - 70px);
+        }
+
+        .profile-section {
+            margin-bottom: 1.75rem;
+        }
+
+        .profile-section:last-child {
+            margin-bottom: 0;
+        }
+
+        .profile-section-title {
+            font-size: 0.85rem;
+            font-weight: 600;
+            color: #6B5642;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+            margin-bottom: 1rem;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .profile-field {
+            margin-bottom: 1rem;
+        }
+
+        .profile-field:last-child {
+            margin-bottom: 0;
+        }
+
+        .profile-field-label {
+            font-size: 0.8rem;
+            color: #8B6F47;
+            margin-bottom: 0.35rem;
+            font-weight: 500;
+        }
+
+        .profile-field-value {
+            font-size: 0.95rem;
+            color: #3D2E1F;
+            background: #FAF7F5;
+            padding: 0.6rem 0.85rem;
+            border-radius: 6px;
+            border: 1px solid #E5DDD1;
+        }
+
+        .profile-field-input {
+            width: 100%;
+            font-size: 0.95rem;
+            color: #3D2E1F;
+            background: #FAF7F5;
+            padding: 0.6rem 0.85rem;
+            border-radius: 6px;
+            border: 1px solid #E5DDD1;
+            transition: border-color 0.2s, box-shadow 0.2s;
+        }
+
+        .profile-field-input:focus {
+            outline: none;
+            border-color: #C88F4A;
+            box-shadow: 0 0 0 3px rgba(200, 143, 74, 0.15);
+        }
+
+        .profile-toggle-row {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 0.75rem 0;
+            border-bottom: 1px solid #F0EBE6;
+        }
+
+        .profile-toggle-row:last-child {
+            border-bottom: none;
+        }
+
+        .profile-toggle-info {
+            flex: 1;
+        }
+
+        .profile-toggle-label {
+            font-size: 0.9rem;
+            color: #3D2E1F;
+            font-weight: 500;
+        }
+
+        .profile-toggle-desc {
+            font-size: 0.8rem;
+            color: #8B6F47;
+            margin-top: 0.15rem;
+        }
+
+        .profile-toggle {
+            position: relative;
+            width: 44px;
+            height: 24px;
+            flex-shrink: 0;
+            margin-left: 1rem;
+        }
+
+        .profile-toggle input {
+            opacity: 0;
+            width: 0;
+            height: 0;
+        }
+
+        .profile-toggle-slider {
+            position: absolute;
+            cursor: pointer;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background-color: #D1C4B7;
+            transition: 0.3s;
+            border-radius: 24px;
+        }
+
+        .profile-toggle-slider:before {
+            position: absolute;
+            content: "";
+            height: 18px;
+            width: 18px;
+            left: 3px;
+            bottom: 3px;
+            background-color: white;
+            transition: 0.3s;
+            border-radius: 50%;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.15);
+        }
+
+        .profile-toggle input:checked + .profile-toggle-slider {
+            background-color: #C88F4A;
+        }
+
+        .profile-toggle input:checked + .profile-toggle-slider:before {
+            transform: translateX(20px);
+        }
+
+        .profile-browser-notif-status {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            padding: 0.75rem 1rem;
+            border-radius: 8px;
+            font-size: 0.85rem;
+            margin-bottom: 1rem;
+        }
+
+        .profile-browser-notif-status.granted {
+            background: #D1FAE5;
+            color: #065F46;
+        }
+
+        .profile-browser-notif-status.denied {
+            background: #FEE2E2;
+            color: #991B1B;
+        }
+
+        .profile-browser-notif-status.default {
+            background: #FEF3C7;
+            color: #92400E;
+        }
+
+        .profile-enable-notif-btn {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.4rem;
+            background: #C88F4A;
+            color: white;
+            border: none;
+            padding: 0.6rem 1rem;
+            border-radius: 6px;
+            font-size: 0.85rem;
+            font-weight: 500;
+            cursor: pointer;
+            transition: background 0.2s;
+        }
+
+        .profile-enable-notif-btn:hover {
+            background: #B87B5B;
+        }
+
+        .profile-enable-notif-btn:disabled {
+            background: #D1C4B7;
+            cursor: not-allowed;
+        }
+
+        .profile-save-btn {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 0.4rem;
+            width: 100%;
+            background: #C88F4A;
+            color: white;
+            border: none;
+            padding: 0.75rem 1.25rem;
+            border-radius: 8px;
+            font-size: 0.9rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: background 0.2s;
+            margin-top: 1.5rem;
+        }
+
+        .profile-save-btn:hover {
+            background: #B87B5B;
+        }
+
+        /* ==========================================
            AIRTABLE TAG SYSTEM STYLES
            ========================================== */
 
@@ -23859,6 +24144,24 @@
         </div>
     </div>
 
+    <!-- Profile Modal -->
+    <div class="profile-modal-overlay" id="profileModalOverlay" onclick="closeProfileModal(event)">
+        <div class="profile-modal" onclick="event.stopPropagation()">
+            <div class="profile-modal-header">
+                <div class="profile-modal-title">
+                    <i class="ph ph-user-circle"></i>
+                    Profile & Notifications
+                </div>
+                <button class="profile-modal-close" onclick="closeProfileModal()">
+                    <i class="ph ph-x"></i>
+                </button>
+            </div>
+            <div class="profile-modal-body" id="profileModalBody">
+                <!-- Populated dynamically -->
+            </div>
+        </div>
+    </div>
+
     <div class="container" id="mainContainer">
         <!-- Left Panel: Entities -->
         <div class="panel panel-left" id="panelLeft">
@@ -25327,6 +25630,9 @@ John Doe,Engineering,john@example.com"
                         <div class="user-menu-header">
                             <div class="user-menu-email">${this.escapeHtml(email)}</div>
                         </div>
+                        <button class="user-menu-item" onclick="openProfileModal(); document.getElementById('userMenuDropdown').classList.remove('open');">
+                            <i class="ph ph-user-circle"></i> Profile & Notifications
+                        </button>
                         <button class="user-menu-item danger" onclick="AuthManager.logout()">
                             <i class="ph ph-sign-out"></i> Sign out
                         </button>
@@ -51628,6 +51934,349 @@ Options:
         }
 
         // ============================================
+        // BROWSER NOTIFICATIONS
+        // ============================================
+        let browserNotificationsEnabled = false;
+
+        function initBrowserNotifications() {
+            // Check if browser supports notifications
+            if (!('Notification' in window)) {
+                console.log('Browser does not support notifications');
+                return;
+            }
+
+            // Load saved preference
+            const saved = localStorage.getItem('browserNotificationsEnabled');
+            if (saved !== null) {
+                browserNotificationsEnabled = JSON.parse(saved);
+            }
+
+            // If permission was granted and user wants notifications, enable them
+            if (Notification.permission === 'granted' && browserNotificationsEnabled) {
+                browserNotificationsEnabled = true;
+            }
+        }
+
+        async function requestBrowserNotificationPermission() {
+            if (!('Notification' in window)) {
+                showToast('Your browser does not support notifications', 'error');
+                return false;
+            }
+
+            try {
+                const permission = await Notification.requestPermission();
+                if (permission === 'granted') {
+                    browserNotificationsEnabled = true;
+                    localStorage.setItem('browserNotificationsEnabled', 'true');
+                    showToast('Browser notifications enabled!', 'success');
+                    renderProfileModal(); // Re-render to update status
+                    return true;
+                } else if (permission === 'denied') {
+                    showToast('Notification permission denied. Please enable in browser settings.', 'error');
+                    return false;
+                }
+            } catch (err) {
+                console.error('Error requesting notification permission:', err);
+                showToast('Failed to request notification permission', 'error');
+                return false;
+            }
+            return false;
+        }
+
+        function showBrowserNotification(title, body, taskId = null) {
+            if (!browserNotificationsEnabled || Notification.permission !== 'granted') {
+                return;
+            }
+
+            try {
+                const notification = new Notification(title, {
+                    body: body,
+                    icon: 'data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100"><circle cx="50" cy="50" r="40" fill="%23C88F4A"/></svg>',
+                    tag: taskId || 'general',
+                    requireInteraction: false
+                });
+
+                notification.onclick = function() {
+                    window.focus();
+                    if (taskId) {
+                        openEntityModal(taskId, 'task');
+                    }
+                    notification.close();
+                };
+
+                // Auto-close after 5 seconds
+                setTimeout(() => notification.close(), 5000);
+            } catch (err) {
+                console.error('Error showing browser notification:', err);
+            }
+        }
+
+        // Override addNotification to also show browser notification
+        const originalAddNotification = addNotification;
+        addNotification = function(type, text, taskId = null) {
+            const notification = originalAddNotification(type, text, taskId);
+
+            // Show browser notification if enabled
+            if (browserNotificationsEnabled && Notification.permission === 'granted') {
+                const titles = {
+                    task: 'Task Update',
+                    comment: 'New Comment',
+                    mention: 'You were mentioned',
+                    assignment: 'New Assignment'
+                };
+                showBrowserNotification(titles[type] || 'Notification', text, taskId);
+            }
+
+            return notification;
+        };
+
+        // ============================================
+        // USER PROFILE MODAL
+        // ============================================
+
+        function openProfileModal() {
+            const overlay = document.getElementById('profileModalOverlay');
+            if (overlay) {
+                overlay.classList.add('open');
+                renderProfileModal();
+            }
+        }
+
+        function closeProfileModal(event) {
+            if (event && event.target !== event.currentTarget) return;
+            const overlay = document.getElementById('profileModalOverlay');
+            if (overlay) {
+                overlay.classList.remove('open');
+            }
+        }
+
+        function renderProfileModal() {
+            const body = document.getElementById('profileModalBody');
+            if (!body) return;
+
+            const session = AuthManager.getSession();
+            const email = session?.email || '';
+
+            // Find the current user's person record
+            const currentPerson = entities.person?.find(p =>
+                p.email?.toLowerCase() === email.toLowerCase()
+            );
+
+            // Get browser notification status
+            const notifSupported = 'Notification' in window;
+            const notifPermission = notifSupported ? Notification.permission : 'unsupported';
+
+            let browserNotifStatusHtml = '';
+            if (!notifSupported) {
+                browserNotifStatusHtml = `
+                    <div class="profile-browser-notif-status denied">
+                        <i class="ph ph-warning"></i>
+                        Your browser does not support notifications
+                    </div>
+                `;
+            } else if (notifPermission === 'granted') {
+                browserNotifStatusHtml = `
+                    <div class="profile-browser-notif-status granted">
+                        <i class="ph ph-check-circle"></i>
+                        Browser notifications are enabled
+                    </div>
+                `;
+            } else if (notifPermission === 'denied') {
+                browserNotifStatusHtml = `
+                    <div class="profile-browser-notif-status denied">
+                        <i class="ph ph-x-circle"></i>
+                        Browser notifications are blocked. Please enable in browser settings.
+                    </div>
+                `;
+            } else {
+                browserNotifStatusHtml = `
+                    <div class="profile-browser-notif-status default">
+                        <i class="ph ph-info"></i>
+                        Browser notifications are not enabled
+                    </div>
+                    <button class="profile-enable-notif-btn" onclick="requestBrowserNotificationPermission()">
+                        <i class="ph ph-bell-ringing"></i>
+                        Enable Browser Notifications
+                    </button>
+                `;
+            }
+
+            body.innerHTML = `
+                <!-- Account Section -->
+                <div class="profile-section">
+                    <div class="profile-section-title">
+                        <i class="ph ph-user"></i>
+                        Account
+                    </div>
+                    <div class="profile-field">
+                        <div class="profile-field-label">Email</div>
+                        <div class="profile-field-value">${AuthManager.escapeHtml(email)}</div>
+                    </div>
+                    ${currentPerson ? `
+                        <div class="profile-field">
+                            <div class="profile-field-label">Display Name</div>
+                            <input type="text" class="profile-field-input" id="profileDisplayName"
+                                   value="${AuthManager.escapeHtml(currentPerson.name || '')}"
+                                   placeholder="Enter your display name">
+                        </div>
+                    ` : `
+                        <div class="profile-field">
+                            <div class="profile-field-label">Display Name</div>
+                            <div class="profile-field-value" style="color: #8B6F47; font-style: italic;">
+                                No linked person record found
+                            </div>
+                        </div>
+                    `}
+                </div>
+
+                <!-- Browser Notifications Section -->
+                <div class="profile-section">
+                    <div class="profile-section-title">
+                        <i class="ph ph-bell"></i>
+                        Browser Notifications
+                    </div>
+                    <p style="font-size: 0.85rem; color: #6B5642; margin-bottom: 1rem;">
+                        Get notified in your browser when you receive new notifications while on this page.
+                    </p>
+                    ${browserNotifStatusHtml}
+                    ${notifPermission === 'granted' ? `
+                        <div class="profile-toggle-row">
+                            <div class="profile-toggle-info">
+                                <div class="profile-toggle-label">Show browser popups</div>
+                                <div class="profile-toggle-desc">Display desktop notifications for new activity</div>
+                            </div>
+                            <label class="profile-toggle">
+                                <input type="checkbox" id="profileBrowserNotifEnabled"
+                                       ${browserNotificationsEnabled ? 'checked' : ''}
+                                       onchange="toggleBrowserNotifications(this.checked)">
+                                <span class="profile-toggle-slider"></span>
+                            </label>
+                        </div>
+                    ` : ''}
+                </div>
+
+                <!-- In-App Notification Preferences -->
+                <div class="profile-section">
+                    <div class="profile-section-title">
+                        <i class="ph ph-gear"></i>
+                        Notification Preferences
+                    </div>
+                    <div class="profile-toggle-row">
+                        <div class="profile-toggle-info">
+                            <div class="profile-toggle-label">Task assignments</div>
+                            <div class="profile-toggle-desc">When you're assigned to a task</div>
+                        </div>
+                        <label class="profile-toggle">
+                            <input type="checkbox" id="prefTaskAssignment"
+                                   ${notificationSettings.taskAssignment ? 'checked' : ''}>
+                            <span class="profile-toggle-slider"></span>
+                        </label>
+                    </div>
+                    <div class="profile-toggle-row">
+                        <div class="profile-toggle-info">
+                            <div class="profile-toggle-label">Task updates</div>
+                            <div class="profile-toggle-desc">When a task you're involved with is updated</div>
+                        </div>
+                        <label class="profile-toggle">
+                            <input type="checkbox" id="prefTaskUpdate"
+                                   ${notificationSettings.taskUpdate ? 'checked' : ''}>
+                            <span class="profile-toggle-slider"></span>
+                        </label>
+                    </div>
+                    <div class="profile-toggle-row">
+                        <div class="profile-toggle-info">
+                            <div class="profile-toggle-label">Mentions</div>
+                            <div class="profile-toggle-desc">When someone @mentions you</div>
+                        </div>
+                        <label class="profile-toggle">
+                            <input type="checkbox" id="prefMentions"
+                                   ${notificationSettings.mentions ? 'checked' : ''}>
+                            <span class="profile-toggle-slider"></span>
+                        </label>
+                    </div>
+                    <div class="profile-toggle-row">
+                        <div class="profile-toggle-info">
+                            <div class="profile-toggle-label">Comments</div>
+                            <div class="profile-toggle-desc">When someone comments on your tasks</div>
+                        </div>
+                        <label class="profile-toggle">
+                            <input type="checkbox" id="prefComments"
+                                   ${notificationSettings.comments ? 'checked' : ''}>
+                            <span class="profile-toggle-slider"></span>
+                        </label>
+                    </div>
+                    <div class="profile-toggle-row">
+                        <div class="profile-toggle-info">
+                            <div class="profile-toggle-label">Due date reminders</div>
+                            <div class="profile-toggle-desc">When tasks are approaching their due date</div>
+                        </div>
+                        <label class="profile-toggle">
+                            <input type="checkbox" id="prefDueDate"
+                                   ${notificationSettings.dueDateReminder ? 'checked' : ''}>
+                            <span class="profile-toggle-slider"></span>
+                        </label>
+                    </div>
+                </div>
+
+                <button class="profile-save-btn" onclick="saveProfileSettings()">
+                    <i class="ph ph-check"></i>
+                    Save Changes
+                </button>
+            `;
+        }
+
+        function toggleBrowserNotifications(enabled) {
+            browserNotificationsEnabled = enabled;
+            localStorage.setItem('browserNotificationsEnabled', JSON.stringify(enabled));
+            if (enabled) {
+                showToast('Browser notifications enabled', 'success');
+            } else {
+                showToast('Browser notifications disabled', 'info');
+            }
+        }
+
+        function saveProfileSettings() {
+            // Save display name if person record exists
+            const displayNameInput = document.getElementById('profileDisplayName');
+            if (displayNameInput) {
+                const session = AuthManager.getSession();
+                const email = session?.email || '';
+                const person = entities.person?.find(p =>
+                    p.email?.toLowerCase() === email.toLowerCase()
+                );
+                if (person && displayNameInput.value !== person.name) {
+                    person.name = displayNameInput.value.trim();
+                    saveData();
+                }
+            }
+
+            // Save notification preferences
+            notificationSettings.taskAssignment = document.getElementById('prefTaskAssignment')?.checked ?? true;
+            notificationSettings.taskUpdate = document.getElementById('prefTaskUpdate')?.checked ?? true;
+            notificationSettings.mentions = document.getElementById('prefMentions')?.checked ?? true;
+            notificationSettings.comments = document.getElementById('prefComments')?.checked ?? true;
+            notificationSettings.dueDateReminder = document.getElementById('prefDueDate')?.checked ?? true;
+
+            // Save to localStorage
+            localStorage.setItem('notificationSettings', JSON.stringify(notificationSettings));
+
+            showToast('Profile settings saved!', 'success');
+            closeProfileModal();
+        }
+
+        function loadNotificationSettings() {
+            const saved = localStorage.getItem('notificationSettings');
+            if (saved) {
+                try {
+                    const parsed = JSON.parse(saved);
+                    notificationSettings = { ...notificationSettings, ...parsed };
+                } catch (e) {
+                    console.error('Error loading notification settings:', e);
+                }
+            }
+        }
+
+        // ============================================
         // AUTOMATION RULES ENGINE
         // ============================================
         let automationRules = [
@@ -56327,6 +56976,8 @@ Options:
                 // Load enhanced task management data
                 loadTaskComments();
                 loadNotifications();
+                loadNotificationSettings();
+                initBrowserNotifications();
                 loadAutomationRules();
 
                 // Preload all Airtable data for fast linking (runs in background)
