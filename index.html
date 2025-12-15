@@ -9309,6 +9309,101 @@
             font-size: 1.1rem;
         }
 
+        /* Sidebar add dropdown */
+        .sidebar-add-container {
+            position: relative;
+            margin-top: auto;
+            flex-shrink: 0;
+        }
+
+        .sidebar-add-dropdown {
+            position: absolute;
+            bottom: 100%;
+            left: 0;
+            right: 0;
+            background: var(--card-bg, #2a2a2e);
+            border: 1px solid var(--border-color, #3a3a3e);
+            border-radius: 8px;
+            padding: 0.5rem;
+            margin-bottom: 0.5rem;
+            display: none;
+            flex-direction: column;
+            gap: 0.25rem;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+            z-index: 100;
+        }
+
+        .sidebar-add-dropdown.show {
+            display: flex;
+        }
+
+        .sidebar-add-dropdown-item {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            padding: 0.625rem 0.75rem;
+            background: transparent;
+            color: var(--text-color, #e0e0e0);
+            border: none;
+            border-radius: 6px;
+            font-size: 0.85rem;
+            cursor: pointer;
+            transition: all 0.15s ease;
+            text-align: left;
+        }
+
+        .sidebar-add-dropdown-item:hover {
+            background: rgba(200, 143, 74, 0.15);
+            color: #C88F4A;
+        }
+
+        .sidebar-add-dropdown-item i {
+            font-size: 1rem;
+            width: 1.25rem;
+            text-align: center;
+        }
+
+        .sidebar-add-dropdown-item.unit-item i { color: #6B8E23; }
+        .sidebar-add-dropdown-item.team-item i { color: #4682B4; }
+        .sidebar-add-dropdown-item.role-item i { color: #C88F4A; }
+
+        /* Section header with add button */
+        .entity-section-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding-right: 0.25rem;
+        }
+
+        .entity-section-header-title {
+            display: flex;
+            align-items: center;
+        }
+
+        .entity-section-add-btn {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            width: 20px;
+            height: 20px;
+            background: transparent;
+            border: none;
+            border-radius: 4px;
+            color: var(--text-muted, #888);
+            cursor: pointer;
+            opacity: 0;
+            transition: all 0.15s ease;
+        }
+
+        .entity-section:hover .entity-section-add-btn {
+            opacity: 1;
+        }
+
+        .entity-section-add-btn:hover {
+            background: rgba(200, 143, 74, 0.15);
+            color: #C88F4A;
+        }
+
         /* Adjust panel-left for flex layout */
         .panel-left {
             display: flex;
@@ -23942,11 +24037,27 @@
                 </div>
             </div>
 
-            <!-- Contextual Add Button -->
-            <button class="sidebar-add-btn" id="sidebarAddBtn" onclick="handleSidebarAdd()">
-                <i class="ph ph-plus"></i>
-                <span id="sidebarAddBtnText">Add Unit</span>
-            </button>
+            <!-- Contextual Add Button with Dropdown -->
+            <div class="sidebar-add-container" id="sidebarAddContainer">
+                <div class="sidebar-add-dropdown" id="sidebarAddDropdown">
+                    <button class="sidebar-add-dropdown-item unit-item" onclick="createNewEntity('unit')">
+                        <i class="ph ph-buildings"></i>
+                        <span>New Unit</span>
+                    </button>
+                    <button class="sidebar-add-dropdown-item team-item" onclick="createNewEntity('team')">
+                        <i class="ph ph-users-three"></i>
+                        <span>New Team</span>
+                    </button>
+                    <button class="sidebar-add-dropdown-item role-item" onclick="createNewEntity('role')">
+                        <i class="ph ph-briefcase"></i>
+                        <span>New Role</span>
+                    </button>
+                </div>
+                <button class="sidebar-add-btn" id="sidebarAddBtn" onclick="toggleSidebarAddDropdown()">
+                    <i class="ph ph-plus"></i>
+                    <span id="sidebarAddBtnText">Add</span>
+                </button>
+            </div>
         </div>
 
         <!-- Center Panel: Multiple Views -->
@@ -37727,7 +37838,10 @@ Cmd/Ctrl + K - Command palette
                     section.className = 'entity-section';
                     const header = document.createElement('div');
                     header.className = 'entity-section-header';
-                    header.innerHTML = '<i class="ph ph-buildings" style="margin-right: 0.25rem;"></i> Units';
+                    header.innerHTML = `
+                        <span class="entity-section-header-title"><i class="ph ph-buildings" style="margin-right: 0.25rem;"></i> Units</span>
+                        <button class="entity-section-add-btn" onclick="createNewEntity('unit')" title="Add new unit"><i class="ph ph-plus"></i></button>
+                    `;
                     section.appendChild(header);
 
                     filteredUnits.forEach(unit => {
@@ -37762,7 +37876,10 @@ Cmd/Ctrl + K - Command palette
                     section.className = 'entity-section';
                     const header = document.createElement('div');
                     header.className = 'entity-section-header';
-                    header.innerHTML = '<i class="ph ph-users-three" style="margin-right: 0.25rem;"></i> Teams';
+                    header.innerHTML = `
+                        <span class="entity-section-header-title"><i class="ph ph-users-three" style="margin-right: 0.25rem;"></i> Teams</span>
+                        <button class="entity-section-add-btn" onclick="createNewEntity('team')" title="Add new team"><i class="ph ph-plus"></i></button>
+                    `;
                     section.appendChild(header);
 
                     filteredTeams.forEach(team => {
@@ -37790,7 +37907,10 @@ Cmd/Ctrl + K - Command palette
                     section.className = 'entity-section';
                     const header = document.createElement('div');
                     header.className = 'entity-section-header';
-                    header.innerHTML = '<i class="ph ph-briefcase" style="margin-right: 0.25rem;"></i> Roles';
+                    header.innerHTML = `
+                        <span class="entity-section-header-title"><i class="ph ph-briefcase" style="margin-right: 0.25rem;"></i> Roles</span>
+                        <button class="entity-section-add-btn" onclick="createNewEntity('role')" title="Add new role"><i class="ph ph-plus"></i></button>
+                    `;
                     section.appendChild(header);
 
                     filteredRoles.forEach(role => {
@@ -38034,10 +38154,14 @@ Cmd/Ctrl + K - Command palette
         function updateSidebarAddButton() {
             const btnText = document.getElementById('sidebarAddBtnText');
             const btn = document.getElementById('sidebarAddBtn');
+            const container = document.getElementById('sidebarAddContainer');
             if (!btnText || !btn) return;
 
+            // Close dropdown when switching tabs
+            closeSidebarAddDropdown();
+
             const config = {
-                'org': { text: 'Add Unit', icon: 'ph-buildings' },
+                'org': { text: 'Add', icon: 'ph-plus' },
                 'people': { text: 'Add Person', icon: 'ph-user-plus' },
                 'recent': { text: 'View All Activity', icon: 'ph-clock-counter-clockwise' }
             };
@@ -38048,36 +38172,65 @@ Cmd/Ctrl + K - Command palette
             // Update icon
             const iconEl = btn.querySelector('i');
             if (iconEl) {
-                iconEl.className = 'ph ' + (currentSidebarTab === 'recent' ? current.icon : 'ph-plus');
+                iconEl.className = 'ph ' + current.icon;
             }
 
-            // Hide button on Recent tab (or make it do something else)
-            btn.style.display = currentSidebarTab === 'recent' ? 'none' : 'flex';
-        }
-
-        function handleSidebarAdd() {
-            if (currentSidebarTab === 'org') {
-                // Open command palette filtered to show unit/team/role creation options
-                openCommandPalette();
-                setTimeout(() => {
-                    const input = document.getElementById('commandPaletteInput');
-                    if (input) {
-                        input.value = 'new unit';
-                        filterCommandPaletteItems();
-                    }
-                }, 100);
-            } else if (currentSidebarTab === 'people') {
-                // Open command palette with person creation
-                openCommandPalette();
-                setTimeout(() => {
-                    const input = document.getElementById('commandPaletteInput');
-                    if (input) {
-                        input.value = 'new person';
-                        filterCommandPaletteItems();
-                    }
-                }, 100);
+            // Hide container on Recent tab
+            if (container) {
+                container.style.display = currentSidebarTab === 'recent' ? 'none' : 'block';
             }
         }
+
+        function toggleSidebarAddDropdown(event) {
+            if (event) event.stopPropagation();
+
+            if (currentSidebarTab === 'people') {
+                // For people tab, directly create a person
+                createNewEntity('person');
+                return;
+            }
+
+            const dropdown = document.getElementById('sidebarAddDropdown');
+            if (dropdown) {
+                dropdown.classList.toggle('show');
+            }
+        }
+
+        function closeSidebarAddDropdown() {
+            const dropdown = document.getElementById('sidebarAddDropdown');
+            if (dropdown) {
+                dropdown.classList.remove('show');
+            }
+        }
+
+        // Create a new entity with a name prompt
+        function createNewEntity(type) {
+            closeSidebarAddDropdown();
+
+            const typeLabels = {
+                unit: 'unit',
+                team: 'team',
+                role: 'role',
+                person: 'person'
+            };
+
+            const name = prompt(`Enter ${typeLabels[type] || type} name:`);
+            if (name && name.trim()) {
+                if (type === 'person') {
+                    createEntity('person', name.trim());
+                } else {
+                    createEntityAndAutofill(type, name.trim());
+                }
+            }
+        }
+
+        // Close dropdown when clicking outside
+        document.addEventListener('click', function(e) {
+            const container = document.getElementById('sidebarAddContainer');
+            if (container && !container.contains(e.target)) {
+                closeSidebarAddDropdown();
+            }
+        });
 
         // Initialize sidebar on load
         function initSidebar() {
