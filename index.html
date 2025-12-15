@@ -31078,6 +31078,11 @@ Cmd/Ctrl + K - Command palette
             historyEl.innerHTML = renderEntityHistorySection(entityId);
 
             document.getElementById('entityModal').classList.add('active');
+
+            // For tasks, refresh email notification section on first load to ensure fresh data
+            if (entityType === 'task') {
+                setTimeout(() => refreshEmailNotificationSection(entityId), 100);
+            }
         }
 
         function closeEntityModal() {
@@ -43714,10 +43719,32 @@ Cmd/Ctrl + K - Command palette
                 maxRecords: 50
             },
             sendEmail: {
+                type: 'task_notification',
                 email: 'test@example.com',
-                code: '123456',
+                subject: 'You were tagged in: Test Task',
+                sender: 'Test User via TaskFlow',
                 app: 'taskflow',
+                workspace: 'Test Workspace',
                 timestamp: new Date().toISOString(),
+                notification: {
+                    recipientName: 'Test Recipient',
+                    recipientEmail: 'test@example.com',
+                    assignerName: 'Test User',
+                    assignerEmail: 'test@example.com',
+                    taskId: 'test-task-id',
+                    taskName: 'Test Task',
+                    taskDescription: 'This is a test task notification from the API testing interface.',
+                    taskStatus: 'pending',
+                    taskPriority: 'medium',
+                    taskDueDate: new Date(Date.now() + 7 * 24 * 60 * 60 * 1000).toISOString().split('T')[0],
+                    roleName: 'Test Role',
+                    teamName: 'Test Team',
+                    parentTaskName: null,
+                    subtaskCount: 2,
+                    subtaskCompleted: 1,
+                    commentCount: 0,
+                    customMessage: 'This is a test notification sent from the API testing panel.'
+                },
                 _webhookUrl: 'https://n8n.intelechia.com/webhook-test/6dab38a9-d010-43b4-9669-5a58dbcfab36'
             },
             custom: {
@@ -49544,7 +49571,7 @@ Options:
             }
 
             return `
-                <div class="email-notification-section">
+                <div class="email-notification-section" id="emailNotificationSection_${task.id}">
                     <div class="email-notification-header">
                         <div class="email-notification-title">
                             <i class="ph ph-envelope"></i>
@@ -49564,6 +49591,35 @@ Options:
                     </button>
                 </div>
             `;
+        }
+
+        // Refresh the email notification section for a task (called on first load to ensure fresh data)
+        function refreshEmailNotificationSection(taskId) {
+            const task = entities.task.find(t => t.id === taskId);
+            if (!task) return;
+
+            const sectionEl = document.getElementById(`emailNotificationSection_${taskId}`);
+            if (!sectionEl) return;
+
+            // Re-get connected roles with fresh relationship data
+            const connectedRoles = relationships
+                .filter(r => (r.subject === taskId || r.object === taskId) && r.predicate !== 'DES')
+                .map(r => {
+                    const otherId = r.subject === taskId ? r.object : r.subject;
+                    return findEntity(otherId);
+                })
+                .filter(e => e && e.type === 'role');
+
+            // Re-render the section with fresh data
+            const newContent = renderTaskEmailNotificationSection(task, connectedRoles);
+
+            // Create a temporary element to parse the HTML
+            const temp = document.createElement('div');
+            temp.innerHTML = newContent;
+            const newSection = temp.firstElementChild;
+
+            // Replace the old section with the new one
+            sectionEl.parentNode.replaceChild(newSection, sectionEl);
         }
 
         // Toggle email notification setting for a task
