@@ -33473,9 +33473,9 @@ Cmd/Ctrl + K - Command palette
                     subject_name: currentModalEntity.name,
                     predicate: 'INS',
                     predicate_label: 'Assign',
-                    object_id: roleId,
-                    object_type: 'role',
-                    object_name: roleEntity.name,
+                    target_id: roleId,
+                    target_type: 'role',
+                    target_name: roleEntity.name,
                     connection_type: 'role_assignment'
                 }
             });
@@ -33602,9 +33602,9 @@ Cmd/Ctrl + K - Command palette
                     subject_name: personEntity.name,
                     predicate: 'INS',
                     predicate_label: 'Assign',
-                    object_id: currentModalEntity.id,
-                    object_type: 'role',
-                    object_name: currentModalEntity.name,
+                    target_id: currentModalEntity.id,
+                    target_type: 'role',
+                    target_name: currentModalEntity.name,
                     connection_type: 'role_assignment'
                 }
             });
@@ -33668,9 +33668,9 @@ Cmd/Ctrl + K - Command palette
                     subject_name: person?.name,
                     predicate: 'INS',
                     predicate_label: 'Remove',
-                    object_id: relationship.object,
-                    object_type: 'role',
-                    object_name: role?.name,
+                    target_id: relationship.object,
+                    target_type: 'role',
+                    target_name: role?.name,
                     connection_type: 'role_assignment_removal'
                 }
             });
@@ -33759,9 +33759,9 @@ Cmd/Ctrl + K - Command palette
                     subject_name: parentEntity.name,
                     predicate: 'DES',
                     predicate_label: 'Contains',
-                    object_id: roleId,
-                    object_type: 'role',
-                    object_name: role.name,
+                    target_id: roleId,
+                    target_type: 'role',
+                    target_name: role.name,
                     connection_type: 'role_team_assignment'
                 }
             });
@@ -33825,9 +33825,9 @@ Cmd/Ctrl + K - Command palette
                     subject_name: parent?.name,
                     predicate: 'DES',
                     predicate_label: 'Contains',
-                    object_id: roleId,
-                    object_type: 'role',
-                    object_name: role?.name,
+                    target_id: roleId,
+                    target_type: 'role',
+                    target_name: role?.name,
                     connection_type: 'role_team_assignment_removal'
                 }
             });
@@ -34069,9 +34069,9 @@ Cmd/Ctrl + K - Command palette
                     subject_name: team.name,
                     predicate: 'DES',
                     predicate_label: 'Contains',
-                    object_id: roleId,
-                    object_type: 'role',
-                    object_name: role.name,
+                    target_id: roleId,
+                    target_type: 'role',
+                    target_name: role.name,
                     connection_type: 'role_team_assignment'
                 }
             });
