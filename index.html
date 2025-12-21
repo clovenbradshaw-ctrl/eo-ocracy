@@ -39037,11 +39037,10 @@ Cmd/Ctrl + K - Command palette
 
                 // Create a new workspace with restored data
                 const wsId = generateWorkspaceId();
-                const timestamp = new Date().toLocaleString();
 
                 workspaces[wsId] = {
                     id: wsId,
-                    name: `Restored from Xano (${timestamp})`,
+                    name: 'My Organization',
                     entities: reconstructed.entities,
                     relationships: reconstructed.relationships,
                     hasSampleData: false,
