@@ -57546,7 +57546,7 @@ Options:
             }
         }
 
-        // Create task from selected text (creates draft task awaiting save)
+        // Create task from selected text - opens quick add modal for immediate creation
         function createTaskFromStreamSelection() {
             try {
                 console.log('[Stream] createTaskFromStreamSelection called');
@@ -57561,36 +57561,11 @@ Options:
                 const editor = document.getElementById('streamEditor');
                 const fullText = editor ? editor.innerText : '';
 
-                // Get context around selection
+                // Get context around selection for description
                 const excerpt = getStreamContextAroundSelection(fullText, selectedText);
 
-                // Create the draft task (not saved yet)
-                const taskId = 'task_' + Date.now() + '_' + Math.random().toString(36).substr(2, 9);
-                const draftTask = {
-                    id: taskId,
-                    type: 'task',
-                    name: selectedText.length > 100 ? selectedText.substring(0, 100) + '...' : selectedText,
-                    description: '',
-                    status: 'pending',
-                    priority: 'medium',
-                    dueDate: null,
-                    sourceType: 'stream',
-                    sourceId: null, // Will be set when note is saved
-                    sourceExcerpt: excerpt,
-                    createdAt: new Date().toISOString(),
-                    updatedAt: new Date().toISOString()
-                };
-
-                // Add to pending tasks (not entities yet)
-                pendingStreamTasks.push(draftTask);
-                console.log('[Stream] Draft task created:', taskId);
-                console.log('[Stream] pendingStreamTasks length:', pendingStreamTasks.length);
-
-                // Update pending tasks list UI
-                renderPendingStreamTasks();
-
-                // Update task count
-                updateStreamTaskCount();
+                // Prepare task name (truncate if too long)
+                const taskName = selectedText.length > 100 ? selectedText.substring(0, 100) + '...' : selectedText;
 
                 // Hide menu, remove highlight, and clear selection
                 hideStreamFloatingMenu();
@@ -57600,8 +57575,16 @@ Options:
                 window.getSelection().removeAllRanges();
                 currentStreamSelection = null;
 
-                // Show toast
-                showStreamToast('Task extracted - click Save to create it');
+                // Open quick add modal with the selected text
+                openQuickAddModal(taskName);
+
+                // Pre-fill the description with stream context
+                const descriptionField = document.getElementById('quickAddModalDescription');
+                if (descriptionField && excerpt && excerpt !== taskName) {
+                    descriptionField.value = 'From stream: ' + excerpt;
+                }
+
+                console.log('[Stream] Opened quick add modal with task:', taskName);
             } catch (error) {
                 console.error('[Stream] Error creating task from stream:', error);
             }
