@@ -36869,7 +36869,7 @@ Cmd/Ctrl + K - Command palette
                         updateTaskCountBadge();
 
                         debug.log(`✅ Applied ${updates.length} update(s), now have ${totalEntities} entities`);
-                        showActivityToast('success', 'Updates Applied', `${updates.length} change(s) synced`);
+                        // Toast removed - status indicator is sufficient for polling updates
                         return true;
                     }
                 }
