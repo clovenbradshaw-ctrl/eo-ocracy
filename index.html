@@ -36898,6 +36898,7 @@ Cmd/Ctrl + K - Command palette
         let updatePollingIntervalMs = 0; // 0 = disabled, 30000 = 30s, 60000 = 1min
         let lastUpdateTimestamp = null;
         let updatePollingInProgress = false;
+        let pendingActivityLogs = 0; // Track in-flight activity logs to prevent poll from reverting local changes
 
         // Fetch updates from the Xano activity_store_updates endpoint
         async function fetchUpdatesFromXano() {
@@ -36953,6 +36954,12 @@ Cmd/Ctrl + K - Command palette
         async function processUpdates(updates) {
             if (!updates || updates.length === 0) {
                 debug.log('✓ No new updates');
+                return false;
+            }
+
+            // Skip processing if there are pending local activity logs to avoid reverting local changes
+            if (pendingActivityLogs > 0) {
+                debug.log(`⏳ Skipping update processing: ${pendingActivityLogs} pending activity log(s)`);
                 return false;
             }
 
@@ -37194,6 +37201,10 @@ Cmd/Ctrl + K - Command palette
             const activityLabel = activity.object_label || activity.object_type || 'item';
             const eventType = activity.eo_operator || activity.event_verb || 'action';
 
+            // Track this as a pending activity log to prevent polling from reverting local changes
+            pendingActivityLogs++;
+            debug.log(`📤 Starting activity log (${pendingActivityLogs} pending)`);
+
             // Get Amino user info if available
             const aminoUser = AminoIdentity.getUser();
             const agentId = aminoUser?.id || aminoUser?.email || ('anon_' + Date.now());
@@ -37272,6 +37283,10 @@ Cmd/Ctrl + K - Command palette
                     showActivityToast('error', 'Connection Error', `Failed to sync "${activityLabel}"`);
                 }
                 return null;
+            } finally {
+                // Always decrement pending count when done (success or failure)
+                pendingActivityLogs = Math.max(0, pendingActivityLogs - 1);
+                debug.log(`📤 Activity log complete (${pendingActivityLogs} pending)`);
             }
         }
 
@@ -55863,7 +55878,7 @@ Options:
 
                 // Log to activity
                 logActivityToXano({
-                    event_verb: 'created',
+                    event_verb: 'INS',
                     eo_operator: 'INS',
                     k_frame: 'Stream Task',
                     object_type: 'task',
