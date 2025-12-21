@@ -30450,6 +30450,15 @@ John Doe,Engineering,john@example.com"
             return type + Date.now();
         }
 
+        // Helper to generate UUID v4 for external IDs
+        function generateUUID() {
+            return 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, function(c) {
+                const r = Math.random() * 16 | 0;
+                const v = c === 'x' ? r : (r & 0x3 | 0x8);
+                return v.toString(16);
+            });
+        }
+
         // Helper to create entity
         function createEntity(type, name) {
             const id = generateId(type);
@@ -44976,7 +44985,7 @@ Cmd/Ctrl + K - Command palette
                             visibilityTeamId: null,
                             assignedEntityId: assignedEntityId,
                             assignedEntityType: assignedEntityType,
-                            externalId: item.externalId || null,
+                            externalId: item.externalId || generateUUID(),
                             importedFrom: 'csv_bulk_import'
                         };
 
@@ -44997,7 +45006,7 @@ Cmd/Ctrl + K - Command palette
                                 dueDate: dueDate,
                                 status: status,
                                 priority: priority,
-                                externalId: item.externalId || null,
+                                externalId: taskObject.externalId,
                                 matterNumber: item.matterNumber || null,
                                 import_source: 'bulk_import'
                             }
