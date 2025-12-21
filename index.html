@@ -36897,6 +36897,13 @@ Cmd/Ctrl + K - Command palette
         // Perform the actual refresh - fetch from Xano and update if changed
         async function performAutoRefresh() {
             if (autoRefreshInProgress) return;
+
+            // Skip refresh if there are pending activity logs to prevent reverting local changes
+            if (pendingActivityLogs > 0) {
+                debug.log(`⏳ Auto-refresh: Skipping - ${pendingActivityLogs} pending activity log(s)`);
+                return;
+            }
+
             autoRefreshInProgress = true;
 
             const toggle = document.getElementById('autoRefreshToggle');
