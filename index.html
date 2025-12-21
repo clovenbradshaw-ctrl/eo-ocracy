@@ -190,6 +190,10 @@
             background: rgba(0,0,0,0.1);
         }
 
+        .view-tabs-tertiary {
+            background: rgba(0,0,0,0.08);
+        }
+
         .view-tab {
             display: flex;
             align-items: center;
@@ -18787,6 +18791,507 @@
         }
 
         /* ============================================
+           STREAM VIEW STYLES
+           ============================================ */
+
+        .stream-view {
+            display: none;
+            height: 100%;
+            background: #FAF7F5;
+        }
+
+        .stream-view.active {
+            display: block;
+        }
+
+        .stream-view-layout {
+            display: grid;
+            grid-template-columns: 1fr 320px;
+            height: 100%;
+            max-width: 1400px;
+            margin: 0 auto;
+        }
+
+        /* Stream Editor Panel */
+        .stream-editor-panel {
+            display: flex;
+            flex-direction: column;
+            padding: 2rem 3rem;
+            border-right: 1px solid #E5DDD1;
+            background: #FDFCFA;
+        }
+
+        .stream-editor-header {
+            margin-bottom: 1.5rem;
+        }
+
+        .stream-editor-title {
+            font-size: 0.75rem;
+            font-family: 'IBM Plex Mono', monospace;
+            font-weight: 500;
+            text-transform: uppercase;
+            letter-spacing: 0.1em;
+            color: #8B6F47;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            margin-bottom: 0.5rem;
+        }
+
+        .stream-editor-date {
+            font-size: 0.875rem;
+            color: #8B6F47;
+            font-style: italic;
+        }
+
+        /* Stream Editor */
+        .stream-editor-wrapper {
+            flex: 1;
+            position: relative;
+            min-height: 300px;
+        }
+
+        .stream-editor {
+            width: 100%;
+            min-height: 300px;
+            max-height: calc(100vh - 400px);
+            overflow-y: auto;
+            padding: 1rem;
+            font-family: 'Newsreader', Georgia, serif;
+            font-size: 1.125rem;
+            line-height: 1.7;
+            color: #3D2E1F;
+            background: white;
+            border: 1px solid #E5DDD1;
+            border-radius: 8px;
+            outline: none;
+            transition: border-color 0.2s;
+        }
+
+        .stream-editor:focus {
+            border-color: #C88F4A;
+        }
+
+        .stream-editor:empty:before {
+            content: attr(placeholder);
+            color: #8B6F47;
+            font-style: italic;
+            pointer-events: none;
+        }
+
+        /* Floating menu for task creation */
+        .stream-floating-menu {
+            position: absolute;
+            background: white;
+            border: 1px solid #E5DDD1;
+            border-radius: 6px;
+            padding: 4px;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.12);
+            display: none;
+            z-index: 100;
+            animation: streamMenuPop 0.15s ease-out;
+        }
+
+        @keyframes streamMenuPop {
+            from {
+                opacity: 0;
+                transform: translateY(4px) scale(0.96);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0) scale(1);
+            }
+        }
+
+        .stream-floating-menu.visible {
+            display: block;
+        }
+
+        .stream-floating-menu button {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            padding: 0.5rem 0.875rem;
+            background: none;
+            border: none;
+            font-family: 'IBM Plex Mono', monospace;
+            font-size: 0.75rem;
+            font-weight: 500;
+            color: #3D2E1F;
+            cursor: pointer;
+            border-radius: 4px;
+            transition: all 0.15s ease;
+        }
+
+        .stream-floating-menu button:hover {
+            background: #C88F4A;
+            color: white;
+        }
+
+        /* Stream Editor Footer */
+        .stream-editor-footer {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-top: 1.5rem;
+            padding-top: 1.5rem;
+            border-top: 1px solid #E5DDD1;
+        }
+
+        .stream-task-count {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            font-family: 'IBM Plex Mono', monospace;
+            font-size: 0.75rem;
+            color: #8B6F47;
+        }
+
+        .stream-editor-actions {
+            display: flex;
+            gap: 0.75rem;
+        }
+
+        .stream-btn {
+            font-family: 'IBM Plex Mono', monospace;
+            font-size: 0.8125rem;
+            font-weight: 500;
+            padding: 0.625rem 1.25rem;
+            border-radius: 6px;
+            cursor: pointer;
+            transition: all 0.15s ease;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .stream-btn-secondary {
+            background: none;
+            border: 1px solid #E5DDD1;
+            color: #8B6F47;
+        }
+
+        .stream-btn-secondary:hover {
+            border-color: #C88F4A;
+            color: #C88F4A;
+        }
+
+        .stream-btn-primary {
+            background: #C88F4A;
+            border: 1px solid #C88F4A;
+            color: white;
+        }
+
+        .stream-btn-primary:hover {
+            background: #B37D3A;
+            border-color: #B37D3A;
+        }
+
+        .stream-btn-primary:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+        }
+
+        /* Stream Archive Panel */
+        .stream-archive-panel {
+            background: white;
+            display: flex;
+            flex-direction: column;
+            overflow: hidden;
+        }
+
+        .stream-archive-header {
+            padding: 1.5rem;
+            border-bottom: 1px solid #E5DDD1;
+        }
+
+        .stream-archive-title {
+            font-size: 0.75rem;
+            font-family: 'IBM Plex Mono', monospace;
+            font-weight: 500;
+            text-transform: uppercase;
+            letter-spacing: 0.1em;
+            color: #8B6F47;
+            margin-bottom: 1rem;
+        }
+
+        .stream-archive-search {
+            width: 100%;
+            padding: 0.5rem 0.75rem;
+            border: 1px solid #E5DDD1;
+            border-radius: 6px;
+            font-size: 0.875rem;
+        }
+
+        .stream-archive-search:focus {
+            outline: none;
+            border-color: #C88F4A;
+        }
+
+        .stream-archive-list {
+            flex: 1;
+            overflow-y: auto;
+            padding: 1rem;
+        }
+
+        .stream-archive-empty {
+            text-align: center;
+            padding: 2rem 1rem;
+            color: #8B6F47;
+        }
+
+        .stream-archive-empty i {
+            font-size: 2.5rem;
+            margin-bottom: 1rem;
+            opacity: 0.4;
+        }
+
+        .stream-archive-empty p {
+            font-size: 0.875rem;
+            font-style: italic;
+        }
+
+        /* Stream Note Card */
+        .stream-note-card {
+            background: #FAF7F5;
+            border: 1px solid #E5DDD1;
+            border-radius: 8px;
+            padding: 1rem;
+            margin-bottom: 0.75rem;
+            cursor: pointer;
+            transition: all 0.15s ease;
+        }
+
+        .stream-note-card:hover {
+            border-color: #C88F4A;
+            box-shadow: 0 2px 8px rgba(200, 143, 74, 0.15);
+        }
+
+        .stream-note-card-date {
+            font-size: 0.7rem;
+            font-family: 'IBM Plex Mono', monospace;
+            color: #8B6F47;
+            margin-bottom: 0.5rem;
+        }
+
+        .stream-note-card-title {
+            font-size: 0.9375rem;
+            font-weight: 500;
+            color: #3D2E1F;
+            margin-bottom: 0.5rem;
+            line-height: 1.4;
+            display: -webkit-box;
+            -webkit-line-clamp: 2;
+            -webkit-box-orient: vertical;
+            overflow: hidden;
+        }
+
+        .stream-note-card-excerpt {
+            font-size: 0.8125rem;
+            color: #8B6F47;
+            line-height: 1.5;
+            display: -webkit-box;
+            -webkit-line-clamp: 2;
+            -webkit-box-orient: vertical;
+            overflow: hidden;
+            margin-bottom: 0.5rem;
+        }
+
+        .stream-note-card-meta {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            font-size: 0.7rem;
+            font-family: 'IBM Plex Mono', monospace;
+            color: #8B6F47;
+        }
+
+        .stream-note-card-meta i {
+            color: #C88F4A;
+        }
+
+        /* Stream Note Modal */
+        .stream-note-modal-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(0, 0, 0, 0.5);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 1000;
+            opacity: 0;
+            visibility: hidden;
+            transition: all 0.2s ease;
+        }
+
+        .stream-note-modal-overlay.visible {
+            opacity: 1;
+            visibility: visible;
+        }
+
+        .stream-note-modal {
+            background: white;
+            border-radius: 12px;
+            width: 90%;
+            max-width: 700px;
+            max-height: 80vh;
+            overflow: hidden;
+            display: flex;
+            flex-direction: column;
+            transform: translateY(20px);
+            transition: transform 0.2s ease;
+        }
+
+        .stream-note-modal-overlay.visible .stream-note-modal {
+            transform: translateY(0);
+        }
+
+        .stream-note-modal-header {
+            padding: 1.25rem 1.5rem;
+            border-bottom: 1px solid #E5DDD1;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+
+        .stream-note-modal-title {
+            font-size: 1.125rem;
+            font-weight: 600;
+            color: #3D2E1F;
+        }
+
+        .stream-note-modal-close {
+            background: none;
+            border: none;
+            font-size: 1.25rem;
+            color: #8B6F47;
+            cursor: pointer;
+            padding: 0.25rem;
+        }
+
+        .stream-note-modal-close:hover {
+            color: #3D2E1F;
+        }
+
+        .stream-note-modal-body {
+            flex: 1;
+            overflow-y: auto;
+            padding: 1.5rem;
+        }
+
+        .stream-note-modal-content {
+            font-family: 'Newsreader', Georgia, serif;
+            font-size: 1.0625rem;
+            line-height: 1.7;
+            color: #3D2E1F;
+        }
+
+        .stream-note-modal-tasks {
+            margin-top: 1.5rem;
+            padding-top: 1.5rem;
+            border-top: 1px solid #E5DDD1;
+        }
+
+        .stream-note-modal-tasks-title {
+            font-size: 0.75rem;
+            font-family: 'IBM Plex Mono', monospace;
+            font-weight: 500;
+            text-transform: uppercase;
+            letter-spacing: 0.1em;
+            color: #8B6F47;
+            margin-bottom: 1rem;
+        }
+
+        .stream-note-task-item {
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+            padding: 0.625rem 0.875rem;
+            background: #FAF7F5;
+            border-radius: 6px;
+            margin-bottom: 0.5rem;
+            font-size: 0.875rem;
+            color: #3D2E1F;
+            cursor: pointer;
+            transition: all 0.15s;
+        }
+
+        .stream-note-task-item:hover {
+            background: #F5EFE6;
+        }
+
+        .stream-note-task-item i {
+            color: #C88F4A;
+        }
+
+        /* Responsive */
+        @media (max-width: 900px) {
+            .stream-view-layout {
+                grid-template-columns: 1fr;
+            }
+
+            .stream-editor-panel {
+                padding: 1.5rem;
+                border-right: none;
+                border-bottom: 1px solid #E5DDD1;
+            }
+
+            .stream-archive-panel {
+                max-height: 300px;
+            }
+        }
+
+        /* Task Stream Source Link (shown in task modal) */
+        .task-stream-source {
+            background: linear-gradient(135deg, #FEF7ED 0%, #FDF5E9 100%);
+            border: 1px solid #F5D5B8;
+            border-radius: 8px;
+            padding: 0.875rem 1rem;
+            margin-bottom: 1rem;
+            cursor: pointer;
+            transition: all 0.15s ease;
+        }
+
+        .task-stream-source:hover {
+            border-color: #C88F4A;
+            box-shadow: 0 2px 8px rgba(200, 143, 74, 0.15);
+        }
+
+        .task-stream-source-header {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            font-size: 0.8125rem;
+            font-weight: 500;
+            color: #8B6F47;
+        }
+
+        .task-stream-source-header i:first-child {
+            color: #C88F4A;
+        }
+
+        .task-stream-source-date {
+            font-size: 0.75rem;
+            color: #A8936C;
+            margin-left: 0.5rem;
+        }
+
+        .task-stream-source-excerpt {
+            margin-top: 0.5rem;
+            font-size: 0.8125rem;
+            color: #6B5642;
+            font-style: italic;
+            line-height: 1.5;
+            display: -webkit-box;
+            -webkit-line-clamp: 2;
+            -webkit-box-orient: vertical;
+            overflow: hidden;
+        }
+
+        /* ============================================
            COMPANY RULES VIEW STYLES
            ============================================ */
 
@@ -23646,6 +24151,12 @@
                         <span>Rules</span>
                     </button>
                 </div>
+                <div class="view-tabs view-tabs-tertiary">
+                    <button class="view-tab" data-view="stream" onclick="switchView('stream')">
+                        <i class="ph ph-notepad"></i>
+                        <span>Stream</span>
+                    </button>
+                </div>
             </div>
         </div>
 
@@ -24308,6 +24819,63 @@
                 </div>
                 <div class="workflows-view-content" id="workflowsViewContent">
                     <!-- Populated dynamically by renderWorkflowsView() -->
+                </div>
+            </div>
+
+            <!-- Stream View (Capture - freeform writing with task extraction) -->
+            <div id="streamView" class="stream-view">
+                <div class="stream-view-layout">
+                    <!-- Editor Panel -->
+                    <div class="stream-editor-panel">
+                        <div class="stream-editor-header">
+                            <div class="stream-editor-title">
+                                <i class="ph ph-notepad"></i>
+                                <span>New Note</span>
+                            </div>
+                            <time class="stream-editor-date" id="streamCurrentDate"></time>
+                        </div>
+
+                        <div class="stream-editor-wrapper">
+                            <div class="stream-editor" id="streamEditor" contenteditable="true" placeholder="Start writing... select text to create tasks"></div>
+
+                            <!-- Floating menu for task creation -->
+                            <div class="stream-floating-menu" id="streamFloatingMenu">
+                                <button id="streamCreateTaskBtn" onclick="createTaskFromStreamSelection()">
+                                    <i class="ph ph-check-square"></i>
+                                    Make task
+                                </button>
+                            </div>
+                        </div>
+
+                        <div class="stream-editor-footer">
+                            <div class="stream-task-count">
+                                <i class="ph ph-check-square"></i>
+                                <span id="streamTaskCount">0</span> tasks extracted
+                            </div>
+                            <div class="stream-editor-actions">
+                                <button class="stream-btn stream-btn-secondary" onclick="clearStreamEditor()">Clear</button>
+                                <button class="stream-btn stream-btn-primary" onclick="saveStreamNote()" id="streamSaveBtn">
+                                    <i class="ph ph-floppy-disk"></i>
+                                    Save Note
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Notes Archive Panel -->
+                    <div class="stream-archive-panel">
+                        <div class="stream-archive-header">
+                            <div class="stream-archive-title">Recent Notes</div>
+                            <input type="text"
+                                   class="stream-archive-search"
+                                   id="streamArchiveSearch"
+                                   placeholder="Search notes..."
+                                   oninput="filterStreamArchive()">
+                        </div>
+                        <div class="stream-archive-list" id="streamArchiveList">
+                            <!-- Populated dynamically -->
+                        </div>
+                    </div>
                 </div>
             </div>
 
@@ -26959,14 +27527,15 @@ John Doe,Engineering,john@example.com"
             person: [],
             task: [],
             product: [],
-            workflow: []
+            workflow: [],
+            stream: []
         };
 
         let relationships = [];
 
         // Ensure all required entity types exist (for backwards compatibility with older saved data)
         function normalizeEntities(e) {
-            const requiredTypes = ['unit', 'team', 'role', 'person', 'task', 'product', 'workflow'];
+            const requiredTypes = ['unit', 'team', 'role', 'person', 'task', 'product', 'workflow', 'stream'];
             const normalized = e || {};
             requiredTypes.forEach(type => {
                 if (!Array.isArray(normalized[type])) {
@@ -28763,6 +29332,7 @@ John Doe,Engineering,john@example.com"
             document.getElementById('calendarView').classList.remove('active');
             document.getElementById('workflowsView').classList.remove('active');
             document.getElementById('companyRulesView').classList.remove('active');
+            document.getElementById('streamView').classList.remove('active');
 
             if (view === 'tree') {
                 document.getElementById('treeView').classList.add('active');
@@ -28809,6 +29379,9 @@ John Doe,Engineering,john@example.com"
             } else if (view === 'company-rules') {
                 document.getElementById('companyRulesView').classList.add('active');
                 renderCompanyRulesView();
+            } else if (view === 'stream') {
+                document.getElementById('streamView').classList.add('active');
+                renderStreamView();
             } else {
                 document.getElementById('graphView').classList.add('active');
                 setTimeout(() => updateGraph(), 100);
@@ -46320,6 +46893,9 @@ Cmd/Ctrl + K - Command palette
                         >${task.description || ''}</textarea>
                     </div>
 
+                    <!-- Stream Source Link (if task came from Stream) -->
+                    ${renderTaskStreamSource(task)}
+
                     <!-- Airtable Linked Records - Always Visible -->
                     ${renderAirtableTags(task)}
 
@@ -54983,6 +55559,512 @@ Options:
                     </div>
                 </div>
             `;
+        }
+
+        // ============================================
+        // STREAM VIEW FUNCTIONS
+        // ============================================
+
+        // Stream state
+        let currentStreamSelection = null;
+        let currentStreamTaskIds = []; // Tasks extracted in current session
+
+        // Initialize stream view
+        function renderStreamView() {
+            // Set current date
+            const dateEl = document.getElementById('streamCurrentDate');
+            if (dateEl) {
+                dateEl.textContent = new Date().toLocaleDateString('en-US', {
+                    weekday: 'long',
+                    year: 'numeric',
+                    month: 'long',
+                    day: 'numeric'
+                });
+            }
+
+            // Reset state for new note
+            currentStreamTaskIds = [];
+            updateStreamTaskCount();
+
+            // Render archive
+            renderStreamArchive();
+
+            // Setup editor listeners
+            setupStreamEditorListeners();
+        }
+
+        // Setup editor event listeners
+        function setupStreamEditorListeners() {
+            const editor = document.getElementById('streamEditor');
+            if (!editor) return;
+
+            // Remove existing listeners by cloning
+            const newEditor = editor.cloneNode(true);
+            editor.parentNode.replaceChild(newEditor, editor);
+
+            // Selection change handler
+            newEditor.addEventListener('mouseup', handleStreamSelectionChange);
+            newEditor.addEventListener('keyup', handleStreamSelectionChange);
+
+            // Click outside to hide menu
+            document.addEventListener('click', (e) => {
+                const menu = document.getElementById('streamFloatingMenu');
+                if (menu && !menu.contains(e.target) && !e.target.closest('#streamEditor')) {
+                    hideStreamFloatingMenu();
+                }
+            });
+        }
+
+        // Handle text selection in editor
+        function handleStreamSelectionChange() {
+            const selection = window.getSelection();
+            const selectedText = selection.toString().trim();
+
+            if (selectedText && selectedText.length > 0) {
+                currentStreamSelection = {
+                    text: selectedText,
+                    range: selection.getRangeAt(0).cloneRange()
+                };
+                showStreamFloatingMenu();
+            } else {
+                currentStreamSelection = null;
+                hideStreamFloatingMenu();
+            }
+        }
+
+        // Show floating menu near selection
+        function showStreamFloatingMenu() {
+            const selection = window.getSelection();
+            if (!selection.rangeCount) return;
+
+            const range = selection.getRangeAt(0);
+            const rect = range.getBoundingClientRect();
+            const editorWrapper = document.querySelector('.stream-editor-wrapper');
+            if (!editorWrapper) return;
+
+            const wrapperRect = editorWrapper.getBoundingClientRect();
+            const menu = document.getElementById('streamFloatingMenu');
+
+            if (menu) {
+                menu.style.top = `${rect.bottom - wrapperRect.top + 8}px`;
+                menu.style.left = `${rect.left - wrapperRect.left}px`;
+                menu.classList.add('visible');
+            }
+        }
+
+        // Hide floating menu
+        function hideStreamFloatingMenu() {
+            const menu = document.getElementById('streamFloatingMenu');
+            if (menu) {
+                menu.classList.remove('visible');
+            }
+        }
+
+        // Create task from selected text
+        function createTaskFromStreamSelection() {
+            if (!currentStreamSelection) return;
+
+            const selectedText = currentStreamSelection.text;
+            const editor = document.getElementById('streamEditor');
+            const fullText = editor ? editor.innerText : '';
+
+            // Get context around selection
+            const excerpt = getStreamContextAroundSelection(fullText, selectedText);
+
+            // Create the task
+            const taskId = 'task_' + Date.now() + '_' + Math.random().toString(36).substr(2, 9);
+            const newTask = {
+                id: taskId,
+                type: 'task',
+                name: selectedText.length > 100 ? selectedText.substring(0, 100) + '...' : selectedText,
+                description: '',
+                status: 'pending',
+                priority: 'medium',
+                dueDate: null,
+                sourceType: 'stream',
+                sourceId: null, // Will be set when note is saved
+                sourceExcerpt: excerpt,
+                createdAt: new Date().toISOString(),
+                updatedAt: new Date().toISOString()
+            };
+
+            // Add to entities
+            if (!entities.task) entities.task = [];
+            entities.task.push(newTask);
+
+            // Track for current session
+            currentStreamTaskIds.push(taskId);
+
+            // Update task count
+            updateStreamTaskCount();
+
+            // Save and refresh
+            saveWorkspaces();
+
+            // Log to activity
+            logActivity('task', taskId, 'created', { source: 'stream' });
+
+            // Show toast
+            showStreamToast('Task created');
+
+            // Hide menu and clear selection
+            hideStreamFloatingMenu();
+            window.getSelection().removeAllRanges();
+            currentStreamSelection = null;
+        }
+
+        // Get context around selected text
+        function getStreamContextAroundSelection(fullText, selectedText) {
+            const index = fullText.indexOf(selectedText);
+            if (index === -1) return selectedText;
+
+            const contextStart = Math.max(0, index - 50);
+            const contextEnd = Math.min(fullText.length, index + selectedText.length + 50);
+
+            let context = '';
+            if (contextStart > 0) context += '...';
+            context += fullText.slice(contextStart, contextEnd);
+            if (contextEnd < fullText.length) context += '...';
+
+            return context;
+        }
+
+        // Update task count display
+        function updateStreamTaskCount() {
+            const countEl = document.getElementById('streamTaskCount');
+            if (countEl) {
+                countEl.textContent = currentStreamTaskIds.length;
+            }
+        }
+
+        // Save stream note
+        function saveStreamNote() {
+            const editor = document.getElementById('streamEditor');
+            if (!editor) return;
+
+            const content = editor.innerHTML;
+            const contentText = editor.innerText.trim();
+
+            if (!contentText) {
+                showStreamToast('Nothing to save');
+                return;
+            }
+
+            // Generate title from first line
+            const firstLine = contentText.split('\n')[0];
+            const title = firstLine.length > 60 ? firstLine.substring(0, 60) + '...' : firstLine;
+
+            // Create stream note
+            const noteId = 'stream_' + Date.now() + '_' + Math.random().toString(36).substr(2, 9);
+            const streamNote = {
+                id: noteId,
+                type: 'stream',
+                title: title,
+                content: content,
+                contentText: contentText,
+                extractedTaskIds: [...currentStreamTaskIds],
+                ownerId: getCurrentUserId(),
+                visibility: 'private',
+                sharedWith: [],
+                archived: false,
+                createdAt: new Date().toISOString(),
+                updatedAt: new Date().toISOString()
+            };
+
+            // Update tasks with source ID
+            currentStreamTaskIds.forEach(taskId => {
+                const task = entities.task.find(t => t.id === taskId);
+                if (task) {
+                    task.sourceId = noteId;
+                }
+            });
+
+            // Add to entities
+            if (!entities.stream) entities.stream = [];
+            entities.stream.push(streamNote);
+
+            // Save
+            saveWorkspaces();
+
+            // Clear editor
+            clearStreamEditor();
+
+            // Refresh archive
+            renderStreamArchive();
+
+            // Show toast
+            showStreamToast('Note saved');
+        }
+
+        // Clear stream editor
+        function clearStreamEditor() {
+            const editor = document.getElementById('streamEditor');
+            if (editor) {
+                editor.innerHTML = '';
+            }
+            currentStreamTaskIds = [];
+            updateStreamTaskCount();
+        }
+
+        // Render stream archive
+        function renderStreamArchive() {
+            const list = document.getElementById('streamArchiveList');
+            if (!list) return;
+
+            const searchTerm = (document.getElementById('streamArchiveSearch')?.value || '').toLowerCase();
+            const currentUserId = getCurrentUserId();
+
+            // Get stream notes for current user (or all if no user)
+            let notes = (entities.stream || [])
+                .filter(note => {
+                    // Filter by owner or shared
+                    if (currentUserId && note.ownerId && note.ownerId !== currentUserId) {
+                        // Check if shared with user
+                        const isShared = note.sharedWith?.some(s =>
+                            s.entityId === currentUserId
+                        );
+                        if (!isShared) return false;
+                    }
+                    // Filter by search
+                    if (searchTerm) {
+                        return note.title?.toLowerCase().includes(searchTerm) ||
+                               note.contentText?.toLowerCase().includes(searchTerm);
+                    }
+                    return !note.archived;
+                })
+                .sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt));
+
+            if (notes.length === 0) {
+                list.innerHTML = `
+                    <div class="stream-archive-empty">
+                        <i class="ph ph-notepad"></i>
+                        <p>${searchTerm ? 'No matching notes' : 'No notes yet'}</p>
+                    </div>
+                `;
+                return;
+            }
+
+            list.innerHTML = notes.map(note => {
+                const date = new Date(note.createdAt);
+                const dateStr = date.toLocaleDateString('en-US', {
+                    month: 'short',
+                    day: 'numeric',
+                    year: date.getFullYear() !== new Date().getFullYear() ? 'numeric' : undefined
+                });
+                const taskCount = note.extractedTaskIds?.length || 0;
+
+                return `
+                    <div class="stream-note-card" onclick="openStreamNote('${note.id}')">
+                        <div class="stream-note-card-date">${dateStr}</div>
+                        <div class="stream-note-card-title">${escapeHtml(note.title)}</div>
+                        <div class="stream-note-card-excerpt">${escapeHtml(note.contentText?.substring(0, 100) || '')}</div>
+                        ${taskCount > 0 ? `
+                            <div class="stream-note-card-meta">
+                                <i class="ph ph-check-square"></i>
+                                ${taskCount} task${taskCount !== 1 ? 's' : ''}
+                            </div>
+                        ` : ''}
+                    </div>
+                `;
+            }).join('');
+        }
+
+        // Filter stream archive
+        function filterStreamArchive() {
+            renderStreamArchive();
+        }
+
+        // Open stream note in modal
+        function openStreamNote(noteId) {
+            const note = entities.stream?.find(n => n.id === noteId);
+            if (!note) return;
+
+            // Get tasks extracted from this note
+            const tasks = (entities.task || []).filter(t =>
+                note.extractedTaskIds?.includes(t.id)
+            );
+
+            const date = new Date(note.createdAt);
+            const dateStr = date.toLocaleDateString('en-US', {
+                weekday: 'long',
+                year: 'numeric',
+                month: 'long',
+                day: 'numeric'
+            });
+
+            // Create modal overlay if it doesn't exist
+            let overlay = document.getElementById('streamNoteModalOverlay');
+            if (!overlay) {
+                overlay = document.createElement('div');
+                overlay.id = 'streamNoteModalOverlay';
+                overlay.className = 'stream-note-modal-overlay';
+                overlay.innerHTML = `
+                    <div class="stream-note-modal">
+                        <div class="stream-note-modal-header">
+                            <div class="stream-note-modal-title" id="streamNoteModalTitle"></div>
+                            <button class="stream-note-modal-close" onclick="closeStreamNoteModal()">
+                                <i class="ph ph-x"></i>
+                            </button>
+                        </div>
+                        <div class="stream-note-modal-body">
+                            <div class="stream-note-modal-date" id="streamNoteModalDate" style="font-size: 0.8rem; color: #8B6F47; margin-bottom: 1rem;"></div>
+                            <div class="stream-note-modal-content" id="streamNoteModalContent"></div>
+                            <div class="stream-note-modal-tasks" id="streamNoteModalTasks"></div>
+                        </div>
+                    </div>
+                `;
+                overlay.addEventListener('click', (e) => {
+                    if (e.target === overlay) closeStreamNoteModal();
+                });
+                document.body.appendChild(overlay);
+            }
+
+            // Populate modal
+            document.getElementById('streamNoteModalTitle').textContent = note.title;
+            document.getElementById('streamNoteModalDate').textContent = dateStr;
+            document.getElementById('streamNoteModalContent').innerHTML = note.content;
+
+            const tasksSection = document.getElementById('streamNoteModalTasks');
+            if (tasks.length > 0) {
+                tasksSection.innerHTML = `
+                    <div class="stream-note-modal-tasks-title">Tasks extracted from this note</div>
+                    ${tasks.map(task => `
+                        <div class="stream-note-task-item" onclick="openTaskFromStream('${task.id}')">
+                            <i class="ph ${task.status === 'completed' ? 'ph-check-circle' : 'ph-circle'}"></i>
+                            <span style="${task.status === 'completed' ? 'text-decoration: line-through; opacity: 0.7;' : ''}">${escapeHtml(task.name)}</span>
+                        </div>
+                    `).join('')}
+                `;
+                tasksSection.style.display = 'block';
+            } else {
+                tasksSection.style.display = 'none';
+            }
+
+            // Show modal
+            setTimeout(() => overlay.classList.add('visible'), 10);
+        }
+
+        // Close stream note modal
+        function closeStreamNoteModal() {
+            const overlay = document.getElementById('streamNoteModalOverlay');
+            if (overlay) {
+                overlay.classList.remove('visible');
+            }
+        }
+
+        // Open task from stream note (navigate to task)
+        function openTaskFromStream(taskId) {
+            closeStreamNoteModal();
+            const task = entities.task?.find(t => t.id === taskId);
+            if (task) {
+                // Switch to kanban view and open task modal
+                switchView('kanban');
+                setTimeout(() => {
+                    openEntityModal(task, 'task');
+                }, 100);
+            }
+        }
+
+        // Show toast notification
+        function showStreamToast(message) {
+            // Use existing toast system or create a simple one
+            let toast = document.getElementById('streamToast');
+            if (!toast) {
+                toast = document.createElement('div');
+                toast.id = 'streamToast';
+                toast.style.cssText = `
+                    position: fixed;
+                    bottom: 100px;
+                    left: 50%;
+                    transform: translateX(-50%) translateY(20px);
+                    background: #3D2E1F;
+                    color: white;
+                    font-family: 'IBM Plex Mono', monospace;
+                    font-size: 0.75rem;
+                    padding: 0.75rem 1.25rem;
+                    border-radius: 6px;
+                    opacity: 0;
+                    transition: all 0.2s ease;
+                    pointer-events: none;
+                    z-index: 1100;
+                `;
+                document.body.appendChild(toast);
+            }
+
+            toast.textContent = message;
+            toast.style.opacity = '1';
+            toast.style.transform = 'translateX(-50%) translateY(0)';
+
+            setTimeout(() => {
+                toast.style.opacity = '0';
+                toast.style.transform = 'translateX(-50%) translateY(20px)';
+            }, 2000);
+        }
+
+        // Get stream source for a task (used in task detail view)
+        function getStreamSourceForTask(taskId) {
+            const task = entities.task?.find(t => t.id === taskId);
+            if (!task || task.sourceType !== 'stream' || !task.sourceId) {
+                return null;
+            }
+            return entities.stream?.find(n => n.id === task.sourceId) || null;
+        }
+
+        // Render stream source link in task modal
+        function renderTaskStreamSource(task) {
+            if (!task || task.sourceType !== 'stream') {
+                return '';
+            }
+
+            const streamNote = getStreamSourceForTask(task.id);
+            const excerpt = task.sourceExcerpt || '';
+
+            if (streamNote) {
+                // Note exists - show link to it
+                const date = new Date(streamNote.createdAt);
+                const dateStr = date.toLocaleDateString('en-US', {
+                    month: 'short',
+                    day: 'numeric'
+                });
+
+                return `
+                    <div class="task-stream-source" onclick="openStreamNoteFromTask('${streamNote.id}')" title="View original note">
+                        <div class="task-stream-source-header">
+                            <i class="ph ph-notepad"></i>
+                            <span>From Stream Note</span>
+                            <span class="task-stream-source-date">${dateStr}</span>
+                            <i class="ph ph-arrow-square-out" style="margin-left: auto; opacity: 0.5;"></i>
+                        </div>
+                        ${excerpt ? `
+                        <div class="task-stream-source-excerpt">"${escapeHtml(excerpt)}"</div>
+                        ` : ''}
+                    </div>
+                `;
+            } else if (excerpt) {
+                // Note doesn't exist but we have the excerpt
+                return `
+                    <div class="task-stream-source" style="cursor: default;">
+                        <div class="task-stream-source-header">
+                            <i class="ph ph-notepad"></i>
+                            <span>From Stream</span>
+                        </div>
+                        <div class="task-stream-source-excerpt">"${escapeHtml(excerpt)}"</div>
+                    </div>
+                `;
+            }
+
+            return '';
+        }
+
+        // Open stream note from task modal
+        function openStreamNoteFromTask(noteId) {
+            // Close entity modal first
+            closeEntityModal();
+            // Switch to stream view and open the note
+            switchView('stream');
+            setTimeout(() => {
+                openStreamNote(noteId);
+            }, 100);
         }
 
         // Render the workflows view
