@@ -37241,6 +37241,12 @@ Cmd/Ctrl + K - Command palette
                         );
 
                         if (totalEntities > 0) {
+                            // CRITICAL: Final check before overwriting - user may have made changes during reconstruction
+                            if (shouldSkipStateOverwrite('performAutoRefresh-final')) {
+                                debug.log('⏳ Aborting auto-refresh - local changes detected during reconstruction');
+                                return;
+                            }
+
                             // Update current workspace with new data
                             entities = normalizeEntities(JSON.parse(JSON.stringify(reconstructed.entities)));
                             relationships = JSON.parse(JSON.stringify(reconstructed.relationships));
@@ -37507,6 +37513,12 @@ Cmd/Ctrl + K - Command palette
                                 debug.log(`🔄 Preserving local-only relationship: ${localRel.id}`);
                                 reconstructedRelationships.push(localRel);
                             }
+                        }
+
+                        // CRITICAL: Final check before overwriting - user may have made changes during reconstruction
+                        if (shouldSkipStateOverwrite('processUpdates-final')) {
+                            debug.log('⏳ Aborting processUpdates - local changes detected during reconstruction');
+                            return false;
                         }
 
                         entities = reconstructedEntities;
@@ -38886,7 +38898,7 @@ Cmd/Ctrl + K - Command palette
             document.querySelector('.panel-left').scrollTop = 0;
         }
 
-        function deleteEntity(id, type) {
+        async function deleteEntity(id, type) {
             if (!confirm('Delete this entity? This will also remove related relationships.')) return;
 
             const entity = entities[type].find(e => e.id === id);
@@ -38911,8 +38923,8 @@ Cmd/Ctrl + K - Command palette
             // Add to recycle bin
             addToRecycleBin(entity, 'entity', type, deletedRelationships);
 
-            // Log to Xano activity store
-            logActivityToXano({
+            // Log to Xano activity store - await to ensure deletion is persisted
+            const result = await logActivityToXano({
                 event_verb: 'NUL', // NUL = Nullification
                 k_frame: 'Removal',
                 eo_operator: 'NUL',
@@ -38925,6 +38937,11 @@ Cmd/Ctrl + K - Command palette
                     action: 'deleted'
                 }
             });
+
+            // Warn if sync failed (deletion still happened locally)
+            if (!result) {
+                console.warn('⚠️ Deletion may not have synced to server');
+            }
 
             // Save and refresh all views for instant visibility
             saveToLocalStorage();
