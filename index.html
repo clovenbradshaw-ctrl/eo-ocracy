@@ -26803,6 +26803,12 @@ John Doe,Engineering,john@example.com"
                 // (Variable is defined later in file, so check if it exists)
                 if (typeof lastLocalChangeTimestamp !== 'undefined') {
                     lastLocalChangeTimestamp = Date.now();
+                    // Persist to localStorage so grace period survives page refresh
+                    try {
+                        localStorage.setItem('eo_lastLocalChangeTimestamp', lastLocalChangeTimestamp.toString());
+                    } catch (e) {
+                        // Ignore localStorage errors
+                    }
                 }
 
                 // Update current workspace data before saving
@@ -27878,6 +27884,17 @@ John Doe,Engineering,john@example.com"
         // INITIALIZE REFRESH SYSTEM LISTENERS
         // ==========================================
 
+        // Track if there are unsaved changes that need to be flushed on unload
+        let _hasPendingChanges = false;
+
+        function markPendingChanges() {
+            _hasPendingChanges = true;
+        }
+
+        function clearPendingChanges() {
+            _hasPendingChanges = false;
+        }
+
         function initRefreshSystemListeners() {
             // Visibility change listener (tab switching)
             document.addEventListener('visibilitychange', handleVisibilityChange);
@@ -27892,7 +27909,23 @@ John Doe,Engineering,john@example.com"
             window.addEventListener('error', handleUnhandledError);
             window.addEventListener('unhandledrejection', handleUnhandledRejection);
 
+            // Flush pending saves before page unload to prevent data loss on quick refresh
+            window.addEventListener('beforeunload', handleBeforeUnload);
+
             console.log('[RefreshSystem] Listeners initialized');
+        }
+
+        /**
+         * Handle page unload - ensure all pending changes are saved
+         * This prevents data loss when user refreshes quickly after making changes
+         */
+        function handleBeforeUnload(event) {
+            if (_hasPendingChanges) {
+                console.log('[RefreshSystem] Flushing pending changes before unload');
+                // Synchronously save to localStorage before page unloads
+                saveWorkspaces();
+                _hasPendingChanges = false;
+            }
         }
 
         // Initialize listeners when DOM is ready
@@ -37291,7 +37324,22 @@ Cmd/Ctrl + K - Command palette
         })();
         let updatePollingInProgress = false;
         let pendingActivityLogs = 0; // Track in-flight activity logs to prevent poll from reverting local changes
-        let lastLocalChangeTimestamp = 0; // Track when last local change was made to prevent stale API data from overwriting
+        // Load lastLocalChangeTimestamp from localStorage to persist grace period across page refresh
+        let lastLocalChangeTimestamp = (() => {
+            try {
+                const stored = localStorage.getItem('eo_lastLocalChangeTimestamp');
+                if (stored) {
+                    const parsed = parseInt(stored, 10);
+                    if (!isNaN(parsed) && parsed > 0) {
+                        debug.log(`📅 Restored lastLocalChangeTimestamp from localStorage: ${new Date(parsed).toISOString()}`);
+                        return parsed;
+                    }
+                }
+            } catch (e) {
+                console.warn('Could not load lastLocalChangeTimestamp from localStorage:', e);
+            }
+            return 0;
+        })();
         const LOCAL_CHANGE_GRACE_PERIOD_MS = 5000; // 5 seconds grace period after local changes
 
         // Check if we should skip overwriting state (to prevent reverting local changes)
@@ -46633,8 +46681,19 @@ Cmd/Ctrl + K - Command palette
             const { skipRefresh = false, immediate = false } = options;
             _saveCount++;
 
+            // Mark that we have pending changes before save
+            // This ensures beforeunload will flush if page closes mid-operation
+            if (typeof markPendingChanges === 'function') {
+                markPendingChanges();
+            }
+
             // Delegate to workspace-aware save
             saveWorkspaces();
+
+            // Clear pending changes flag after successful save
+            if (typeof clearPendingChanges === 'function') {
+                clearPendingChanges();
+            }
 
             // Auto-refresh UI after save unless disabled or skipped
             if (_autoRefreshAfterSave && !skipRefresh) {
