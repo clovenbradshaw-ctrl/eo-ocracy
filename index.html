@@ -27002,6 +27002,60 @@ John Doe,Engineering,john@example.com"
                         rel.object = action.oldData.object;
                     }
                     break;
+
+                case 'change_parent':
+                    // Undo parent change - remove new parent relationship and restore old one
+                    relationships = relationships.filter(r => r.id !== action.newParentRel.id);
+                    if (action.oldParentRel) {
+                        relationships.push(action.oldParentRel);
+                    }
+                    break;
+
+                case 'remove_parent':
+                    // Undo parent removal - restore the parent relationship
+                    if (action.oldParentRel) {
+                        relationships.push(action.oldParentRel);
+                    }
+                    break;
+
+                case 'assign_role_to_task':
+                    // Undo role assignment - remove new relationship and restore old ones
+                    relationships = relationships.filter(r => r.id !== action.newRel.id);
+                    if (action.oldRels && action.oldRels.length > 0) {
+                        relationships.push(...action.oldRels);
+                    }
+                    break;
+
+                case 'remove_role_from_task':
+                    // Undo role removal - restore the removed relationships
+                    if (action.removedRels && action.removedRels.length > 0) {
+                        relationships.push(...action.removedRels);
+                    }
+                    break;
+
+                case 'set_predecessor':
+                    // Undo predecessor setting - restore old predecessor
+                    const taskForPred = entities.task.find(t => t.id === action.taskId);
+                    if (taskForPred) {
+                        taskForPred.predecessorId = action.oldPredecessorId;
+                    }
+                    break;
+
+                case 'remove_predecessor':
+                    // Undo predecessor removal - restore the predecessor
+                    const taskForPredRestore = entities.task.find(t => t.id === action.taskId);
+                    if (taskForPredRestore) {
+                        taskForPredRestore.predecessorId = action.oldPredecessorId;
+                    }
+                    break;
+
+                case 'move_entity':
+                    // Undo entity move via drag/drop - remove new relationship and restore old ones
+                    relationships = relationships.filter(r => r.id !== action.newRel.id);
+                    if (action.removedRels && action.removedRels.length > 0) {
+                        relationships.push(...action.removedRels);
+                    }
+                    break;
             }
 
             // Push to redo history for redo functionality
@@ -27074,6 +27128,63 @@ John Doe,Engineering,john@example.com"
                         rel.predicate = action.data.predicate;
                         rel.object = action.data.object;
                     }
+                    break;
+
+                case 'change_parent':
+                    // Redo parent change - remove old parent and add new one
+                    if (action.oldParentRel) {
+                        relationships = relationships.filter(r => r.id !== action.oldParentRel.id);
+                    }
+                    relationships.push(action.newParentRel);
+                    break;
+
+                case 'remove_parent':
+                    // Redo parent removal - remove the parent relationship
+                    if (action.oldParentRel) {
+                        relationships = relationships.filter(r => r.id !== action.oldParentRel.id);
+                    }
+                    break;
+
+                case 'assign_role_to_task':
+                    // Redo role assignment - remove old relationships and add new one
+                    if (action.oldRels && action.oldRels.length > 0) {
+                        const oldRelIds = action.oldRels.map(r => r.id);
+                        relationships = relationships.filter(r => !oldRelIds.includes(r.id));
+                    }
+                    relationships.push(action.newRel);
+                    break;
+
+                case 'remove_role_from_task':
+                    // Redo role removal - remove the relationships again
+                    if (action.removedRels && action.removedRels.length > 0) {
+                        const removedRelIds = action.removedRels.map(r => r.id);
+                        relationships = relationships.filter(r => !removedRelIds.includes(r.id));
+                    }
+                    break;
+
+                case 'set_predecessor':
+                    // Redo predecessor setting - apply new predecessor
+                    const taskForPred = entities.task.find(t => t.id === action.taskId);
+                    if (taskForPred) {
+                        taskForPred.predecessorId = action.newPredecessorId;
+                    }
+                    break;
+
+                case 'remove_predecessor':
+                    // Redo predecessor removal - remove the predecessor
+                    const taskForPredRemove = entities.task.find(t => t.id === action.taskId);
+                    if (taskForPredRemove) {
+                        taskForPredRemove.predecessorId = null;
+                    }
+                    break;
+
+                case 'move_entity':
+                    // Redo entity move - remove old relationships and add new one
+                    if (action.removedRels && action.removedRels.length > 0) {
+                        const removedRelIds = action.removedRels.map(r => r.id);
+                        relationships = relationships.filter(r => !removedRelIds.includes(r.id));
+                    }
+                    relationships.push(action.newRel);
                     break;
             }
 
@@ -31373,6 +31484,14 @@ John Doe,Engineering,john@example.com"
             if (!entities[type]) entities[type] = [];
             entities[type].push(entity);
 
+            // Track in undo history
+            pushToUndoHistory({
+                type: 'create_entity',
+                entityType: type,
+                data: JSON.parse(JSON.stringify(entity)),
+                description: `Create ${type}: ${name}`
+            });
+
             saveToLocalStorage();
             refreshAllViews();
             addToHistory({
@@ -32439,13 +32558,17 @@ Cmd/Ctrl + K - Command palette
             const newParent = findEntity(newParentId);
             if (!newParent) return;
 
+            // Track old parent relationship for undo
+            let oldParentRel = null;
+            const oldParent = findEntity(relationships.find(r => r.predicate === 'DES' && r.object === entityId)?.subject);
+
             // Remove existing parent relationship if any
             const existingParentIdx = relationships.findIndex(r =>
                 r.predicate === 'DES' && r.object === entityId
             );
 
             if (existingParentIdx >= 0) {
-                const oldRel = relationships[existingParentIdx];
+                oldParentRel = JSON.parse(JSON.stringify(relationships[existingParentIdx]));
                 relationships.splice(existingParentIdx, 1);
 
                 // Log removal
@@ -32454,12 +32577,12 @@ Cmd/Ctrl + K - Command palette
                     eo_operator: 'NUL',
                     k_frame: 'Parent Removal',
                     object_type: 'relationship',
-                    object_id: oldRel.id,
+                    object_id: oldParentRel.id,
                     object_label: `Removed parent from ${currentModalEntity.name}`,
                     data_json: {
                         entity_id: entityId,
                         entity_name: currentModalEntity.name,
-                        old_parent_id: oldRel.subject
+                        old_parent_id: oldParentRel.subject
                     }
                 });
             }
@@ -32475,6 +32598,16 @@ Cmd/Ctrl + K - Command palette
             };
 
             relationships.push(relationship);
+
+            // Track in undo history
+            pushToUndoHistory({
+                type: 'change_parent',
+                entityId: entityId,
+                entityName: currentModalEntity.name,
+                oldParentRel: oldParentRel,
+                newParentRel: JSON.parse(JSON.stringify(relationship)),
+                description: `Move ${currentModalEntity.name} to ${newParent.name}${oldParent ? ` (was in ${oldParent.name})` : ''}`
+            });
 
             // Log to Xano
             logActivityToXano({
@@ -32517,9 +32650,18 @@ Cmd/Ctrl + K - Command palette
             );
 
             if (parentIdx >= 0) {
-                const oldRel = relationships[parentIdx];
+                const oldRel = JSON.parse(JSON.stringify(relationships[parentIdx]));
                 const oldParent = findEntity(oldRel.subject);
                 relationships.splice(parentIdx, 1);
+
+                // Track in undo history
+                pushToUndoHistory({
+                    type: 'remove_parent',
+                    entityId: entityId,
+                    entityName: currentModalEntity.name,
+                    oldParentRel: oldRel,
+                    description: `Remove ${currentModalEntity.name} from ${oldParent?.name || 'parent'}`
+                });
 
                 // Log removal
                 logActivityToXano({
@@ -40082,8 +40224,15 @@ Cmd/Ctrl + K - Command palette
 
             relationships.push(relationship);
 
-            // Log to Xano
+            // Track in undo history
             const operatorData = eoOperators[operatorCode];
+            pushToUndoHistory({
+                type: 'create_relationship',
+                data: JSON.parse(JSON.stringify(relationship)),
+                description: `Add activity: ${currentModalEntity.name} ${operatorData.label} ${workProduct.name}`
+            });
+
+            // Log to Xano
             logActivityToXano({
                 event_verb: operatorCode,
                 eo_operator: operatorCode,
@@ -43295,6 +43444,17 @@ Cmd/Ctrl + K - Command palette
             // Remove existing DES parent relationships for the dragged entity
             // (teams should only be in one unit, roles in one team/unit at hierarchy level)
             const parentTypes = targetEntity.type === 'unit' ? ['unit'] : ['unit', 'team'];
+
+            // Track removed relationships for undo
+            const removedRels = relationships.filter(r => {
+                if (r.predicate !== 'DES') return false;
+                const isParentRel = (r.subject === draggedData.id || r.object === draggedData.id);
+                if (!isParentRel) return false;
+                const otherId = r.subject === draggedData.id ? r.object : r.subject;
+                const otherEntity = findEntity(otherId);
+                return otherEntity && parentTypes.includes(otherEntity.type);
+            }).map(r => JSON.parse(JSON.stringify(r)));
+
             relationships = relationships.filter(r => {
                 if (r.predicate !== 'DES') return true;
                 // Check if this relationship connects dragged entity to a parent of same type
@@ -43307,11 +43467,22 @@ Cmd/Ctrl + K - Command palette
             });
 
             // Create new DES relationship (target contains dragged)
-            relationships.push({
+            const newRel = {
                 id: 'rel-' + Date.now(),
                 subject: targetEntity.id,
                 predicate: 'DES',
                 object: draggedData.id
+            };
+            relationships.push(newRel);
+
+            // Track in undo history
+            pushToUndoHistory({
+                type: 'move_entity',
+                entityId: draggedData.id,
+                entityName: draggedData.name,
+                removedRels: removedRels,
+                newRel: JSON.parse(JSON.stringify(newRel)),
+                description: `Move ${draggedData.name} to ${targetEntity.name}`
             });
 
             saveState();
@@ -48430,12 +48601,19 @@ Cmd/Ctrl + K - Command palette
 
         // Assign role to task inline (from task card dropdown)
         function assignRoleToTaskInline(taskId, roleId) {
+            const task = entities.task.find(t => t.id === taskId);
+            const role = findEntity(roleId);
+
             // First remove any existing role connections
             const existingRoles = relationships.filter(r =>
                 (r.subject === taskId || r.object === taskId) &&
                 r.predicate !== 'DES' &&
                 (findEntity(r.subject)?.type === 'role' || findEntity(r.object)?.type === 'role')
             );
+
+            // Track old relationships for undo
+            const oldRels = existingRoles.map(r => JSON.parse(JSON.stringify(r)));
+
             existingRoles.forEach(rel => {
                 const idx = relationships.indexOf(rel);
                 if (idx > -1) relationships.splice(idx, 1);
@@ -48443,19 +48621,29 @@ Cmd/Ctrl + K - Command palette
 
             // Create new CON relationship
             const relId = 'rel' + Date.now();
-            relationships.push({
+            const newRel = {
                 id: relId,
                 subject: taskId,
                 predicate: 'CON',
                 object: roleId,
                 description: ''
+            };
+            relationships.push(newRel);
+
+            // Track in undo history
+            pushToUndoHistory({
+                type: 'assign_role_to_task',
+                taskId: taskId,
+                roleId: roleId,
+                oldRels: oldRels,
+                newRel: JSON.parse(JSON.stringify(newRel)),
+                description: `Assign ${role?.name || 'role'} to ${task?.name || 'task'}`
             });
 
             saveData();
 
             // Refresh the task display
             if (typeof renderEntityDetails === 'function') {
-                const task = entities.task.find(t => t.id === taskId);
                 if (task) {
                     renderEntityDetails(task, 'task');
                 }
@@ -48464,21 +48652,36 @@ Cmd/Ctrl + K - Command palette
 
         // Remove role from task inline
         function removeTaskRoleInline(taskId) {
+            const task = entities.task.find(t => t.id === taskId);
+
             const existingRoles = relationships.filter(r =>
                 (r.subject === taskId || r.object === taskId) &&
                 r.predicate !== 'DES' &&
                 (findEntity(r.subject)?.type === 'role' || findEntity(r.object)?.type === 'role')
             );
+
+            // Track removed relationships for undo
+            const removedRels = existingRoles.map(r => JSON.parse(JSON.stringify(r)));
+
             existingRoles.forEach(rel => {
                 const idx = relationships.indexOf(rel);
                 if (idx > -1) relationships.splice(idx, 1);
             });
 
+            // Track in undo history if any roles were removed
+            if (removedRels.length > 0) {
+                pushToUndoHistory({
+                    type: 'remove_role_from_task',
+                    taskId: taskId,
+                    removedRels: removedRels,
+                    description: `Remove role from ${task?.name || 'task'}`
+                });
+            }
+
             saveData();
 
             // Refresh the task display
             if (typeof renderEntityDetails === 'function') {
-                const task = entities.task.find(t => t.id === taskId);
                 if (task) {
                     renderEntityDetails(task, 'task');
                 }
@@ -49389,13 +49592,28 @@ Options:
 
         // Remove role connection from task
         function removeTaskRoleConnection(taskId, roleId) {
+            const task = entities.task.find(t => t.id === taskId);
+            const role = findEntity(roleId);
+
             const relIndex = relationships.findIndex(r =>
                 ((r.subject === taskId && r.object === roleId) ||
                  (r.subject === roleId && r.object === taskId)) &&
                 r.predicate !== 'DES'
             );
             if (relIndex > -1) {
+                // Track for undo
+                const removedRel = JSON.parse(JSON.stringify(relationships[relIndex]));
+
                 relationships.splice(relIndex, 1);
+
+                // Track in undo history
+                pushToUndoHistory({
+                    type: 'remove_role_from_task',
+                    taskId: taskId,
+                    removedRels: [removedRel],
+                    description: `Remove ${role?.name || 'role'} from ${task?.name || 'task'}`
+                });
+
                 saveData();
                 openEntityModal(taskId, 'task');
             }
@@ -49409,7 +49627,20 @@ Options:
 
             const task = entities.task.find(t => t.id === taskId);
             if (task) {
+                const oldPredecessorId = task.predecessorId;
+                const predecessor = entities.task.find(t => t.id === predecessorId);
+
                 task.predecessorId = predecessorId;
+
+                // Track in undo history
+                pushToUndoHistory({
+                    type: 'set_predecessor',
+                    taskId: taskId,
+                    oldPredecessorId: oldPredecessorId,
+                    newPredecessorId: predecessorId,
+                    description: `Set ${predecessor?.name || 'task'} as predecessor of ${task.name}`
+                });
+
                 saveData();
                 openEntityModal(taskId, 'task');
             }
@@ -49419,7 +49650,19 @@ Options:
         function removeTaskPredecessor(taskId) {
             const task = entities.task.find(t => t.id === taskId);
             if (task) {
+                const oldPredecessorId = task.predecessorId;
+                const oldPredecessor = entities.task.find(t => t.id === oldPredecessorId);
+
                 task.predecessorId = null;
+
+                // Track in undo history
+                pushToUndoHistory({
+                    type: 'remove_predecessor',
+                    taskId: taskId,
+                    oldPredecessorId: oldPredecessorId,
+                    description: `Remove predecessor ${oldPredecessor?.name || ''} from ${task.name}`
+                });
+
                 saveData();
                 openEntityModal(taskId, 'task');
             }
