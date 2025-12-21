@@ -46294,6 +46294,16 @@ Cmd/Ctrl + K - Command palette
                 },
                 _webhookUrl: 'https://n8n.intelechia.com/webhook-test/6dab38a9-d010-43b4-9669-5a58dbcfab36'
             },
+            sendLoginCode: {
+                type: 'login_code',
+                email: 'test@example.com',
+                code: '123456',
+                subject: 'Your login code for TaskFlow',
+                sender: 'TaskFlow',
+                app: 'taskflow',
+                timestamp: new Date().toISOString(),
+                _webhookUrl: 'https://n8n.intelechia.com/webhook-test/6dab38a9-d010-43b4-9669-5a58dbcfab36'
+            },
             custom: {
                 action: 'custom',
                 data: {}
@@ -46398,6 +46408,11 @@ Cmd/Ctrl + K - Command palette
                 // If this is a task_notification email, generate and include the HTML body
                 if (body.type === 'task_notification' && body.notification && !body.htmlBody) {
                     body.htmlBody = EmailTemplates.taskNotification(body.notification);
+                }
+
+                // If this is a login_code email, generate and include the HTML body
+                if (body.type === 'login_code' && body.code && body.email && !body.htmlBody) {
+                    body.htmlBody = EmailTemplates.loginCode({ code: body.code, email: body.email });
                 }
             }
 
