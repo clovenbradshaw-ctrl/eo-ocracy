@@ -27392,6 +27392,9 @@ John Doe,Engineering,john@example.com"
                     case 'company-rules':
                         if (typeof renderCompanyRulesView === 'function') renderCompanyRulesView();
                         break;
+                    case 'stream':
+                        if (typeof renderStreamArchive === 'function') renderStreamArchive();
+                        break;
                     default:
                         // Default to graph view for unknown views
                         updateGraph();
@@ -27410,6 +27413,16 @@ John Doe,Engineering,john@example.com"
                 }
             } catch (e) {
                 console.error('[RefreshSystem] Error refreshing task board:', e);
+            }
+
+            // Also refresh stream archive if visible
+            try {
+                const streamView = document.getElementById('streamView');
+                if (streamView?.classList.contains('active') && typeof renderStreamArchive === 'function') {
+                    renderStreamArchive();
+                }
+            } catch (e) {
+                console.error('[RefreshSystem] Error refreshing stream archive:', e);
             }
         }
 
@@ -37884,7 +37897,8 @@ Cmd/Ctrl + K - Command palette
                 person: [],
                 task: [],
                 product: [],
-                workflow: []
+                workflow: [],
+                stream: []
             };
             const reconstructedRelationships = [];
             const deletedEntityIds = new Set();
@@ -37946,6 +37960,15 @@ Cmd/Ctrl + K - Command palette
                     if (activity.sourceType) entity.sourceType = activity.sourceType;
                     if (activity.sourceExcerpt) entity.sourceExcerpt = activity.sourceExcerpt;
                     if (activity.sourceId) entity.sourceId = activity.sourceId;
+                    // Stream note specific fields
+                    if (activity.title) entity.title = activity.title;
+                    if (activity.content) entity.content = activity.content;
+                    if (activity.contentText) entity.contentText = activity.contentText;
+                    if (activity.extractedTaskIds) entity.extractedTaskIds = activity.extractedTaskIds;
+                    if (activity.ownerId) entity.ownerId = activity.ownerId;
+                    if (activity.visibility) entity.visibility = activity.visibility;
+                    if (activity.sharedWith) entity.sharedWith = activity.sharedWith;
+                    if (activity.archived !== undefined) entity.archived = activity.archived;
 
                     reconstructedEntities[objectType].push(entity);
                     entityMap.set(objectId, entity);
@@ -56336,6 +56359,25 @@ Options:
             // Save
             saveWorkspaces();
 
+            // Log to Xano for sync
+            logActivityToXano({
+                event_verb: 'INS',
+                eo_operator: 'INS',
+                object_type: 'stream',
+                object_id: noteId,
+                object_label: title,
+                data_json: {
+                    title: streamNote.title,
+                    content: streamNote.content,
+                    contentText: streamNote.contentText,
+                    extractedTaskIds: streamNote.extractedTaskIds,
+                    ownerId: streamNote.ownerId,
+                    visibility: streamNote.visibility,
+                    sharedWith: streamNote.sharedWith,
+                    archived: streamNote.archived
+                }
+            });
+
             // Clear editor
             clearStreamEditor();
 
@@ -56575,6 +56617,15 @@ Options:
             entities.stream = entities.stream.filter(n => n.id !== noteId);
             saveWorkspaces();
 
+            // Log deletion to Xano
+            logActivityToXano({
+                event_verb: 'NUL',
+                eo_operator: 'NUL',
+                object_type: 'stream',
+                object_id: noteId,
+                object_label: note.title
+            });
+
             closeStreamNoteModal();
             renderStreamArchive();
             showStreamToast('Note deleted');
@@ -56585,9 +56636,24 @@ Options:
             const note = entities.stream?.find(n => n.id === noteId);
             if (!note) return;
 
+            const wasArchived = note.archived;
             note.archived = !note.archived;
             note.updatedAt = new Date().toISOString();
             saveWorkspaces();
+
+            // Log archive state change to Xano
+            logActivityToXano({
+                event_verb: 'ALT',
+                eo_operator: 'ALT',
+                object_type: 'stream',
+                object_id: noteId,
+                object_label: note.title,
+                data_json: {
+                    field: 'archived',
+                    old_value: wasArchived,
+                    new_value: note.archived
+                }
+            });
 
             closeStreamNoteModal();
             renderStreamArchive();
