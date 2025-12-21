@@ -30445,6 +30445,11 @@ John Doe,Engineering,john@example.com"
             }
         }
 
+        // Helper to generate unique entity ID
+        function generateId(type) {
+            return type + Date.now();
+        }
+
         // Helper to create entity
         function createEntity(type, name) {
             const id = generateId(type);
