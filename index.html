@@ -36794,7 +36794,7 @@ Cmd/Ctrl + K - Command palette
             autoRefreshInProgress = true;
 
             const toggle = document.getElementById('autoRefreshToggle');
-            toggle.classList.add('refreshing');
+            if (toggle) toggle.classList.add('refreshing');
 
             try {
                 const activities = await getActivitiesFromXano();
@@ -36839,7 +36839,7 @@ Cmd/Ctrl + K - Command palette
                 console.error('❌ Auto-refresh error:', error);
             } finally {
                 autoRefreshInProgress = false;
-                toggle.classList.remove('refreshing');
+                if (toggle) toggle.classList.remove('refreshing');
             }
         }
 
@@ -55880,11 +55880,12 @@ Options:
                 logActivityToXano({
                     event_verb: 'INS',
                     eo_operator: 'INS',
+                    k_frame: 'Stream Task',
                     object_type: 'task',
                     object_id: taskId,
                     object_label: newTask.name,
                     data_json: { source: 'stream' }
-                });
+                }, false);
 
                 // Hide menu and clear selection
                 hideStreamFloatingMenu();
