@@ -20434,6 +20434,103 @@
             color: #3D2E1F;
         }
 
+        /* Gantt checkbox column styles */
+        .gantt-checkbox-column {
+            width: 40px;
+            min-width: 40px;
+            padding: 0.5rem;
+            border-right: 1px solid #E5DDD1;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .gantt-checkbox-column input[type="checkbox"] {
+            cursor: pointer;
+            width: 16px;
+            height: 16px;
+            accent-color: #C88F4A;
+        }
+
+        .gantt-row.selected {
+            background: rgba(200, 143, 74, 0.08);
+        }
+
+        .gantt-row.selected .gantt-task-cell {
+            background: rgba(200, 143, 74, 0.05);
+        }
+
+        .gantt-selection-bar {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+            padding: 0.75rem 1rem;
+            background: linear-gradient(135deg, #8B5A2B 0%, #C88F4A 100%);
+            border-radius: 8px;
+            margin-bottom: 0.75rem;
+            color: white;
+            animation: slideDown 0.2s ease-out;
+        }
+
+        .gantt-selection-bar .selection-count {
+            font-weight: 600;
+            font-size: 0.9rem;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .gantt-selection-bar .selection-count i {
+            font-size: 1.1rem;
+        }
+
+        .gantt-selection-bar .selection-actions {
+            display: flex;
+            gap: 0.5rem;
+            margin-left: auto;
+        }
+
+        .gantt-selection-bar button {
+            padding: 0.4rem 0.75rem;
+            border: 1px solid rgba(255,255,255,0.3);
+            border-radius: 6px;
+            background: rgba(255,255,255,0.1);
+            color: white;
+            font-size: 0.85rem;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            gap: 0.35rem;
+            transition: all 0.15s ease;
+        }
+
+        .gantt-selection-bar button:hover {
+            background: rgba(255,255,255,0.2);
+            border-color: rgba(255,255,255,0.5);
+        }
+
+        .gantt-selection-bar button.danger {
+            background: rgba(220, 38, 38, 0.3);
+            border-color: rgba(220, 38, 38, 0.5);
+        }
+
+        .gantt-selection-bar button.danger:hover {
+            background: rgba(220, 38, 38, 0.5);
+        }
+
+        .gantt-selection-bar .clear-selection {
+            background: transparent;
+            border: none;
+            padding: 0.4rem;
+            font-size: 1.1rem;
+            opacity: 0.8;
+        }
+
+        .gantt-selection-bar .clear-selection:hover {
+            opacity: 1;
+            background: transparent;
+        }
+
         /* ============================================
            CALENDAR VIEW STYLES
            ============================================ */
@@ -58774,6 +58871,40 @@ Options:
             const today = new Date();
             today.setHours(0, 0, 0, 0);
 
+            // Check selection state
+            const allSelected = filteredTasks.length > 0 && filteredTasks.every(t => selectedTaskIds.has(t.id));
+            const someSelected = selectedTaskIds.size > 0;
+
+            // Build selection bar if items selected
+            let selectionBarHtml = '';
+            if (someSelected) {
+                selectionBarHtml = `
+                    <div class="gantt-selection-bar">
+                        <button class="clear-selection" onclick="clearGanttSelection()" title="Clear selection">
+                            <i class="ph ph-x"></i>
+                        </button>
+                        <div class="selection-count">
+                            <i class="ph ph-check-square"></i>
+                            <span>${selectedTaskIds.size} selected</span>
+                        </div>
+                        <div class="selection-actions">
+                            <button onclick="bulkSetTaskStatusGantt('completed')">
+                                <i class="ph ph-check-circle"></i> Mark Done
+                            </button>
+                            <button onclick="bulkSetTaskStatusGantt('in_progress')">
+                                <i class="ph ph-clock"></i> In Progress
+                            </button>
+                            <button onclick="bulkSetTaskStatusGantt('pending')">
+                                <i class="ph ph-circle"></i> To Do
+                            </button>
+                            <button class="danger" onclick="bulkDeleteTasksGantt()">
+                                <i class="ph ph-trash"></i> Delete
+                            </button>
+                        </div>
+                    </div>
+                `;
+            }
+
             // Build header
             let headerHtml = `
                 <div class="gantt-header">
@@ -58792,6 +58923,12 @@ Options:
                 </div>
                 <div class="gantt-container">
                     <div class="gantt-timeline-header">
+                        <div class="gantt-checkbox-column">
+                            <input type="checkbox"
+                                   ${allSelected ? 'checked' : ''}
+                                   onclick="toggleSelectAllGanttTasks(this.checked)"
+                                   title="Select all">
+                        </div>
                         <div class="gantt-task-column">Task</div>
                         <div class="gantt-timeline-dates">
             `;
@@ -58869,8 +59006,14 @@ Options:
                     }
                 }
 
+                const isSelected = selectedTaskIds.has(task.id);
                 rowsHtml += `
-                    <div class="gantt-row">
+                    <div class="gantt-row ${isSelected ? 'selected' : ''}">
+                        <div class="gantt-checkbox-column" onclick="event.stopPropagation();">
+                            <input type="checkbox"
+                                   ${isSelected ? 'checked' : ''}
+                                   onclick="toggleGanttTaskSelection('${task.id}', this.checked)">
+                        </div>
                         <div class="gantt-task-cell" onclick="openTaskModal('${task.id}')" style="cursor: pointer;">
                             <div class="gantt-task-status ${statusClass}"></div>
                             <span style="overflow: hidden; text-overflow: ellipsis; white-space: nowrap;">${task.name}</span>
@@ -58883,7 +59026,7 @@ Options:
                 `;
             });
 
-            content.innerHTML = headerHtml + rowsHtml + '</div>';
+            content.innerHTML = selectionBarHtml + headerHtml + rowsHtml + '</div>';
         }
 
         function ganttNavigate(days) {
@@ -58895,6 +59038,71 @@ Options:
             ganttStartDate = new Date();
             ganttStartDate.setDate(ganttStartDate.getDate() - 7);
             renderGanttView();
+        }
+
+        // Gantt multi-select functions
+        function toggleGanttTaskSelection(taskId, isChecked) {
+            if (isChecked) {
+                selectedTaskIds.add(taskId);
+            } else {
+                selectedTaskIds.delete(taskId);
+            }
+            renderGanttView();
+        }
+
+        function toggleSelectAllGanttTasks(selectAll) {
+            const tasks = getAdvancedFilteredTasks();
+            if (selectAll) {
+                tasks.forEach(t => selectedTaskIds.add(t.id));
+            } else {
+                tasks.forEach(t => selectedTaskIds.delete(t.id));
+            }
+            renderGanttView();
+        }
+
+        function clearGanttSelection() {
+            selectedTaskIds.clear();
+            renderGanttView();
+        }
+
+        function bulkSetTaskStatusGantt(newStatus) {
+            if (selectedTaskIds.size === 0) return;
+
+            const statusLabels = { pending: 'To Do', in_progress: 'In Progress', completed: 'Done' };
+            const count = selectedTaskIds.size;
+
+            selectedTaskIds.forEach(taskId => {
+                const task = entities.task.find(t => t.id === taskId);
+                if (task) {
+                    task.status = newStatus;
+                }
+            });
+
+            saveEntitiesToLocalStorage();
+            selectedTaskIds.clear();
+            renderGanttView();
+            showToast(`Updated ${count} task${count > 1 ? 's' : ''} to "${statusLabels[newStatus]}"`, 'success');
+        }
+
+        function bulkDeleteTasksGantt() {
+            if (selectedTaskIds.size === 0) return;
+
+            const count = selectedTaskIds.size;
+            if (!confirm(`Are you sure you want to delete ${count} task${count > 1 ? 's' : ''}? This cannot be undone.`)) {
+                return;
+            }
+
+            selectedTaskIds.forEach(taskId => {
+                // Remove from entities
+                entities.task = entities.task.filter(t => t.id !== taskId);
+                // Remove any relationships involving this task
+                relationships = relationships.filter(r => r.subject !== taskId && r.object !== taskId);
+            });
+
+            saveEntitiesToLocalStorage();
+            selectedTaskIds.clear();
+            renderGanttView();
+            showToast(`Deleted ${count} task${count > 1 ? 's' : ''}`, 'success');
         }
 
         // Gantt Drag State
