@@ -38070,13 +38070,11 @@ Cmd/Ctrl + K - Command palette
                 status.textContent = 'On';
                 toggle.title = 'Auto-refresh: ON - Syncing every 10 seconds';
                 startAutoRefresh();
-                debug.log('🔄 Auto-refresh enabled');
             } else {
                 toggle.classList.remove('active');
                 status.textContent = 'Off';
                 toggle.title = 'Auto-refresh: Click to enable automatic syncing of new data';
                 stopAutoRefresh();
-                debug.log('⏹️ Auto-refresh disabled');
             }
 
             // Save preference to localStorage
@@ -38118,7 +38116,6 @@ Cmd/Ctrl + K - Command palette
 
             // Skip refresh if there are pending activity logs to prevent reverting local changes
             if (pendingActivityLogs > 0) {
-                debug.log(`⏳ Auto-refresh: Skipping - ${pendingActivityLogs} pending activity log(s)`);
                 return;
             }
 
@@ -38132,14 +38129,12 @@ Cmd/Ctrl + K - Command palette
 
                 // CRITICAL: Check again after await - user may have made changes during fetch
                 if (shouldSkipStateOverwrite('performAutoRefresh')) {
-                    debug.log('⏳ Aborting auto-refresh - local changes detected during fetch');
                     return;
                 }
 
                 if (activities && activities.length > 0) {
                     // Check if there are new activities
                     if (activities.length !== lastActivityCount) {
-                        debug.log('🔄 Auto-refresh: Detected change (' + lastActivityCount + ' -> ' + activities.length + ' activities)');
                         lastActivityCount = activities.length;
 
                         // Reconstruct entities from activities
@@ -38151,7 +38146,6 @@ Cmd/Ctrl + K - Command palette
                         if (totalEntities > 0) {
                             // CRITICAL: Final check before overwriting - user may have made changes during reconstruction
                             if (shouldSkipStateOverwrite('performAutoRefresh-final')) {
-                                debug.log('⏳ Aborting auto-refresh - local changes detected during reconstruction');
                                 return;
                             }
 
@@ -38173,8 +38167,6 @@ Cmd/Ctrl + K - Command palette
                             refreshAllViews();
                             updateFilterStatus();
                             updateTaskCountBadge();
-
-                            debug.log('✅ Auto-refresh: Updated with ' + totalEntities + ' entities');
                         }
                     }
                 }
@@ -38192,11 +38184,8 @@ Cmd/Ctrl + K - Command palette
                 isTabVisible = !document.hidden;
 
                 if (isTabVisible && autoRefreshEnabled) {
-                    debug.log('👁️ Tab visible - resuming auto-refresh');
                     // Immediate refresh when tab becomes visible
                     performAutoRefresh();
-                } else if (!isTabVisible) {
-                    debug.log('👁️ Tab hidden - pausing auto-refresh');
                 }
             });
         }
@@ -38216,7 +38205,6 @@ Cmd/Ctrl + K - Command palette
                         status.textContent = 'On';
                         toggle.title = 'Auto-refresh: ON - Syncing every 10 seconds';
                         startAutoRefresh();
-                        debug.log('🔄 Auto-refresh enabled by default for instant visibility');
                     }
                 }
             } catch (e) {
@@ -38306,7 +38294,6 @@ Cmd/Ctrl + K - Command palette
                     params.append('timestamp', lastUpdateTimestamp);
                 }
 
-                debug.log('🔄 Checking for updates from Xano...');
                 const response = await fetchWithRetry(
                     `${XANO_BASE_URL}/activity_store_updates?${params.toString()}`,
                     {
@@ -38326,7 +38313,6 @@ Cmd/Ctrl + K - Command palette
                 }
 
                 const data = await response.json();
-                debug.log('📥 Updates received:', data);
 
                 // Update the last timestamp if we got data
                 if (data && data.length > 0) {
@@ -38345,7 +38331,6 @@ Cmd/Ctrl + K - Command palette
                         // Persist to localStorage for delta sync across page reloads
                         try {
                             localStorage.setItem('eo_lastUpdateTimestamp', lastUpdateTimestamp.toString());
-                            debug.log(`💾 Saved lastUpdateTimestamp to localStorage: ${new Date(lastUpdateTimestamp).toISOString()}`);
                         } catch (e) {
                             console.warn('Could not save lastUpdateTimestamp to localStorage:', e);
                         }
@@ -38362,17 +38347,13 @@ Cmd/Ctrl + K - Command palette
         // Process updates and apply them to the local state
         async function processUpdates(updates) {
             if (!updates || updates.length === 0) {
-                debug.log('✓ No new updates');
                 return false;
             }
 
             // Skip processing if there are pending local activity logs to avoid reverting local changes
             if (pendingActivityLogs > 0) {
-                debug.log(`⏳ Skipping update processing: ${pendingActivityLogs} pending activity log(s)`);
                 return false;
             }
-
-            debug.log(`📥 Processing ${updates.length} update(s)...`);
 
             try {
                 // OPTIMIZED: Use cached activities + delta updates instead of refetching everything
@@ -38395,17 +38376,13 @@ Cmd/Ctrl + K - Command palette
                     // Update the cache with merged activities
                     cachedActivities = Array.from(activityMap.values());
                     activities = cachedActivities;
-
-                    debug.log(`⚡ Using cached activities: ${cachedActivities.length} total (${parsedUpdates.length} new)`);
                 } else {
                     // Cache not populated yet - need to do full fetch (only happens on first update before initial load)
-                    debug.log('📥 Cache empty, performing full fetch...');
                     activities = await getActivitiesFromXano();
                 }
 
                 // CRITICAL: Check for local changes
                 if (shouldSkipStateOverwrite('processUpdates')) {
-                    debug.log('⏳ Aborting processUpdates - local changes detected');
                     return false;
                 }
 
@@ -38422,7 +38399,6 @@ Cmd/Ctrl + K - Command palette
                         for (const deletedId of reconstructed.deletedEntityIds) {
                             if (locallyDeletedEntityIds.has(deletedId)) {
                                 locallyDeletedEntityIds.delete(deletedId);
-                                debug.log(`✓ Cleared confirmed deletion from tracking: entity ${deletedId}`);
                             }
                         }
                     }
@@ -38430,7 +38406,6 @@ Cmd/Ctrl + K - Command palette
                         for (const deletedId of reconstructed.deletedRelationshipIds) {
                             if (locallyDeletedRelationshipIds.has(deletedId)) {
                                 locallyDeletedRelationshipIds.delete(deletedId);
-                                debug.log(`✓ Cleared confirmed deletion from tracking: relationship ${deletedId}`);
                             }
                         }
                     }
@@ -38445,7 +38420,6 @@ Cmd/Ctrl + K - Command palette
                         for (const type of Object.keys(reconstructedEntities)) {
                             reconstructedEntities[type] = reconstructedEntities[type].filter(e => {
                                 if (locallyDeletedEntityIds.has(e.id)) {
-                                    debug.log(`🚫 Excluding locally deleted ${type} from sync: ${e.name || e.id}`);
                                     return false;
                                 }
                                 return true;
@@ -38469,11 +38443,9 @@ Cmd/Ctrl + K - Command palette
                             for (const localEntity of entities[type] || []) {
                                 // Skip if this entity was locally deleted
                                 if (locallyDeletedEntityIds.has(localEntity.id)) {
-                                    debug.log(`🚫 Not preserving deleted ${type}: ${localEntity.name || localEntity.id}`);
                                     continue;
                                 }
                                 if (!reconstructedEntityIds.has(localEntity.id)) {
-                                    debug.log(`🔄 Preserving local-only ${type}: ${localEntity.name || localEntity.id}`);
                                     reconstructedEntities[type].push(localEntity);
                                 }
                             }
@@ -38482,7 +38454,6 @@ Cmd/Ctrl + K - Command palette
                         // Filter out locally deleted relationships from reconstructed data
                         const filteredReconstructedRelationships = reconstructedRelationships.filter(r => {
                             if (locallyDeletedRelationshipIds.has(r.id)) {
-                                debug.log(`🚫 Excluding locally deleted relationship from sync: ${r.id}`);
                                 return false;
                             }
                             return true;
@@ -38494,18 +38465,15 @@ Cmd/Ctrl + K - Command palette
                         for (const localRel of relationships) {
                             // Skip if this relationship was locally deleted
                             if (locallyDeletedRelationshipIds.has(localRel.id)) {
-                                debug.log(`🚫 Not preserving deleted relationship: ${localRel.id}`);
                                 continue;
                             }
                             if (!reconstructedRelationshipIds.has(localRel.id)) {
-                                debug.log(`🔄 Preserving local-only relationship: ${localRel.id}`);
                                 filteredReconstructedRelationships.push(localRel);
                             }
                         }
 
                         // CRITICAL: Final check before overwriting - user may have made changes during reconstruction
                         if (shouldSkipStateOverwrite('processUpdates-final')) {
-                            debug.log('⏳ Aborting processUpdates - local changes detected during reconstruction');
                             return false;
                         }
 
@@ -38527,7 +38495,6 @@ Cmd/Ctrl + K - Command palette
                         updateFilterStatus();
                         updateTaskCountBadge();
 
-                        debug.log(`✅ Applied ${updates.length} update(s), now have ${totalEntities} entities`);
                         // Toast removed - status indicator is sufficient for polling updates
                         return true;
                     }
@@ -38601,7 +38568,6 @@ Cmd/Ctrl + K - Command palette
                 updatePollingEnabled = false;
                 if (statusIndicator) statusIndicator.classList.remove('active');
                 if (statusText) statusText.textContent = 'Updates disabled';
-                debug.log('⏹️ Update polling disabled');
             } else {
                 updatePollingEnabled = true;
                 if (statusIndicator) statusIndicator.classList.add('active');
@@ -38626,8 +38592,6 @@ Cmd/Ctrl + K - Command palette
                         performUpdateCheck();
                     }
                 }, intervalMs);
-
-                debug.log(`🔄 Update polling enabled: every ${intervalMs / 1000}s`);
             }
 
             // Save preference to localStorage
@@ -38646,7 +38610,6 @@ Cmd/Ctrl + K - Command palette
                     const intervalMs = parseInt(savedInterval, 10);
                     if ([0, 3000, 30000, 60000].includes(intervalMs)) {
                         setUpdateInterval(intervalMs);
-                        debug.log('🔄 Update polling preference restored:', intervalMs);
                     }
                 } else {
                     // Default to 30 seconds - balances responsiveness with API efficiency
@@ -38843,7 +38806,6 @@ Cmd/Ctrl + K - Command palette
 
         async function getActivitiesFromXano() {
             try {
-                debug.log('🔄 Fetching activities from Xano...');
                 const response = await fetchWithRetry(`${XANO_BASE_URL}/activity_store`, {
                     method: 'GET',
                     mode: 'cors',
@@ -38859,7 +38821,6 @@ Cmd/Ctrl + K - Command palette
                 }
 
                 const activities = await response.json();
-                debug.log('📥 Fetched activities from Xano:', activities.length, 'records');
 
                 // Update connection status on successful fetch
                 updateXanoStatusIndicator('connected', xanoActivityUploadCount);
@@ -38908,8 +38869,6 @@ Cmd/Ctrl + K - Command palette
                     }
                 }
 
-                debug.log('📋 Loaded', declaredAgents.size, 'agents from activity history');
-
                 // Update lastUpdateTimestamp from fetched activities so delta sync only gets new records
                 if (parsedActivities.length > 0) {
                     const timestamps = parsedActivities.map(a => {
@@ -38926,7 +38885,6 @@ Cmd/Ctrl + K - Command palette
                             lastUpdateTimestamp = maxTimestamp;
                             try {
                                 localStorage.setItem('eo_lastUpdateTimestamp', lastUpdateTimestamp.toString());
-                                debug.log(`💾 Set lastUpdateTimestamp from initial load: ${new Date(lastUpdateTimestamp).toISOString()}`);
                             } catch (e) {
                                 console.warn('Could not save lastUpdateTimestamp to localStorage:', e);
                             }
@@ -38949,7 +38907,6 @@ Cmd/Ctrl + K - Command palette
 
                 // Populate the activities cache for delta sync optimization
                 cachedActivities = enrichedActivities;
-                debug.log(`💾 Cached ${cachedActivities.length} activities for delta sync`);
 
                 return enrichedActivities;
             } catch (error) {
@@ -60745,13 +60702,11 @@ Options:
 
                 // Initialize auto-refresh system
                 initAutoRefresh();
-                debug.log('🔄 Auto-refresh system initialized');
 
                 // Initialize update polling system
                 // Polling every 3 seconds will sync any changes from other users
                 // No need for immediate sync - trust localStorage on page load
                 initUpdatePolling();
-                debug.log('🔄 Update polling system initialized');
 
                 debug.log('🎉 Initialization complete!');
                 debug.log('📊 Current state:', {
