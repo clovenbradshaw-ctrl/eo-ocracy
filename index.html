@@ -54490,14 +54490,24 @@ Options:
                 const t = entities.task.find(t => t.id === taskId);
                 if (!t) return;
 
+                const oldStatus = t.status;
                 t.status = newStatus;
                 saveToLocalStorage();
 
                 logActivityToXano({
                     event_verb: 'ALT',
+                    eo_operator: 'ALT',
                     k_frame: 'Status Change',
                     object_type: 'task',
-                    object_label: `${t.name} → ${newStatus}`
+                    object_id: taskId,
+                    object_label: t.name,
+                    data_json: {
+                        field: 'status',
+                        old_value: oldStatus,
+                        new_value: newStatus,
+                        old_display: getStatusLabel(oldStatus),
+                        new_display: getStatusLabel(newStatus)
+                    }
                 });
 
                 renderKanbanBoard();
