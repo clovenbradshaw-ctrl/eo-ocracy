@@ -57644,8 +57644,8 @@ Options:
                 }
             }
 
-            // Don't trigger T shortcut if in an input field
-            if (event.target.tagName === 'INPUT' || event.target.tagName === 'TEXTAREA' || event.target.tagName === 'SELECT') {
+            // Don't trigger T shortcut if in an input field or contenteditable element (like Stream editor)
+            if (event.target.tagName === 'INPUT' || event.target.tagName === 'TEXTAREA' || event.target.tagName === 'SELECT' || event.target.isContentEditable) {
                 return;
             }
 
