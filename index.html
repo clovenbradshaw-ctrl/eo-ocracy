@@ -19249,6 +19249,79 @@
             color: #C88F4A;
         }
 
+        /* Stream Note Modal Actions */
+        .stream-note-modal-actions {
+            display: flex;
+            align-items: center;
+            gap: 0.25rem;
+        }
+
+        .stream-note-modal-action {
+            background: none;
+            border: none;
+            font-size: 1.125rem;
+            color: #8B6F47;
+            cursor: pointer;
+            padding: 0.375rem;
+            border-radius: 4px;
+            transition: all 0.15s;
+        }
+
+        .stream-note-modal-action:hover {
+            background: #FAF7F5;
+            color: #3D2E1F;
+        }
+
+        .stream-note-modal-action-danger:hover {
+            background: #FEE2E2;
+            color: #DC2626;
+        }
+
+        /* Stream Archive Controls */
+        .stream-archive-controls {
+            display: flex;
+            gap: 0.5rem;
+            margin-top: 0.75rem;
+        }
+
+        .stream-archive-select {
+            flex: 1;
+            padding: 0.375rem 0.5rem;
+            border: 1px solid #E5DDD1;
+            border-radius: 4px;
+            font-size: 0.75rem;
+            font-family: 'IBM Plex Mono', monospace;
+            color: #3D2E1F;
+            background: white;
+            cursor: pointer;
+        }
+
+        .stream-archive-select:focus {
+            outline: none;
+            border-color: #C88F4A;
+        }
+
+        /* Archived Note Card State */
+        .stream-note-card.archived {
+            opacity: 0.7;
+            background: #F5F3F0;
+        }
+
+        .stream-note-card-archived-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.25rem;
+            font-size: 0.65rem;
+            font-family: 'IBM Plex Mono', monospace;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+            color: #8B6F47;
+            background: #E5DDD1;
+            padding: 0.125rem 0.375rem;
+            border-radius: 3px;
+            margin-left: 0.5rem;
+        }
+
         /* Responsive */
         @media (max-width: 900px) {
             .stream-view-layout {
@@ -24889,12 +24962,25 @@
                     <!-- Notes Archive Panel -->
                     <div class="stream-archive-panel">
                         <div class="stream-archive-header">
-                            <div class="stream-archive-title">Recent Notes</div>
+                            <div class="stream-archive-title">Notes</div>
                             <input type="text"
                                    class="stream-archive-search"
                                    id="streamArchiveSearch"
                                    placeholder="Search notes..."
                                    oninput="filterStreamArchive()">
+                            <div class="stream-archive-controls">
+                                <select class="stream-archive-select" id="streamArchiveFilterSelect" onchange="setStreamArchiveFilter(this.value)">
+                                    <option value="active">Active</option>
+                                    <option value="all">All Notes</option>
+                                    <option value="archived">Archived</option>
+                                    <option value="with-tasks">With Tasks</option>
+                                </select>
+                                <select class="stream-archive-select" id="streamArchiveSortSelect" onchange="setStreamArchiveSort(this.value)">
+                                    <option value="newest">Newest First</option>
+                                    <option value="oldest">Oldest First</option>
+                                    <option value="title">By Title</option>
+                                </select>
+                            </div>
                         </div>
                         <div class="stream-archive-list" id="streamArchiveList">
                             <!-- Populated dynamically -->
@@ -55874,20 +55960,54 @@ Options:
                         );
                         if (!isShared) return false;
                     }
+
                     // Filter by search
                     if (searchTerm) {
-                        return note.title?.toLowerCase().includes(searchTerm) ||
+                        const matches = note.title?.toLowerCase().includes(searchTerm) ||
                                note.contentText?.toLowerCase().includes(searchTerm);
+                        if (!matches) return false;
                     }
-                    return !note.archived;
-                })
-                .sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt));
+
+                    // Apply filter
+                    switch (streamArchiveFilter) {
+                        case 'all':
+                            return true;
+                        case 'archived':
+                            return note.archived === true;
+                        case 'with-tasks':
+                            return !note.archived && (note.extractedTaskIds?.length > 0);
+                        case 'active':
+                        default:
+                            return !note.archived;
+                    }
+                });
+
+            // Apply sort
+            notes.sort((a, b) => {
+                switch (streamArchiveSort) {
+                    case 'oldest':
+                        return new Date(a.createdAt) - new Date(b.createdAt);
+                    case 'title':
+                        return (a.title || '').localeCompare(b.title || '');
+                    case 'newest':
+                    default:
+                        return new Date(b.createdAt) - new Date(a.createdAt);
+                }
+            });
 
             if (notes.length === 0) {
+                let emptyMessage = 'No notes yet';
+                if (searchTerm) {
+                    emptyMessage = 'No matching notes';
+                } else if (streamArchiveFilter === 'archived') {
+                    emptyMessage = 'No archived notes';
+                } else if (streamArchiveFilter === 'with-tasks') {
+                    emptyMessage = 'No notes with tasks';
+                }
                 list.innerHTML = `
                     <div class="stream-archive-empty">
                         <i class="ph ph-notepad"></i>
-                        <p>${searchTerm ? 'No matching notes' : 'No notes yet'}</p>
+                        <p>${emptyMessage}</p>
                     </div>
                 `;
                 return;
@@ -55901,10 +56021,14 @@ Options:
                     year: date.getFullYear() !== new Date().getFullYear() ? 'numeric' : undefined
                 });
                 const taskCount = note.extractedTaskIds?.length || 0;
+                const isArchived = note.archived === true;
 
                 return `
-                    <div class="stream-note-card" onclick="openStreamNote('${note.id}')">
-                        <div class="stream-note-card-date">${dateStr}</div>
+                    <div class="stream-note-card${isArchived ? ' archived' : ''}" onclick="openStreamNote('${note.id}')">
+                        <div class="stream-note-card-date">
+                            ${dateStr}
+                            ${isArchived ? '<span class="stream-note-card-archived-badge"><i class="ph ph-archive"></i> Archived</span>' : ''}
+                        </div>
                         <div class="stream-note-card-title">${escapeHtml(note.title)}</div>
                         <div class="stream-note-card-excerpt">${escapeHtml(note.contentText?.substring(0, 100) || '')}</div>
                         ${taskCount > 0 ? `
@@ -55951,9 +56075,17 @@ Options:
                     <div class="stream-note-modal">
                         <div class="stream-note-modal-header">
                             <div class="stream-note-modal-title" id="streamNoteModalTitle"></div>
-                            <button class="stream-note-modal-close" onclick="closeStreamNoteModal()">
-                                <i class="ph ph-x"></i>
-                            </button>
+                            <div class="stream-note-modal-actions">
+                                <button class="stream-note-modal-action" id="streamNoteArchiveBtn" title="Archive note">
+                                    <i class="ph ph-archive"></i>
+                                </button>
+                                <button class="stream-note-modal-action stream-note-modal-action-danger" id="streamNoteDeleteBtn" title="Delete note">
+                                    <i class="ph ph-trash"></i>
+                                </button>
+                                <button class="stream-note-modal-close" onclick="closeStreamNoteModal()">
+                                    <i class="ph ph-x"></i>
+                                </button>
+                            </div>
                         </div>
                         <div class="stream-note-modal-body">
                             <div class="stream-note-modal-date" id="streamNoteModalDate" style="font-size: 0.8rem; color: #8B6F47; margin-bottom: 1rem;"></div>
@@ -55967,6 +56099,17 @@ Options:
                 });
                 document.body.appendChild(overlay);
             }
+
+            // Set up action buttons for this note
+            const archiveBtn = document.getElementById('streamNoteArchiveBtn');
+            const deleteBtn = document.getElementById('streamNoteDeleteBtn');
+            archiveBtn.onclick = () => toggleArchiveStreamNote(noteId);
+            deleteBtn.onclick = () => deleteStreamNote(noteId);
+            // Update archive button icon based on note state
+            archiveBtn.innerHTML = note.archived
+                ? '<i class="ph ph-arrow-counter-clockwise"></i>'
+                : '<i class="ph ph-archive"></i>';
+            archiveBtn.title = note.archived ? 'Restore note' : 'Archive note';
 
             // Populate modal
             document.getElementById('streamNoteModalTitle').textContent = note.title;
@@ -55999,6 +56142,55 @@ Options:
             if (overlay) {
                 overlay.classList.remove('visible');
             }
+        }
+
+        // Delete stream note
+        function deleteStreamNote(noteId) {
+            const note = entities.stream?.find(n => n.id === noteId);
+            if (!note) return;
+
+            // Show confirmation dialog
+            if (!confirm(`Delete "${note.title}"?\n\nThis will permanently delete this note. Tasks extracted from this note will not be deleted.`)) {
+                return;
+            }
+
+            // Remove from entities
+            entities.stream = entities.stream.filter(n => n.id !== noteId);
+            saveWorkspaces();
+
+            closeStreamNoteModal();
+            renderStreamArchive();
+            showStreamToast('Note deleted');
+        }
+
+        // Archive/unarchive stream note
+        function toggleArchiveStreamNote(noteId) {
+            const note = entities.stream?.find(n => n.id === noteId);
+            if (!note) return;
+
+            note.archived = !note.archived;
+            note.updatedAt = new Date().toISOString();
+            saveWorkspaces();
+
+            closeStreamNoteModal();
+            renderStreamArchive();
+            showStreamToast(note.archived ? 'Note archived' : 'Note restored');
+        }
+
+        // Current filter and sort state for stream archive
+        let streamArchiveFilter = 'active'; // 'all', 'active', 'archived', 'with-tasks'
+        let streamArchiveSort = 'newest'; // 'newest', 'oldest', 'title'
+
+        // Set stream archive filter
+        function setStreamArchiveFilter(filter) {
+            streamArchiveFilter = filter;
+            renderStreamArchive();
+        }
+
+        // Set stream archive sort
+        function setStreamArchiveSort(sort) {
+            streamArchiveSort = sort;
+            renderStreamArchive();
         }
 
         // Open task from stream note (navigate to task)
