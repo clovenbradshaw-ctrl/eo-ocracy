@@ -23697,6 +23697,10 @@
                                 <span class="check-icon"><i class="ph ph-check"></i></span>
                                 <span>Off</span>
                             </button>
+                            <button class="update-interval-option" onclick="setUpdateInterval(3000)" id="updateIntervalLive">
+                                <span class="check-icon"><i class="ph ph-check"></i></span>
+                                <span>Live (3s)</span>
+                            </button>
                             <button class="update-interval-option" onclick="setUpdateInterval(30000)" id="updateInterval30s">
                                 <span class="check-icon"><i class="ph ph-check"></i></span>
                                 <span>Every 30 seconds</span>
@@ -36336,7 +36340,7 @@ Cmd/Ctrl + K - Command palette
             }
 
             // Update UI to show selected option
-            const options = ['updateIntervalOff', 'updateInterval30s', 'updateInterval60s'];
+            const options = ['updateIntervalOff', 'updateIntervalLive', 'updateInterval30s', 'updateInterval60s'];
             options.forEach(id => {
                 const el = document.getElementById(id);
                 if (el) el.classList.remove('active');
@@ -36355,7 +36359,10 @@ Cmd/Ctrl + K - Command palette
                 updatePollingEnabled = true;
                 if (statusIndicator) statusIndicator.classList.add('active');
 
-                if (intervalMs === 30000) {
+                if (intervalMs === 3000) {
+                    document.getElementById('updateIntervalLive')?.classList.add('active');
+                    if (statusText) statusText.textContent = 'Live (every 3s)';
+                } else if (intervalMs === 30000) {
                     document.getElementById('updateInterval30s')?.classList.add('active');
                     if (statusText) statusText.textContent = 'Active (every 30s)';
                 } else if (intervalMs === 60000) {
@@ -36390,7 +36397,7 @@ Cmd/Ctrl + K - Command palette
                 const savedInterval = localStorage.getItem('updatePollingIntervalMs');
                 if (savedInterval !== null) {
                     const intervalMs = parseInt(savedInterval, 10);
-                    if ([0, 30000, 60000].includes(intervalMs)) {
+                    if ([0, 3000, 30000, 60000].includes(intervalMs)) {
                         setUpdateInterval(intervalMs);
                         debug.log('🔄 Update polling preference restored:', intervalMs);
                     }
