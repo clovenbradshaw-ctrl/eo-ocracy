@@ -45326,7 +45326,15 @@ Cmd/Ctrl + K - Command palette
             ],
             task: [
                 { key: 'name', label: 'Subject/Name', required: true, aliases: ['subject', 'title', 'task_name', 'task'] },
-                { key: 'status', label: 'Status', required: false, aliases: ['task_status'], transform: 'taskStatus' },
+                { key: 'status', label: 'Status', required: false, aliases: ['task_status'], transform: 'taskStatus', valueMapping: {
+                    enabled: true,
+                    options: [
+                        { value: 'pending', label: 'Pending' },
+                        { value: 'in_progress', label: 'In Progress' },
+                        { value: 'completed', label: 'Completed' }
+                    ],
+                    defaultValue: 'pending'
+                }},
                 { key: 'dueDate', label: 'Due Date', required: false, aliases: ['due', 'due_date', 'deadline'], transform: 'date' },
                 { key: 'priority', label: 'Priority', required: false, aliases: ['priority_value'], transform: 'priority' },
                 { key: 'description', label: 'Description', required: false, aliases: ['notes', 'details'] },
@@ -45348,6 +45356,7 @@ Cmd/Ctrl + K - Command palette
                 headers: [],
                 fieldMappings: {},
                 setAllValues: {},
+                valueMappings: {}, // Custom value mappings for single-select fields like status
                 processedData: []
             };
 
@@ -45640,6 +45649,9 @@ Cmd/Ctrl + K - Command palette
                 const currentMapping = Object.entries(bulkImportState.fieldMappings).find(([src, tgt]) => tgt === field.key);
                 const mappedColumn = currentMapping ? currentMapping[0] : '';
 
+                // For fields with valueMapping, hide the Set for All button and show value mapping instead
+                const hasValueMapping = field.valueMapping && field.valueMapping.enabled;
+
                 html += `
                     <div class="bulk-import-mapping-row" data-field="${field.key}">
                         <div>
@@ -45657,6 +45669,7 @@ Cmd/Ctrl + K - Command palette
                                 `).join('')}
                             </select>
                         </div>
+                        ${!hasValueMapping ? `
                         <div class="bulk-import-set-all">
                             <button class="bulk-import-set-all-btn" onclick="toggleSetAll('${field.key}', this)" title="Set a default value for all items">
                                 <i class="ph ph-pencil-simple"></i> Set for All
@@ -45670,7 +45683,9 @@ Cmd/Ctrl + K - Command palette
                                 ${field.type === 'relationship' ? `list="existingEntities_${field.key}"` : ''}>
                             ${field.type === 'relationship' ? renderExistingEntitiesDatalist(field) : ''}
                         </div>
+                        ` : '<div></div>'}
                     </div>
+                    ${hasValueMapping ? `<div id="valueMappingContainer_${field.key}" style="margin-bottom: 0.5rem;">${renderValueMappingUI(field, mappedColumn)}</div>` : ''}
                 `;
             });
 
@@ -45707,6 +45722,19 @@ Cmd/Ctrl + K - Command palette
                 bulkImportState.fieldMappings[sourceColumn] = fieldKey;
             }
 
+            // Clear and re-initialize value mappings for this field when column changes
+            delete bulkImportState.valueMappings[fieldKey];
+
+            // Update value mapping UI if this field has valueMapping enabled
+            const fields = bulkImportFields[bulkImportState.entityType];
+            const field = fields.find(f => f.key === fieldKey);
+            if (field && field.valueMapping && field.valueMapping.enabled) {
+                const container = document.getElementById(`valueMappingContainer_${fieldKey}`);
+                if (container) {
+                    container.innerHTML = renderValueMappingUI(field, sourceColumn);
+                }
+            }
+
             updateBulkImportNextButton();
             renderMappedPreview();
         }
@@ -45738,6 +45766,84 @@ Cmd/Ctrl + K - Command palette
             renderMappedPreview();
         }
 
+        // Get unique values from a mapped column
+        function getUniqueValuesForColumn(columnName) {
+            if (!columnName || !bulkImportState.parsedData.length) return [];
+            const values = new Set();
+            bulkImportState.parsedData.forEach(row => {
+                const val = row[columnName];
+                if (val && val.trim()) {
+                    values.add(val.trim());
+                }
+            });
+            return Array.from(values).sort();
+        }
+
+        // Render value mapping UI for single-select fields
+        function renderValueMappingUI(field, mappedColumn) {
+            if (!field.valueMapping || !field.valueMapping.enabled || !mappedColumn) {
+                return '';
+            }
+
+            const uniqueValues = getUniqueValuesForColumn(mappedColumn);
+            if (uniqueValues.length === 0) return '';
+
+            // Initialize value mappings for this field if not already set
+            if (!bulkImportState.valueMappings[field.key]) {
+                bulkImportState.valueMappings[field.key] = {};
+                // Auto-map values that match option values/labels
+                uniqueValues.forEach(val => {
+                    const lowerVal = val.toLowerCase().trim();
+                    const matchedOption = field.valueMapping.options.find(opt =>
+                        opt.value.toLowerCase() === lowerVal ||
+                        opt.label.toLowerCase() === lowerVal ||
+                        (opt.value === 'completed' && (lowerVal === 'complete' || lowerVal === 'done')) ||
+                        (opt.value === 'in_progress' && (lowerVal === 'in progress' || lowerVal === 'inprogress' || lowerVal === 'active'))
+                    );
+                    bulkImportState.valueMappings[field.key][val] = matchedOption ? matchedOption.value : field.valueMapping.defaultValue;
+                });
+            }
+
+            let html = `
+                <div class="bulk-import-value-mapping" style="margin-top: 0.75rem; padding: 0.75rem; background: #FAF7F5; border-radius: 6px; border: 1px solid #E5DDD1;">
+                    <div style="font-size: 0.75rem; font-weight: 600; color: #6B5642; margin-bottom: 0.5rem;">
+                        <i class="ph ph-arrows-split"></i> Map Values to Status Options
+                    </div>
+                    <div style="display: flex; flex-direction: column; gap: 0.5rem;">
+            `;
+
+            uniqueValues.forEach(val => {
+                const currentMapping = bulkImportState.valueMappings[field.key]?.[val] || field.valueMapping.defaultValue;
+                html += `
+                    <div style="display: flex; align-items: center; gap: 0.5rem; font-size: 0.8rem;">
+                        <span style="flex: 1; color: #4A3F35; font-family: monospace; background: #fff; padding: 0.25rem 0.5rem; border-radius: 4px; border: 1px solid #E5DDD1;">${escapeHtml(val)}</span>
+                        <i class="ph ph-arrow-right" style="color: #8B6F47;"></i>
+                        <select class="bulk-import-value-mapping-select" style="flex: 1; padding: 0.25rem 0.5rem; border: 1px solid #E5DDD1; border-radius: 4px; font-size: 0.8rem; background: #fff;" onchange="updateValueMapping('${field.key}', '${escapeHtml(val).replace(/'/g, "\\'")}', this.value)">
+                            ${field.valueMapping.options.map(opt => `
+                                <option value="${opt.value}" ${currentMapping === opt.value ? 'selected' : ''}>${opt.label}</option>
+                            `).join('')}
+                        </select>
+                    </div>
+                `;
+            });
+
+            html += `
+                    </div>
+                </div>
+            `;
+
+            return html;
+        }
+
+        // Update value mapping for a field
+        function updateValueMapping(fieldKey, sourceValue, targetValue) {
+            if (!bulkImportState.valueMappings[fieldKey]) {
+                bulkImportState.valueMappings[fieldKey] = {};
+            }
+            bulkImportState.valueMappings[fieldKey][sourceValue] = targetValue;
+            renderMappedPreview();
+        }
+
         function renderMappedPreview() {
             const table = document.getElementById('bulkImportMappedTable');
             const countEl = document.getElementById('bulkImportMappedCount');
@@ -45758,6 +45864,7 @@ Cmd/Ctrl + K - Command palette
                 html += `<td class="row-number">${idx + 1}</td>`;
                 fields.forEach(f => {
                     let value = '';
+                    let displayValue = '';
                     const setAll = bulkImportState.setAllValues[f.key];
 
                     // Check if there's a column mapping
@@ -45766,11 +45873,24 @@ Cmd/Ctrl + K - Command palette
 
                     if (mappedColumn && row[mappedColumn[0]]) {
                         value = row[mappedColumn[0]];
+
+                        // Apply value mapping for preview if available
+                        if (f.valueMapping && f.valueMapping.enabled && bulkImportState.valueMappings[f.key]) {
+                            const mappedValue = bulkImportState.valueMappings[f.key][value];
+                            if (mappedValue) {
+                                const option = f.valueMapping.options.find(opt => opt.value === mappedValue);
+                                displayValue = `<span style="color: #4A3F35;">${escapeHtml(option ? option.label : mappedValue)}</span>`;
+                            } else {
+                                displayValue = escapeHtml(value);
+                            }
+                        } else {
+                            displayValue = escapeHtml(value);
+                        }
                     } else if (setAll && setAll.enabled && setAll.value) {
-                        value = `<span class="preview-set-all">${escapeHtml(setAll.value)}</span>`;
+                        displayValue = `<span class="preview-set-all">${escapeHtml(setAll.value)}</span>`;
                     }
 
-                    html += `<td>${value ? (value.includes('preview-set-all') ? value : escapeHtml(value)) : '<span style="color: #ccc;">—</span>'}</td>`;
+                    html += `<td>${displayValue || '<span style="color: #ccc;">—</span>'}</td>`;
                 });
                 html += '</tr>';
             });
@@ -45813,8 +45933,18 @@ Cmd/Ctrl + K - Command palette
                         }
                     }
 
-                    // Apply transform if defined (for tasks: date, status, priority)
-                    if (value && field.transform && bulkImportTransforms[field.transform]) {
+                    // Apply custom value mapping if defined (for single-select fields like status)
+                    if (value && field.valueMapping && field.valueMapping.enabled && bulkImportState.valueMappings[field.key]) {
+                        const customMapping = bulkImportState.valueMappings[field.key][value];
+                        if (customMapping) {
+                            value = customMapping;
+                        } else {
+                            // Fall back to default value if no mapping found
+                            value = field.valueMapping.defaultValue;
+                        }
+                    }
+                    // Apply transform if defined and no custom value mapping was used
+                    else if (value && field.transform && bulkImportTransforms[field.transform]) {
                         const transformed = bulkImportTransforms[field.transform](value);
                         if (transformed !== null) {
                             value = transformed;
