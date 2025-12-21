@@ -38303,6 +38303,7 @@ Cmd/Ctrl + K - Command palette
             const agentId = aminoUser?.id || aminoUser?.email || ('anon_' + Date.now());
             const agentName = aminoUser?.name || aminoUser?.email || 'Anonymous User';
             const agentEmail = aminoUser?.email || null;
+            let requestId = null;
 
             try {
                 // Ensure agent is declared (user details stored once, not repeated in every activity)
@@ -38339,6 +38340,9 @@ Cmd/Ctrl + K - Command palette
 
                 debug.log('📝 Logging activity to Xano:', payload);
 
+                requestId = ApiLogger.logRequest('POST', `${XANO_BASE_URL}/activity_store`, payload, 'Xano');
+                const startTime = performance.now();
+
                 const response = await fetch(`${XANO_BASE_URL}/activity_store`, {
                     method: 'POST',
                     mode: 'cors',
@@ -38348,7 +38352,10 @@ Cmd/Ctrl + K - Command palette
                     body: JSON.stringify(payload)
                 });
 
+                const duration = Math.round(performance.now() - startTime);
+
                 if (!response.ok) {
+                    ApiLogger.logResponse(requestId, response.status, response.statusText, duration, 'Xano');
                     console.error('❌ Failed to log activity:', response.statusText);
                     updateXanoStatusIndicator('disconnected');
                     if (showToast) {
@@ -38358,6 +38365,7 @@ Cmd/Ctrl + K - Command palette
                 }
 
                 const result = await response.json();
+                ApiLogger.logResponse(requestId, response.status, result, duration, 'Xano');
                 debug.log('✅ Activity logged:', result);
 
                 // Update status and count on success
@@ -38370,6 +38378,9 @@ Cmd/Ctrl + K - Command palette
 
                 return result;
             } catch (error) {
+                if (requestId) {
+                    ApiLogger.logError(requestId, error, 'Xano');
+                }
                 console.error('❌ Error logging activity to Xano:', error);
                 updateXanoStatusIndicator('disconnected');
                 if (showToast) {
