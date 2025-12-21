@@ -37813,6 +37813,9 @@ Cmd/Ctrl + K - Command palette
         let updatePollingEnabled = false;
         let updatePollingInterval = null;
         let updatePollingIntervalMs = 0; // 0 = disabled, 30000 = 30s, 60000 = 1min
+        // Local cache of all activities - populated on initial load, appended to on updates
+        // This prevents refetching ALL activities every time there's a delta update
+        let cachedActivities = null; // null = not loaded yet, [] = loaded but empty
         let lastUpdateTimestamp = (() => {
             try {
                 const stored = localStorage.getItem('eo_lastUpdateTimestamp');
@@ -37946,12 +37949,37 @@ Cmd/Ctrl + K - Command palette
             debug.log(`📥 Processing ${updates.length} update(s)...`);
 
             try {
-                // Get full activity list to reconstruct state
-                const activities = await getActivitiesFromXano();
+                // OPTIMIZED: Use cached activities + delta updates instead of refetching everything
+                // This is efficient for append-only databases
+                let activities;
 
-                // CRITICAL: Check again after await - user may have made changes during fetch
+                if (cachedActivities !== null) {
+                    // Parse the delta updates and append to cache
+                    const parsedUpdates = parseUpdatesToActivities(updates);
+
+                    // Deduplicate by ID - use a Map to ensure uniqueness
+                    const activityMap = new Map();
+                    for (const a of cachedActivities) {
+                        activityMap.set(a.id, a);
+                    }
+                    for (const u of parsedUpdates) {
+                        activityMap.set(u.id, u); // New updates overwrite if duplicate
+                    }
+
+                    // Update the cache with merged activities
+                    cachedActivities = Array.from(activityMap.values());
+                    activities = cachedActivities;
+
+                    debug.log(`⚡ Using cached activities: ${cachedActivities.length} total (${parsedUpdates.length} new)`);
+                } else {
+                    // Cache not populated yet - need to do full fetch (only happens on first update before initial load)
+                    debug.log('📥 Cache empty, performing full fetch...');
+                    activities = await getActivitiesFromXano();
+                }
+
+                // CRITICAL: Check for local changes
                 if (shouldSkipStateOverwrite('processUpdates')) {
-                    debug.log('⏳ Aborting processUpdates - local changes detected during fetch');
+                    debug.log('⏳ Aborting processUpdates - local changes detected');
                     return false;
                 }
 
@@ -38195,12 +38223,12 @@ Cmd/Ctrl + K - Command palette
                         debug.log('🔄 Update polling preference restored:', intervalMs);
                     }
                 } else {
-                    // Default to 3 seconds (Live mode)
-                    setUpdateInterval(3000);
+                    // Default to 30 seconds - balances responsiveness with API efficiency
+                    setUpdateInterval(30000);
                 }
             } catch (e) {
                 console.warn('Could not restore update polling preference');
-                setUpdateInterval(3000);
+                setUpdateInterval(30000);
             }
         }
 
@@ -38356,6 +38384,15 @@ Cmd/Ctrl + K - Command palette
                 xanoActivityUploadCount++;
                 updateXanoStatusIndicator('connected', xanoActivityUploadCount);
 
+                // Add to cached activities if cache exists (keeps cache in sync with server)
+                if (cachedActivities !== null && result && result.id) {
+                    const parsedResult = parseUpdatesToActivities([result]);
+                    if (parsedResult.length > 0) {
+                        cachedActivities.push(parsedResult[0]);
+                        debug.log(`💾 Added activity to cache (${cachedActivities.length} total)`);
+                    }
+                }
+
                 if (showToast) {
                     showActivityToast('success', 'Saved', `${eventType}: ${activityLabel}`);
                 }
@@ -38472,7 +38509,7 @@ Cmd/Ctrl + K - Command palette
                 }
 
                 // Enrich activities with agent info from registry (for display purposes)
-                return parsedActivities.map(a => {
+                const enrichedActivities = parsedActivities.map(a => {
                     if (a.agent_id && declaredAgents.has(a.agent_id)) {
                         const agentInfo = declaredAgents.get(a.agent_id);
                         return {
@@ -38483,11 +38520,60 @@ Cmd/Ctrl + K - Command palette
                     }
                     return a;
                 });
+
+                // Populate the activities cache for delta sync optimization
+                cachedActivities = enrichedActivities;
+                debug.log(`💾 Cached ${cachedActivities.length} activities for delta sync`);
+
+                return enrichedActivities;
             } catch (error) {
                 console.error('Error fetching activities from Xano:', error);
                 updateXanoStatusIndicator('disconnected');
                 return [];
             }
+        }
+
+        // Parse raw update records into the same format as activities
+        function parseUpdatesToActivities(updates) {
+            if (!updates || updates.length === 0) return [];
+
+            return updates
+                .filter(a => a.app_id === APP_ID)
+                .map(a => {
+                    // Parse data if it's a string (Xano returns JSON as stringified text)
+                    let dataObj = a.data;
+                    if (typeof a.data === 'string') {
+                        try {
+                            dataObj = JSON.parse(a.data);
+                        } catch (e) {
+                            console.warn('Failed to parse update data:', a.id, e);
+                            dataObj = {};
+                        }
+                    } else if (!dataObj || typeof dataObj !== 'object') {
+                        dataObj = {};
+                    }
+
+                    const parsed = {
+                        id: a.id,
+                        created_at: a.created_at,
+                        app_id: a.app_id,
+                        entity_id: a.entity_id,
+                        event_type: a.event_type,
+                        // Flatten data fields for easier access
+                        ...dataObj,
+                        // Keep original data object for reference
+                        _raw: a
+                    };
+
+                    // Enrich with agent info if available
+                    if (parsed.agent_id && declaredAgents.has(parsed.agent_id)) {
+                        const agentInfo = declaredAgents.get(parsed.agent_id);
+                        parsed.agent_name = parsed.agent_name || agentInfo.name;
+                        parsed.agent_email = parsed.agent_email || agentInfo.email;
+                    }
+
+                    return parsed;
+                });
         }
 
         // Get history for a specific entity
