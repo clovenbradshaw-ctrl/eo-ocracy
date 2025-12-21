@@ -25987,6 +25987,35 @@ John Doe,Engineering,john@example.com"
                         </div>
                     </div>
 
+                    <div class="bulk-import-section" style="margin-top: 1.5rem;">
+                        <div class="bulk-import-section-title">
+                            <i class="ph ph-copy-simple"></i> Deduplication
+                        </div>
+                        <p style="font-size: 0.875rem; color: #8B6F47; margin-bottom: 1rem;">
+                            Check for existing items and avoid creating duplicates. Select a field to match against existing data.
+                        </p>
+                        <div style="display: flex; gap: 1rem; align-items: center; flex-wrap: wrap;">
+                            <div style="flex: 1; min-width: 200px;">
+                                <label style="display: block; font-size: 0.75rem; color: #8B6F47; margin-bottom: 0.25rem;">Match existing items by:</label>
+                                <select id="bulkImportDedupeField" style="width: 100%; padding: 0.5rem; border: 1px solid #D4C5B0; border-radius: 6px; font-size: 0.875rem;" onchange="updateDedupeSettings()">
+                                    <option value="">No deduplication (import all)</option>
+                                    <!-- Options populated dynamically -->
+                                </select>
+                            </div>
+                            <div style="flex: 1; min-width: 200px;">
+                                <label style="display: block; font-size: 0.75rem; color: #8B6F47; margin-bottom: 0.25rem;">When duplicate found:</label>
+                                <select id="bulkImportDedupeAction" style="width: 100%; padding: 0.5rem; border: 1px solid #D4C5B0; border-radius: 6px; font-size: 0.875rem;" onchange="updateDedupeSettings()">
+                                    <option value="skip">Skip (keep existing)</option>
+                                    <option value="update">Update existing item</option>
+                                </select>
+                            </div>
+                        </div>
+                        <div id="bulkImportDedupeStats" style="display: none; margin-top: 0.75rem; padding: 0.75rem; background: #FFF8E7; border-radius: 6px; font-size: 0.875rem;">
+                            <i class="ph ph-info" style="color: #D4A574;"></i>
+                            <span id="bulkImportDedupeMessage"></span>
+                        </div>
+                    </div>
+
                     <div id="bulkImportMappedPreview" style="margin-top: 1.5rem;">
                         <div class="bulk-import-section-title">
                             <i class="ph ph-eye"></i> Preview with Mapping Applied
@@ -45899,7 +45928,10 @@ Cmd/Ctrl + K - Command palette
             headers: [],
             fieldMappings: {},  // { sourceColumn: targetField }
             setAllValues: {},   // { targetField: { enabled: true, value: 'xyz' } }
-            processedData: []
+            processedData: [],
+            dedupeField: '',    // Field to check for duplicates (e.g., 'name', 'externalId')
+            dedupeAction: 'skip', // 'skip' or 'update'
+            duplicates: []      // Array of { importRow, existingEntity } pairs
         };
 
         // Transform functions for field value normalization
@@ -46028,7 +46060,10 @@ Cmd/Ctrl + K - Command palette
                 fieldMappings: {},
                 setAllValues: {},
                 valueMappings: {}, // Custom value mappings for single-select fields like status
-                processedData: []
+                processedData: [],
+                dedupeField: '',
+                dedupeAction: 'skip',
+                duplicates: []
             };
 
             // Reset UI
@@ -46363,6 +46398,48 @@ Cmd/Ctrl + K - Command palette
             container.innerHTML = html;
             updateBulkImportNextButton();
             renderMappedPreview();
+            populateDedupeFieldOptions();
+        }
+
+        function populateDedupeFieldOptions() {
+            const select = document.getElementById('bulkImportDedupeField');
+            if (!select) return;
+
+            const fields = bulkImportFields[bulkImportState.entityType];
+
+            // Build options - only include fields that are mapped or have values
+            let html = '<option value="">No deduplication (import all)</option>';
+
+            fields.forEach(field => {
+                // Skip relationship fields - they can't be used for deduplication reliably
+                if (field.type === 'relationship') return;
+
+                html += `<option value="${field.key}">${field.label}</option>`;
+            });
+
+            select.innerHTML = html;
+
+            // Restore previous selection if valid
+            if (bulkImportState.dedupeField) {
+                select.value = bulkImportState.dedupeField;
+            }
+
+            // Also restore action
+            const actionSelect = document.getElementById('bulkImportDedupeAction');
+            if (actionSelect && bulkImportState.dedupeAction) {
+                actionSelect.value = bulkImportState.dedupeAction;
+            }
+        }
+
+        function updateDedupeSettings() {
+            const fieldSelect = document.getElementById('bulkImportDedupeField');
+            const actionSelect = document.getElementById('bulkImportDedupeAction');
+
+            bulkImportState.dedupeField = fieldSelect?.value || '';
+            bulkImportState.dedupeAction = actionSelect?.value || 'skip';
+
+            // Re-run preview to show dedupe info
+            renderMappedPreview();
         }
 
         function renderExistingEntitiesDatalist(field) {
@@ -46520,9 +46597,18 @@ Cmd/Ctrl + K - Command palette
             const countEl = document.getElementById('bulkImportMappedCount');
             const fields = bulkImportFields[bulkImportState.entityType];
 
+            // Detect duplicates if dedupe field is selected
+            bulkImportState.duplicates = [];
+            if (bulkImportState.dedupeField) {
+                detectDuplicates();
+            }
+
             // Build header
             let html = '<thead><tr>';
             html += '<th class="row-number-header"></th>';
+            if (bulkImportState.dedupeField) {
+                html += '<th style="width: 60px;">Status</th>';
+            }
             fields.forEach(f => {
                 html += `<th>${f.label}</th>`;
             });
@@ -46531,8 +46617,21 @@ Cmd/Ctrl + K - Command palette
             // Process and show preview
             const previewRows = bulkImportState.parsedData.slice(0, 10);
             previewRows.forEach((row, idx) => {
-                html += '<tr>';
+                const isDuplicate = bulkImportState.duplicates.some(d => d.rowIndex === idx);
+                const duplicateInfo = bulkImportState.duplicates.find(d => d.rowIndex === idx);
+
+                html += `<tr style="${isDuplicate ? 'background: #FFF8E7;' : ''}">`;
                 html += `<td class="row-number">${idx + 1}</td>`;
+
+                if (bulkImportState.dedupeField) {
+                    if (isDuplicate) {
+                        const actionLabel = bulkImportState.dedupeAction === 'skip' ? 'Skip' : 'Update';
+                        html += `<td><span style="background: #D4A574; color: white; padding: 2px 6px; border-radius: 4px; font-size: 0.7rem;">${actionLabel}</span></td>`;
+                    } else {
+                        html += `<td><span style="background: #4CAF50; color: white; padding: 2px 6px; border-radius: 4px; font-size: 0.7rem;">New</span></td>`;
+                    }
+                }
+
                 fields.forEach(f => {
                     let value = '';
                     let displayValue = '';
@@ -46567,12 +46666,88 @@ Cmd/Ctrl + K - Command palette
             });
 
             if (bulkImportState.parsedData.length > 10) {
-                html += `<tr><td colspan="${fields.length + 1}" style="text-align: center; color: #8B6F47; font-style: italic;">... and ${bulkImportState.parsedData.length - 10} more rows</td></tr>`;
+                const colSpan = fields.length + 1 + (bulkImportState.dedupeField ? 1 : 0);
+                html += `<tr><td colspan="${colSpan}" style="text-align: center; color: #8B6F47; font-style: italic;">... and ${bulkImportState.parsedData.length - 10} more rows</td></tr>`;
             }
 
             html += '</tbody>';
             table.innerHTML = html;
             countEl.textContent = `${bulkImportState.parsedData.length} items`;
+
+            // Update dedupe stats
+            updateDedupeStats();
+        }
+
+        function detectDuplicates() {
+            const dedupeField = bulkImportState.dedupeField;
+            if (!dedupeField) return;
+
+            const entityType = bulkImportState.entityType;
+            const existingEntities = entities[entityType] || [];
+
+            bulkImportState.duplicates = [];
+
+            bulkImportState.parsedData.forEach((row, idx) => {
+                // Get the value for the dedupe field from the import row
+                let importValue = '';
+
+                // Check mapped column
+                const mappedColumn = Object.entries(bulkImportState.fieldMappings)
+                    .find(([src, tgt]) => tgt === dedupeField);
+
+                if (mappedColumn && row[mappedColumn[0]]) {
+                    importValue = row[mappedColumn[0]].trim().toLowerCase();
+                } else {
+                    // Check set-all value
+                    const setAll = bulkImportState.setAllValues[dedupeField];
+                    if (setAll && setAll.enabled && setAll.value) {
+                        importValue = setAll.value.trim().toLowerCase();
+                    }
+                }
+
+                if (!importValue) return;
+
+                // Find matching existing entity
+                const matchingEntity = existingEntities.find(e => {
+                    const existingValue = (e[dedupeField] || e.name || '').toString().trim().toLowerCase();
+                    return existingValue === importValue;
+                });
+
+                if (matchingEntity) {
+                    bulkImportState.duplicates.push({
+                        rowIndex: idx,
+                        importValue: importValue,
+                        existingEntity: matchingEntity
+                    });
+                }
+            });
+        }
+
+        function updateDedupeStats() {
+            const statsEl = document.getElementById('bulkImportDedupeStats');
+            const messageEl = document.getElementById('bulkImportDedupeMessage');
+
+            if (!statsEl || !messageEl) return;
+
+            if (!bulkImportState.dedupeField) {
+                statsEl.style.display = 'none';
+                return;
+            }
+
+            const duplicateCount = bulkImportState.duplicates.length;
+            const totalCount = bulkImportState.parsedData.length;
+            const newCount = totalCount - duplicateCount;
+
+            statsEl.style.display = 'block';
+
+            if (duplicateCount === 0) {
+                messageEl.innerHTML = `<strong>No duplicates found.</strong> All ${totalCount} items will be imported as new.`;
+            } else {
+                const actionText = bulkImportState.dedupeAction === 'skip'
+                    ? `${duplicateCount} will be skipped (already exist)`
+                    : `${duplicateCount} existing items will be updated`;
+                messageEl.innerHTML = `<strong>Found ${duplicateCount} duplicate(s).</strong> ${actionText}, ${newCount} new item(s) will be created.`;
+            }
         }
 
         function processAndPreviewData() {
@@ -46581,8 +46756,21 @@ Cmd/Ctrl + K - Command palette
             let validCount = 0;
             let errorCount = 0;
 
+            // Re-detect duplicates for final processing
+            if (bulkImportState.dedupeField) {
+                detectDuplicates();
+            }
+
             bulkImportState.parsedData.forEach((row, idx) => {
                 const processed = { _original: row, _errors: [], _rowIndex: idx };
+
+                // Check if this row is a duplicate
+                const duplicateInfo = bulkImportState.duplicates.find(d => d.rowIndex === idx);
+                if (duplicateInfo) {
+                    processed._isDuplicate = true;
+                    processed._existingEntity = duplicateInfo.existingEntity;
+                    processed._dedupeAction = bulkImportState.dedupeAction;
+                }
 
                 fields.forEach(field => {
                     let value = '';
@@ -46639,11 +46827,28 @@ Cmd/Ctrl + K - Command palette
                 bulkImportState.processedData.push(processed);
             });
 
+            // Calculate how many will actually be imported (accounting for skipped duplicates)
+            const duplicateCount = bulkImportState.duplicates.length;
+            const skippedCount = bulkImportState.dedupeAction === 'skip' ? duplicateCount : 0;
+            const updateCount = bulkImportState.dedupeAction === 'update' ? duplicateCount : 0;
+            const newCount = validCount - duplicateCount;
+            const actualImportCount = bulkImportState.dedupeAction === 'skip' ? newCount : validCount;
+
             // Update counts
             document.getElementById('bulkImportTotalCount').textContent = bulkImportState.processedData.length;
             document.getElementById('bulkImportValidCount').textContent = validCount;
             document.getElementById('bulkImportErrorCount').textContent = errorCount;
-            document.getElementById('bulkImportFinalCount').textContent = `${validCount} valid items`;
+
+            // Update final count to reflect actual imports
+            let finalCountText = `${validCount} valid items`;
+            if (duplicateCount > 0) {
+                if (bulkImportState.dedupeAction === 'skip') {
+                    finalCountText = `${newCount} new + ${skippedCount} skipped`;
+                } else {
+                    finalCountText = `${newCount} new + ${updateCount} updates`;
+                }
+            }
+            document.getElementById('bulkImportFinalCount').textContent = finalCountText;
 
             // Update entity type label
             const typeLabels = {
@@ -46661,11 +46866,25 @@ Cmd/Ctrl + K - Command palette
             // Render final table
             renderFinalPreview();
 
-            // Disable import if no valid items
-            document.getElementById('bulkImportImportBtn').disabled = validCount === 0;
-            document.getElementById('bulkImportFooterInfo').textContent = validCount > 0
-                ? `${validCount} items ready to import.`
-                : 'No valid items to import. Please check your data.';
+            // Disable import if no valid items to actually import
+            const hasItemsToImport = actualImportCount > 0 || updateCount > 0;
+            document.getElementById('bulkImportImportBtn').disabled = !hasItemsToImport;
+
+            let footerText = '';
+            if (!hasItemsToImport && validCount === 0) {
+                footerText = 'No valid items to import. Please check your data.';
+            } else if (!hasItemsToImport) {
+                footerText = 'All items are duplicates and will be skipped.';
+            } else if (duplicateCount > 0) {
+                if (bulkImportState.dedupeAction === 'skip') {
+                    footerText = `${newCount} new items to import, ${skippedCount} duplicates will be skipped.`;
+                } else {
+                    footerText = `${newCount} new items to create, ${updateCount} existing items to update.`;
+                }
+            } else {
+                footerText = `${validCount} items ready to import.`;
+            }
+            document.getElementById('bulkImportFooterInfo').textContent = footerText;
         }
 
         function renderFinalPreview() {
@@ -46682,17 +46901,36 @@ Cmd/Ctrl + K - Command palette
 
             bulkImportState.processedData.forEach((row, idx) => {
                 const hasErrors = row._errors.length > 0;
-                html += `<tr class="${hasErrors ? 'error' : ''}">`;
+                const isDuplicate = row._isDuplicate;
+                const dedupeAction = row._dedupeAction;
+
+                let rowClass = '';
+                if (hasErrors) rowClass = 'error';
+                else if (isDuplicate && dedupeAction === 'skip') rowClass = 'duplicate-skip';
+                else if (isDuplicate) rowClass = 'duplicate-update';
+
+                html += `<tr class="${rowClass}" style="${isDuplicate ? 'background: #FFF8E7;' : ''}">`;
                 html += `<td class="row-number">${idx + 1}</td>`;
                 fields.forEach(f => {
                     const value = row[f.key];
                     const isSetAll = row[`${f.key}_isSetAll`];
                     html += `<td>${value ? `<span class="${isSetAll ? 'preview-set-all' : ''}">${escapeHtml(value)}</span>` : '<span style="color: #ccc;">—</span>'}</td>`;
                 });
-                html += `<td>${hasErrors
-                    ? `<span class="preview-error"><i class="ph ph-warning"></i> ${row._errors.join(', ')}</span>`
-                    : '<span style="color: #4CAF50;"><i class="ph ph-check"></i> Valid</span>'
-                }</td>`;
+
+                // Status column
+                let statusHtml = '';
+                if (hasErrors) {
+                    statusHtml = `<span class="preview-error"><i class="ph ph-warning"></i> ${row._errors.join(', ')}</span>`;
+                } else if (isDuplicate) {
+                    if (dedupeAction === 'skip') {
+                        statusHtml = '<span style="color: #D4A574;"><i class="ph ph-minus-circle"></i> Skip (exists)</span>';
+                    } else {
+                        statusHtml = '<span style="color: #2196F3;"><i class="ph ph-arrows-clockwise"></i> Update existing</span>';
+                    }
+                } else {
+                    statusHtml = '<span style="color: #4CAF50;"><i class="ph ph-plus-circle"></i> New</span>';
+                }
+                html += `<td>${statusHtml}</td>`;
                 html += '</tr>';
             });
 
@@ -46700,11 +46938,104 @@ Cmd/Ctrl + K - Command palette
             table.innerHTML = html;
         }
 
+        function updateExistingEntity(existingEntity, importItem, entityType, fields) {
+            // Update the existing entity with new values from the import
+            const currentUserId = AminoIdentity.currentUser?.id || AminoIdentity.currentUser?.email || null;
+
+            if (entityType === 'task') {
+                // Update task-specific fields
+                if (importItem.name) existingEntity.name = importItem.name;
+                if (importItem.description) existingEntity.description = importItem.description;
+                if (importItem.status) {
+                    existingEntity.status = bulkImportTransforms.taskStatus(importItem.status);
+                }
+                if (importItem.dueDate) {
+                    existingEntity.dueDate = bulkImportTransforms.date(importItem.dueDate);
+                }
+                if (importItem.priority) {
+                    existingEntity.priority = bulkImportTransforms.priority(importItem.priority);
+                }
+
+                // Update tags
+                if (importItem.matterNumber || importItem.tags) {
+                    const tags = existingEntity.tags || [];
+                    if (importItem.matterNumber && !tags.includes(importItem.matterNumber)) {
+                        tags.push(importItem.matterNumber);
+                    }
+                    if (importItem.tags) {
+                        const additionalTags = importItem.tags.split(/[,;]/).map(t => t.trim()).filter(t => t);
+                        additionalTags.forEach(tag => {
+                            if (!tags.includes(tag)) tags.push(tag);
+                        });
+                    }
+                    existingEntity.tags = tags;
+                }
+
+                // Update assigned role if specified
+                if (importItem.role) {
+                    const role = entities.role?.find(r =>
+                        r.name.toLowerCase() === importItem.role.toLowerCase()
+                    );
+                    if (role) {
+                        existingEntity.assignedEntityId = role.id;
+                        existingEntity.assignedEntityType = 'role';
+                    }
+                }
+
+                existingEntity.updatedAt = new Date().toISOString();
+                existingEntity.updatedBy = currentUserId;
+
+                // Log update to Xano
+                logActivityToXano({
+                    event_verb: 'UPD',
+                    eo_operator: 'UPD',
+                    k_frame: 'Task (Bulk Update)',
+                    object_type: 'task',
+                    object_id: existingEntity.id,
+                    object_label: existingEntity.name,
+                    data_json: {
+                        entity_name: existingEntity.name,
+                        update_source: 'bulk_import'
+                    }
+                }, false);
+            } else {
+                // Update standard entity fields
+                if (importItem.name) existingEntity.name = importItem.name;
+
+                // Update any other mapped fields
+                fields.forEach(field => {
+                    if (field.type !== 'relationship' && importItem[field.key]) {
+                        existingEntity[field.key] = importItem[field.key];
+                    }
+                });
+
+                existingEntity.updatedAt = new Date().toISOString();
+                existingEntity.updatedBy = currentUserId;
+
+                // Log update to Xano
+                logActivityToXano({
+                    event_verb: 'UPD',
+                    eo_operator: 'UPD',
+                    k_frame: 'Entity (Bulk Update)',
+                    object_type: entityType,
+                    object_id: existingEntity.id,
+                    object_label: existingEntity.name,
+                    data_json: {
+                        entity_type: entityType,
+                        entity_name: existingEntity.name,
+                        update_source: 'bulk_import'
+                    }
+                }, false);
+            }
+        }
+
         function executeBulkImport() {
             const validItems = bulkImportState.processedData.filter(row => row._errors.length === 0);
             const entityType = bulkImportState.entityType;
             const fields = bulkImportFields[entityType];
             let importedCount = 0;
+            let updatedCount = 0;
+            let skippedCount = 0;
             const totalItems = validItems.length;
             const currentUserId = AminoIdentity.currentUser?.id || AminoIdentity.currentUser?.email || null;
 
@@ -46727,6 +47058,22 @@ Cmd/Ctrl + K - Command palette
                     const item = validItems[i];
                     const name = item.name;
                     if (!name) continue;
+
+                    // Handle duplicates
+                    if (item._isDuplicate) {
+                        if (item._dedupeAction === 'skip') {
+                            skippedCount++;
+                            continue; // Skip this item
+                        } else if (item._dedupeAction === 'update') {
+                            // Update existing entity
+                            const existingEntity = item._existingEntity;
+                            if (existingEntity) {
+                                updateExistingEntity(existingEntity, item, entityType, fields);
+                                updatedCount++;
+                                continue;
+                            }
+                        }
+                    }
 
                     // Special handling for tasks
                     if (entityType === 'task') {
@@ -46996,12 +47343,35 @@ Cmd/Ctrl + K - Command palette
                 // Show success
                 document.getElementById('bulkImportReviewContent').style.display = 'none';
                 document.getElementById('bulkImportSuccessContent').style.display = 'block';
-                document.getElementById('bulkImportSuccessMessage').textContent =
-                    `Successfully imported ${importedCount} ${bulkImportState.entityType}${importedCount !== 1 ? 's' : ''}.`;
+
+                // Build success message with counts
+                let successParts = [];
+                if (importedCount > 0) {
+                    successParts.push(`${importedCount} new`);
+                }
+                if (updatedCount > 0) {
+                    successParts.push(`${updatedCount} updated`);
+                }
+                if (skippedCount > 0) {
+                    successParts.push(`${skippedCount} skipped`);
+                }
+                const successMessage = successParts.length > 0
+                    ? `Successfully processed: ${successParts.join(', ')}.`
+                    : 'No items were imported.';
+                document.getElementById('bulkImportSuccessMessage').textContent = successMessage;
 
                 // Show summary toast for bulk import
-                if (importedCount > 0) {
-                    showActivityToast('success', 'Bulk Import Complete', `${importedCount} ${bulkImportState.entityType}${importedCount !== 1 ? 's' : ''} saved`);
+                const totalProcessed = importedCount + updatedCount;
+                if (totalProcessed > 0) {
+                    let toastMessage = '';
+                    if (importedCount > 0 && updatedCount > 0) {
+                        toastMessage = `${importedCount} created, ${updatedCount} updated`;
+                    } else if (updatedCount > 0) {
+                        toastMessage = `${updatedCount} ${bulkImportState.entityType}${updatedCount !== 1 ? 's' : ''} updated`;
+                    } else {
+                        toastMessage = `${importedCount} ${bulkImportState.entityType}${importedCount !== 1 ? 's' : ''} saved`;
+                    }
+                    showActivityToast('success', 'Bulk Import Complete', toastMessage);
                 }
 
                 // Update footer
