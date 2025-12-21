@@ -26879,19 +26879,18 @@ John Doe,Engineering,john@example.com"
             // Load undo history for this workspace
             loadUndoHistory();
 
+            // Load saved view and filters for this workspace
+            loadViewAndFilters();
+
             // Re-render everything
             renderEntityList();
             updateSelects();
             updateParentOptions();
             renderActivityList();
 
-            if (currentView === 'graph') {
-                updateGraph();
-            } else if (currentView === 'tree') {
-                renderTreeView();
-            } else if (currentView === 'card') {
-                renderCardView();
-            }
+            // Sync filter UI and switch to saved view (or default to kanban)
+            syncAllFilterUI();
+            switchView(currentView || 'kanban');
 
             // Save the switch
             saveWorkspaces();
@@ -29745,6 +29744,8 @@ John Doe,Engineering,john@example.com"
         // View switching
         function switchView(view) {
             currentView = view;
+            // Persist view to localStorage
+            saveViewAndFilters();
 
             // Update both old view-toggle-btn and new view-tab classes
             document.querySelectorAll('.view-toggle-btn, .view-tab').forEach(btn => {
@@ -30716,6 +30717,8 @@ John Doe,Engineering,john@example.com"
             syncStatusChipsUI();
             syncInlineStatusButtons();
             updateFilterActiveCount();
+            // Persist filter state to localStorage
+            saveViewAndFilters();
         }
 
         // Sync inline status filter buttons with advancedFilters.status
@@ -30730,6 +30733,75 @@ John Doe,Engineering,john@example.com"
                     }
                 }
             });
+        }
+
+        // ==========================================
+        // VIEW & FILTER PERSISTENCE (localStorage)
+        // ==========================================
+
+        // Save current view and filters to localStorage (workspace-scoped)
+        function saveViewAndFilters() {
+            if (!currentWorkspaceId) return;
+
+            try {
+                // Save current view
+                localStorage.setItem(`currentView_${currentWorkspaceId}`, currentView);
+
+                // Save advanced filters (serialize dates as ISO strings)
+                const filtersToSave = {
+                    ...advancedFilters,
+                    dateFrom: advancedFilters.dateFrom ? advancedFilters.dateFrom.toISOString() : null,
+                    dateTo: advancedFilters.dateTo ? advancedFilters.dateTo.toISOString() : null
+                };
+                localStorage.setItem(`advancedFilters_${currentWorkspaceId}`, JSON.stringify(filtersToSave));
+            } catch (e) {
+                console.error('Failed to save view and filters:', e);
+            }
+        }
+
+        // Load saved view and filters from localStorage (workspace-scoped)
+        function loadViewAndFilters() {
+            if (!currentWorkspaceId) return;
+
+            try {
+                // Load saved view
+                const savedView = localStorage.getItem(`currentView_${currentWorkspaceId}`);
+                if (savedView) {
+                    currentView = savedView;
+                }
+
+                // Load saved filters
+                const savedFilters = localStorage.getItem(`advancedFilters_${currentWorkspaceId}`);
+                if (savedFilters) {
+                    const parsed = JSON.parse(savedFilters);
+
+                    // Restore filters with proper date parsing
+                    advancedFilters = {
+                        status: parsed.status || ['pending', 'in_progress', 'completed'],
+                        priority: parsed.priority || ['high', 'medium', 'low'],
+                        dateFrom: parsed.dateFrom ? new Date(parsed.dateFrom) : null,
+                        dateTo: parsed.dateTo ? new Date(parsed.dateTo) : null,
+                        datePreset: parsed.datePreset || null,
+                        assignees: parsed.assignees || [],
+                        entities: parsed.entities || ['unit', 'team', 'role', 'person'],
+                        tags: parsed.tags || [],
+                        onlyMe: parsed.onlyMe || false,
+                        onlyMyTeams: parsed.onlyMyTeams || false,
+                        recent: parsed.recent || false,
+                        onlyCompleted: parsed.onlyCompleted || false
+                    };
+
+                    // Sync legacy viewFilters with restored entities
+                    viewFilters = {
+                        role: advancedFilters.entities.includes('role'),
+                        person: advancedFilters.entities.includes('person'),
+                        team: advancedFilters.entities.includes('team'),
+                        unit: advancedFilters.entities.includes('unit')
+                    };
+                }
+            } catch (e) {
+                console.error('Failed to load view and filters:', e);
+            }
         }
 
         // Get count of all active filters for badges (unified logic for all filter UIs)
@@ -59319,12 +59391,14 @@ Options:
                     });
                 }
 
-                // Show kanban view by default
+                // Load saved view and filters from localStorage, then switch to saved view (or kanban default)
                 try {
-                    switchView('kanban');
-                    debug.log('✅ Kanban view activated');
+                    loadViewAndFilters();
+                    syncAllFilterUI();
+                    switchView(currentView || 'kanban');
+                    debug.log('✅ View activated:', currentView || 'kanban');
                 } catch (e) {
-                    console.error('❌ Error switching to kanban view:', e);
+                    console.error('❌ Error loading view/filters:', e);
                     updateStatus('Error loading view', false);
                 }
 
