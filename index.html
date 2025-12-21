@@ -23353,6 +23353,220 @@
             font-size: 14px;
         }
 
+        /* Airtable Output Autocomplete - Inline link selector */
+        .airtable-output-container {
+            position: relative;
+        }
+
+        .airtable-output-input-wrapper {
+            position: relative;
+            display: flex;
+            align-items: center;
+        }
+
+        .airtable-output-input {
+            width: 100%;
+            padding: 10px 14px;
+            padding-left: 36px;
+            border: 2px solid #E5DDD1;
+            border-radius: 8px;
+            font-size: 14px;
+            color: #3D2E1F;
+            background: white;
+            transition: all 0.2s;
+        }
+
+        .airtable-output-input:focus {
+            outline: none;
+            border-color: #C88F4A;
+            box-shadow: 0 0 0 3px rgba(200, 143, 74, 0.1);
+        }
+
+        .airtable-output-input::placeholder {
+            color: #9CA3AF;
+        }
+
+        .airtable-output-icon {
+            position: absolute;
+            left: 12px;
+            color: #8B6F47;
+            font-size: 16px;
+            pointer-events: none;
+        }
+
+        .airtable-output-dropdown {
+            position: absolute;
+            top: 100%;
+            left: 0;
+            right: 0;
+            margin-top: 4px;
+            background: white;
+            border: 1px solid #E5DDD1;
+            border-radius: 10px;
+            box-shadow: 0 8px 24px rgba(61, 46, 31, 0.15);
+            max-height: 320px;
+            overflow-y: auto;
+            z-index: 1000;
+            display: none;
+        }
+
+        .airtable-output-dropdown.show {
+            display: block;
+        }
+
+        .airtable-output-category {
+            padding: 8px 12px 4px;
+            font-size: 11px;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            color: #8B6F47;
+            background: #FAF7F5;
+            border-bottom: 1px solid #E5DDD1;
+            position: sticky;
+            top: 0;
+        }
+
+        .airtable-output-item {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            padding: 10px 14px;
+            cursor: pointer;
+            transition: background 0.15s;
+        }
+
+        .airtable-output-item:hover {
+            background: #FDF8F3;
+        }
+
+        .airtable-output-item.selected {
+            background: #FDF8F3;
+        }
+
+        .airtable-output-item-icon {
+            width: 32px;
+            height: 32px;
+            border-radius: 6px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 14px;
+            flex-shrink: 0;
+        }
+
+        .airtable-output-item-info {
+            flex: 1;
+            min-width: 0;
+        }
+
+        .airtable-output-item-name {
+            font-size: 14px;
+            font-weight: 500;
+            color: #3D2E1F;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+
+        .airtable-output-item-type {
+            font-size: 11px;
+            color: #8B6F47;
+            text-transform: uppercase;
+            letter-spacing: 0.3px;
+        }
+
+        .airtable-output-empty {
+            padding: 24px 16px;
+            text-align: center;
+            color: #9CA3AF;
+            font-size: 13px;
+        }
+
+        .airtable-output-empty i {
+            font-size: 24px;
+            margin-bottom: 8px;
+            display: block;
+        }
+
+        .airtable-output-loading {
+            padding: 16px;
+            text-align: center;
+            color: #8B6F47;
+        }
+
+        .airtable-output-loading i {
+            animation: spin 1s linear infinite;
+        }
+
+        /* Selected output display */
+        .airtable-output-selected {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            padding: 10px 14px;
+            background: #FDF8F3;
+            border: 2px solid #C88F4A;
+            border-radius: 8px;
+        }
+
+        .airtable-output-selected-icon {
+            width: 36px;
+            height: 36px;
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 16px;
+            flex-shrink: 0;
+        }
+
+        .airtable-output-selected-info {
+            flex: 1;
+            min-width: 0;
+        }
+
+        .airtable-output-selected-name {
+            font-size: 14px;
+            font-weight: 600;
+            color: #3D2E1F;
+        }
+
+        .airtable-output-selected-type {
+            font-size: 11px;
+            color: #8B6F47;
+            text-transform: uppercase;
+            letter-spacing: 0.3px;
+        }
+
+        .airtable-output-selected-actions {
+            display: flex;
+            gap: 6px;
+        }
+
+        .airtable-output-action-btn {
+            width: 28px;
+            height: 28px;
+            border: none;
+            border-radius: 6px;
+            background: rgba(200, 143, 74, 0.15);
+            color: #C88F4A;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.2s;
+        }
+
+        .airtable-output-action-btn:hover {
+            background: rgba(200, 143, 74, 0.25);
+        }
+
+        .airtable-output-action-btn.remove:hover {
+            background: #FEE2E2;
+            color: #DC2626;
+        }
+
         /* Simple Task Modal - Airtable Linked Records Section */
         .simple-task-airtable-section {
             margin-top: 16px;
@@ -48756,6 +48970,9 @@ Cmd/Ctrl + K - Command palette
                 airtableTagsList.innerHTML = '';
             }
 
+            // Reset Airtable output
+            resetHeroOutput();
+
             // Reset collaborators
             heroCollaborators = [];
             renderCollaboratorAvatars();
@@ -49467,6 +49684,9 @@ Cmd/Ctrl + K - Command palette
                     <!-- Airtable Linked Records - Always Visible -->
                     ${renderAirtableTags(task)}
 
+                    <!-- Airtable Output/Deliverable - Always Visible -->
+                    ${renderAirtableOutput(task)}
+
                     <!-- Email Notification Section -->
                     ${renderTaskEmailNotificationSection(task, connectedRoles)}
 
@@ -49657,6 +49877,290 @@ Cmd/Ctrl + K - Command palette
                 AirtableAPI.openInAmino(tag);
             } catch (e) {
                 console.error('Error opening tag:', e);
+            }
+        }
+
+        // Render the output/deliverable section for a task
+        function renderAirtableOutput(task) {
+            const output = task.airtableOutput;
+
+            if (!output) {
+                return `
+                    <!-- Airtable Output Section (Empty) -->
+                    <div class="simple-task-airtable-section">
+                        <label class="simple-task-section-label">
+                            <i class="ph ph-package"></i> Output/Deliverable
+                        </label>
+                        <div class="simple-task-airtable-container">
+                            <button class="simple-task-airtable-add-btn" onclick="event.stopPropagation(); openOutputPicker('${task.id}')">
+                                <i class="ph ph-plus"></i> Link Output from Airtable...
+                            </button>
+                        </div>
+                        <div class="simple-task-airtable-hint">
+                            <i class="ph ph-info"></i> Link the case, application, or client this task produces output for
+                        </div>
+                    </div>
+                `;
+            }
+
+            const config = AirtableAPI.getTableConfig(output.type);
+            const typeLabel = config?.label || output.type.toUpperCase();
+
+            return `
+                <!-- Airtable Output Section (Selected) -->
+                <div class="simple-task-airtable-section">
+                    <label class="simple-task-section-label">
+                        <i class="ph ph-package"></i> Output/Deliverable
+                        <span class="section-label-hint">(click to open in Amino)</span>
+                    </label>
+                    <div class="airtable-output-selected" style="margin-top: 8px;">
+                        <div class="airtable-output-selected-icon" style="background: ${config?.color || '#6B7280'}20; color: ${config?.color || '#6B7280'};">
+                            <i class="ph ${config?.icon || 'ph-tag'}"></i>
+                        </div>
+                        <div class="airtable-output-selected-info" onclick="event.stopPropagation(); openTaskOutputInAmino('${task.id}')" style="cursor: pointer;">
+                            <div class="airtable-output-selected-name">${escapeHtml(output.label)}</div>
+                            <div class="airtable-output-selected-type">${typeLabel}</div>
+                        </div>
+                        <div class="airtable-output-selected-actions">
+                            <button type="button" class="airtable-output-action-btn" onclick="event.stopPropagation(); openTaskOutputInAmino('${task.id}')" title="Open in Amino">
+                                <i class="ph ph-arrow-square-out"></i>
+                            </button>
+                            <button type="button" class="airtable-output-action-btn remove" onclick="event.stopPropagation(); removeTaskOutput('${task.id}')" title="Remove">
+                                <i class="ph ph-x"></i>
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            `;
+        }
+
+        // Open output picker for existing task
+        let outputPickerTaskId = null;
+
+        function openOutputPicker(taskId) {
+            outputPickerTaskId = taskId;
+
+            // Create or show the output picker modal
+            let overlay = document.getElementById('outputPickerOverlay');
+            if (!overlay) {
+                createOutputPickerModal();
+                overlay = document.getElementById('outputPickerOverlay');
+            }
+
+            // Reset UI state
+            document.getElementById('outputPickerSearch').value = '';
+            performOutputPickerSearch('');
+
+            // Show overlay
+            overlay.classList.add('show');
+        }
+
+        function closeOutputPicker() {
+            const overlay = document.getElementById('outputPickerOverlay');
+            if (overlay) {
+                overlay.classList.remove('show');
+            }
+            outputPickerTaskId = null;
+        }
+
+        function createOutputPickerModal() {
+            const modal = document.createElement('div');
+            modal.id = 'outputPickerOverlay';
+            modal.className = 'airtable-picker-overlay';
+            modal.onclick = (e) => {
+                if (e.target === modal) closeOutputPicker();
+            };
+
+            modal.innerHTML = `
+                <div class="airtable-picker-modal">
+                    <div class="airtable-picker-header">
+                        <h3><i class="ph ph-package"></i> Link Output</h3>
+                        <button class="airtable-picker-close" onclick="closeOutputPicker()">
+                            <i class="ph ph-x"></i>
+                        </button>
+                    </div>
+
+                    <div class="airtable-picker-search">
+                        <div class="airtable-picker-search-row">
+                            <input type="text" id="outputPickerSearch" placeholder="Search Airtable records..."
+                                   oninput="performOutputPickerSearch(this.value)">
+                        </div>
+                    </div>
+
+                    <div class="airtable-picker-results" id="outputPickerResults">
+                        <div class="airtable-picker-empty">
+                            <i class="ph ph-magnifying-glass" style="font-size: 32px; margin-bottom: 8px;"></i>
+                            <div>Type to search records</div>
+                        </div>
+                    </div>
+                </div>
+            `;
+
+            document.body.appendChild(modal);
+        }
+
+        function performOutputPickerSearch(query) {
+            const resultsContainer = document.getElementById('outputPickerResults');
+            if (!resultsContainer) return;
+
+            try {
+                const results = AirtableAPI.searchAllRecordsLocal(query, []);
+
+                if (!results || results.length === 0) {
+                    resultsContainer.innerHTML = `
+                        <div class="airtable-picker-empty">
+                            <i class="ph ph-magnifying-glass" style="font-size: 32px; margin-bottom: 8px;"></i>
+                            <div>${query ? 'No matches found' : 'Type to search records'}</div>
+                        </div>
+                    `;
+                    return;
+                }
+
+                // Group results by category
+                const grouped = {};
+                results.forEach(record => {
+                    const cat = record._category || 'other';
+                    if (!grouped[cat]) grouped[cat] = [];
+                    grouped[cat].push(record);
+                });
+
+                let html = '';
+                const categoryOrder = ['clients', 'cases', 'applications', 'events', 'users'];
+
+                categoryOrder.forEach(cat => {
+                    if (!grouped[cat] || grouped[cat].length === 0) return;
+
+                    const config = AirtableAPI.getTableConfig(cat);
+                    const categoryLabel = config?.label || cat.toUpperCase();
+
+                    grouped[cat].slice(0, 8).forEach(record => {
+                        const displayField = config?.displayField || 'Name';
+                        const name = record.fields?.[displayField] || record.label || 'Unnamed';
+                        const escapedName = escapeHtml(name);
+
+                        html += `
+                            <div class="airtable-picker-item type-${cat}" onclick="selectTaskOutput('${record.id}', '${escapedName.replace(/'/g, "\\'")}', '${cat}')">
+                                <div class="item-icon" style="background: ${config?.color || '#6B7280'}20; color: ${config?.color || '#6B7280'};">
+                                    <i class="ph ${config?.icon || 'ph-tag'}"></i>
+                                </div>
+                                <div class="item-info">
+                                    <div class="item-name">${escapedName}</div>
+                                    <div class="item-type">${categoryLabel}</div>
+                                </div>
+                            </div>
+                        `;
+                    });
+                });
+
+                resultsContainer.innerHTML = html || `
+                    <div class="airtable-picker-empty">
+                        <i class="ph ph-magnifying-glass" style="font-size: 32px; margin-bottom: 8px;"></i>
+                        <div>No records found</div>
+                    </div>
+                `;
+
+            } catch (error) {
+                console.error('Error searching output records:', error);
+                resultsContainer.innerHTML = `
+                    <div class="airtable-picker-empty">
+                        <i class="ph ph-warning" style="font-size: 32px; margin-bottom: 8px; color: #DC2626;"></i>
+                        <div>Error loading records</div>
+                    </div>
+                `;
+            }
+        }
+
+        async function selectTaskOutput(recordId, label, category) {
+            if (!outputPickerTaskId) return;
+
+            const task = entities.task?.find(t => t.id === outputPickerTaskId);
+            if (!task) return;
+
+            const config = AirtableAPI.getTableConfig(category);
+
+            // Create the output object
+            const output = {
+                id: recordId,
+                type: category,
+                table: config?.tableId || '',
+                label: label,
+                clientId: null
+            };
+
+            // Resolve parent client ID for cases/applications
+            if (category === 'cases' || category === 'applications') {
+                try {
+                    const result = await AirtableAPI.getRecordWithParents(category, recordId);
+                    if (result.clientId) {
+                        output.clientId = result.clientId;
+                    } else if (result.parents?.client?.id) {
+                        output.clientId = result.parents.client.id;
+                    }
+                } catch (e) {
+                    console.warn('Could not resolve parent client:', e);
+                }
+            }
+
+            if (category === 'clients') {
+                output.clientId = recordId;
+            }
+
+            // Log activity
+            logActivityToXano({
+                event_verb: 'UPD',
+                eo_operator: 'UPD',
+                k_frame: 'Link Output',
+                object_type: 'task',
+                object_id: task.id,
+                object_label: task.name,
+                data_json: {
+                    field: 'airtableOutput',
+                    newValue: output,
+                    oldValue: task.airtableOutput
+                }
+            });
+
+            // Set the output on the task
+            task.airtableOutput = output;
+            saveToLocalStorage();
+
+            // Update UI
+            closeOutputPicker();
+            renderSimpleTaskModal(task);
+            showToast(`Output linked: ${label}`, 'success');
+        }
+
+        function removeTaskOutput(taskId) {
+            const task = entities.task?.find(t => t.id === taskId);
+            if (!task || !task.airtableOutput) return;
+
+            // Log activity
+            logActivityToXano({
+                event_verb: 'UPD',
+                eo_operator: 'UPD',
+                k_frame: 'Unlink Output',
+                object_type: 'task',
+                object_id: task.id,
+                object_label: task.name,
+                data_json: {
+                    field: 'airtableOutput',
+                    newValue: null,
+                    oldValue: task.airtableOutput
+                }
+            });
+
+            task.airtableOutput = null;
+            saveToLocalStorage();
+
+            // Update UI
+            renderSimpleTaskModal(task);
+            showToast('Output removed', 'info');
+        }
+
+        function openTaskOutputInAmino(taskId) {
+            const task = entities.task?.find(t => t.id === taskId);
+            if (task?.airtableOutput) {
+                AirtableAPI.openInAmino(task.airtableOutput);
             }
         }
 
@@ -51973,6 +52477,7 @@ Options:
                     producesProductId: null,
                     followsWorkflowId: null,
                     airtableTags: [...quickAddModalState.airtableTags],  // Airtable record tags (clients, cases, events, apps)
+                    airtableOutput: null,  // Output/deliverable linked to Airtable (not available in quick add)
                     createdAt: new Date().toISOString(),
                     createdBy: currentUserId,
                     visibility: quickAddModalState.visibility,
@@ -53961,6 +54466,247 @@ Options:
         function removeHeroAirtableTag(tagId) {
             heroAirtableTags = heroAirtableTags.filter(t => t.id !== tagId);
             renderHeroAirtableTags();
+        }
+
+        // ============================================
+        // AIRTABLE OUTPUT AUTOCOMPLETE
+        // ============================================
+
+        // State for the output autocomplete
+        let heroAirtableOutput = null; // Single output record { id, type, table, label, clientId }
+        let outputDropdownVisible = false;
+        let outputSearchDebounceTimer = null;
+
+        // Show the output dropdown
+        function showOutputDropdown() {
+            const dropdown = document.getElementById('heroOutputDropdown');
+            if (!dropdown) return;
+
+            outputDropdownVisible = true;
+            dropdown.classList.add('show');
+
+            // Load initial records if empty
+            const searchInput = document.getElementById('heroOutputSearch');
+            if (searchInput && !searchInput.value.trim()) {
+                searchOutputRecords('');
+            }
+
+            // Close dropdown when clicking outside
+            setTimeout(() => {
+                document.addEventListener('click', handleOutputClickOutside);
+            }, 0);
+        }
+
+        // Hide the output dropdown
+        function hideOutputDropdown() {
+            const dropdown = document.getElementById('heroOutputDropdown');
+            if (dropdown) {
+                dropdown.classList.remove('show');
+            }
+            outputDropdownVisible = false;
+            document.removeEventListener('click', handleOutputClickOutside);
+        }
+
+        // Handle click outside to close dropdown
+        function handleOutputClickOutside(e) {
+            const container = document.getElementById('heroOutputContainer');
+            if (container && !container.contains(e.target)) {
+                hideOutputDropdown();
+            }
+        }
+
+        // Search Airtable records for output autocomplete
+        function searchOutputRecords(query) {
+            // Debounce the search
+            clearTimeout(outputSearchDebounceTimer);
+            outputSearchDebounceTimer = setTimeout(() => {
+                performOutputSearch(query);
+            }, 150);
+        }
+
+        // Perform the actual search
+        function performOutputSearch(query) {
+            const dropdown = document.getElementById('heroOutputDropdown');
+            if (!dropdown) return;
+
+            // Show loading state
+            dropdown.innerHTML = `
+                <div class="airtable-output-loading">
+                    <i class="ph ph-spinner"></i> Searching...
+                </div>
+            `;
+
+            try {
+                // Search across all Airtable categories using the local cache
+                const results = AirtableAPI.searchAllRecordsLocal(query, []);
+
+                if (!results || results.length === 0) {
+                    dropdown.innerHTML = `
+                        <div class="airtable-output-empty">
+                            <i class="ph ph-magnifying-glass"></i>
+                            ${query ? 'No matches found' : 'Type to search Airtable records'}
+                        </div>
+                    `;
+                    return;
+                }
+
+                // Group results by category
+                const grouped = {};
+                results.forEach(record => {
+                    const cat = record._category || 'other';
+                    if (!grouped[cat]) grouped[cat] = [];
+                    grouped[cat].push(record);
+                });
+
+                // Render grouped results
+                let html = '';
+                const categoryOrder = ['clients', 'cases', 'applications', 'events', 'users'];
+
+                categoryOrder.forEach(cat => {
+                    if (!grouped[cat] || grouped[cat].length === 0) return;
+
+                    const config = AirtableAPI.getTableConfig(cat);
+                    const categoryLabel = config?.label || cat.toUpperCase();
+
+                    html += `<div class="airtable-output-category">${categoryLabel}S</div>`;
+
+                    grouped[cat].slice(0, 5).forEach(record => {
+                        const displayField = config?.displayField || 'Name';
+                        const name = record.fields?.[displayField] || record.label || 'Unnamed';
+                        const escapedName = escapeHtml(name);
+
+                        html += `
+                            <div class="airtable-output-item"
+                                 onclick="selectOutputRecord('${record.id}', '${escapedName.replace(/'/g, "\\'")}', '${cat}')">
+                                <div class="airtable-output-item-icon" style="background: ${config?.color || '#6B7280'}20; color: ${config?.color || '#6B7280'};">
+                                    <i class="ph ${config?.icon || 'ph-tag'}"></i>
+                                </div>
+                                <div class="airtable-output-item-info">
+                                    <div class="airtable-output-item-name">${escapedName}</div>
+                                    <div class="airtable-output-item-type">${categoryLabel}</div>
+                                </div>
+                            </div>
+                        `;
+                    });
+                });
+
+                dropdown.innerHTML = html || `
+                    <div class="airtable-output-empty">
+                        <i class="ph ph-magnifying-glass"></i>
+                        No records found
+                    </div>
+                `;
+
+            } catch (error) {
+                console.error('Error searching output records:', error);
+                dropdown.innerHTML = `
+                    <div class="airtable-output-empty">
+                        <i class="ph ph-warning"></i>
+                        Error loading records
+                    </div>
+                `;
+            }
+        }
+
+        // Select an output record
+        async function selectOutputRecord(recordId, label, category) {
+            const config = AirtableAPI.getTableConfig(category);
+
+            // Create the output object
+            heroAirtableOutput = {
+                id: recordId,
+                type: category,
+                table: config?.tableId || '',
+                label: label,
+                clientId: null
+            };
+
+            // Resolve parent client ID for cases/applications
+            if (category === 'cases' || category === 'applications') {
+                try {
+                    const result = await AirtableAPI.getRecordWithParents(category, recordId);
+                    if (result.clientId) {
+                        heroAirtableOutput.clientId = result.clientId;
+                    } else if (result.parents?.client?.id) {
+                        heroAirtableOutput.clientId = result.parents.client.id;
+                    }
+                } catch (e) {
+                    console.warn('Could not resolve parent client:', e);
+                }
+            }
+
+            // For clients, clientId is the record itself
+            if (category === 'clients') {
+                heroAirtableOutput.clientId = recordId;
+            }
+
+            // Update the UI
+            renderSelectedOutput();
+            hideOutputDropdown();
+            showToast(`Output linked: ${label}`, 'success');
+        }
+
+        // Render the selected output display
+        function renderSelectedOutput() {
+            const inputWrapper = document.getElementById('heroOutputInputWrapper');
+            const selectedDisplay = document.getElementById('heroOutputSelected');
+            const searchInput = document.getElementById('heroOutputSearch');
+
+            if (!inputWrapper || !selectedDisplay) return;
+
+            if (heroAirtableOutput) {
+                // Show selected state
+                inputWrapper.style.display = 'none';
+                selectedDisplay.style.display = 'flex';
+
+                const config = AirtableAPI.getTableConfig(heroAirtableOutput.type);
+                const typeLabel = config?.label || heroAirtableOutput.type.toUpperCase();
+
+                selectedDisplay.innerHTML = `
+                    <div class="airtable-output-selected-icon" style="background: ${config?.color || '#6B7280'}20; color: ${config?.color || '#6B7280'};">
+                        <i class="ph ${config?.icon || 'ph-tag'}"></i>
+                    </div>
+                    <div class="airtable-output-selected-info">
+                        <div class="airtable-output-selected-name">${escapeHtml(heroAirtableOutput.label)}</div>
+                        <div class="airtable-output-selected-type">${typeLabel}</div>
+                    </div>
+                    <div class="airtable-output-selected-actions">
+                        <button type="button" class="airtable-output-action-btn" onclick="openOutputInAmino()" title="Open in Amino">
+                            <i class="ph ph-arrow-square-out"></i>
+                        </button>
+                        <button type="button" class="airtable-output-action-btn remove" onclick="clearSelectedOutput()" title="Remove">
+                            <i class="ph ph-x"></i>
+                        </button>
+                    </div>
+                `;
+            } else {
+                // Show input state
+                inputWrapper.style.display = 'flex';
+                selectedDisplay.style.display = 'none';
+                if (searchInput) searchInput.value = '';
+            }
+        }
+
+        // Clear the selected output
+        function clearSelectedOutput() {
+            heroAirtableOutput = null;
+            renderSelectedOutput();
+        }
+
+        // Open output record in Amino
+        function openOutputInAmino() {
+            if (heroAirtableOutput) {
+                AirtableAPI.openInAmino(heroAirtableOutput);
+            }
+        }
+
+        // Reset output state (called when modal is closed/opened)
+        function resetHeroOutput() {
+            heroAirtableOutput = null;
+            const searchInput = document.getElementById('heroOutputSearch');
+            if (searchInput) searchInput.value = '';
+            renderSelectedOutput();
+            hideOutputDropdown();
         }
 
         // ============================================
@@ -56127,6 +56873,7 @@ Options:
                     producesProductId: null,
                     followsWorkflowId: workflowId || null,
                     airtableTags: [...heroAirtableTags],  // Airtable record tags (clients, cases, events, apps)
+                    airtableOutput: heroAirtableOutput ? { ...heroAirtableOutput } : null,  // Output/deliverable linked to Airtable
                     createdAt: new Date().toISOString(),
                     createdBy: currentUserId,
                     visibility: heroVisibility || 'public',
@@ -61658,6 +62405,33 @@ Options:
                     </div>
                     <div class="hero-airtable-hint">
                         <i class="ph ph-info"></i> Link this task to Airtable records for easy filtering and navigation
+                    </div>
+                </div>
+
+                <!-- Output/Deliverable - Link to Airtable -->
+                <div class="hero-task-input-group" style="margin-top: 1rem;">
+                    <label class="hero-task-label"><i class="ph ph-package"></i> Output (Optional)</label>
+                    <div class="airtable-output-container" id="heroOutputContainer">
+                        <!-- Shows either input or selected state -->
+                        <div class="airtable-output-input-wrapper" id="heroOutputInputWrapper">
+                            <i class="ph ph-magnifying-glass airtable-output-icon"></i>
+                            <input type="text"
+                                   class="airtable-output-input"
+                                   id="heroOutputSearch"
+                                   placeholder="Search Airtable for deliverable..."
+                                   autocomplete="off"
+                                   onfocus="showOutputDropdown()"
+                                   oninput="searchOutputRecords(this.value)">
+                            <div class="airtable-output-dropdown" id="heroOutputDropdown">
+                                <!-- Dropdown items populated dynamically -->
+                            </div>
+                        </div>
+                        <div class="airtable-output-selected" id="heroOutputSelected" style="display: none;">
+                            <!-- Populated when output is selected -->
+                        </div>
+                    </div>
+                    <div class="hero-airtable-hint">
+                        <i class="ph ph-info"></i> Link to the case, application, or client this task produces output for
                     </div>
                 </div>
 
