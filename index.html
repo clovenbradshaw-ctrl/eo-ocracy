@@ -18832,6 +18832,9 @@
         }
 
         .stream-editor-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
             margin-bottom: 1.5rem;
         }
 
@@ -18845,7 +18848,12 @@
             display: flex;
             align-items: center;
             gap: 0.5rem;
-            margin-bottom: 0.5rem;
+        }
+
+        .stream-header-actions {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
         }
 
         .stream-editor-date {
@@ -24846,7 +24854,13 @@
                                 <i class="ph ph-notepad"></i>
                                 <span>New Note</span>
                             </div>
-                            <time class="stream-editor-date" id="streamCurrentDate"></time>
+                            <div class="stream-header-actions">
+                                <time class="stream-editor-date" id="streamCurrentDate"></time>
+                                <button class="stream-btn stream-btn-primary" onclick="saveStreamNote()" id="streamSaveBtn">
+                                    <i class="ph ph-floppy-disk"></i>
+                                    Save Note
+                                </button>
+                            </div>
                         </div>
 
                         <div class="stream-editor-wrapper">
@@ -24868,10 +24882,6 @@
                             </div>
                             <div class="stream-editor-actions">
                                 <button class="stream-btn stream-btn-secondary" onclick="clearStreamEditor()">Clear</button>
-                                <button class="stream-btn stream-btn-primary" onclick="saveStreamNote()" id="streamSaveBtn">
-                                    <i class="ph ph-floppy-disk"></i>
-                                    Save Note
-                                </button>
                             </div>
                         </div>
                     </div>
