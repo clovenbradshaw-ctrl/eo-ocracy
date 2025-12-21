@@ -26768,6 +26768,12 @@ John Doe,Engineering,john@example.com"
 
         function saveWorkspaces() {
             try {
+                // Track local change timestamp to prevent API from overwriting recent changes
+                // (Variable is defined later in file, so check if it exists)
+                if (typeof lastLocalChangeTimestamp !== 'undefined') {
+                    lastLocalChangeTimestamp = Date.now();
+                }
+
                 // Update current workspace data before saving
                 if (currentWorkspaceId && workspaces[currentWorkspaceId]) {
                     workspaces[currentWorkspaceId].entities = JSON.parse(JSON.stringify(entities));
@@ -27425,6 +27431,13 @@ John Doe,Engineering,john@example.com"
          */
         function forceRefreshFromStorage() {
             try {
+                // Skip refresh if there are pending local changes to prevent reverting
+                // (shouldSkipStateOverwrite is defined later in file, so check if it exists)
+                if (typeof shouldSkipStateOverwrite === 'function' && shouldSkipStateOverwrite('forceRefreshFromStorage')) {
+                    console.log('[RefreshSystem] Skipping force refresh - local changes pending');
+                    return;
+                }
+
                 const hasWorkspaces = loadWorkspaces();
                 if (hasWorkspaces && currentWorkspaceId && workspaces[currentWorkspaceId]) {
                     const ws = workspaces[currentWorkspaceId];
@@ -36930,6 +36943,12 @@ Cmd/Ctrl + K - Command palette
             try {
                 const activities = await getActivitiesFromXano();
 
+                // CRITICAL: Check again after await - user may have made changes during fetch
+                if (shouldSkipStateOverwrite('performAutoRefresh')) {
+                    debug.log('⏳ Aborting auto-refresh - local changes detected during fetch');
+                    return;
+                }
+
                 if (activities && activities.length > 0) {
                     // Check if there are new activities
                     if (activities.length !== lastActivityCount) {
@@ -37030,6 +37049,26 @@ Cmd/Ctrl + K - Command palette
         let lastUpdateTimestamp = null;
         let updatePollingInProgress = false;
         let pendingActivityLogs = 0; // Track in-flight activity logs to prevent poll from reverting local changes
+        let lastLocalChangeTimestamp = 0; // Track when last local change was made to prevent stale API data from overwriting
+        const LOCAL_CHANGE_GRACE_PERIOD_MS = 5000; // 5 seconds grace period after local changes
+
+        // Check if we should skip overwriting state (to prevent reverting local changes)
+        function shouldSkipStateOverwrite(context = '') {
+            // Skip if there are pending API calls
+            if (pendingActivityLogs > 0) {
+                debug.log(`⏳ [${context}] Skipping state overwrite: ${pendingActivityLogs} pending activity log(s)`);
+                return true;
+            }
+
+            // Skip if a local change happened recently (handles race condition where API call completed but server hasn't processed it)
+            const timeSinceLastChange = Date.now() - lastLocalChangeTimestamp;
+            if (timeSinceLastChange < LOCAL_CHANGE_GRACE_PERIOD_MS) {
+                debug.log(`⏳ [${context}] Skipping state overwrite: local change ${timeSinceLastChange}ms ago (grace period: ${LOCAL_CHANGE_GRACE_PERIOD_MS}ms)`);
+                return true;
+            }
+
+            return false;
+        }
 
         // Fetch updates from the Xano activity_store_updates endpoint
         async function fetchUpdatesFromXano() {
@@ -37106,6 +37145,12 @@ Cmd/Ctrl + K - Command palette
             try {
                 // Get full activity list to reconstruct state
                 const activities = await getActivitiesFromXano();
+
+                // CRITICAL: Check again after await - user may have made changes during fetch
+                if (shouldSkipStateOverwrite('processUpdates')) {
+                    debug.log('⏳ Aborting processUpdates - local changes detected during fetch');
+                    return false;
+                }
 
                 if (activities && activities.length > 0) {
                     // Reconstruct entities from activities
