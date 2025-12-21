@@ -16015,6 +16015,119 @@
             margin: 8px 16px;
         }
 
+        /* Ownership Dropdown Tabs (People vs Roles) */
+        .ownership-tabs {
+            display: flex;
+            border-bottom: 1px solid #E5DDD1;
+            background: #FAF7F5;
+            position: sticky;
+            top: 0;
+            z-index: 2;
+        }
+
+        .ownership-tab {
+            flex: 1;
+            padding: 10px 16px;
+            text-align: center;
+            font-size: 12px;
+            font-weight: 600;
+            color: #8B6F47;
+            cursor: pointer;
+            transition: all 0.15s ease;
+            border-bottom: 2px solid transparent;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 6px;
+        }
+
+        .ownership-tab:hover {
+            background: #FFF8F0;
+            color: #C88F4A;
+        }
+
+        .ownership-tab.active {
+            color: #C88F4A;
+            border-bottom-color: #C88F4A;
+            background: white;
+        }
+
+        .ownership-tab i {
+            font-size: 14px;
+        }
+
+        .ownership-tab-content {
+            display: none;
+        }
+
+        .ownership-tab-content.active {
+            display: block;
+        }
+
+        /* Person option styling */
+        .simple-task-person-option {
+            padding: 10px 16px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            font-size: 13px;
+            color: #3D2E1F;
+            transition: all 0.15s ease;
+            border-left: 3px solid transparent;
+            position: relative;
+        }
+
+        .simple-task-person-option:hover {
+            background: linear-gradient(135deg, #FFF8F0 0%, #FFF4E8 100%);
+            border-left-color: #C88F4A;
+            padding-left: 20px;
+        }
+
+        .simple-task-person-option:hover::after {
+            content: 'Click to assign';
+            position: absolute;
+            right: 12px;
+            font-size: 10px;
+            color: #C88F4A;
+            font-weight: 500;
+            text-transform: uppercase;
+            letter-spacing: 0.03em;
+        }
+
+        .simple-task-person-option i {
+            font-size: 16px;
+            color: #8B6F47;
+            transition: transform 0.15s ease;
+        }
+
+        .simple-task-person-option:hover i {
+            transform: scale(1.1);
+        }
+
+        .simple-task-person-option.selected {
+            background: linear-gradient(135deg, #FFF4E8 0%, #FFEDD5 100%);
+            color: #C88F4A;
+            font-weight: 600;
+            border-left-color: #C88F4A;
+        }
+
+        .simple-task-person-option.selected:hover::after {
+            content: 'Currently assigned';
+        }
+
+        .simple-task-person-option.selected i.ph-check {
+            margin-left: auto;
+            color: #C88F4A;
+        }
+
+        .simple-task-person-role-hint {
+            font-size: 11px;
+            color: #A08060;
+            margin-left: auto;
+            font-weight: 400;
+        }
+
         .simple-task-role-group-header {
             padding: 12px 16px 6px;
             font-size: 11px;
@@ -28687,6 +28800,9 @@ John Doe,Engineering,john@example.com"
         // Modal state - stores current entity being viewed
         let currentModalEntity = null;
         let currentModalEntityType = null;
+
+        // Default ownership view - 'people' or 'roles' (default to 'people')
+        let defaultOwnershipView = 'people';
 
         // Tree view state - grouping and section expansion
         let treeViewState = {
@@ -49722,6 +49838,7 @@ Cmd/Ctrl + K - Command palette
         function populateTaskRoleOptions(taskId) {
             const container = document.getElementById(`roleOptions_${taskId}`);
             const roles = entities.role || [];
+            const people = entities.person || [];
 
             // Get currently connected role
             const connectedRoles = relationships
@@ -49733,45 +49850,117 @@ Cmd/Ctrl + K - Command palette
                 .filter(e => e && e.type === 'role');
             const currentRoleId = connectedRoles.length > 0 ? connectedRoles[0].id : null;
 
+            // Get the person assigned to the current role (if any)
+            let currentPersonId = null;
+            if (currentRoleId) {
+                const personRel = relationships.find(r =>
+                    r.predicate === 'INS' && r.object === currentRoleId
+                );
+                if (personRel) {
+                    currentPersonId = personRel.subject;
+                }
+            }
+
+            // Build the tabs HTML
+            const isPeopleActive = defaultOwnershipView === 'people';
+            let html = `
+                <div class="ownership-tabs">
+                    <div class="ownership-tab ${isPeopleActive ? 'active' : ''}" onclick="switchOwnershipTab('${taskId}', 'people')">
+                        <i class="ph ph-user"></i> People
+                    </div>
+                    <div class="ownership-tab ${!isPeopleActive ? 'active' : ''}" onclick="switchOwnershipTab('${taskId}', 'roles')">
+                        <i class="ph ph-briefcase"></i> Roles
+                    </div>
+                </div>
+            `;
+
+            // People tab content
+            html += `<div class="ownership-tab-content ${isPeopleActive ? 'active' : ''}" id="peopleTab_${taskId}">`;
+
+            if (people.length === 0) {
+                html += `
+                    <div class="simple-task-role-option" style="color: #888; cursor: default;">
+                        <i class="ph ph-info"></i> No people yet
+                    </div>
+                `;
+            } else {
+                // Add remove option if there's a current assignment
+                if (currentRoleId) {
+                    html += `
+                        <div class="simple-task-role-option remove-role" onclick="removeTaskRoleInline('${taskId}'); closeTaskRoleDropdown('${taskId}');">
+                            <i class="ph ph-x-circle"></i> Remove assignment
+                        </div>
+                        <div class="simple-task-role-divider"></div>
+                    `;
+                }
+
+                // Render people with their roles
+                people.forEach(person => {
+                    // Find roles this person is assigned to
+                    const personRoles = relationships
+                        .filter(r => r.predicate === 'INS' && r.subject === person.id)
+                        .map(r => findEntity(r.object))
+                        .filter(e => e && e.type === 'role');
+
+                    const roleNames = personRoles.map(r => r.name).join(', ');
+                    const isSelected = currentPersonId === person.id;
+                    const firstRoleId = personRoles.length > 0 ? personRoles[0].id : null;
+
+                    html += `
+                        <div class="simple-task-person-option ${isSelected ? 'selected' : ''}"
+                             onclick="assignPersonToTaskInline('${taskId}', '${person.id}'); closeTaskRoleDropdown('${taskId}');">
+                            <i class="ph ph-user"></i>
+                            <span>${escapeHtml(person.name)}</span>
+                            ${roleNames ? `<span class="simple-task-person-role-hint">${escapeHtml(roleNames)}</span>` : ''}
+                            ${isSelected ? '<i class="ph ph-check"></i>' : ''}
+                        </div>
+                    `;
+                });
+            }
+            html += `</div>`;
+
+            // Roles tab content
+            html += `<div class="ownership-tab-content ${!isPeopleActive ? 'active' : ''}" id="rolesTab_${taskId}">`;
+
             if (roles.length === 0) {
-                container.innerHTML = `
+                html += `
                     <div class="simple-task-role-option" style="color: #888; cursor: default;">
                         <i class="ph ph-info"></i> No roles yet
                     </div>
                 `;
-                return;
-            }
-
-            const hierarchy = buildRoleHierarchyStructure();
-            let html = '';
-
-            // Add encouragement prompt when no role is selected
-            if (!currentRoleId) {
-                html += `
-                    <div class="simple-task-role-prompt">
-                        <i class="ph ph-lightbulb"></i>
-                        <div class="simple-task-role-prompt-text">
-                            <strong>Who should own this task?</strong>
-                            Assigning a role helps track accountability and ensures nothing falls through the cracks.
+            } else {
+                // Add "No role" option if there's a current role
+                if (currentRoleId) {
+                    html += `
+                        <div class="simple-task-role-option remove-role" onclick="removeTaskRoleInline('${taskId}'); closeTaskRoleDropdown('${taskId}');">
+                            <i class="ph ph-x-circle"></i> Remove role
                         </div>
-                    </div>
-                `;
-            }
+                        <div class="simple-task-role-divider"></div>
+                    `;
+                }
 
-            // Add "No role" option if there's a current role
-            if (currentRoleId) {
-                html += `
-                    <div class="simple-task-role-option remove-role" onclick="removeTaskRoleInline('${taskId}'); closeTaskRoleDropdown('${taskId}');">
-                        <i class="ph ph-x-circle"></i> Remove role
-                    </div>
-                    <div class="simple-task-role-divider"></div>
-                `;
-            }
+                const hierarchy = buildRoleHierarchyStructure();
 
-            // Render units with their teams and roles
-            hierarchy.units.forEach(unit => {
-                html += `<div class="simple-task-role-group-header"><i class="ph ph-buildings"></i> ${unit.name}</div>`;
-                unit.teams.forEach(team => {
+                // Render units with their teams and roles
+                hierarchy.units.forEach(unit => {
+                    html += `<div class="simple-task-role-group-header"><i class="ph ph-buildings"></i> ${unit.name}</div>`;
+                    unit.teams.forEach(team => {
+                        html += `<div class="simple-task-role-team-header"><i class="ph ph-users-three"></i> ${team.name}</div>`;
+                        team.roles.forEach(role => {
+                            const isSelected = currentRoleId === role.id;
+                            html += `
+                                <div class="simple-task-role-option ${isSelected ? 'selected' : ''}"
+                                     onclick="assignRoleToTaskInline('${taskId}', '${role.id}'); closeTaskRoleDropdown('${taskId}');">
+                                    <i class="ph ph-briefcase"></i> ${role.name}
+                                    ${isSelected ? '<i class="ph ph-check"></i>' : ''}
+                                </div>
+                            `;
+                        });
+                    });
+                });
+
+                // Render orphan teams
+                hierarchy.orphanTeams.forEach(team => {
                     html += `<div class="simple-task-role-team-header"><i class="ph ph-users-three"></i> ${team.name}</div>`;
                     team.roles.forEach(role => {
                         const isSelected = currentRoleId === role.id;
@@ -49784,41 +49973,118 @@ Cmd/Ctrl + K - Command palette
                         `;
                     });
                 });
-            });
 
-            // Render orphan teams
-            hierarchy.orphanTeams.forEach(team => {
-                html += `<div class="simple-task-role-team-header"><i class="ph ph-users-three"></i> ${team.name}</div>`;
-                team.roles.forEach(role => {
-                    const isSelected = currentRoleId === role.id;
-                    html += `
-                        <div class="simple-task-role-option ${isSelected ? 'selected' : ''}"
-                             onclick="assignRoleToTaskInline('${taskId}', '${role.id}'); closeTaskRoleDropdown('${taskId}');">
-                            <i class="ph ph-briefcase"></i> ${role.name}
-                            ${isSelected ? '<i class="ph ph-check"></i>' : ''}
-                        </div>
-                    `;
-                });
-            });
-
-            // Render orphan roles
-            if (hierarchy.orphanRoles.length > 0) {
-                if (hierarchy.units.length > 0 || hierarchy.orphanTeams.length > 0) {
-                    html += `<div class="simple-task-role-group-header">Other Roles</div>`;
+                // Render orphan roles
+                if (hierarchy.orphanRoles.length > 0) {
+                    if (hierarchy.units.length > 0 || hierarchy.orphanTeams.length > 0) {
+                        html += `<div class="simple-task-role-group-header">Other Roles</div>`;
+                    }
+                    hierarchy.orphanRoles.forEach(role => {
+                        const isSelected = currentRoleId === role.id;
+                        html += `
+                            <div class="simple-task-role-option ${isSelected ? 'selected' : ''}"
+                                 onclick="assignRoleToTaskInline('${taskId}', '${role.id}'); closeTaskRoleDropdown('${taskId}');">
+                                <i class="ph ph-briefcase"></i> ${role.name}
+                                ${isSelected ? '<i class="ph ph-check"></i>' : ''}
+                            </div>
+                        `;
+                    });
                 }
-                hierarchy.orphanRoles.forEach(role => {
-                    const isSelected = currentRoleId === role.id;
-                    html += `
-                        <div class="simple-task-role-option ${isSelected ? 'selected' : ''}"
-                             onclick="assignRoleToTaskInline('${taskId}', '${role.id}'); closeTaskRoleDropdown('${taskId}');">
-                            <i class="ph ph-briefcase"></i> ${role.name}
-                            ${isSelected ? '<i class="ph ph-check"></i>' : ''}
-                        </div>
-                    `;
-                });
             }
+            html += `</div>`;
 
             container.innerHTML = html;
+        }
+
+        // Switch between People and Roles tabs in ownership dropdown
+        function switchOwnershipTab(taskId, view) {
+            defaultOwnershipView = view;
+            const peopleTab = document.getElementById(`peopleTab_${taskId}`);
+            const rolesTab = document.getElementById(`rolesTab_${taskId}`);
+            const container = document.getElementById(`roleOptions_${taskId}`);
+
+            if (container) {
+                const tabs = container.querySelectorAll('.ownership-tab');
+                tabs.forEach(tab => tab.classList.remove('active'));
+
+                if (view === 'people') {
+                    tabs[0]?.classList.add('active');
+                    if (peopleTab) peopleTab.classList.add('active');
+                    if (rolesTab) rolesTab.classList.remove('active');
+                } else {
+                    tabs[1]?.classList.add('active');
+                    if (rolesTab) rolesTab.classList.add('active');
+                    if (peopleTab) peopleTab.classList.remove('active');
+                }
+            }
+        }
+
+        // Assign a person to a task (via their role)
+        function assignPersonToTaskInline(taskId, personId) {
+            const task = entities.task.find(t => t.id === taskId);
+            const person = findEntity(personId);
+
+            // Find the person's role(s)
+            const personRoles = relationships
+                .filter(r => r.predicate === 'INS' && r.subject === personId)
+                .map(r => findEntity(r.object))
+                .filter(e => e && e.type === 'role');
+
+            if (personRoles.length === 0) {
+                showToast('This person has no role assigned. Please assign them to a role first.', 'warning');
+                return;
+            }
+
+            // Use the first role for now (could later prompt if multiple roles)
+            const roleId = personRoles[0].id;
+
+            // First remove any existing role connections
+            const existingRoles = relationships.filter(r =>
+                (r.subject === taskId || r.object === taskId) &&
+                r.predicate !== 'DES' &&
+                (findEntity(r.subject)?.type === 'role' || findEntity(r.object)?.type === 'role')
+            );
+
+            // Track old relationships for undo
+            const oldRels = existingRoles.map(r => JSON.parse(JSON.stringify(r)));
+
+            existingRoles.forEach(rel => {
+                const idx = relationships.indexOf(rel);
+                if (idx > -1) relationships.splice(idx, 1);
+            });
+
+            // Create new CON relationship to the role
+            const relId = 'rel' + Date.now();
+            const newRel = {
+                id: relId,
+                subject: taskId,
+                predicate: 'CON',
+                object: roleId,
+                description: ''
+            };
+            relationships.push(newRel);
+
+            // Track in undo history
+            pushToUndoHistory({
+                type: 'assign_person_to_task',
+                taskId: taskId,
+                personId: personId,
+                roleId: roleId,
+                oldRels: oldRels,
+                newRel: JSON.parse(JSON.stringify(newRel)),
+                description: `Assign ${person?.name || 'person'} to ${task?.name || 'task'}`
+            });
+
+            saveData();
+
+            // Refresh the task display
+            if (typeof renderEntityDetails === 'function') {
+                if (task) {
+                    renderEntityDetails(task, 'task');
+                }
+            }
+
+            showToast(`Assigned to ${person?.name || 'person'}`, 'success');
         }
 
         // Assign role to task inline (from task card dropdown)
