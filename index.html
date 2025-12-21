@@ -36316,7 +36316,7 @@ Cmd/Ctrl + K - Command palette
 
                 // Update status text
                 if (statusText && updatePollingIntervalMs > 0) {
-                    const intervalLabel = updatePollingIntervalMs === 30000 ? '30s' : '1min';
+                    const intervalLabel = updatePollingIntervalMs === 3000 ? '3s' : updatePollingIntervalMs === 30000 ? '30s' : '1min';
                     statusText.textContent = `Active (every ${intervalLabel})`;
                 }
             } catch (error) {
@@ -36408,12 +36408,12 @@ Cmd/Ctrl + K - Command palette
                         debug.log('🔄 Update polling preference restored:', intervalMs);
                     }
                 } else {
-                    // Default to off
-                    setUpdateInterval(0);
+                    // Default to 3 seconds (Live mode)
+                    setUpdateInterval(3000);
                 }
             } catch (e) {
                 console.warn('Could not restore update polling preference');
-                setUpdateInterval(0);
+                setUpdateInterval(3000);
             }
         }
 
