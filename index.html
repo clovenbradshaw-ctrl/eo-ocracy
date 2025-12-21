@@ -37117,7 +37117,21 @@ Cmd/Ctrl + K - Command palette
         let updatePollingEnabled = false;
         let updatePollingInterval = null;
         let updatePollingIntervalMs = 0; // 0 = disabled, 30000 = 30s, 60000 = 1min
-        let lastUpdateTimestamp = null;
+        let lastUpdateTimestamp = (() => {
+            try {
+                const stored = localStorage.getItem('eo_lastUpdateTimestamp');
+                if (stored) {
+                    const parsed = parseInt(stored, 10);
+                    if (!isNaN(parsed) && parsed > 0) {
+                        debug.log(`📅 Restored lastUpdateTimestamp from localStorage: ${new Date(parsed).toISOString()}`);
+                        return parsed;
+                    }
+                }
+            } catch (e) {
+                console.warn('Could not load lastUpdateTimestamp from localStorage:', e);
+            }
+            return null;
+        })();
         let updatePollingInProgress = false;
         let pendingActivityLogs = 0; // Track in-flight activity logs to prevent poll from reverting local changes
         let lastLocalChangeTimestamp = 0; // Track when last local change was made to prevent stale API data from overwriting
@@ -37188,6 +37202,13 @@ Cmd/Ctrl + K - Command palette
                     }).filter(Boolean);
                     if (timestamps.length > 0) {
                         lastUpdateTimestamp = Math.max(...timestamps);
+                        // Persist to localStorage for delta sync across page reloads
+                        try {
+                            localStorage.setItem('eo_lastUpdateTimestamp', lastUpdateTimestamp.toString());
+                            debug.log(`💾 Saved lastUpdateTimestamp to localStorage: ${new Date(lastUpdateTimestamp).toISOString()}`);
+                        } catch (e) {
+                            console.warn('Could not save lastUpdateTimestamp to localStorage:', e);
+                        }
                     }
                 }
 
@@ -37645,6 +37666,30 @@ Cmd/Ctrl + K - Command palette
                 }
 
                 debug.log('📋 Loaded', declaredAgents.size, 'agents from activity history');
+
+                // Update lastUpdateTimestamp from fetched activities so delta sync only gets new records
+                if (parsedActivities.length > 0) {
+                    const timestamps = parsedActivities.map(a => {
+                        const ts = a.created_at;
+                        if (!ts) return null;
+                        if (typeof ts === 'number') return ts;
+                        return new Date(ts).getTime();
+                    }).filter(Boolean);
+
+                    if (timestamps.length > 0) {
+                        const maxTimestamp = Math.max(...timestamps);
+                        // Only update if newer than current (or if current is null)
+                        if (!lastUpdateTimestamp || maxTimestamp > lastUpdateTimestamp) {
+                            lastUpdateTimestamp = maxTimestamp;
+                            try {
+                                localStorage.setItem('eo_lastUpdateTimestamp', lastUpdateTimestamp.toString());
+                                debug.log(`💾 Set lastUpdateTimestamp from initial load: ${new Date(lastUpdateTimestamp).toISOString()}`);
+                            } catch (e) {
+                                console.warn('Could not save lastUpdateTimestamp to localStorage:', e);
+                            }
+                        }
+                    }
+                }
 
                 // Enrich activities with agent info from registry (for display purposes)
                 return parsedActivities.map(a => {
