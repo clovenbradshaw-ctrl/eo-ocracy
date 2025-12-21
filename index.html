@@ -19014,6 +19014,107 @@
             cursor: not-allowed;
         }
 
+        /* Stream Pending Tasks List */
+        .stream-pending-tasks {
+            margin-top: 1rem;
+            display: flex;
+            flex-direction: column;
+            gap: 0.5rem;
+        }
+
+        .stream-pending-tasks:empty {
+            display: none;
+        }
+
+        .stream-pending-task {
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+            padding: 0.75rem 1rem;
+            background: linear-gradient(135deg, #FFF9F0 0%, #FFF5E8 100%);
+            border: 1px dashed #E5DDD1;
+            border-radius: 8px;
+            animation: streamTaskSlideIn 0.2s ease-out;
+        }
+
+        @keyframes streamTaskSlideIn {
+            from {
+                opacity: 0;
+                transform: translateY(-8px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .stream-pending-task-icon {
+            color: #C88F4A;
+            font-size: 1.125rem;
+            flex-shrink: 0;
+        }
+
+        .stream-pending-task-name {
+            flex: 1;
+            font-family: 'IBM Plex Mono', monospace;
+            font-size: 0.8125rem;
+            color: #3D2E1F;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+
+        .stream-pending-task-actions {
+            display: flex;
+            gap: 0.5rem;
+            flex-shrink: 0;
+        }
+
+        .stream-pending-task-btn {
+            font-family: 'IBM Plex Mono', monospace;
+            font-size: 0.6875rem;
+            font-weight: 500;
+            padding: 0.375rem 0.75rem;
+            border-radius: 4px;
+            cursor: pointer;
+            transition: all 0.15s ease;
+            display: flex;
+            align-items: center;
+            gap: 0.375rem;
+        }
+
+        .stream-pending-task-btn-save {
+            background: #C88F4A;
+            border: 1px solid #C88F4A;
+            color: white;
+        }
+
+        .stream-pending-task-btn-save:hover {
+            background: #B37D3A;
+            border-color: #B37D3A;
+        }
+
+        .stream-pending-task-btn-discard {
+            background: none;
+            border: 1px solid #E5DDD1;
+            color: #8B6F47;
+        }
+
+        .stream-pending-task-btn-discard:hover {
+            border-color: #C88F4A;
+            color: #C88F4A;
+        }
+
+        .stream-pending-tasks-header {
+            font-family: 'IBM Plex Mono', monospace;
+            font-size: 0.6875rem;
+            font-weight: 500;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+            color: #8B6F47;
+            margin-bottom: 0.25rem;
+        }
+
         /* Stream Archive Panel */
         .stream-archive-panel {
             background: white;
@@ -24946,6 +25047,11 @@
                                     Make task
                                 </button>
                             </div>
+                        </div>
+
+                        <!-- Pending Tasks List -->
+                        <div class="stream-pending-tasks" id="streamPendingTasks">
+                            <!-- Populated dynamically when tasks are extracted -->
                         </div>
 
                         <div class="stream-editor-footer">
@@ -55724,7 +55830,8 @@ Options:
 
         // Stream state
         let currentStreamSelection = null;
-        let currentStreamTaskIds = []; // Tasks extracted in current session
+        let currentStreamTaskIds = []; // Tasks extracted in current session (saved tasks)
+        let pendingStreamTasks = []; // Tasks awaiting save confirmation
 
         // Initialize stream view
         function renderStreamView() {
@@ -55741,6 +55848,8 @@ Options:
 
             // Reset state for new note
             currentStreamTaskIds = [];
+            pendingStreamTasks = [];
+            renderPendingStreamTasks();
             updateStreamTaskCount();
 
             // Render archive
@@ -55826,7 +55935,7 @@ Options:
             }
         }
 
-        // Create task from selected text
+        // Create task from selected text (creates draft task awaiting save)
         function createTaskFromStreamSelection() {
             try {
                 console.log('[Stream] createTaskFromStreamSelection called');
@@ -55844,9 +55953,9 @@ Options:
                 // Get context around selection
                 const excerpt = getStreamContextAroundSelection(fullText, selectedText);
 
-                // Create the task
+                // Create the draft task (not saved yet)
                 const taskId = 'task_' + Date.now() + '_' + Math.random().toString(36).substr(2, 9);
-                const newTask = {
+                const draftTask = {
                     id: taskId,
                     type: 'task',
                     name: selectedText.length > 100 ? selectedText.substring(0, 100) + '...' : selectedText,
@@ -55861,41 +55970,24 @@ Options:
                     updatedAt: new Date().toISOString()
                 };
 
-                // Add to entities
-                if (!entities.task) entities.task = [];
-                entities.task.push(newTask);
-                console.log('[Stream] Task created:', taskId);
-                console.log('[Stream] entities.task length:', entities.task.length);
+                // Add to pending tasks (not entities yet)
+                pendingStreamTasks.push(draftTask);
+                console.log('[Stream] Draft task created:', taskId);
+                console.log('[Stream] pendingStreamTasks length:', pendingStreamTasks.length);
 
-                // Track for current session
-                currentStreamTaskIds.push(taskId);
+                // Update pending tasks list UI
+                renderPendingStreamTasks();
 
                 // Update task count
                 updateStreamTaskCount();
-
-                // Save and refresh
-                saveWorkspaces();
-
-                // Log to activity
-                logActivityToXano({
-                    event_verb: 'INS',
-                    eo_operator: 'INS',
-                    k_frame: 'Stream Task',
-                    object_type: 'task',
-                    object_id: taskId,
-                    object_label: newTask.name,
-                    data_json: { source: 'stream' }
-                }, false);
 
                 // Hide menu and clear selection
                 hideStreamFloatingMenu();
                 window.getSelection().removeAllRanges();
                 currentStreamSelection = null;
 
-                // Open task popup for editing
-                console.log('[Stream] Opening task modal for:', taskId);
-                openTaskModal(taskId);
-                console.log('[Stream] openTaskModal called');
+                // Show toast
+                showStreamToast('Task extracted - click Save to create it');
             } catch (error) {
                 console.error('[Stream] Error creating task from stream:', error);
             }
@@ -55917,11 +56009,114 @@ Options:
             return context;
         }
 
+        // Render pending stream tasks list
+        function renderPendingStreamTasks() {
+            const container = document.getElementById('streamPendingTasks');
+            if (!container) return;
+
+            if (pendingStreamTasks.length === 0) {
+                container.innerHTML = '';
+                return;
+            }
+
+            let html = '<div class="stream-pending-tasks-header">Pending Tasks</div>';
+
+            pendingStreamTasks.forEach(task => {
+                const escapedName = task.name.replace(/</g, '&lt;').replace(/>/g, '&gt;');
+                html += `
+                    <div class="stream-pending-task" data-task-id="${task.id}">
+                        <i class="ph ph-check-square stream-pending-task-icon"></i>
+                        <span class="stream-pending-task-name" title="${escapedName}">${escapedName}</span>
+                        <div class="stream-pending-task-actions">
+                            <button class="stream-pending-task-btn stream-pending-task-btn-save" onclick="saveStreamTask('${task.id}')">
+                                <i class="ph ph-floppy-disk"></i>
+                                Save
+                            </button>
+                            <button class="stream-pending-task-btn stream-pending-task-btn-discard" onclick="discardStreamTask('${task.id}')">
+                                <i class="ph ph-x"></i>
+                            </button>
+                        </div>
+                    </div>
+                `;
+            });
+
+            container.innerHTML = html;
+        }
+
+        // Save a pending stream task (persist to entities)
+        function saveStreamTask(taskId) {
+            const taskIndex = pendingStreamTasks.findIndex(t => t.id === taskId);
+            if (taskIndex === -1) {
+                console.error('[Stream] Task not found in pending:', taskId);
+                return;
+            }
+
+            const task = pendingStreamTasks[taskIndex];
+
+            // Add to entities
+            if (!entities.task) entities.task = [];
+            entities.task.push(task);
+
+            // Track for current session
+            currentStreamTaskIds.push(taskId);
+
+            // Remove from pending
+            pendingStreamTasks.splice(taskIndex, 1);
+
+            // Save and refresh
+            saveWorkspaces();
+
+            // Log to activity
+            logActivityToXano({
+                event_verb: 'INS',
+                eo_operator: 'INS',
+                k_frame: 'Stream Task',
+                object_type: 'task',
+                object_id: taskId,
+                object_label: task.name,
+                data_json: { source: 'stream' }
+            }, false);
+
+            // Update UI
+            renderPendingStreamTasks();
+            updateStreamTaskCount();
+
+            // Show toast
+            showStreamToast('Task saved');
+
+            console.log('[Stream] Task saved:', taskId);
+        }
+
+        // Discard a pending stream task
+        function discardStreamTask(taskId) {
+            const taskIndex = pendingStreamTasks.findIndex(t => t.id === taskId);
+            if (taskIndex === -1) {
+                console.error('[Stream] Task not found in pending:', taskId);
+                return;
+            }
+
+            // Remove from pending
+            pendingStreamTasks.splice(taskIndex, 1);
+
+            // Update UI
+            renderPendingStreamTasks();
+            updateStreamTaskCount();
+
+            // Show toast
+            showStreamToast('Task discarded');
+
+            console.log('[Stream] Task discarded:', taskId);
+        }
+
         // Update task count display
         function updateStreamTaskCount() {
             const countEl = document.getElementById('streamTaskCount');
             if (countEl) {
-                countEl.textContent = currentStreamTaskIds.length;
+                // Show both saved and pending counts
+                const savedCount = currentStreamTaskIds.length;
+                const pendingCount = pendingStreamTasks.length;
+                const totalCount = savedCount + pendingCount;
+                countEl.textContent = totalCount;
             }
         }
 
@@ -55991,6 +56186,8 @@ Options:
                 editor.innerHTML = '';
             }
             currentStreamTaskIds = [];
+            pendingStreamTasks = [];
+            renderPendingStreamTasks();
             updateStreamTaskCount();
         }
 
