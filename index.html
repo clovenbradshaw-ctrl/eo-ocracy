@@ -24854,7 +24854,7 @@
 
                             <!-- Floating menu for task creation -->
                             <div class="stream-floating-menu" id="streamFloatingMenu">
-                                <button id="streamCreateTaskBtn" onmousedown="event.preventDefault()" onclick="createTaskFromStreamSelection()">
+                                <button id="streamCreateTaskBtn" onmousedown="event.preventDefault(); event.stopPropagation();" onclick="createTaskFromStreamSelection()">
                                     <i class="ph ph-check-square"></i>
                                     Make task
                                 </button>
@@ -31265,51 +31265,62 @@ Cmd/Ctrl + K - Command palette
 
         // Open task modal - wrapper for Gantt and Calendar views
         function openTaskModal(taskId) {
+            console.log('[Modal] openTaskModal called with:', taskId);
             showEntityDetails(taskId);
         }
 
         // Show entity details - helper function to open entity modal without knowing the type
         function showEntityDetails(entityId) {
-            // Determine entity type from ID prefix or by searching
-            const typeMap = [
-                { prefix: 'task', type: 'task' },
-                { prefix: 'prod', type: 'product' },
-                { prefix: 'workflow', type: 'workflow' },
-                { prefix: 'wf', type: 'workflow' },
-                { prefix: 'role', type: 'role' },
-                { prefix: 'u', type: 'unit' },
-                { prefix: 't', type: 'team' },
-                { prefix: 'p', type: 'person' },
-                { prefix: 'o', type: 'product' } // Legacy: old 'o' prefix objects become products
-            ];
+            try {
+                console.log('[Modal] showEntityDetails called with:', entityId);
+                // Determine entity type from ID prefix or by searching
+                const typeMap = [
+                    { prefix: 'task', type: 'task' },
+                    { prefix: 'prod', type: 'product' },
+                    { prefix: 'workflow', type: 'workflow' },
+                    { prefix: 'wf', type: 'workflow' },
+                    { prefix: 'role', type: 'role' },
+                    { prefix: 'u', type: 'unit' },
+                    { prefix: 't', type: 'team' },
+                    { prefix: 'p', type: 'person' },
+                    { prefix: 'o', type: 'product' } // Legacy: old 'o' prefix objects become products
+                ];
 
-            let entityType = null;
-            let entity = null;
+                let entityType = null;
+                let entity = null;
 
-            // Try to find by prefix
-            for (const mapping of typeMap) {
-                if (entityId.startsWith(mapping.prefix)) {
-                    entity = entities[mapping.type]?.find(e => e.id === entityId);
-                    if (entity) {
-                        entityType = mapping.type;
-                        break;
+                // Try to find by prefix
+                for (const mapping of typeMap) {
+                    if (entityId.startsWith(mapping.prefix)) {
+                        entity = entities[mapping.type]?.find(e => e.id === entityId);
+                        console.log('[Modal] Checking prefix:', mapping.prefix, 'found:', !!entity);
+                        if (entity) {
+                            entityType = mapping.type;
+                            break;
+                        }
                     }
                 }
-            }
 
-            // If not found by prefix, search all types
-            if (!entity) {
-                for (const type of ['unit', 'team', 'role', 'person', 'task', 'product', 'workflow']) {
-                    entity = entities[type]?.find(e => e.id === entityId);
-                    if (entity) {
-                        entityType = type;
-                        break;
+                // If not found by prefix, search all types
+                if (!entity) {
+                    console.log('[Modal] Entity not found by prefix, searching all types');
+                    for (const type of ['unit', 'team', 'role', 'person', 'task', 'product', 'workflow']) {
+                        entity = entities[type]?.find(e => e.id === entityId);
+                        if (entity) {
+                            entityType = type;
+                            break;
+                        }
                     }
                 }
-            }
 
-            if (entity && entityType) {
-                openEntityModal(entityId, entityType);
+                console.log('[Modal] Final result - entity:', !!entity, 'entityType:', entityType);
+                if (entity && entityType) {
+                    openEntityModal(entityId, entityType);
+                } else {
+                    console.log('[Modal] Entity not found, modal will not open');
+                }
+            } catch (error) {
+                console.error('[Modal] Error in showEntityDetails:', error);
             }
         }
 
@@ -55648,14 +55659,17 @@ Options:
         function handleStreamSelectionChange() {
             const selection = window.getSelection();
             const selectedText = selection.toString().trim();
+            console.log('[Stream] handleStreamSelectionChange - selectedText:', selectedText);
 
             if (selectedText && selectedText.length > 0) {
                 currentStreamSelection = {
                     text: selectedText,
                     range: selection.getRangeAt(0).cloneRange()
                 };
+                console.log('[Stream] Selection saved:', selectedText);
                 showStreamFloatingMenu();
             } else {
+                console.log('[Stream] No selection, clearing currentStreamSelection');
                 currentStreamSelection = null;
                 hideStreamFloatingMenu();
             }
@@ -55691,55 +55705,69 @@ Options:
 
         // Create task from selected text
         function createTaskFromStreamSelection() {
-            if (!currentStreamSelection) return;
+            try {
+                console.log('[Stream] createTaskFromStreamSelection called');
+                console.log('[Stream] currentStreamSelection:', currentStreamSelection);
+                if (!currentStreamSelection) {
+                    console.log('[Stream] No selection, returning early');
+                    return;
+                }
 
-            const selectedText = currentStreamSelection.text;
-            const editor = document.getElementById('streamEditor');
-            const fullText = editor ? editor.innerText : '';
+                const selectedText = currentStreamSelection.text;
+                console.log('[Stream] Selected text:', selectedText);
+                const editor = document.getElementById('streamEditor');
+                const fullText = editor ? editor.innerText : '';
 
-            // Get context around selection
-            const excerpt = getStreamContextAroundSelection(fullText, selectedText);
+                // Get context around selection
+                const excerpt = getStreamContextAroundSelection(fullText, selectedText);
 
-            // Create the task
-            const taskId = 'task_' + Date.now() + '_' + Math.random().toString(36).substr(2, 9);
-            const newTask = {
-                id: taskId,
-                type: 'task',
-                name: selectedText.length > 100 ? selectedText.substring(0, 100) + '...' : selectedText,
-                description: '',
-                status: 'pending',
-                priority: 'medium',
-                dueDate: null,
-                sourceType: 'stream',
-                sourceId: null, // Will be set when note is saved
-                sourceExcerpt: excerpt,
-                createdAt: new Date().toISOString(),
-                updatedAt: new Date().toISOString()
-            };
+                // Create the task
+                const taskId = 'task_' + Date.now() + '_' + Math.random().toString(36).substr(2, 9);
+                const newTask = {
+                    id: taskId,
+                    type: 'task',
+                    name: selectedText.length > 100 ? selectedText.substring(0, 100) + '...' : selectedText,
+                    description: '',
+                    status: 'pending',
+                    priority: 'medium',
+                    dueDate: null,
+                    sourceType: 'stream',
+                    sourceId: null, // Will be set when note is saved
+                    sourceExcerpt: excerpt,
+                    createdAt: new Date().toISOString(),
+                    updatedAt: new Date().toISOString()
+                };
 
-            // Add to entities
-            if (!entities.task) entities.task = [];
-            entities.task.push(newTask);
+                // Add to entities
+                if (!entities.task) entities.task = [];
+                entities.task.push(newTask);
+                console.log('[Stream] Task created:', taskId);
+                console.log('[Stream] entities.task length:', entities.task.length);
 
-            // Track for current session
-            currentStreamTaskIds.push(taskId);
+                // Track for current session
+                currentStreamTaskIds.push(taskId);
 
-            // Update task count
-            updateStreamTaskCount();
+                // Update task count
+                updateStreamTaskCount();
 
-            // Save and refresh
-            saveWorkspaces();
+                // Save and refresh
+                saveWorkspaces();
 
-            // Log to activity
-            logActivity('task', taskId, 'created', { source: 'stream' });
+                // Log to activity
+                logActivity('task', taskId, 'created', { source: 'stream' });
 
-            // Hide menu and clear selection
-            hideStreamFloatingMenu();
-            window.getSelection().removeAllRanges();
-            currentStreamSelection = null;
+                // Hide menu and clear selection
+                hideStreamFloatingMenu();
+                window.getSelection().removeAllRanges();
+                currentStreamSelection = null;
 
-            // Open task popup for editing
-            openTaskModal(taskId);
+                // Open task popup for editing
+                console.log('[Stream] Opening task modal for:', taskId);
+                openTaskModal(taskId);
+                console.log('[Stream] openTaskModal called');
+            } catch (error) {
+                console.error('[Stream] Error creating task from stream:', error);
+            }
         }
 
         // Get context around selected text
