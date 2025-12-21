@@ -37115,9 +37115,42 @@ Cmd/Ctrl + K - Command palette
                     );
 
                     if (totalEntities > 0) {
-                        // Update current workspace with new data
-                        entities = normalizeEntities(JSON.parse(JSON.stringify(reconstructed.entities)));
-                        relationships = JSON.parse(JSON.stringify(reconstructed.relationships));
+                        // MERGE instead of replacing - preserve local entities not yet synced to Xano
+                        const reconstructedEntities = normalizeEntities(JSON.parse(JSON.stringify(reconstructed.entities)));
+                        const reconstructedRelationships = JSON.parse(JSON.stringify(reconstructed.relationships));
+
+                        // Build a set of entity IDs from reconstructed data
+                        const reconstructedEntityIds = new Set();
+                        for (const type of Object.keys(reconstructedEntities)) {
+                            for (const entity of reconstructedEntities[type] || []) {
+                                reconstructedEntityIds.add(entity.id);
+                            }
+                        }
+
+                        // Preserve local entities that don't exist in reconstructed data (not yet synced)
+                        for (const type of Object.keys(entities)) {
+                            if (!reconstructedEntities[type]) {
+                                reconstructedEntities[type] = [];
+                            }
+                            for (const localEntity of entities[type] || []) {
+                                if (!reconstructedEntityIds.has(localEntity.id)) {
+                                    debug.log(`🔄 Preserving local-only ${type}: ${localEntity.name || localEntity.id}`);
+                                    reconstructedEntities[type].push(localEntity);
+                                }
+                            }
+                        }
+
+                        // Similarly preserve local relationships not in reconstructed data
+                        const reconstructedRelationshipIds = new Set(reconstructedRelationships.map(r => r.id));
+                        for (const localRel of relationships) {
+                            if (!reconstructedRelationshipIds.has(localRel.id)) {
+                                debug.log(`🔄 Preserving local-only relationship: ${localRel.id}`);
+                                reconstructedRelationships.push(localRel);
+                            }
+                        }
+
+                        entities = reconstructedEntities;
+                        relationships = reconstructedRelationships;
 
                         // Update workspace
                         if (currentWorkspaceId && workspaces[currentWorkspaceId]) {
@@ -37821,6 +37854,11 @@ Cmd/Ctrl + K - Command palette
                     if (activity.collaborators) entity.collaborators = activity.collaborators;
                     if (activity.recurring) entity.recurring = activity.recurring;
                     if (activity.followsWorkflowId) entity.followsWorkflowId = activity.followsWorkflowId;
+                    // Stream task specific fields
+                    if (activity.source) entity.source = activity.source;
+                    if (activity.sourceType) entity.sourceType = activity.sourceType;
+                    if (activity.sourceExcerpt) entity.sourceExcerpt = activity.sourceExcerpt;
+                    if (activity.sourceId) entity.sourceId = activity.sourceId;
 
                     reconstructedEntities[objectType].push(entity);
                     entityMap.set(objectId, entity);
@@ -56098,7 +56136,7 @@ Options:
             // Save and refresh
             saveWorkspaces();
 
-            // Log to activity
+            // Log to activity with full task data for proper reconstruction
             logActivityToXano({
                 event_verb: 'INS',
                 eo_operator: 'INS',
@@ -56106,7 +56144,17 @@ Options:
                 object_type: 'task',
                 object_id: taskId,
                 object_label: task.name,
-                data_json: { source: 'stream' }
+                data_json: {
+                    source: 'stream',
+                    sourceType: task.sourceType,
+                    sourceExcerpt: task.sourceExcerpt,
+                    status: task.status || 'pending',
+                    priority: task.priority,
+                    dueDate: task.dueDate,
+                    description: task.description,
+                    tags: task.tags,
+                    collaborators: task.collaborators
+                }
             }, false);
 
             // Update UI
