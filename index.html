@@ -46422,6 +46422,11 @@ Cmd/Ctrl + K - Command palette
                     responseEl.className = 'api-test-response-display error';
                     return;
                 }
+
+                // If this is a task_notification email, generate and include the HTML body
+                if (body.type === 'task_notification' && body.notification && !body.htmlBody) {
+                    body.htmlBody = EmailTemplates.taskNotification(body.notification);
+                }
             }
 
             // Set loading state
