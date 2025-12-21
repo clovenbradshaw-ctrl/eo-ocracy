@@ -28192,10 +28192,10 @@ John Doe,Engineering,john@example.com"
 
         let relationships = [];
 
-        // Track locally deleted items to prevent them from reappearing during sync
-        // These sets persist until the deletion is confirmed in the API response
-        const locallyDeletedEntityIds = new Set();
-        const locallyDeletedRelationshipIds = new Set();
+        // Queue of local activities not yet confirmed in API
+        // These are merged with API activities by timestamp during sync
+        // This ensures local changes (including deletions) are always respected
+        let pendingLocalActivities = [];
 
         // Ensure all required entity types exist (for backwards compatibility with older saved data)
         function normalizeEntities(e) {
@@ -36724,12 +36724,6 @@ Cmd/Ctrl + K - Command palette
             // Add to recycle bin
             addToRecycleBin(entityData, 'entity', entityType, removedRelationships);
 
-            // Track deleted items locally to prevent reappearance during sync
-            locallyDeletedEntityIds.add(entityId);
-            for (const rel of removedRelationships) {
-                locallyDeletedRelationshipIds.add(rel.id);
-            }
-
             // Remove from entities
             entities[entityType] = entities[entityType].filter(e => e.id !== entityId);
 
@@ -37056,9 +37050,6 @@ Cmd/Ctrl + K - Command palette
 
             // Add to recycle bin
             addToRecycleBin(rel, 'relationship', null);
-
-            // Track deleted relationship locally to prevent reappearance during sync
-            locallyDeletedRelationshipIds.add(relId);
 
             relationships = relationships.filter(r => r.id !== relId);
 
@@ -37884,98 +37875,24 @@ Cmd/Ctrl + K - Command palette
                 }
 
                 if (activities && activities.length > 0) {
-                    // Reconstruct entities from activities
-                    const reconstructed = reconstructEntitiesFromActivities(activities);
+                    // Merge pending local activities with API activities
+                    // Local activities have timestamps and will be sorted chronologically
+                    // This ensures local changes (including deletions) are always respected
+                    let mergedActivities = [...activities];
+                    if (pendingLocalActivities.length > 0) {
+                        debug.log(`🔀 Merging ${pendingLocalActivities.length} pending local activities with ${activities.length} API activities`);
+                        mergedActivities = [...activities, ...pendingLocalActivities];
+                    }
+
+                    // Reconstruct entities from merged activities (sorted by timestamp internally)
+                    const reconstructed = reconstructEntitiesFromActivities(mergedActivities);
                     const totalEntities = Object.values(reconstructed.entities).reduce(
                         (sum, arr) => sum + arr.length, 0
                     );
 
-                    // Clear locally deleted items that are confirmed deleted in Xano
-                    // This prevents the tracking sets from growing indefinitely
-                    if (reconstructed.deletedEntityIds) {
-                        for (const deletedId of reconstructed.deletedEntityIds) {
-                            if (locallyDeletedEntityIds.has(deletedId)) {
-                                locallyDeletedEntityIds.delete(deletedId);
-                                debug.log(`✓ Cleared confirmed deletion from tracking: entity ${deletedId}`);
-                            }
-                        }
-                    }
-                    if (reconstructed.deletedRelationshipIds) {
-                        for (const deletedId of reconstructed.deletedRelationshipIds) {
-                            if (locallyDeletedRelationshipIds.has(deletedId)) {
-                                locallyDeletedRelationshipIds.delete(deletedId);
-                                debug.log(`✓ Cleared confirmed deletion from tracking: relationship ${deletedId}`);
-                            }
-                        }
-                    }
-
                     if (totalEntities > 0) {
-                        // MERGE instead of replacing - preserve local entities not yet synced to Xano
                         const reconstructedEntities = normalizeEntities(JSON.parse(JSON.stringify(reconstructed.entities)));
                         const reconstructedRelationships = JSON.parse(JSON.stringify(reconstructed.relationships));
-
-                        // Filter out locally deleted entities from reconstructed data
-                        // This prevents deleted items from reappearing if NUL activity isn't in Xano yet
-                        for (const type of Object.keys(reconstructedEntities)) {
-                            reconstructedEntities[type] = reconstructedEntities[type].filter(e => {
-                                if (locallyDeletedEntityIds.has(e.id)) {
-                                    debug.log(`🚫 Excluding locally deleted ${type} from sync: ${e.name || e.id}`);
-                                    return false;
-                                }
-                                return true;
-                            });
-                        }
-
-                        // Build a set of entity IDs from reconstructed data
-                        const reconstructedEntityIds = new Set();
-                        for (const type of Object.keys(reconstructedEntities)) {
-                            for (const entity of reconstructedEntities[type] || []) {
-                                reconstructedEntityIds.add(entity.id);
-                            }
-                        }
-
-                        // Preserve local entities that don't exist in reconstructed data (not yet synced)
-                        // BUT skip entities that were locally deleted
-                        for (const type of Object.keys(entities)) {
-                            if (!reconstructedEntities[type]) {
-                                reconstructedEntities[type] = [];
-                            }
-                            for (const localEntity of entities[type] || []) {
-                                // Skip if this entity was locally deleted
-                                if (locallyDeletedEntityIds.has(localEntity.id)) {
-                                    debug.log(`🚫 Not preserving deleted ${type}: ${localEntity.name || localEntity.id}`);
-                                    continue;
-                                }
-                                if (!reconstructedEntityIds.has(localEntity.id)) {
-                                    debug.log(`🔄 Preserving local-only ${type}: ${localEntity.name || localEntity.id}`);
-                                    reconstructedEntities[type].push(localEntity);
-                                }
-                            }
-                        }
-
-                        // Filter out locally deleted relationships from reconstructed data
-                        const filteredReconstructedRelationships = reconstructedRelationships.filter(r => {
-                            if (locallyDeletedRelationshipIds.has(r.id)) {
-                                debug.log(`🚫 Excluding locally deleted relationship from sync: ${r.id}`);
-                                return false;
-                            }
-                            return true;
-                        });
-
-                        // Similarly preserve local relationships not in reconstructed data
-                        // BUT skip relationships that were locally deleted
-                        const reconstructedRelationshipIds = new Set(filteredReconstructedRelationships.map(r => r.id));
-                        for (const localRel of relationships) {
-                            // Skip if this relationship was locally deleted
-                            if (locallyDeletedRelationshipIds.has(localRel.id)) {
-                                debug.log(`🚫 Not preserving deleted relationship: ${localRel.id}`);
-                                continue;
-                            }
-                            if (!reconstructedRelationshipIds.has(localRel.id)) {
-                                debug.log(`🔄 Preserving local-only relationship: ${localRel.id}`);
-                                filteredReconstructedRelationships.push(localRel);
-                            }
-                        }
 
                         // CRITICAL: Final check before overwriting - user may have made changes during reconstruction
                         if (shouldSkipStateOverwrite('processUpdates-final')) {
@@ -37984,7 +37901,7 @@ Cmd/Ctrl + K - Command palette
                         }
 
                         entities = reconstructedEntities;
-                        relationships = filteredReconstructedRelationships;
+                        relationships = reconstructedRelationships;
 
                         // Update workspace
                         if (currentWorkspaceId && workspaces[currentWorkspaceId]) {
@@ -38210,6 +38127,21 @@ Cmd/Ctrl + K - Command palette
             pendingActivityLogs++;
             debug.log(`📤 Starting activity log (${pendingActivityLogs} pending)`);
 
+            // Create local activity record with timestamp BEFORE API sync
+            // This ensures local changes are respected even if API is slow/fails
+            const localActivityId = `local_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`;
+            const localActivity = {
+                _localId: localActivityId,
+                created_at: new Date().toISOString(),
+                eo_operator: activity.eo_operator || activity.event_verb,
+                object_type: activity.object_type,
+                object_id: activity.object_id,
+                object_label: activity.object_label,
+                ...activity.data_json
+            };
+            pendingLocalActivities.push(localActivity);
+            debug.log(`📋 Added to pending local activities: ${localActivityId}`);
+
             // Get Amino user info if available
             const aminoUser = AminoIdentity.getUser();
             const agentId = aminoUser?.id || aminoUser?.email || ('anon_' + Date.now());
@@ -38271,6 +38203,10 @@ Cmd/Ctrl + K - Command palette
 
                 const result = await response.json();
                 debug.log('✅ Activity logged:', result);
+
+                // Remove from pending local activities now that it's confirmed in API
+                pendingLocalActivities = pendingLocalActivities.filter(a => a._localId !== localActivityId);
+                debug.log(`✓ Removed confirmed activity from pending: ${localActivityId}`);
 
                 // Update status and count on success
                 xanoActivityUploadCount++;
@@ -38824,9 +38760,7 @@ Cmd/Ctrl + K - Command palette
 
             return {
                 entities: reconstructedEntities,
-                relationships: finalRelationships,
-                deletedEntityIds: deletedEntityIds,
-                deletedRelationshipIds: deletedRelationshipIds
+                relationships: finalRelationships
             };
         }
 
