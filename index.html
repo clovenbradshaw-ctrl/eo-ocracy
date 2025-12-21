@@ -57233,12 +57233,13 @@ Options:
                     `;
                 }
             } else if (excerpt) {
-                // Note doesn't exist but we have the excerpt
+                // Note doesn't exist but we have the excerpt - still make it clickable
                 return `
-                    <div class="task-stream-source" style="cursor: default;">
+                    <div class="task-stream-source" onclick="openStreamExcerptModal('${escapeHtml(excerpt).replace(/'/g, "\\'").replace(/"/g, '&quot;')}')" title="View source note excerpt">
                         <div class="task-stream-source-header">
                             <i class="ph ph-notepad"></i>
                             <span>From Stream</span>
+                            <i class="ph ph-arrow-square-out" style="margin-left: auto; opacity: 0.5;"></i>
                         </div>
                         <div class="task-stream-source-excerpt">"${escapeHtml(excerpt)}"</div>
                     </div>
@@ -57265,6 +57266,70 @@ Options:
 
             // Open stream note modal directly without closing entity modal or switching views
             openStreamNote(noteId);
+        }
+
+        // Open modal for stream excerpt when full note is not available
+        function openStreamExcerptModal(excerpt) {
+            // Create modal overlay if it doesn't exist
+            let overlay = document.getElementById('streamExcerptModalOverlay');
+            if (!overlay) {
+                overlay = document.createElement('div');
+                overlay.id = 'streamExcerptModalOverlay';
+                overlay.className = 'stream-note-modal-overlay';
+                overlay.innerHTML = `
+                    <div class="stream-note-modal" style="max-width: 500px;">
+                        <div class="stream-note-modal-header">
+                            <div class="stream-note-modal-title">
+                                <i class="ph ph-notepad" style="margin-right: 0.5rem; color: #C88F4A;"></i>
+                                Source Note
+                            </div>
+                            <div class="stream-note-modal-actions">
+                                <button class="stream-note-modal-action" onclick="closeStreamExcerptModal()" title="Close">
+                                    <i class="ph ph-x"></i>
+                                </button>
+                            </div>
+                        </div>
+                        <div class="stream-note-modal-body">
+                            <div style="padding: 1rem; background: linear-gradient(135deg, #FEF7ED 0%, #FDF5E9 100%); border-radius: 8px; border: 1px solid #F5D5B8;">
+                                <div style="font-size: 0.75rem; color: #8B6F47; margin-bottom: 0.5rem; display: flex; align-items: center; gap: 0.5rem;">
+                                    <i class="ph ph-info"></i>
+                                    Original note excerpt
+                                </div>
+                                <div id="streamExcerptContent" style="font-size: 1rem; color: #5D4E37; font-style: italic; line-height: 1.6;"></div>
+                            </div>
+                            <div style="margin-top: 1rem; padding: 0.75rem; background: #f8f8f8; border-radius: 6px; font-size: 0.8125rem; color: #666;">
+                                <i class="ph ph-info" style="margin-right: 0.5rem;"></i>
+                                The full note content is no longer available. This excerpt was saved when the task was created.
+                            </div>
+                        </div>
+                    </div>
+                `;
+                overlay.addEventListener('click', (e) => {
+                    if (e.target === overlay) {
+                        closeStreamExcerptModal();
+                    }
+                });
+                document.body.appendChild(overlay);
+            }
+
+            // Update content
+            const contentEl = document.getElementById('streamExcerptContent');
+            if (contentEl) {
+                contentEl.textContent = `"${excerpt}"`;
+            }
+
+            // Show modal
+            requestAnimationFrame(() => {
+                overlay.classList.add('visible');
+            });
+        }
+
+        // Close stream excerpt modal
+        function closeStreamExcerptModal() {
+            const overlay = document.getElementById('streamExcerptModalOverlay');
+            if (overlay) {
+                overlay.classList.remove('visible');
+            }
         }
 
         // Render the workflows view
