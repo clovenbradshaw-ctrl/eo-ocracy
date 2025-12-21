@@ -29812,6 +29812,48 @@ John Doe,Engineering,john@example.com"
             return true;
         }
 
+        /**
+         * Check if the current user can see a stream note based on visibility settings
+         * @param {Object} streamNote - The stream note object to check
+         * @returns {boolean} - True if user can see the stream note
+         */
+        function canUserSeeStreamNote(streamNote) {
+            if (!streamNote) return false;
+
+            const visibility = streamNote.visibility || 'private';
+
+            // Public notes are visible to everyone
+            if (visibility === 'public') {
+                return true;
+            }
+
+            const currentUserId = getCurrentUserId();
+            const currentUserEmail = AminoIdentity.currentUser?.email;
+
+            // If no current user, can't see private notes
+            if (!currentUserId) return false;
+
+            // Check if note was created by current user (ownerId field)
+            const isOwner = streamNote.ownerId === currentUserId ||
+                           streamNote.ownerId === currentUserEmail;
+
+            if (isOwner) return true;
+
+            // Check if user is in sharedWith list
+            const sharedWith = streamNote.sharedWith || [];
+            if (sharedWith.includes(currentUserId) || sharedWith.includes(currentUserEmail)) {
+                return true;
+            }
+
+            // Private notes are only visible to owner or shared users
+            if (visibility === 'private') {
+                return false;
+            }
+
+            // Default to not visible for unknown visibility types (fail closed for security)
+            return false;
+        }
+
         function getFilteredTasks() {
             let filteredTasks = [...(entities.task || [])];
 
@@ -56636,26 +56678,45 @@ Options:
             const excerpt = task.sourceExcerpt || '';
 
             if (streamNote) {
-                // Note exists - show link to it
+                // Note exists - check if user has permission to view it
+                const canView = canUserSeeStreamNote(streamNote);
                 const date = new Date(streamNote.createdAt);
                 const dateStr = date.toLocaleDateString('en-US', {
                     month: 'short',
                     day: 'numeric'
                 });
 
-                return `
-                    <div class="task-stream-source" onclick="openStreamNoteFromTask('${streamNote.id}')" title="View original note">
-                        <div class="task-stream-source-header">
-                            <i class="ph ph-notepad"></i>
-                            <span>From Stream Note</span>
-                            <span class="task-stream-source-date">${dateStr}</span>
-                            <i class="ph ph-arrow-square-out" style="margin-left: auto; opacity: 0.5;"></i>
+                if (canView) {
+                    // User can view - show clickable link
+                    return `
+                        <div class="task-stream-source" onclick="openStreamNoteFromTask('${streamNote.id}')" title="View original note">
+                            <div class="task-stream-source-header">
+                                <i class="ph ph-notepad"></i>
+                                <span>From Stream Note</span>
+                                <span class="task-stream-source-date">${dateStr}</span>
+                                <i class="ph ph-arrow-square-out" style="margin-left: auto; opacity: 0.5;"></i>
+                            </div>
+                            ${excerpt ? `
+                            <div class="task-stream-source-excerpt">"${escapeHtml(excerpt)}"</div>
+                            ` : ''}
                         </div>
-                        ${excerpt ? `
-                        <div class="task-stream-source-excerpt">"${escapeHtml(excerpt)}"</div>
-                        ` : ''}
-                    </div>
-                `;
+                    `;
+                } else {
+                    // User cannot view - show non-clickable info with lock icon
+                    return `
+                        <div class="task-stream-source" style="cursor: default; opacity: 0.7;" title="You don't have permission to view this note">
+                            <div class="task-stream-source-header">
+                                <i class="ph ph-notepad"></i>
+                                <span>From Stream Note</span>
+                                <span class="task-stream-source-date">${dateStr}</span>
+                                <i class="ph ph-lock" style="margin-left: auto; opacity: 0.7;"></i>
+                            </div>
+                            ${excerpt ? `
+                            <div class="task-stream-source-excerpt">"${escapeHtml(excerpt)}"</div>
+                            ` : ''}
+                        </div>
+                    `;
+                }
             } else if (excerpt) {
                 // Note doesn't exist but we have the excerpt
                 return `
@@ -56674,13 +56735,21 @@ Options:
 
         // Open stream note from task modal
         function openStreamNoteFromTask(noteId) {
-            // Close entity modal first
-            closeEntityModal();
-            // Switch to stream view and open the note
-            switchView('stream');
-            setTimeout(() => {
-                openStreamNote(noteId);
-            }, 100);
+            const streamNote = entities.stream?.find(n => n.id === noteId);
+
+            if (!streamNote) {
+                showStreamToast('Stream note not found');
+                return;
+            }
+
+            // Check if user has permission to view this stream note
+            if (!canUserSeeStreamNote(streamNote)) {
+                showStreamToast('You don\'t have permission to view this note');
+                return;
+            }
+
+            // Open stream note modal directly without closing entity modal or switching views
+            openStreamNote(noteId);
         }
 
         // Render the workflows view
