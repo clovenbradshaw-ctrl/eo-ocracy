@@ -30385,7 +30385,6 @@ John Doe,Engineering,john@example.com"
                 // Sync with completed quick selector
                 const isOnlyCompleted = advancedFilters.status.length === 1 && advancedFilters.status[0] === 'completed';
                 advancedFilters.onlyCompleted = isOnlyCompleted;
-                updateQuickSelectorUI();
             } else if (filterType === 'priority') {
                 if (chip.classList.contains('active')) {
                     if (!advancedFilters.priority.includes(filterValue)) {
@@ -30414,8 +30413,7 @@ John Doe,Engineering,john@example.com"
                 }
             }
 
-            updateFilterActiveCount();
-            updateInlineFilterUI();
+            syncAllFilterUI();
             applyAdvancedFilters();
         }
 
@@ -30436,18 +30434,11 @@ John Doe,Engineering,john@example.com"
                 advancedFilters.status = advancedFilters.status.filter(s => s !== status);
             }
 
-            // Sync with advanced filter panel chips
-            const panelChip = document.querySelector(`.filter-chip[data-filter="status"][data-value="${status}"]`);
-            if (panelChip) {
-                if (isActive) {
-                    panelChip.classList.add('active');
-                } else {
-                    panelChip.classList.remove('active');
-                }
-            }
+            // Sync with completed quick selector
+            const isOnlyCompleted = advancedFilters.status.length === 1 && advancedFilters.status[0] === 'completed';
+            advancedFilters.onlyCompleted = isOnlyCompleted;
 
-            updateFilterActiveCount();
-            updateInlineFilterUI();
+            syncAllFilterUI();
             applyAdvancedFilters();
         }
 
@@ -30467,8 +30458,7 @@ John Doe,Engineering,john@example.com"
                 }
             }
 
-            updateFilterActiveCount();
-            updateQuickFilterChipUI();
+            syncAllFilterUI();
             applyAdvancedFilters();
         }
 
@@ -30490,9 +30480,7 @@ John Doe,Engineering,john@example.com"
                 }
             }
 
-            updateFilterActiveCount();
-            updateQuickFilterChipUI();
-            updateQuickSelectorUI(); // Sync quick selector buttons
+            syncAllFilterUI();
             applyAdvancedFilters();
         }
 
@@ -30540,20 +30528,22 @@ John Doe,Engineering,john@example.com"
                     break;
                 case 'completed':
                     advancedFilters.onlyCompleted = !advancedFilters.onlyCompleted;
-                    // If showing only completed, update status filter
+                    // Toggle 'completed' status in the array like other status filters
                     if (advancedFilters.onlyCompleted) {
-                        advancedFilters.status = ['completed'];
+                        // Ensure completed is in the status array
+                        if (!advancedFilters.status.includes('completed')) {
+                            advancedFilters.status.push('completed');
+                        }
                     } else {
-                        advancedFilters.status = ['pending', 'in_progress', 'completed'];
+                        // Remove completed from status array if other statuses exist
+                        if (advancedFilters.status.length > 1) {
+                            advancedFilters.status = advancedFilters.status.filter(s => s !== 'completed');
+                        }
                     }
-                    // Sync status chips in advanced panel
-                    syncStatusChipsUI();
                     break;
             }
 
-            updateQuickSelectorUI();
-            updateQuickFilterChipUI();
-            updateFilterActiveCount();
+            syncAllFilterUI();
             applyAdvancedFilters();
         }
 
@@ -30624,6 +30614,7 @@ John Doe,Engineering,john@example.com"
             // Sync with legacy viewFilters
             viewFilters[entityType] = isChecked;
 
+            syncAllFilterUI();
             applyAdvancedFilters();
         }
 
@@ -30675,16 +30666,43 @@ John Doe,Engineering,john@example.com"
             }
         }
 
-        // Get count of all active filters for badges
+        // Unified function to sync all filter UI elements
+        function syncAllFilterUI() {
+            updateInlineFilterUI();
+            updateQuickSelectorUI();
+            updateQuickFilterChipUI();
+            syncStatusChipsUI();
+            syncInlineStatusButtons();
+            updateFilterActiveCount();
+        }
+
+        // Sync inline status filter buttons with advancedFilters.status
+        function syncInlineStatusButtons() {
+            ['pending', 'in_progress', 'completed'].forEach(status => {
+                const btn = document.querySelector(`.inline-filter-btn[data-status="${status}"]`);
+                if (btn) {
+                    if (advancedFilters.status.includes(status)) {
+                        btn.classList.add('active');
+                    } else {
+                        btn.classList.remove('active');
+                    }
+                }
+            });
+        }
+
+        // Get count of all active filters for badges (unified logic for all filter UIs)
         function getActiveAdvancedFilterCount() {
             let count = 0;
             if (advancedFilters.status.length < 3) count++;
             if (advancedFilters.priority.length < 3) count++;
             if (advancedFilters.dateFrom || advancedFilters.dateTo || advancedFilters.datePreset) count++;
             if (advancedFilters.assignees.length > 0) count++;
+            if (advancedFilters.entities.length < 4) count++;
             if (advancedFilters.tags.length > 0) count++;
             if (advancedFilters.onlyMe) count++;
             if (advancedFilters.onlyMyTeams) count++;
+            if (advancedFilters.recent) count++;
+            if (advancedFilters.onlyCompleted) count++;
             return count;
         }
 
@@ -30739,7 +30757,7 @@ John Doe,Engineering,john@example.com"
             const selectedBtn = document.querySelector(`.filter-date-preset[data-preset="${preset}"]`);
             if (selectedBtn) selectedBtn.classList.add('active');
 
-            updateFilterActiveCount();
+            syncAllFilterUI();
             applyAdvancedFilters();
         }
 
@@ -30775,7 +30793,7 @@ John Doe,Engineering,john@example.com"
                 advancedFilters.assignees.splice(idx, 1);
             }
             populateAssigneeList();
-            updateFilterActiveCount();
+            syncAllFilterUI();
             applyAdvancedFilters();
         }
 
@@ -30814,13 +30832,8 @@ John Doe,Engineering,john@example.com"
         }
 
         function updateFilterActiveCount() {
-            let count = 0;
-
-            // Count non-default filters (excluding status - shown inline, and entities - in settings)
-            if (advancedFilters.priority.length < 3) count++;
-            if (advancedFilters.dateFrom || advancedFilters.dateTo || advancedFilters.datePreset) count++;
-            if (advancedFilters.assignees.length > 0) count++;
-            if (advancedFilters.tags.length > 0) count++;
+            // Use unified filter count logic
+            const count = getActiveAdvancedFilterCount();
 
             const badge = document.getElementById('filterActiveCount');
             const viewBadge = document.getElementById('viewFilterBadge');
@@ -30854,10 +30867,7 @@ John Doe,Engineering,john@example.com"
                 onlyCompleted: false
             };
 
-            // Reset quick filter selectors UI
-            updateQuickSelectorUI();
-
-            // Reset UI
+            // Reset UI elements that aren't handled by syncAllFilterUI
             document.querySelectorAll('.filter-chip').forEach(chip => {
                 const filterType = chip.dataset.filter;
                 if (filterType === 'tag' || filterType === 'quick') {
@@ -30875,8 +30885,7 @@ John Doe,Engineering,john@example.com"
             viewFilters = { role: true, person: true, team: true, unit: true };
 
             populateAssigneeList();
-            updateFilterActiveCount();
-            updateInlineFilterUI();
+            syncAllFilterUI();
             applyAdvancedFilters();
         }
 
