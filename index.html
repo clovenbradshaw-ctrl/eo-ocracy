@@ -36794,7 +36794,7 @@ Cmd/Ctrl + K - Command palette
             autoRefreshInProgress = true;
 
             const toggle = document.getElementById('autoRefreshToggle');
-            toggle.classList.add('refreshing');
+            if (toggle) toggle.classList.add('refreshing');
 
             try {
                 const activities = await getActivitiesFromXano();
@@ -36839,7 +36839,7 @@ Cmd/Ctrl + K - Command palette
                 console.error('❌ Auto-refresh error:', error);
             } finally {
                 autoRefreshInProgress = false;
-                toggle.classList.remove('refreshing');
+                if (toggle) toggle.classList.remove('refreshing');
             }
         }
 
@@ -43584,7 +43584,9 @@ Cmd/Ctrl + K - Command palette
             // Build a lookup of ALL entities for hierarchy calculation (including person)
             const allEntities = new Map();
             ['unit', 'team', 'role', 'person', 'object'].forEach(type => {
-                entities[type].forEach(e => allEntities.set(e.id, e));
+                if (entities[type]) {
+                    entities[type].forEach(e => allEntities.set(e.id, e));
+                }
             });
 
             // Build FULL hierarchy from DES relationships (unit -> team -> role)
@@ -55860,7 +55862,15 @@ Options:
                 saveWorkspaces();
 
                 // Log to activity
-                logActivity('task', taskId, 'created', { source: 'stream' });
+                logActivityToXano({
+                    event_verb: 'created',
+                    eo_operator: 'INS',
+                    k_frame: 'Stream Task',
+                    object_type: 'task',
+                    object_id: taskId,
+                    object_label: newTask.name,
+                    data_json: { source: 'stream' }
+                }, false);
 
                 // Hide menu and clear selection
                 hideStreamFloatingMenu();
