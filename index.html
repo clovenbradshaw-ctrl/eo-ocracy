@@ -24856,6 +24856,9 @@
                             <button class="bulk-import-entity-btn" data-type="product" onclick="selectBulkImportType('product')">
                                 <i class="ph ph-package"></i> Products
                             </button>
+                            <button class="bulk-import-entity-btn" data-type="task" onclick="selectBulkImportType('task')">
+                                <i class="ph ph-check-square"></i> Tasks
+                            </button>
                         </div>
                     </div>
 
@@ -24991,6 +24994,18 @@ John Doe,Engineering,john@example.com"
                                 <table class="bulk-import-preview-table" id="bulkImportFinalTable">
                                 </table>
                             </div>
+                        </div>
+                    </div>
+
+                    <!-- Progress indicator for large imports -->
+                    <div id="bulkImportProgress" style="display: none; padding: 2rem; text-align: center;">
+                        <div style="margin-bottom: 1rem;">
+                            <i class="ph ph-spinner" style="font-size: 2rem; color: #C88F4A; animation: spin 1s linear infinite;"></i>
+                        </div>
+                        <div style="font-size: 1rem; font-weight: 600; color: #6B5642; margin-bottom: 0.5rem;">Importing tasks...</div>
+                        <div style="font-size: 0.875rem; color: #8B6F47; margin-bottom: 1rem;" id="bulkImportProgressText">Processing...</div>
+                        <div style="background: #E5DDD1; border-radius: 4px; height: 8px; overflow: hidden;">
+                            <div id="bulkImportProgressBar" style="background: #C88F4A; height: 100%; width: 0%; transition: width 0.3s ease;"></div>
                         </div>
                     </div>
 
@@ -44197,6 +44212,73 @@ Cmd/Ctrl + K - Command palette
             processedData: []
         };
 
+        // Transform functions for field value normalization
+        const bulkImportTransforms = {
+            // Transform various date formats to YYYY-MM-DD
+            date: (value) => {
+                if (!value || value.trim() === '') return null;
+                const trimmed = value.trim();
+
+                // Try MM/DD/YYYY format
+                const usMatch = trimmed.match(/^(\d{1,2})\/(\d{1,2})\/(\d{4})$/);
+                if (usMatch) {
+                    const [, month, day, year] = usMatch;
+                    return `${year}-${month.padStart(2, '0')}-${day.padStart(2, '0')}`;
+                }
+
+                // Try DD/MM/YYYY format
+                const euMatch = trimmed.match(/^(\d{1,2})-(\d{1,2})-(\d{4})$/);
+                if (euMatch) {
+                    const [, day, month, year] = euMatch;
+                    return `${year}-${month.padStart(2, '0')}-${day.padStart(2, '0')}`;
+                }
+
+                // Try YYYY-MM-DD format (already correct)
+                const isoMatch = trimmed.match(/^(\d{4})-(\d{2})-(\d{2})$/);
+                if (isoMatch) return trimmed;
+
+                // Try to parse with Date object as fallback
+                const parsed = new Date(trimmed);
+                if (!isNaN(parsed.getTime())) {
+                    return parsed.toISOString().split('T')[0];
+                }
+
+                return null;
+            },
+
+            // Transform status values to internal format
+            taskStatus: (value) => {
+                if (!value) return 'pending';
+                const lower = value.toLowerCase().trim();
+                if (lower === 'complete' || lower === 'completed' || lower === 'done') return 'completed';
+                if (lower === 'in_progress' || lower === 'in progress' || lower === 'inprogress' || lower === 'active') return 'in_progress';
+                return 'pending'; // Default to pending
+            },
+
+            // Transform priority values to internal format
+            priority: (value) => {
+                if (!value) return 'medium';
+                const lower = value.toLowerCase().trim();
+
+                // Handle text values
+                if (lower === 'low' || lower === 'minor') return 'low';
+                if (lower === 'normal' || lower === 'medium' || lower === 'moderate') return 'medium';
+                if (lower === 'high' || lower === 'important') return 'high';
+                if (lower === 'urgent' || lower === 'critical' || lower === 'highest') return 'urgent';
+
+                // Handle numeric values (1=low, 2=medium/normal, 3=high, 4=urgent)
+                const num = parseInt(value);
+                if (!isNaN(num)) {
+                    if (num <= 1) return 'low';
+                    if (num === 2) return 'medium';
+                    if (num === 3) return 'high';
+                    if (num >= 4) return 'urgent';
+                }
+
+                return 'medium'; // Default
+            }
+        };
+
         // Field definitions for each entity type
         const bulkImportFields = {
             unit: [
@@ -44218,6 +44300,22 @@ Cmd/Ctrl + K - Command palette
             object: [
                 { key: 'name', label: 'Name', required: true },
                 { key: 'parent', label: 'Parent Role', required: false, type: 'relationship', targetType: 'role' }
+            ],
+            product: [
+                { key: 'name', label: 'Name', required: true },
+                { key: 'parent', label: 'Parent Role', required: false, type: 'relationship', targetType: 'role' }
+            ],
+            task: [
+                { key: 'name', label: 'Subject/Name', required: true, aliases: ['subject', 'title', 'task_name', 'task'] },
+                { key: 'status', label: 'Status', required: false, aliases: ['task_status'], transform: 'taskStatus' },
+                { key: 'dueDate', label: 'Due Date', required: false, aliases: ['due', 'due_date', 'deadline'], transform: 'date' },
+                { key: 'priority', label: 'Priority', required: false, aliases: ['priority_value'], transform: 'priority' },
+                { key: 'description', label: 'Description', required: false, aliases: ['notes', 'details'] },
+                { key: 'assignee', label: 'Assignee', required: false, aliases: ['assignee_first_name', 'clio_user', 'assigned_to'], type: 'lookup', lookupType: 'person' },
+                { key: 'role', label: 'Assigned Role', required: false, type: 'relationship', targetType: 'role' },
+                { key: 'externalId', label: 'External ID', required: false, aliases: ['uniqueid', 'unique_id', 'id', 'external_id', 'clio_id'] },
+                { key: 'matterNumber', label: 'Matter/Case Number', required: false, aliases: ['matter_display_number', 'matter_custom_number', 'case_number', 'matter'] },
+                { key: 'tags', label: 'Tags', required: false, aliases: ['labels', 'categories'] }
             ]
         };
 
@@ -44454,9 +44552,10 @@ Cmd/Ctrl + K - Command palette
             document.getElementById('bulkImportImportBtn').style.display = step === 3 ? 'inline-flex' : 'none';
             document.getElementById('bulkImportDoneBtn').style.display = 'none';
 
-            // Reset success content visibility
+            // Reset success content and progress indicator visibility
             document.getElementById('bulkImportReviewContent').style.display = 'block';
             document.getElementById('bulkImportSuccessContent').style.display = 'none';
+            document.getElementById('bulkImportProgress').style.display = 'none';
 
             updateBulkImportNextButton();
         }
@@ -44488,12 +44587,29 @@ Cmd/Ctrl + K - Command palette
             bulkImportState.setAllValues = {};
 
             fields.forEach(field => {
-                // Try to find a matching header
-                const matchingHeader = bulkImportState.headers.find(h =>
-                    h.toLowerCase().includes(field.key.toLowerCase()) ||
-                    h.toLowerCase().includes(field.label.toLowerCase().split(' ')[0].toLowerCase())
-                );
-                if (matchingHeader) {
+                // Try to find a matching header - check field key, label, and aliases
+                const matchingHeader = bulkImportState.headers.find(h => {
+                    const headerLower = h.toLowerCase().replace(/[_\s-]/g, '');
+                    const keyLower = field.key.toLowerCase().replace(/[_\s-]/g, '');
+                    const labelLower = field.label.toLowerCase().split(' ')[0].replace(/[_\s-]/g, '');
+
+                    // Check exact or partial match with key/label
+                    if (headerLower.includes(keyLower) || headerLower.includes(labelLower) ||
+                        keyLower.includes(headerLower) || labelLower.includes(headerLower)) {
+                        return true;
+                    }
+
+                    // Check aliases if defined
+                    if (field.aliases) {
+                        return field.aliases.some(alias => {
+                            const aliasLower = alias.toLowerCase().replace(/[_\s-]/g, '');
+                            return headerLower === aliasLower || headerLower.includes(aliasLower) || aliasLower.includes(headerLower);
+                        });
+                    }
+
+                    return false;
+                });
+                if (matchingHeader && !Object.values(bulkImportState.fieldMappings).includes(field.key)) {
                     bulkImportState.fieldMappings[matchingHeader] = field.key;
                 }
             });
@@ -44678,6 +44794,14 @@ Cmd/Ctrl + K - Command palette
                         }
                     }
 
+                    // Apply transform if defined (for tasks: date, status, priority)
+                    if (value && field.transform && bulkImportTransforms[field.transform]) {
+                        const transformed = bulkImportTransforms[field.transform](value);
+                        if (transformed !== null) {
+                            value = transformed;
+                        }
+                    }
+
                     processed[field.key] = value;
 
                     // Validate required fields
@@ -44707,7 +44831,9 @@ Cmd/Ctrl + K - Command palette
                 team: 'Teams',
                 role: 'Roles',
                 person: 'People',
-                object: 'Objects'
+                object: 'Objects',
+                product: 'Products',
+                task: 'Tasks'
             };
             document.getElementById('bulkImportEntityTypeLabel').innerHTML =
                 `Importing as: <strong>${typeLabels[bulkImportState.entityType]}</strong>`;
@@ -44759,123 +44885,264 @@ Cmd/Ctrl + K - Command palette
             const entityType = bulkImportState.entityType;
             const fields = bulkImportFields[entityType];
             let importedCount = 0;
+            const totalItems = validItems.length;
+            const currentUserId = AminoIdentity.currentUser?.id || AminoIdentity.currentUser?.email || null;
 
-            validItems.forEach(item => {
-                const name = item.name;
-                if (!name) return;
+            // Show progress for large imports
+            const progressEl = document.getElementById('bulkImportProgress');
+            const progressBar = document.getElementById('bulkImportProgressBar');
+            const progressText = document.getElementById('bulkImportProgressText');
+            if (totalItems > 50 && progressEl) {
+                progressEl.style.display = 'block';
+            }
 
-                // Create entity
-                const id = entityType[0] + Date.now() + Math.random().toString(36).substr(2, 5);
-                const entity = {
-                    id,
-                    name,
-                    type: entityType
-                };
+            // Process items in batches for large imports
+            const batchSize = 100;
+            let currentIndex = 0;
 
-                entities[entityType].push(entity);
+            function processBatch() {
+                const batchEnd = Math.min(currentIndex + batchSize, totalItems);
 
-                // Log to Xano (suppress individual toasts for bulk operations)
-                logActivityToXano({
-                    event_verb: 'INS',
-                    eo_operator: 'INS',
-                    k_frame: 'Entity (Bulk Import)',
-                    object_type: entityType,
-                    object_id: id,
-                    object_label: name,
-                    data_json: {
-                        entity_type: entityType,
-                        entity_name: name,
-                        import_source: 'bulk_import'
-                    }
-                }, false);
+                for (let i = currentIndex; i < batchEnd; i++) {
+                    const item = validItems[i];
+                    const name = item.name;
+                    if (!name) continue;
 
-                // Handle relationships
-                fields.forEach(field => {
-                    if (field.type === 'relationship' && item[field.key]) {
-                        const targetName = item[field.key];
-                        const targetTypes = field.targetTypes || [field.targetType];
+                    // Special handling for tasks
+                    if (entityType === 'task') {
+                        const taskId = 'task' + Date.now() + Math.random().toString(36).substr(2, 5);
 
-                        // Find matching entity
-                        let targetEntity = null;
-                        for (const tt of targetTypes) {
-                            targetEntity = entities[tt]?.find(e =>
-                                e.name.toLowerCase() === targetName.toLowerCase()
+                        // Apply transforms to get proper values
+                        const status = bulkImportTransforms.taskStatus(item.status);
+                        const dueDate = bulkImportTransforms.date(item.dueDate);
+                        const priority = bulkImportTransforms.priority(item.priority);
+
+                        // Build tags array from matterNumber and tags field
+                        const tags = [];
+                        if (item.matterNumber) {
+                            tags.push(item.matterNumber);
+                        }
+                        if (item.tags) {
+                            // Split tags by comma or semicolon
+                            const additionalTags = item.tags.split(/[,;]/).map(t => t.trim()).filter(t => t);
+                            tags.push(...additionalTags);
+                        }
+
+                        // Find assigned role if specified
+                        let assignedEntityId = null;
+                        let assignedEntityType = null;
+                        if (item.role) {
+                            const role = entities.role?.find(r =>
+                                r.name.toLowerCase() === item.role.toLowerCase()
                             );
-                            if (targetEntity) break;
+                            if (role) {
+                                assignedEntityId = role.id;
+                                assignedEntityType = 'role';
+                            }
                         }
 
-                        // Skip person-role relationships - people cannot have activities
-                        if (field.key === 'role' && entityType === 'person') {
-                            return;
-                        }
+                        // Create task object with all fields
+                        const taskObject = {
+                            id: taskId,
+                            name: name,
+                            type: 'task',
+                            description: item.description || '',
+                            dueDate: dueDate,
+                            predecessorId: null,
+                            status: status,
+                            priority: priority,
+                            tags: tags,
+                            collaborators: [],
+                            recurring: null,
+                            producesProductId: null,
+                            followsWorkflowId: null,
+                            airtableTags: [],
+                            createdAt: new Date().toISOString(),
+                            createdBy: currentUserId,
+                            visibility: 'public',
+                            visibilityTeamId: null,
+                            assignedEntityId: assignedEntityId,
+                            assignedEntityType: assignedEntityType,
+                            externalId: item.externalId || null,
+                            importedFrom: 'csv_bulk_import'
+                        };
 
-                        if (targetEntity) {
-                            // Create hierarchy relationship: Parent DES Child
+                        if (!entities.task) entities.task = [];
+                        entities.task.push(taskObject);
+
+                        // Log to Xano
+                        logActivityToXano({
+                            event_verb: 'INS',
+                            eo_operator: 'INS',
+                            k_frame: 'Task (Bulk Import)',
+                            object_type: 'task',
+                            object_id: taskId,
+                            object_label: name,
+                            data_json: {
+                                entity_name: name,
+                                description: item.description || '',
+                                dueDate: dueDate,
+                                status: status,
+                                priority: priority,
+                                externalId: item.externalId || null,
+                                matterNumber: item.matterNumber || null,
+                                import_source: 'bulk_import'
+                            }
+                        }, false);
+
+                        // Create role relationship if found
+                        if (assignedEntityId) {
                             const relId = 'rel' + Date.now() + Math.random().toString(36).substr(2, 5);
-                            const subjectId = targetEntity.id;
-                            const objectId = id;
-                            const predicate = 'DES';
-
                             relationships.push({
                                 id: relId,
-                                subject: subjectId,
-                                predicate: predicate,
-                                object: objectId
+                                subject: assignedEntityId,
+                                predicate: 'CON',
+                                object: taskId
                             });
-
-                            // Log relationship (suppress individual toasts for bulk operations)
-                            logActivityToXano({
-                                event_verb: predicate,
-                                eo_operator: predicate,
-                                k_frame: 'Connection (Bulk Import)',
-                                object_type: 'relationship',
-                                object_id: relId,
-                                object_label: `${findEntity(subjectId)?.name} ${predicate} ${findEntity(objectId)?.name}`,
-                                data_json: {
-                                    subject_id: subjectId,
-                                    object_id: objectId,
-                                    predicate: predicate,
-                                    import_source: 'bulk_import'
-                                }
-                            }, false);
                         }
+
+                    } else {
+                        // Standard entity creation (non-task)
+                        const id = entityType[0] + Date.now() + Math.random().toString(36).substr(2, 5);
+                        const entity = {
+                            id,
+                            name,
+                            type: entityType
+                        };
+
+                        entities[entityType].push(entity);
+
+                        // Log to Xano (suppress individual toasts for bulk operations)
+                        logActivityToXano({
+                            event_verb: 'INS',
+                            eo_operator: 'INS',
+                            k_frame: 'Entity (Bulk Import)',
+                            object_type: entityType,
+                            object_id: id,
+                            object_label: name,
+                            data_json: {
+                                entity_type: entityType,
+                                entity_name: name,
+                                import_source: 'bulk_import'
+                            }
+                        }, false);
+
+                        // Handle relationships
+                        fields.forEach(field => {
+                            if (field.type === 'relationship' && item[field.key]) {
+                                const targetName = item[field.key];
+                                const targetTypes = field.targetTypes || [field.targetType];
+
+                                // Find matching entity
+                                let targetEntity = null;
+                                for (const tt of targetTypes) {
+                                    targetEntity = entities[tt]?.find(e =>
+                                        e.name.toLowerCase() === targetName.toLowerCase()
+                                    );
+                                    if (targetEntity) break;
+                                }
+
+                                // Skip person-role relationships - people cannot have activities
+                                if (field.key === 'role' && entityType === 'person') {
+                                    return;
+                                }
+
+                                if (targetEntity) {
+                                    // Create hierarchy relationship: Parent DES Child
+                                    const relId = 'rel' + Date.now() + Math.random().toString(36).substr(2, 5);
+                                    const subjectId = targetEntity.id;
+                                    const objectId = id;
+                                    const predicate = 'DES';
+
+                                    relationships.push({
+                                        id: relId,
+                                        subject: subjectId,
+                                        predicate: predicate,
+                                        object: objectId
+                                    });
+
+                                    // Log relationship (suppress individual toasts for bulk operations)
+                                    logActivityToXano({
+                                        event_verb: predicate,
+                                        eo_operator: predicate,
+                                        k_frame: 'Connection (Bulk Import)',
+                                        object_type: 'relationship',
+                                        object_id: relId,
+                                        object_label: `${findEntity(subjectId)?.name} ${predicate} ${findEntity(objectId)?.name}`,
+                                        data_json: {
+                                            subject_id: subjectId,
+                                            object_id: objectId,
+                                            predicate: predicate,
+                                            import_source: 'bulk_import'
+                                        }
+                                    }, false);
+                                }
+                            }
+                        });
                     }
-                });
 
-                importedCount++;
-            });
+                    importedCount++;
+                }
 
-            // Save and refresh
-            saveToLocalStorage();
-            renderEntityList();
-            updateSelects();
-            updateParentOptions();
-            renderActivityList();
+                // Update progress
+                if (progressBar && progressText) {
+                    const progress = Math.round((batchEnd / totalItems) * 100);
+                    progressBar.style.width = progress + '%';
+                    progressText.textContent = `${batchEnd} of ${totalItems} items...`;
+                }
 
-            if (currentView === 'graph') {
-                updateGraph();
-            } else if (currentView === 'tree') {
-                renderTreeView();
-            } else if (currentView === 'card') {
-                renderCardView();
+                currentIndex = batchEnd;
+
+                // Continue with next batch or finish
+                if (currentIndex < totalItems) {
+                    // Use setTimeout to allow UI updates
+                    setTimeout(processBatch, 0);
+                } else {
+                    finishImport();
+                }
             }
 
-            // Show success
-            document.getElementById('bulkImportReviewContent').style.display = 'none';
-            document.getElementById('bulkImportSuccessContent').style.display = 'block';
-            document.getElementById('bulkImportSuccessMessage').textContent =
-                `Successfully imported ${importedCount} ${bulkImportState.entityType}${importedCount !== 1 ? 's' : ''}.`;
+            function finishImport() {
+                // Hide progress
+                if (progressEl) {
+                    progressEl.style.display = 'none';
+                }
 
-            // Show summary toast for bulk import
-            if (importedCount > 0) {
-                showActivityToast('success', 'Bulk Import Complete', `${importedCount} ${bulkImportState.entityType}${importedCount !== 1 ? 's' : ''} saved`);
+                // Save and refresh
+                saveToLocalStorage();
+                renderEntityList();
+                updateSelects();
+                updateParentOptions();
+                renderActivityList();
+
+                if (currentView === 'graph') {
+                    updateGraph();
+                } else if (currentView === 'tree') {
+                    renderTreeView();
+                } else if (currentView === 'card') {
+                    renderCardView();
+                }
+
+                // Show success
+                document.getElementById('bulkImportReviewContent').style.display = 'none';
+                document.getElementById('bulkImportSuccessContent').style.display = 'block';
+                document.getElementById('bulkImportSuccessMessage').textContent =
+                    `Successfully imported ${importedCount} ${bulkImportState.entityType}${importedCount !== 1 ? 's' : ''}.`;
+
+                // Show summary toast for bulk import
+                if (importedCount > 0) {
+                    showActivityToast('success', 'Bulk Import Complete', `${importedCount} ${bulkImportState.entityType}${importedCount !== 1 ? 's' : ''} saved`);
+                }
+
+                // Update footer
+                document.getElementById('bulkImportImportBtn').style.display = 'none';
+                document.getElementById('bulkImportBackBtn').style.display = 'none';
+                document.getElementById('bulkImportDoneBtn').style.display = 'inline-flex';
+                document.getElementById('bulkImportFooterInfo').textContent = 'Import complete!';
             }
 
-            // Update footer
-            document.getElementById('bulkImportImportBtn').style.display = 'none';
-            document.getElementById('bulkImportBackBtn').style.display = 'none';
-            document.getElementById('bulkImportDoneBtn').style.display = 'inline-flex';
-            document.getElementById('bulkImportFooterInfo').textContent = 'Import complete!';
+            // Start processing
+            processBatch();
         }
 
         function saveWorkspaceName() {
