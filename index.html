@@ -39286,6 +39286,11 @@ Cmd/Ctrl + K - Command palette
                     if (activity.visibility) entity.visibility = activity.visibility;
                     if (activity.sharedWith) entity.sharedWith = activity.sharedWith;
                     if (activity.archived !== undefined) entity.archived = activity.archived;
+                    // Bulk import fields - preserve all original CSV data
+                    if (activity.importedData) entity.importedData = activity.importedData;
+                    if (activity.originalImport) entity.originalImport = activity.originalImport;
+                    if (activity.import_source) entity.importedFrom = activity.import_source;
+                    if (activity.externalId) entity.externalId = activity.externalId;
 
                     reconstructedEntities[objectType].push(entity);
                     entityMap.set(objectId, entity);
@@ -47447,6 +47452,16 @@ Cmd/Ctrl + K - Command palette
                             }
                         }
 
+                        // Preserve ALL original CSV data (including unmapped columns) for future use
+                        // This allows the client app to access any imported field later
+                        const importedData = {};
+                        const knownFields = ['name', 'description', 'status', 'dueDate', 'priority', 'matterNumber', 'tags', 'role', 'externalId', '_errors', '_row'];
+                        for (const key of Object.keys(item)) {
+                            if (!knownFields.includes(key)) {
+                                importedData[key] = item[key];
+                            }
+                        }
+
                         // Create task object with all fields
                         const taskObject = {
                             id: taskId,
@@ -47470,13 +47485,17 @@ Cmd/Ctrl + K - Command palette
                             assignedEntityId: assignedEntityId,
                             assignedEntityType: assignedEntityType,
                             externalId: item.externalId || generateUUID(),
-                            importedFrom: 'csv_bulk_import'
+                            importedFrom: 'csv_bulk_import',
+                            // Store ALL original CSV data for future access
+                            importedData: Object.keys(importedData).length > 0 ? importedData : null,
+                            // Store the complete original row as-is
+                            originalImport: { ...item, _errors: undefined, _row: undefined }
                         };
 
                         if (!entities.task) entities.task = [];
                         entities.task.push(taskObject);
 
-                        // Log to Xano
+                        // Log to Xano - include ALL imported data for reconstruction
                         logActivityToXano({
                             event_verb: 'INS',
                             eo_operator: 'INS',
@@ -47490,9 +47509,13 @@ Cmd/Ctrl + K - Command palette
                                 dueDate: dueDate,
                                 status: status,
                                 priority: priority,
+                                tags: tags,
                                 externalId: taskObject.externalId,
                                 matterNumber: item.matterNumber || null,
-                                import_source: 'bulk_import'
+                                import_source: 'bulk_import',
+                                // Include ALL original data for reconstruction
+                                importedData: taskObject.importedData,
+                                originalImport: taskObject.originalImport
                             }
                         }, false);
 
@@ -47614,12 +47637,23 @@ Cmd/Ctrl + K - Command palette
                     progressEl.style.display = 'none';
                 }
 
-                // Save and refresh
-                saveToLocalStorage();
+                // Force update workspace with imported entities before saving
+                if (currentWorkspaceId && workspaces[currentWorkspaceId]) {
+                    workspaces[currentWorkspaceId].entities = JSON.parse(JSON.stringify(entities));
+                    workspaces[currentWorkspaceId].relationships = JSON.parse(JSON.stringify(relationships));
+                    workspaces[currentWorkspaceId].updatedAt = Date.now();
+                }
+
+                // Save with immediate option for instant visibility
+                saveToLocalStorage({ immediate: true });
+
+                // Full UI refresh
                 renderEntityList();
                 updateSelects();
                 updateParentOptions();
                 renderActivityList();
+                updateTaskCountBadge();
+                updateFilterStatus();
 
                 // Refresh the current view to display imported data
                 switch (currentView) {
@@ -60711,9 +60745,11 @@ Options:
                 initAutoRefresh();
 
                 // Initialize update polling system
-                // Polling every 3 seconds will sync any changes from other users
-                // No need for immediate sync - trust localStorage on page load
                 initUpdatePolling();
+
+                // Immediately sync from Xano to pick up any externally imported records
+                // This ensures bulk imported data shows up instantly on page load
+                performUpdateCheck();
 
                 debug.log('🎉 Initialization complete!');
                 debug.log('📊 Current state:', {
