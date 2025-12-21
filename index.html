@@ -1755,10 +1755,19 @@
             gap: 0.5rem;
         }
 
+        /* Main app container - flex layout for proper header/content sizing */
+        #mainAppContainer {
+            display: flex;
+            flex-direction: column;
+            height: 100vh;
+            min-height: 0;
+        }
+
         .container {
             display: grid;
             grid-template-columns: 320px 1fr;
-            height: calc(100vh - 100px);
+            flex: 1;
+            min-height: 0;
         }
 
         .panel {
@@ -3347,6 +3356,7 @@
             position: relative;
             overflow: hidden;
             height: 100%;
+            min-height: 0;
         }
 
         .tree-view {
@@ -11862,6 +11872,7 @@
             display: none;
             flex-direction: column;
             height: 100%;
+            min-height: 0;
             background: #FAF7F5;
             overflow: auto;
         }
@@ -17523,6 +17534,7 @@
             display: none;
             flex-direction: column;
             height: 100%;
+            min-height: 0;
             background: #FAF7F5;
         }
 
@@ -17915,6 +17927,7 @@
             display: none;
             flex-direction: column;
             height: 100%;
+            min-height: 0;
             background: #FAF7F5;
         }
 
@@ -18804,6 +18817,7 @@
         .stream-view {
             display: none;
             height: 100%;
+            min-height: 0;
             background: #FAF7F5;
         }
 
@@ -19495,6 +19509,7 @@
             display: none;
             flex-direction: column;
             height: 100%;
+            min-height: 0;
             background: #FAF7F5;
         }
 
@@ -19684,6 +19699,7 @@
             display: none;
             flex-direction: column;
             height: 100%;
+            min-height: 0;
             background: #FAF7F5;
         }
 
@@ -20040,6 +20056,7 @@
             display: none;
             flex-direction: column;
             height: 100%;
+            min-height: 0;
             background: #FAF7F5;
         }
 
@@ -20313,6 +20330,7 @@
             display: none;
             flex-direction: column;
             height: 100%;
+            min-height: 0;
             background: #FAF7F5;
         }
 
