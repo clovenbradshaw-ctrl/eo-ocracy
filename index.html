@@ -12119,21 +12119,22 @@
 
         .structure-orphan-item.clickable:hover {
             background: #E5DDD1;
-            transform: translateY(-1px);
             box-shadow: 0 2px 4px rgba(0,0,0,0.08);
         }
 
         .structure-orphan-item.clickable .assign-hint {
-            display: none;
-            font-size: 0.6875rem;
-            color: #8B7B6B;
-            margin-left: auto;
-        }
-
-        .structure-orphan-item.clickable:hover .assign-hint {
             display: flex;
             align-items: center;
             gap: 0.25rem;
+            font-size: 0.6875rem;
+            color: #8B7B6B;
+            margin-left: auto;
+            opacity: 0;
+            transition: opacity 0.2s ease;
+        }
+
+        .structure-orphan-item.clickable:hover .assign-hint {
+            opacity: 1;
         }
 
         /* Assignment dropdown */
