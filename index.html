@@ -26840,16 +26840,20 @@ John Doe,Engineering,john@example.com"
                 const requestBody = {
                     type: 'login_code',
                     email: email,
-                    code: code,
                     subject: 'Your login code for TaskFlow',
                     sender: 'TaskFlow',
                     app: 'taskflow',
                     timestamp: new Date().toISOString(),
+                    // Login data object (matches notification structure for task emails)
+                    loginData: {
+                        code: code,
+                        email: email
+                    },
                     htmlBody: htmlBody
                 };
 
                 // Log request (sanitize code for security)
-                const sanitizedBody = { ...requestBody, code: '****' };
+                const sanitizedBody = { ...requestBody, loginData: { ...requestBody.loginData, code: '****' } };
                 const requestId = ApiLogger.logRequest('POST', this.webhookUrl, sanitizedBody, 'Auth');
                 const startTime = performance.now();
 
@@ -46297,11 +46301,14 @@ Cmd/Ctrl + K - Command palette
             sendLoginCode: {
                 type: 'login_code',
                 email: 'test@example.com',
-                code: '123456',
                 subject: 'Your login code for TaskFlow',
                 sender: 'TaskFlow',
                 app: 'taskflow',
                 timestamp: new Date().toISOString(),
+                loginData: {
+                    code: '123456',
+                    email: 'test@example.com'
+                },
                 _webhookUrl: 'https://n8n.intelechia.com/webhook-test/6dab38a9-d010-43b4-9669-5a58dbcfab36'
             },
             custom: {
@@ -46411,8 +46418,8 @@ Cmd/Ctrl + K - Command palette
                 }
 
                 // If this is a login_code email, generate and include the HTML body
-                if (body.type === 'login_code' && body.code && body.email && !body.htmlBody) {
-                    body.htmlBody = EmailTemplates.loginCode({ code: body.code, email: body.email });
+                if (body.type === 'login_code' && body.loginData && !body.htmlBody) {
+                    body.htmlBody = EmailTemplates.loginCode({ code: body.loginData.code, email: body.loginData.email });
                 }
             }
 
