@@ -56204,7 +56204,7 @@ Options:
                 }
             });
 
-            saveEntitiesToLocalStorage();
+            saveToLocalStorage();
             selectedTaskIds.clear();
             renderTaskTable();
             showToast(`Updated ${count} task${count > 1 ? 's' : ''} to "${statusLabels[newStatus]}"`, 'success');
@@ -56225,7 +56225,7 @@ Options:
                 relationships = relationships.filter(r => r.subject !== taskId && r.object !== taskId);
             });
 
-            saveEntitiesToLocalStorage();
+            saveToLocalStorage();
             selectedTaskIds.clear();
             renderTaskTable();
             showToast(`Deleted ${count} task${count > 1 ? 's' : ''}`, 'success');
@@ -56272,7 +56272,7 @@ Options:
                 }
             });
 
-            saveEntitiesToLocalStorage();
+            saveToLocalStorage();
             selectedTaskIds.clear();
             renderKanbanBoard();
             showToast(`Updated ${count} task${count > 1 ? 's' : ''} to "${statusLabels[newStatus]}"`, 'success');
@@ -56293,7 +56293,7 @@ Options:
                 relationships = relationships.filter(r => r.subject !== taskId && r.object !== taskId);
             });
 
-            saveEntitiesToLocalStorage();
+            saveToLocalStorage();
             selectedTaskIds.clear();
             renderKanbanBoard();
             showToast(`Deleted ${count} task${count > 1 ? 's' : ''}`, 'success');
@@ -59283,7 +59283,7 @@ Options:
                 }
             });
 
-            saveEntitiesToLocalStorage();
+            saveToLocalStorage();
             selectedTaskIds.clear();
             renderGanttView();
             showToast(`Updated ${count} task${count > 1 ? 's' : ''} to "${statusLabels[newStatus]}"`, 'success');
@@ -59304,7 +59304,7 @@ Options:
                 relationships = relationships.filter(r => r.subject !== taskId && r.object !== taskId);
             });
 
-            saveEntitiesToLocalStorage();
+            saveToLocalStorage();
             selectedTaskIds.clear();
             renderGanttView();
             showToast(`Deleted ${count} task${count > 1 ? 's' : ''}`, 'success');
