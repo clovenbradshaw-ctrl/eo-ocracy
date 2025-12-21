@@ -19036,6 +19036,18 @@
             pointer-events: none;
         }
 
+        /* Highlight state when text is selected as potential task */
+        .stream-editor.stream-text-highlighted {
+            background: linear-gradient(135deg, #FFF9F0 0%, #FFF5E6 100%);
+            border-color: #C88F4A;
+            box-shadow: 0 0 0 3px rgba(200, 143, 74, 0.15), inset 0 0 20px rgba(200, 143, 74, 0.05);
+        }
+
+        .stream-editor.stream-text-highlighted::selection,
+        .stream-editor.stream-text-highlighted *::selection {
+            background: rgba(200, 143, 74, 0.3);
+        }
+
         /* Floating menu for task creation */
         .stream-floating-menu {
             position: absolute;
@@ -25296,7 +25308,7 @@
                         </div>
 
                         <div class="stream-editor-wrapper">
-                            <div class="stream-editor" id="streamEditor" contenteditable="true" placeholder="Start writing... select text to create tasks"></div>
+                            <div class="stream-editor" id="streamEditor" contenteditable="true" placeholder="Start writing... click anywhere to make entire text a task"></div>
 
                             <!-- Floating menu for task creation -->
                             <div class="stream-floating-menu" id="streamFloatingMenu">
@@ -57376,6 +57388,10 @@ Options:
         // Track if document click handler is already added
         let streamClickHandlerAdded = false;
 
+        // Track if a drag selection is in progress
+        let streamMouseDownTime = 0;
+        let streamMouseDownPos = { x: 0, y: 0 };
+
         // Setup editor event listeners
         function setupStreamEditorListeners() {
             const editor = document.getElementById('streamEditor');
@@ -57385,19 +57401,101 @@ Options:
             const newEditor = editor.cloneNode(true);
             editor.parentNode.replaceChild(newEditor, editor);
 
-            // Selection change handler
-            newEditor.addEventListener('mouseup', handleStreamSelectionChange);
+            // Track mouse down for click vs drag detection
+            newEditor.addEventListener('mousedown', (e) => {
+                streamMouseDownTime = Date.now();
+                streamMouseDownPos = { x: e.clientX, y: e.clientY };
+            });
+
+            // Selection change handler - handles both click and drag selection
+            newEditor.addEventListener('mouseup', handleStreamMouseUp);
             newEditor.addEventListener('keyup', handleStreamSelectionChange);
 
-            // Click outside to hide menu (only add once)
+            // Click outside to hide menu and remove highlight (only add once)
             if (!streamClickHandlerAdded) {
                 streamClickHandlerAdded = true;
                 document.addEventListener('click', (e) => {
                     const menu = document.getElementById('streamFloatingMenu');
+                    const editorEl = document.getElementById('streamEditor');
                     if (menu && !menu.contains(e.target) && !e.target.closest('#streamEditor')) {
                         hideStreamFloatingMenu();
+                        // Remove highlight when clicking outside
+                        if (editorEl) {
+                            editorEl.classList.remove('stream-text-highlighted');
+                        }
                     }
                 });
+            }
+        }
+
+        // Handle mouse up - distinguish between click and drag selection
+        function handleStreamMouseUp(e) {
+            const editor = document.getElementById('streamEditor');
+            if (!editor) return;
+
+            const timeDiff = Date.now() - streamMouseDownTime;
+            const distX = Math.abs(e.clientX - streamMouseDownPos.x);
+            const distY = Math.abs(e.clientY - streamMouseDownPos.y);
+            const isClick = timeDiff < 300 && distX < 5 && distY < 5;
+
+            const selection = window.getSelection();
+            const selectedText = selection.toString().trim();
+
+            // If it's a quick click with no drag selection, and there's text in the editor
+            if (isClick && !selectedText && editor.innerText.trim().length > 0) {
+                // User clicked on a word - highlight entire text as potential task
+                highlightStreamTextAsTask();
+            } else if (selectedText) {
+                // User dragged to select specific text - use normal selection behavior
+                handleStreamSelectionChange();
+            }
+        }
+
+        // Highlight entire text as a potential task
+        function highlightStreamTextAsTask() {
+            const editor = document.getElementById('streamEditor');
+            if (!editor) return;
+
+            const fullText = editor.innerText.trim();
+            if (!fullText) return;
+
+            // Select all text in the editor
+            const range = document.createRange();
+            range.selectNodeContents(editor);
+            const selection = window.getSelection();
+            selection.removeAllRanges();
+            selection.addRange(range);
+
+            // Add highlight class
+            editor.classList.add('stream-text-highlighted');
+
+            // Store selection
+            currentStreamSelection = {
+                text: fullText,
+                range: range.cloneRange()
+            };
+
+            console.log('[Stream] Highlighted entire text as potential task:', fullText.substring(0, 50) + '...');
+
+            // Show floating menu
+            showStreamFloatingMenuForFullText();
+        }
+
+        // Show floating menu positioned for full text selection
+        function showStreamFloatingMenuForFullText() {
+            const editor = document.getElementById('streamEditor');
+            const editorWrapper = document.querySelector('.stream-editor-wrapper');
+            if (!editor || !editorWrapper) return;
+
+            const editorRect = editor.getBoundingClientRect();
+            const wrapperRect = editorWrapper.getBoundingClientRect();
+            const menu = document.getElementById('streamFloatingMenu');
+
+            if (menu) {
+                // Position menu at top-right of the editor
+                menu.style.top = `${editorRect.top - wrapperRect.top - 40}px`;
+                menu.style.left = `${editorRect.right - wrapperRect.left - 100}px`;
+                menu.classList.add('visible');
             }
         }
 
@@ -57495,8 +57593,11 @@ Options:
                 // Update task count
                 updateStreamTaskCount();
 
-                // Hide menu and clear selection
+                // Hide menu, remove highlight, and clear selection
                 hideStreamFloatingMenu();
+                if (editor) {
+                    editor.classList.remove('stream-text-highlighted');
+                }
                 window.getSelection().removeAllRanges();
                 currentStreamSelection = null;
 
