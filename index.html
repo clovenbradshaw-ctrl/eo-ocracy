@@ -18828,6 +18828,7 @@
             border-right: 1px solid #E5DDD1;
             background: #FDFCFA;
             position: relative;
+            overflow: auto;
         }
 
         .stream-editor-header {
@@ -24853,7 +24854,7 @@
 
                             <!-- Floating menu for task creation -->
                             <div class="stream-floating-menu" id="streamFloatingMenu">
-                                <button id="streamCreateTaskBtn" onclick="createTaskFromStreamSelection()">
+                                <button id="streamCreateTaskBtn" onmousedown="event.preventDefault()" onclick="createTaskFromStreamSelection()">
                                     <i class="ph ph-check-square"></i>
                                     Make task
                                 </button>
@@ -55615,6 +55616,9 @@ Options:
             setupStreamEditorListeners();
         }
 
+        // Track if document click handler is already added
+        let streamClickHandlerAdded = false;
+
         // Setup editor event listeners
         function setupStreamEditorListeners() {
             const editor = document.getElementById('streamEditor');
@@ -55628,13 +55632,16 @@ Options:
             newEditor.addEventListener('mouseup', handleStreamSelectionChange);
             newEditor.addEventListener('keyup', handleStreamSelectionChange);
 
-            // Click outside to hide menu
-            document.addEventListener('click', (e) => {
-                const menu = document.getElementById('streamFloatingMenu');
-                if (menu && !menu.contains(e.target) && !e.target.closest('#streamEditor')) {
-                    hideStreamFloatingMenu();
-                }
-            });
+            // Click outside to hide menu (only add once)
+            if (!streamClickHandlerAdded) {
+                streamClickHandlerAdded = true;
+                document.addEventListener('click', (e) => {
+                    const menu = document.getElementById('streamFloatingMenu');
+                    if (menu && !menu.contains(e.target) && !e.target.closest('#streamEditor')) {
+                        hideStreamFloatingMenu();
+                    }
+                });
+            }
         }
 
         // Handle text selection in editor
