@@ -18822,8 +18822,10 @@
             display: flex;
             flex-direction: column;
             padding: 2rem 3rem;
+            padding-bottom: 0;
             border-right: 1px solid #E5DDD1;
             background: #FDFCFA;
+            position: relative;
         }
 
         .stream-editor-header {
@@ -18938,9 +18940,13 @@
             display: flex;
             align-items: center;
             justify-content: space-between;
-            margin-top: 1.5rem;
-            padding-top: 1.5rem;
+            padding: 1rem 3rem;
             border-top: 1px solid #E5DDD1;
+            background: #FDFCFA;
+            position: sticky;
+            bottom: 0;
+            margin: 0 -3rem;
+            margin-top: auto;
         }
 
         .stream-task-count {
@@ -55718,13 +55724,13 @@ Options:
             // Log to activity
             logActivity('task', taskId, 'created', { source: 'stream' });
 
-            // Show toast
-            showStreamToast('Task created');
-
             // Hide menu and clear selection
             hideStreamFloatingMenu();
             window.getSelection().removeAllRanges();
             currentStreamSelection = null;
+
+            // Open task popup for editing
+            openTaskModal(taskId);
         }
 
         // Get context around selected text
