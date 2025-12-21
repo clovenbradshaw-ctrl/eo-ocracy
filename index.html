@@ -26174,6 +26174,416 @@ John Doe,Engineering,john@example.com"
         window.ApiLogger = ApiLogger;
 
         // ==========================================
+        // EMAIL TEMPLATES
+        // ==========================================
+        const EmailTemplates = {
+            // Brand colors matching the app
+            colors: {
+                primary: '#C88F4A',      // Golden amber
+                primaryDark: '#B87B5B',  // Terracotta
+                background: '#F5F2ED',   // Warm cream
+                cardBg: '#FFFFFF',       // White
+                text: '#3D2E1F',         // Dark brown
+                textMuted: '#6B5744',    // Mid brown
+                textLight: '#8B6F47',    // Light brown
+                border: '#E5DDD1',       // Cream border
+                success: '#2E7D32',      // Green
+                successBg: '#E8F5E9',    // Light green
+                warning: '#F59E0B',      // Amber
+                warningBg: '#FEF3C7',    // Light amber
+                info: '#3B82F6',         // Blue
+                infoBg: '#EFF6FF',       // Light blue
+                error: '#DC2626',        // Red
+                errorBg: '#FEE2E2'       // Light red
+            },
+
+            // Base wrapper for all emails
+            wrapEmail(content, preheader = '') {
+                const c = this.colors;
+                return `
+<!DOCTYPE html>
+<html lang="en" xmlns:v="urn:schemas-microsoft-com:vml" xmlns:o="urn:schemas-microsoft-com:office:office">
+<head>
+    <meta charset="utf-8">
+    <meta name="x-apple-disable-message-reformatting">
+    <meta http-equiv="x-ua-compatible" content="ie=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="format-detection" content="telephone=no, date=no, address=no, email=no">
+    <!--[if mso]>
+    <noscript>
+        <xml>
+            <o:OfficeDocumentSettings>
+                <o:PixelsPerInch>96</o:PixelsPerInch>
+            </o:OfficeDocumentSettings>
+        </xml>
+    </noscript>
+    <style>
+        td, th, div, p, a, h1, h2, h3, h4, h5, h6 {font-family: "Segoe UI", sans-serif; mso-line-height-rule: exactly;}
+    </style>
+    <![endif]-->
+    <title>TaskFlow</title>
+    <style>
+        .hover-bg-primary:hover { background-color: ${c.primaryDark} !important; }
+        @media (max-width: 600px) {
+            .sm-w-full { width: 100% !important; }
+            .sm-px-4 { padding-left: 16px !important; padding-right: 16px !important; }
+            .sm-py-8 { padding-top: 32px !important; padding-bottom: 32px !important; }
+        }
+    </style>
+</head>
+<body style="margin: 0; width: 100%; padding: 0; word-break: break-word; -webkit-font-smoothing: antialiased; background-color: ${c.background};">
+    ${preheader ? `<div style="display: none; max-height: 0; overflow: hidden;">${preheader}&#847; &#847; &#847; &#847; &#847; &#847; &#847; &#847; &#847; &#847; &#847; &#847; &#847; &#847; &#847; &#847; &#847; &#847; &#847; &#847; &#847; &#847; &#847; &#847; &#847; &#847; &#847; &#847; &#847; &#847;</div>` : ''}
+    <div role="article" aria-roledescription="email" aria-label="Email from TaskFlow" lang="en">
+        <table style="width: 100%; font-family: ui-sans-serif, system-ui, -apple-system, 'Segoe UI', sans-serif;" cellpadding="0" cellspacing="0" role="presentation">
+            <tr>
+                <td align="center" style="background-color: ${c.background}; padding: 40px 16px;">
+                    <table class="sm-w-full" style="width: 600px; max-width: 100%;" cellpadding="0" cellspacing="0" role="presentation">
+                        <!-- Logo Header -->
+                        <tr>
+                            <td style="text-align: center; padding-bottom: 24px;">
+                                <table cellpadding="0" cellspacing="0" role="presentation" style="margin: 0 auto;">
+                                    <tr>
+                                        <td style="background: linear-gradient(135deg, ${c.primary} 0%, ${c.primaryDark} 100%); padding: 12px 24px; border-radius: 12px;">
+                                            <span style="font-size: 24px; font-weight: 700; color: #FFFFFF; letter-spacing: -0.5px;">TaskFlow</span>
+                                        </td>
+                                    </tr>
+                                </table>
+                            </td>
+                        </tr>
+                        <!-- Main Content Card -->
+                        <tr>
+                            <td style="background-color: ${c.cardBg}; border-radius: 16px; box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1); overflow: hidden;">
+                                ${content}
+                            </td>
+                        </tr>
+                        <!-- Footer -->
+                        <tr>
+                            <td style="padding: 32px 24px; text-align: center;">
+                                <p style="margin: 0 0 8px; font-size: 14px; color: ${c.textMuted};">
+                                    This email was sent by <strong style="color: ${c.text};">TaskFlow</strong>
+                                </p>
+                                <p style="margin: 0; font-size: 12px; color: ${c.textLight};">
+                                    &copy; ${new Date().getFullYear()} TaskFlow. All rights reserved.
+                                </p>
+                            </td>
+                        </tr>
+                    </table>
+                </td>
+            </tr>
+        </table>
+    </div>
+</body>
+</html>`;
+            },
+
+            // Login verification code email
+            loginCode(data) {
+                const c = this.colors;
+                const { code, email } = data;
+
+                const content = `
+                    <table style="width: 100%;" cellpadding="0" cellspacing="0" role="presentation">
+                        <tr>
+                            <td style="padding: 48px 40px; text-align: center;">
+                                <!-- Icon -->
+                                <div style="margin: 0 auto 24px; width: 72px; height: 72px; background-color: ${c.successBg}; border-radius: 50%; line-height: 72px;">
+                                    <span style="font-size: 36px;">🔐</span>
+                                </div>
+
+                                <!-- Title -->
+                                <h1 style="margin: 0 0 8px; font-size: 28px; font-weight: 700; color: ${c.text};">
+                                    Your Login Code
+                                </h1>
+                                <p style="margin: 0 0 32px; font-size: 16px; color: ${c.textMuted};">
+                                    Enter this code to sign in to your TaskFlow account
+                                </p>
+
+                                <!-- Verification Code -->
+                                <table cellpadding="0" cellspacing="0" role="presentation" style="margin: 0 auto 32px;">
+                                    <tr>
+                                        <td style="background: linear-gradient(135deg, ${c.primary} 0%, ${c.primaryDark} 100%); padding: 20px 48px; border-radius: 12px;">
+                                            <span style="font-size: 42px; font-weight: 700; letter-spacing: 12px; color: #FFFFFF; font-family: 'Courier New', monospace;">${code}</span>
+                                        </td>
+                                    </tr>
+                                </table>
+
+                                <!-- Expiry Notice -->
+                                <table cellpadding="0" cellspacing="0" role="presentation" style="margin: 0 auto 32px;">
+                                    <tr>
+                                        <td style="background-color: ${c.warningBg}; padding: 12px 20px; border-radius: 8px; border-left: 4px solid ${c.warning};">
+                                            <span style="font-size: 14px; color: ${c.text};">⏱️ This code expires in <strong>10 minutes</strong></span>
+                                        </td>
+                                    </tr>
+                                </table>
+
+                                <!-- Divider -->
+                                <hr style="border: none; border-top: 1px solid ${c.border}; margin: 0 0 24px;">
+
+                                <!-- Security Notice -->
+                                <p style="margin: 0; font-size: 13px; color: ${c.textLight}; line-height: 1.6;">
+                                    This code was requested for <strong style="color: ${c.text};">${email}</strong><br>
+                                    If you didn't request this code, you can safely ignore this email.
+                                </p>
+                            </td>
+                        </tr>
+                    </table>
+                `;
+
+                return this.wrapEmail(content, `Your TaskFlow login code is ${code}`);
+            },
+
+            // Task notification email
+            taskNotification(data) {
+                const c = this.colors;
+                const {
+                    recipientName,
+                    recipientEmail,
+                    assignerName,
+                    assignerEmail,
+                    taskId,
+                    taskName,
+                    taskDescription,
+                    taskStatus,
+                    taskPriority,
+                    taskDueDate,
+                    roleName,
+                    teamName,
+                    parentTaskName,
+                    subtaskCount,
+                    subtaskCompleted,
+                    commentCount,
+                    customMessage,
+                    workspaceName
+                } = data;
+
+                const recipientFirstName = recipientName?.split(' ')[0] || 'there';
+
+                // Status styling
+                const statusStyles = {
+                    pending: { bg: c.warningBg, color: '#92400E', label: 'To Do', icon: '○' },
+                    in_progress: { bg: c.infoBg, color: '#1E40AF', label: 'In Progress', icon: '◐' },
+                    completed: { bg: c.successBg, color: c.success, label: 'Done', icon: '✓' }
+                };
+                const status = statusStyles[taskStatus] || statusStyles.pending;
+
+                // Priority styling
+                const priorityStyles = {
+                    low: { bg: '#F3F4F6', color: '#6B7280', label: 'Low' },
+                    medium: { bg: c.warningBg, color: '#92400E', label: 'Medium' },
+                    high: { bg: c.errorBg, color: c.error, label: 'High' }
+                };
+                const priority = priorityStyles[taskPriority] || priorityStyles.medium;
+
+                // Format due date
+                let formattedDueDate = '';
+                if (taskDueDate) {
+                    try {
+                        const date = new Date(taskDueDate + 'T00:00:00');
+                        formattedDueDate = date.toLocaleDateString('en-US', {
+                            weekday: 'long',
+                            year: 'numeric',
+                            month: 'long',
+                            day: 'numeric'
+                        });
+                    } catch (e) {
+                        formattedDueDate = taskDueDate;
+                    }
+                }
+
+                // Build context items
+                let contextHtml = '';
+                if (parentTaskName || subtaskCount > 0 || commentCount > 0) {
+                    let contextItems = '';
+                    if (parentTaskName) {
+                        contextItems += `
+                            <tr>
+                                <td style="padding: 8px 12px; border-bottom: 1px solid ${c.border};">
+                                    <span style="color: ${c.textMuted}; font-size: 14px;">📁 Part of:</span>
+                                    <span style="color: ${c.text}; font-size: 14px; font-weight: 500; margin-left: 8px;">${parentTaskName}</span>
+                                </td>
+                            </tr>
+                        `;
+                    }
+                    if (subtaskCount > 0) {
+                        const progress = Math.round((subtaskCompleted / subtaskCount) * 100);
+                        contextItems += `
+                            <tr>
+                                <td style="padding: 8px 12px; border-bottom: 1px solid ${c.border};">
+                                    <span style="color: ${c.textMuted}; font-size: 14px;">✅ Subtasks:</span>
+                                    <span style="color: ${c.text}; font-size: 14px; font-weight: 500; margin-left: 8px;">${subtaskCompleted}/${subtaskCount} completed (${progress}%)</span>
+                                </td>
+                            </tr>
+                        `;
+                    }
+                    if (commentCount > 0) {
+                        contextItems += `
+                            <tr>
+                                <td style="padding: 8px 12px;">
+                                    <span style="color: ${c.textMuted}; font-size: 14px;">💬 Comments:</span>
+                                    <span style="color: ${c.text}; font-size: 14px; font-weight: 500; margin-left: 8px;">${commentCount} comment${commentCount !== 1 ? 's' : ''}</span>
+                                </td>
+                            </tr>
+                        `;
+                    }
+                    contextHtml = `
+                        <!-- Context Section -->
+                        <tr>
+                            <td style="padding: 0 40px 24px;">
+                                <p style="margin: 0 0 12px; font-size: 12px; font-weight: 600; color: ${c.textMuted}; text-transform: uppercase; letter-spacing: 0.5px;">
+                                    Context
+                                </p>
+                                <table style="width: 100%; background-color: ${c.background}; border-radius: 8px; overflow: hidden;" cellpadding="0" cellspacing="0" role="presentation">
+                                    ${contextItems}
+                                </table>
+                            </td>
+                        </tr>
+                    `;
+                }
+
+                // Custom message section
+                let customMessageHtml = '';
+                if (customMessage && customMessage.trim()) {
+                    customMessageHtml = `
+                        <!-- Custom Message -->
+                        <tr>
+                            <td style="padding: 0 40px 24px;">
+                                <table style="width: 100%; background-color: ${c.warningBg}; border-radius: 8px; border-left: 4px solid ${c.warning};" cellpadding="0" cellspacing="0" role="presentation">
+                                    <tr>
+                                        <td style="padding: 16px 20px;">
+                                            <p style="margin: 0 0 8px; font-size: 12px; font-weight: 600; color: ${c.textMuted}; text-transform: uppercase; letter-spacing: 0.5px;">
+                                                Message from ${assignerName}
+                                            </p>
+                                            <p style="margin: 0; font-size: 15px; color: ${c.text}; font-style: italic; line-height: 1.6;">
+                                                "${customMessage}"
+                                            </p>
+                                        </td>
+                                    </tr>
+                                </table>
+                            </td>
+                        </tr>
+                    `;
+                }
+
+                const content = `
+                    <table style="width: 100%;" cellpadding="0" cellspacing="0" role="presentation">
+                        <!-- Header Banner -->
+                        <tr>
+                            <td style="background: linear-gradient(135deg, ${c.primary} 0%, ${c.primaryDark} 100%); padding: 32px 40px; text-align: center;">
+                                <p style="margin: 0 0 4px; font-size: 14px; color: rgba(255,255,255,0.8);">You've been assigned to a task</p>
+                                <h1 style="margin: 0; font-size: 24px; font-weight: 700; color: #FFFFFF; line-height: 1.3;">
+                                    ${taskName}
+                                </h1>
+                            </td>
+                        </tr>
+
+                        <!-- Greeting -->
+                        <tr>
+                            <td style="padding: 32px 40px 16px;">
+                                <p style="margin: 0; font-size: 16px; color: ${c.text}; line-height: 1.6;">
+                                    Hi ${recipientFirstName},
+                                </p>
+                                <p style="margin: 12px 0 0; font-size: 16px; color: ${c.textMuted}; line-height: 1.6;">
+                                    <strong style="color: ${c.text};">${assignerName}</strong> has assigned you to a task in the
+                                    <strong style="color: ${c.text};">${workspaceName}</strong> workspace.
+                                </p>
+                            </td>
+                        </tr>
+
+                        <!-- Task Details Card -->
+                        <tr>
+                            <td style="padding: 8px 40px 24px;">
+                                <table style="width: 100%; background-color: ${c.background}; border-radius: 12px; overflow: hidden;" cellpadding="0" cellspacing="0" role="presentation">
+                                    <!-- Role -->
+                                    <tr>
+                                        <td style="padding: 16px 20px; border-bottom: 1px solid ${c.border};">
+                                            <table style="width: 100%;" cellpadding="0" cellspacing="0" role="presentation">
+                                                <tr>
+                                                    <td style="width: 100px; font-size: 13px; color: ${c.textMuted}; vertical-align: top;">Role</td>
+                                                    <td style="font-size: 15px; color: ${c.text}; font-weight: 500;">${roleName}${teamName ? ` <span style="color: ${c.textMuted}; font-weight: 400;">· ${teamName}</span>` : ''}</td>
+                                                </tr>
+                                            </table>
+                                        </td>
+                                    </tr>
+                                    <!-- Status & Priority -->
+                                    <tr>
+                                        <td style="padding: 16px 20px; border-bottom: 1px solid ${c.border};">
+                                            <table style="width: 100%;" cellpadding="0" cellspacing="0" role="presentation">
+                                                <tr>
+                                                    <td style="width: 100px; font-size: 13px; color: ${c.textMuted}; vertical-align: middle;">Status</td>
+                                                    <td>
+                                                        <table cellpadding="0" cellspacing="0" role="presentation">
+                                                            <tr>
+                                                                <td style="background-color: ${status.bg}; padding: 4px 12px; border-radius: 16px;">
+                                                                    <span style="font-size: 13px; font-weight: 600; color: ${status.color};">${status.icon} ${status.label}</span>
+                                                                </td>
+                                                                <td style="padding-left: 8px;">
+                                                                    <span style="background-color: ${priority.bg}; padding: 4px 12px; border-radius: 16px; font-size: 13px; font-weight: 600; color: ${priority.color};">${priority.label} Priority</span>
+                                                                </td>
+                                                            </tr>
+                                                        </table>
+                                                    </td>
+                                                </tr>
+                                            </table>
+                                        </td>
+                                    </tr>
+                                    ${formattedDueDate ? `
+                                    <!-- Due Date -->
+                                    <tr>
+                                        <td style="padding: 16px 20px; border-bottom: 1px solid ${c.border};">
+                                            <table style="width: 100%;" cellpadding="0" cellspacing="0" role="presentation">
+                                                <tr>
+                                                    <td style="width: 100px; font-size: 13px; color: ${c.textMuted}; vertical-align: top;">Due Date</td>
+                                                    <td style="font-size: 15px; color: ${c.text}; font-weight: 500;">📅 ${formattedDueDate}</td>
+                                                </tr>
+                                            </table>
+                                        </td>
+                                    </tr>
+                                    ` : ''}
+                                    ${taskDescription ? `
+                                    <!-- Description -->
+                                    <tr>
+                                        <td style="padding: 16px 20px;">
+                                            <p style="margin: 0 0 8px; font-size: 13px; color: ${c.textMuted};">Description</p>
+                                            <p style="margin: 0; font-size: 14px; color: ${c.text}; line-height: 1.6; background-color: #FFFFFF; padding: 12px; border-radius: 8px; border: 1px solid ${c.border};">
+                                                ${taskDescription}
+                                            </p>
+                                        </td>
+                                    </tr>
+                                    ` : ''}
+                                </table>
+                            </td>
+                        </tr>
+
+                        ${contextHtml}
+                        ${customMessageHtml}
+
+                        <!-- Divider -->
+                        <tr>
+                            <td style="padding: 0 40px;">
+                                <hr style="border: none; border-top: 1px solid ${c.border}; margin: 0;">
+                            </td>
+                        </tr>
+
+                        <!-- Footer Note -->
+                        <tr>
+                            <td style="padding: 24px 40px 32px; text-align: center;">
+                                <p style="margin: 0; font-size: 13px; color: ${c.textLight}; line-height: 1.5;">
+                                    This notification was sent from TaskFlow<br>
+                                    Workspace: <strong style="color: ${c.textMuted};">${workspaceName}</strong>
+                                </p>
+                            </td>
+                        </tr>
+                    </table>
+                `;
+
+                return this.wrapEmail(content, `${assignerName} assigned you to: ${taskName}`);
+            }
+        };
+
+        // Make EmailTemplates available globally
+        window.EmailTemplates = EmailTemplates;
+
+        // ==========================================
         // AUTHENTICATION MANAGER
         // ==========================================
 
@@ -26430,6 +26840,9 @@ John Doe,Engineering,john@example.com"
 
                 debug.log('🔐 AuthManager: Sending code to', email);
 
+                // Generate HTML email template
+                const htmlBody = EmailTemplates.loginCode({ code, email });
+
                 const requestBody = {
                     type: 'login_code',
                     email: email,
@@ -26437,7 +26850,8 @@ John Doe,Engineering,john@example.com"
                     subject: 'Your login code for TaskFlow',
                     sender: 'TaskFlow',
                     app: 'taskflow',
-                    timestamp: new Date().toISOString()
+                    timestamp: new Date().toISOString(),
+                    htmlBody: htmlBody
                 };
 
                 // Log request (sanitize code for security)
@@ -52519,6 +52933,31 @@ Options:
             sendBtn.disabled = true;
             sendBtn.innerHTML = '<i class="ph ph-spinner ph-spin"></i> Sending...';
 
+            // Build notification data object
+            const notificationData = {
+                recipientName: recipient.person.name,
+                recipientEmail: recipient.email,
+                assignerName: senderName,
+                assignerEmail: senderEmail,
+                taskId: task.id,
+                taskName: task.name,
+                taskDescription: task.description || '',
+                taskStatus: task.status || 'pending',
+                taskPriority: task.priority || 'medium',
+                taskDueDate: task.dueDate || null,
+                roleName: recipient.role.name,
+                teamName: team?.name || null,
+                parentTaskName: parentTask?.name || null,
+                subtaskCount: subtasks.length,
+                subtaskCompleted: completedSubtasks,
+                commentCount: comments.length,
+                customMessage: customMessage,
+                workspaceName: workspaceName
+            };
+
+            // Generate HTML email template
+            const htmlBody = EmailTemplates.taskNotification(notificationData);
+
             try {
                 const response = await fetch(AuthManager.webhookUrl, {
                     method: 'POST',
@@ -52533,25 +52972,8 @@ Options:
                         app: 'taskflow',
                         workspace: workspaceName,
                         timestamp: new Date().toISOString(),
-                        notification: {
-                            recipientName: recipient.person.name,
-                            recipientEmail: recipient.email,
-                            assignerName: senderName,
-                            assignerEmail: senderEmail,
-                            taskId: task.id,
-                            taskName: task.name,
-                            taskDescription: task.description || '',
-                            taskStatus: task.status || 'pending',
-                            taskPriority: task.priority || 'medium',
-                            taskDueDate: task.dueDate || null,
-                            roleName: recipient.role.name,
-                            teamName: team?.name || null,
-                            parentTaskName: parentTask?.name || null,
-                            subtaskCount: subtasks.length,
-                            subtaskCompleted: completedSubtasks,
-                            commentCount: comments.length,
-                            customMessage: customMessage
-                        }
+                        notification: notificationData,
+                        htmlBody: htmlBody
                     })
                 });
 
