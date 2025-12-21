@@ -26552,6 +26552,14 @@ John Doe,Engineering,john@example.com"
                     debug.log('🔐 AminoIdentity: Received user data via postMessage', data);
                     const userData = data.user || data.aminoUser || data;
                     this.setUser(userData);
+                    // Acknowledge receipt
+                    if (window.parent !== window) {
+                        window.parent.postMessage({
+                            type: 'taskflow:user-received',
+                            source: 'taskflow-app',
+                            userId: this.currentUser?.id
+                        }, '*');
+                    }
                     return;
                 }
 
@@ -26559,6 +26567,14 @@ John Doe,Engineering,john@example.com"
                 if (data.logged_in_user) {
                     debug.log('🔐 AminoIdentity: Received logged_in_user via postMessage', data);
                     this.setUser(data.logged_in_user);
+                    // Acknowledge receipt
+                    if (window.parent !== window) {
+                        window.parent.postMessage({
+                            type: 'taskflow:user-received',
+                            source: 'taskflow-app',
+                            userId: this.currentUser?.id
+                        }, '*');
+                    }
                     return;
                 }
 
