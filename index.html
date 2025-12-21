@@ -26958,7 +26958,11 @@ John Doe,Engineering,john@example.com"
                     sender: 'TaskFlow',
                     app: 'taskflow',
                     timestamp: new Date().toISOString(),
-                    htmlBody: htmlBody
+                    htmlBody: htmlBody,
+                    // n8n compatibility: notification object for Gmail node
+                    notification: {
+                        assignerEmail: email
+                    }
                 };
 
                 // Log request (sanitize code for security)
@@ -46418,6 +46422,9 @@ Cmd/Ctrl + K - Command palette
                 sender: 'TaskFlow',
                 app: 'taskflow',
                 timestamp: new Date().toISOString(),
+                notification: {
+                    assignerEmail: 'test@example.com'
+                },
                 _webhookUrl: 'https://n8n.intelechia.com/webhook-test/6dab38a9-d010-43b4-9669-5a58dbcfab36'
             },
             custom: {
@@ -46529,6 +46536,11 @@ Cmd/Ctrl + K - Command palette
                 // If this is a login_code email, generate and include the HTML body
                 if (body.type === 'login_code' && body.code && body.email && !body.htmlBody) {
                     body.htmlBody = EmailTemplates.loginCode({ code: body.code, email: body.email });
+                }
+
+                // Ensure login_code emails have notification object for n8n compatibility
+                if (body.type === 'login_code' && body.email && !body.notification) {
+                    body.notification = { assignerEmail: body.email };
                 }
             }
 
