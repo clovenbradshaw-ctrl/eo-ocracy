@@ -47270,31 +47270,83 @@ Cmd/Ctrl + K - Command palette
             }
         };
 
-        // Field definitions for each entity type
+        // Field definitions for each entity type - expanded for schema-free mapping
         const bulkImportFields = {
             unit: [
                 { key: 'name', label: 'Name', required: true },
-                { key: 'parent', label: 'Parent Unit', required: false, type: 'relationship', targetType: 'unit' }
+                { key: 'parent', label: 'Parent Unit', required: false, type: 'relationship', targetType: 'unit' },
+                { key: 'description', label: 'Description', required: false, aliases: ['notes', 'details', 'about'] },
+                { key: 'code', label: 'Code/Identifier', required: false, aliases: ['unit_code', 'identifier', 'short_name'] },
+                { key: 'location', label: 'Location', required: false, aliases: ['address', 'office', 'site'] },
+                { key: 'externalId', label: 'External ID', required: false, aliases: ['uniqueid', 'unique_id', 'id', 'external_id'] },
+                { key: 'email', label: 'Email', required: false, aliases: ['email_address', 'contact_email'] },
+                { key: 'phone', label: 'Phone', required: false, aliases: ['phone_number', 'telephone', 'contact'] },
+                { key: 'status', label: 'Status', required: false, aliases: ['state', 'active'] },
+                { key: 'tags', label: 'Tags', required: false, aliases: ['labels', 'categories'] }
             ],
             team: [
                 { key: 'name', label: 'Name', required: true },
-                { key: 'parent', label: 'Parent (Unit or Team)', required: false, type: 'relationship', targetTypes: ['unit', 'team'] }
+                { key: 'parent', label: 'Parent (Unit or Team)', required: false, type: 'relationship', targetTypes: ['unit', 'team'] },
+                { key: 'description', label: 'Description', required: false, aliases: ['notes', 'details', 'about'] },
+                { key: 'code', label: 'Code/Identifier', required: false, aliases: ['team_code', 'identifier', 'short_name'] },
+                { key: 'lead', label: 'Team Lead', required: false, aliases: ['leader', 'manager', 'head'], type: 'lookup', lookupType: 'person' },
+                { key: 'externalId', label: 'External ID', required: false, aliases: ['uniqueid', 'unique_id', 'id', 'external_id'] },
+                { key: 'email', label: 'Email', required: false, aliases: ['email_address', 'contact_email', 'team_email'] },
+                { key: 'status', label: 'Status', required: false, aliases: ['state', 'active'] },
+                { key: 'tags', label: 'Tags', required: false, aliases: ['labels', 'categories'] }
             ],
             role: [
                 { key: 'name', label: 'Name', required: true },
-                { key: 'parent', label: 'Parent (Unit or Team)', required: false, type: 'relationship', targetTypes: ['unit', 'team'] }
+                { key: 'parent', label: 'Parent (Unit or Team)', required: false, type: 'relationship', targetTypes: ['unit', 'team'] },
+                { key: 'description', label: 'Description', required: false, aliases: ['notes', 'details', 'about', 'responsibilities'] },
+                { key: 'code', label: 'Code/Identifier', required: false, aliases: ['role_code', 'identifier', 'short_name'] },
+                { key: 'level', label: 'Level/Grade', required: false, aliases: ['grade', 'rank', 'seniority'] },
+                { key: 'department', label: 'Department', required: false, aliases: ['dept', 'division'] },
+                { key: 'externalId', label: 'External ID', required: false, aliases: ['uniqueid', 'unique_id', 'id', 'external_id'] },
+                { key: 'status', label: 'Status', required: false, aliases: ['state', 'active'] },
+                { key: 'tags', label: 'Tags', required: false, aliases: ['labels', 'categories'] }
             ],
             person: [
-                { key: 'name', label: 'Name', required: true },
-                { key: 'role', label: 'Assigned Role', required: false, type: 'relationship', targetType: 'role' }
+                { key: 'name', label: 'Name', required: true, aliases: ['full_name', 'display_name'] },
+                { key: 'role', label: 'Assigned Role', required: false, type: 'relationship', targetType: 'role' },
+                { key: 'firstName', label: 'First Name', required: false, aliases: ['first', 'given_name', 'forename'] },
+                { key: 'lastName', label: 'Last Name', required: false, aliases: ['last', 'surname', 'family_name'] },
+                { key: 'email', label: 'Email', required: false, aliases: ['email_address', 'work_email', 'contact_email'] },
+                { key: 'phone', label: 'Phone', required: false, aliases: ['phone_number', 'telephone', 'mobile', 'cell'] },
+                { key: 'title', label: 'Job Title', required: false, aliases: ['job_title', 'position', 'designation'] },
+                { key: 'department', label: 'Department', required: false, aliases: ['dept', 'division', 'team'] },
+                { key: 'location', label: 'Location', required: false, aliases: ['office', 'site', 'address'] },
+                { key: 'manager', label: 'Manager', required: false, aliases: ['reports_to', 'supervisor'], type: 'lookup', lookupType: 'person' },
+                { key: 'startDate', label: 'Start Date', required: false, aliases: ['hire_date', 'joined', 'join_date'], transform: 'date' },
+                { key: 'externalId', label: 'External ID', required: false, aliases: ['uniqueid', 'unique_id', 'id', 'external_id', 'employee_id'] },
+                { key: 'status', label: 'Status', required: false, aliases: ['state', 'active', 'employment_status'] },
+                { key: 'notes', label: 'Notes', required: false, aliases: ['comments', 'bio', 'about'] },
+                { key: 'tags', label: 'Tags', required: false, aliases: ['labels', 'categories', 'skills'] }
             ],
             object: [
                 { key: 'name', label: 'Name', required: true },
-                { key: 'parent', label: 'Parent Role', required: false, type: 'relationship', targetType: 'role' }
+                { key: 'parent', label: 'Parent Role', required: false, type: 'relationship', targetType: 'role' },
+                { key: 'description', label: 'Description', required: false, aliases: ['notes', 'details', 'about'] },
+                { key: 'code', label: 'Code/Identifier', required: false, aliases: ['object_code', 'identifier', 'sku'] },
+                { key: 'type', label: 'Object Type', required: false, aliases: ['category', 'kind', 'class'] },
+                { key: 'location', label: 'Location', required: false, aliases: ['address', 'site', 'storage'] },
+                { key: 'owner', label: 'Owner', required: false, aliases: ['responsible', 'custodian'], type: 'lookup', lookupType: 'person' },
+                { key: 'externalId', label: 'External ID', required: false, aliases: ['uniqueid', 'unique_id', 'id', 'external_id'] },
+                { key: 'status', label: 'Status', required: false, aliases: ['state', 'condition', 'active'] },
+                { key: 'tags', label: 'Tags', required: false, aliases: ['labels', 'categories'] }
             ],
             product: [
                 { key: 'name', label: 'Name', required: true },
-                { key: 'parent', label: 'Parent Role', required: false, type: 'relationship', targetType: 'role' }
+                { key: 'parent', label: 'Parent Role', required: false, type: 'relationship', targetType: 'role' },
+                { key: 'description', label: 'Description', required: false, aliases: ['notes', 'details', 'about'] },
+                { key: 'code', label: 'Code/SKU', required: false, aliases: ['product_code', 'sku', 'identifier'] },
+                { key: 'category', label: 'Category', required: false, aliases: ['type', 'kind', 'class'] },
+                { key: 'price', label: 'Price', required: false, aliases: ['cost', 'amount', 'value'] },
+                { key: 'unit', label: 'Unit of Measure', required: false, aliases: ['uom', 'units'] },
+                { key: 'owner', label: 'Owner', required: false, aliases: ['responsible', 'manager'], type: 'lookup', lookupType: 'person' },
+                { key: 'externalId', label: 'External ID', required: false, aliases: ['uniqueid', 'unique_id', 'id', 'external_id'] },
+                { key: 'status', label: 'Status', required: false, aliases: ['state', 'active', 'available'] },
+                { key: 'tags', label: 'Tags', required: false, aliases: ['labels', 'categories'] }
             ],
             task: [
                 { key: 'name', label: 'Subject/Name', required: true, aliases: ['subject', 'title', 'task_name', 'task'] },
@@ -47329,6 +47381,7 @@ Cmd/Ctrl + K - Command palette
                 fieldMappings: {},
                 setAllValues: {},
                 valueMappings: {}, // Custom value mappings for single-select fields like status
+                customFields: [], // User-defined custom fields: [{ key: 'fieldname', label: 'Field Name', sourceColumn: 'csv_column' }]
                 processedData: []
             };
 
@@ -47673,9 +47726,93 @@ Cmd/Ctrl + K - Command palette
                 `;
             });
 
+            // Custom Fields section - allow users to create new fields from unmapped columns
+            const entityMappedColumns = new Set(Object.keys(bulkImportState.fieldMappings));
+            const customFieldColumns = new Set(bulkImportState.customFields.map(cf => cf.sourceColumn));
+            const allMappedColumns = new Set([...entityMappedColumns, ...customFieldColumns]);
+            const availableForCustom = bulkImportState.headers.filter(h => !allMappedColumns.has(h));
+
+            html += `
+                <div style="margin-top: 1.5rem; margin-bottom: 0.75rem; padding-top: 1rem; border-top: 2px solid #E5DDD1;">
+                    <div style="font-size: 0.85rem; font-weight: 600; color: #6B5642;">
+                        <i class="ph ph-plus-circle"></i> Custom Fields
+                    </div>
+                    <div style="font-size: 0.7rem; color: #8B6F47; margin-top: 0.25rem;">
+                        Create additional fields from your CSV columns (schema-free)
+                    </div>
+                </div>
+            `;
+
+            // Show existing custom field mappings
+            if (bulkImportState.customFields.length > 0) {
+                bulkImportState.customFields.forEach((cf, index) => {
+                    html += `
+                        <div class="bulk-import-mapping-row" data-custom-field="${index}">
+                            <div>
+                                <input type="text"
+                                    class="bulk-import-mapping-col-input"
+                                    value="${escapeHtml(cf.label)}"
+                                    placeholder="Field name..."
+                                    oninput="updateCustomFieldLabel(${index}, this.value)"
+                                    style="background: #FFF8E7; border: 1px solid #E5DDD1; border-radius: 4px; padding: 0.5rem 0.75rem; font-size: 0.85rem; color: #6B5642; width: 100%;">
+                            </div>
+                            <div class="bulk-import-mapping-arrow"><i class="ph ph-arrow-left"></i></div>
+                            <div>
+                                <select class="bulk-import-mapping-select" onchange="updateCustomFieldColumn(${index}, this.value)">
+                                    <option value="${escapeHtml(cf.sourceColumn)}" selected>${escapeHtml(cf.sourceColumn)}</option>
+                                    ${availableForCustom.map(h => `
+                                        <option value="${escapeHtml(h)}">${escapeHtml(h)}</option>
+                                    `).join('')}
+                                </select>
+                            </div>
+                            <div>
+                                <button onclick="removeCustomField(${index})"
+                                    style="background: none; border: none; color: #d32f2f; cursor: pointer; padding: 0.5rem;"
+                                    title="Remove custom field">
+                                    <i class="ph ph-trash"></i>
+                                </button>
+                            </div>
+                        </div>
+                    `;
+                });
+            }
+
+            // Add buttons for custom field creation
+            if (availableForCustom.length > 0) {
+                html += `
+                    <div style="margin-top: 0.5rem; display: flex; gap: 0.5rem; flex-wrap: wrap;">
+                        <button onclick="addCustomFieldFromColumn()"
+                            style="background: #FFF8E7; border: 1px dashed #C4A76C; border-radius: 6px; padding: 0.5rem 1rem; color: #8B6F47; cursor: pointer; font-size: 0.8rem; display: flex; align-items: center; gap: 0.5rem;">
+                            <i class="ph ph-plus"></i> Add Custom Field
+                        </button>
+                        <button onclick="mapAllRemainingColumns()"
+                            style="background: #E8F5E9; border: 1px solid #A5D6A7; border-radius: 6px; padding: 0.5rem 1rem; color: #2E7D32; cursor: pointer; font-size: 0.8rem; display: flex; align-items: center; gap: 0.5rem;"
+                            title="Create custom fields for all unmapped columns">
+                            <i class="ph ph-arrows-out-line-vertical"></i> Map All Remaining (${availableForCustom.length})
+                        </button>
+                    </div>
+                    <div id="customFieldColumnSelect" style="display: none; margin-top: 0.5rem; padding: 0.75rem; background: #FAF7F5; border-radius: 6px; border: 1px solid #E5DDD1;">
+                        <div style="font-size: 0.75rem; color: #6B5642; margin-bottom: 0.5rem;">Select a column to map:</div>
+                        <div style="display: flex; flex-wrap: wrap; gap: 0.5rem;">
+                            ${availableForCustom.map(h => `
+                                <button onclick="createCustomFieldFromColumn('${escapeHtml(h)}')"
+                                    style="padding: 0.35rem 0.6rem; border-radius: 4px; font-size: 0.75rem; font-family: monospace; background: #fff; color: #6B5642; border: 1px solid #E5DDD1; cursor: pointer;">
+                                    ${escapeHtml(h)}
+                                </button>
+                            `).join('')}
+                        </div>
+                    </div>
+                `;
+            } else if (bulkImportState.customFields.length === 0) {
+                html += `
+                    <div style="font-size: 0.75rem; color: #8B6F47; font-style: italic; padding: 0.5rem;">
+                        All columns are already mapped to entity fields.
+                    </div>
+                `;
+            }
+
             // All CSV Columns section - show ALL columns from the imported data
-            const mappedColumns = new Set(Object.keys(bulkImportState.fieldMappings));
-            const unmappedColumns = bulkImportState.headers.filter(h => !mappedColumns.has(h));
+            const unmappedColumns = bulkImportState.headers.filter(h => !allMappedColumns.has(h));
 
             html += `
                 <div style="margin-top: 1.5rem; margin-bottom: 0.75rem; padding-top: 1rem; border-top: 2px solid #E5DDD1;">
@@ -47691,9 +47828,12 @@ Cmd/Ctrl + K - Command palette
             `;
 
             bulkImportState.headers.forEach(header => {
-                const isMapped = mappedColumns.has(header);
-                const mappedTo = isMapped ? bulkImportState.fieldMappings[header] : null;
+                const isMappedToEntity = entityMappedColumns.has(header);
+                const isMappedToCustom = customFieldColumns.has(header);
+                const isMapped = isMappedToEntity || isMappedToCustom;
+                const mappedTo = isMappedToEntity ? bulkImportState.fieldMappings[header] : null;
                 const mappedField = mappedTo ? fields.find(f => f.key === mappedTo) : null;
+                const customField = isMappedToCustom ? bulkImportState.customFields.find(cf => cf.sourceColumn === header) : null;
 
                 html += `
                     <div style="
@@ -47701,22 +47841,27 @@ Cmd/Ctrl + K - Command palette
                         border-radius: 4px;
                         font-size: 0.75rem;
                         font-family: monospace;
-                        ${isMapped ?
+                        ${isMappedToEntity ?
                             'background: #E8F5E9; color: #2E7D32; border: 1px solid #A5D6A7;' :
+                            isMappedToCustom ?
+                            'background: #FFF8E7; color: #8B6F47; border: 1px solid #C4A76C;' :
                             'background: #fff; color: #6B5642; border: 1px solid #E5DDD1;'}
                     ">
                         ${escapeHtml(header)}
-                        ${isMapped ? `<i class="ph ph-arrow-right" style="margin: 0 0.25rem; opacity: 0.6;"></i><span style="font-family: inherit; font-weight: 500;">${mappedField ? mappedField.label : mappedTo}</span>` : ''}
+                        ${isMappedToEntity ? `<i class="ph ph-arrow-right" style="margin: 0 0.25rem; opacity: 0.6;"></i><span style="font-family: inherit; font-weight: 500;">${mappedField ? mappedField.label : mappedTo}</span>` : ''}
+                        ${isMappedToCustom ? `<i class="ph ph-arrow-right" style="margin: 0 0.25rem; opacity: 0.6;"></i><span style="font-family: inherit; font-weight: 500;">${customField.label}</span>` : ''}
                     </div>
                 `;
             });
 
+            const totalMapped = entityMappedColumns.size + bulkImportState.customFields.length;
             html += `
                     </div>
                     <div style="margin-top: 0.75rem; padding-top: 0.75rem; border-top: 1px dashed #E5DDD1; font-size: 0.7rem; color: #8B6F47;">
                         <i class="ph ph-info" style="margin-right: 0.25rem;"></i>
-                        <strong>${mappedColumns.size}</strong> column${mappedColumns.size !== 1 ? 's' : ''} mapped to entity fields.
-                        <strong>${unmappedColumns.length}</strong> additional column${unmappedColumns.length !== 1 ? 's' : ''} will be stored as raw data.
+                        <strong>${entityMappedColumns.size}</strong> column${entityMappedColumns.size !== 1 ? 's' : ''} mapped to entity fields.
+                        <strong>${bulkImportState.customFields.length}</strong> custom field${bulkImportState.customFields.length !== 1 ? 's' : ''}.
+                        <strong>${unmappedColumns.length}</strong> additional column${unmappedColumns.length !== 1 ? 's' : ''} stored as raw data.
                     </div>
                 </div>
             `;
@@ -47796,6 +47941,104 @@ Cmd/Ctrl + K - Command palette
                 bulkImportState.setAllValues[fieldKey].value = value;
             }
             renderMappedPreview();
+        }
+
+        // Custom field management functions
+        function addCustomFieldFromColumn() {
+            const selectDiv = document.getElementById('customFieldColumnSelect');
+            if (selectDiv) {
+                selectDiv.style.display = selectDiv.style.display === 'none' ? 'block' : 'none';
+            }
+        }
+
+        function createCustomFieldFromColumn(columnName) {
+            // Generate a key from the column name (camelCase, alphanumeric)
+            const key = columnName
+                .toLowerCase()
+                .replace(/[^a-z0-9\s_-]/gi, '')
+                .replace(/[\s_-]+(.)?/g, (_, c) => c ? c.toUpperCase() : '')
+                .replace(/^[A-Z]/, c => c.toLowerCase());
+
+            // Generate a readable label from the column name
+            const label = columnName
+                .replace(/[_-]/g, ' ')
+                .replace(/([A-Z])/g, ' $1')
+                .trim()
+                .split(' ')
+                .map(word => word.charAt(0).toUpperCase() + word.slice(1).toLowerCase())
+                .join(' ');
+
+            bulkImportState.customFields.push({
+                key: key || 'customField' + bulkImportState.customFields.length,
+                label: label || columnName,
+                sourceColumn: columnName
+            });
+
+            // Re-render the full mapping UI to update available columns
+            renderFieldMappingUI();
+        }
+
+        function updateCustomFieldLabel(index, label) {
+            if (bulkImportState.customFields[index]) {
+                bulkImportState.customFields[index].label = label;
+                // Also update the key based on the new label
+                bulkImportState.customFields[index].key = label
+                    .toLowerCase()
+                    .replace(/[^a-z0-9\s_-]/gi, '')
+                    .replace(/[\s_-]+(.)?/g, (_, c) => c ? c.toUpperCase() : '')
+                    .replace(/^[A-Z]/, c => c.toLowerCase()) || 'customField' + index;
+            }
+            renderMappedPreview();
+        }
+
+        function updateCustomFieldColumn(index, column) {
+            if (bulkImportState.customFields[index]) {
+                bulkImportState.customFields[index].sourceColumn = column;
+            }
+            // Re-render to update available columns in all dropdowns
+            renderFieldMappingUI();
+        }
+
+        function removeCustomField(index) {
+            bulkImportState.customFields.splice(index, 1);
+            // Re-render the full mapping UI
+            renderFieldMappingUI();
+        }
+
+        function mapAllRemainingColumns() {
+            // Get all columns not already mapped to entity fields or custom fields
+            const entityMappedColumns = new Set(Object.keys(bulkImportState.fieldMappings));
+            const customFieldColumns = new Set(bulkImportState.customFields.map(cf => cf.sourceColumn));
+            const allMappedColumns = new Set([...entityMappedColumns, ...customFieldColumns]);
+            const availableForCustom = bulkImportState.headers.filter(h => !allMappedColumns.has(h));
+
+            // Create a custom field for each unmapped column
+            availableForCustom.forEach(columnName => {
+                // Generate a key from the column name (camelCase, alphanumeric)
+                const key = columnName
+                    .toLowerCase()
+                    .replace(/[^a-z0-9\s_-]/gi, '')
+                    .replace(/[\s_-]+(.)?/g, (_, c) => c ? c.toUpperCase() : '')
+                    .replace(/^[A-Z]/, c => c.toLowerCase());
+
+                // Generate a readable label from the column name
+                const label = columnName
+                    .replace(/[_-]/g, ' ')
+                    .replace(/([A-Z])/g, ' $1')
+                    .trim()
+                    .split(' ')
+                    .map(word => word.charAt(0).toUpperCase() + word.slice(1).toLowerCase())
+                    .join(' ');
+
+                bulkImportState.customFields.push({
+                    key: key || 'customField' + bulkImportState.customFields.length,
+                    label: label || columnName,
+                    sourceColumn: columnName
+                });
+            });
+
+            // Re-render the full mapping UI
+            renderFieldMappingUI();
         }
 
         // Get unique values from a mapped column
@@ -48018,6 +48261,18 @@ Cmd/Ctrl + K - Command palette
                     }
                 });
 
+                // Process custom fields
+                if (bulkImportState.customFields && bulkImportState.customFields.length > 0) {
+                    processed._customFields = {};
+                    bulkImportState.customFields.forEach(cf => {
+                        let value = '';
+                        if (cf.sourceColumn && row[cf.sourceColumn]) {
+                            value = row[cf.sourceColumn].trim();
+                        }
+                        processed._customFields[cf.key] = value;
+                    });
+                }
+
                 if (processed._errors.length === 0) {
                     validCount++;
                 } else {
@@ -48183,8 +48438,17 @@ Cmd/Ctrl + K - Command palette
                             // Store the field mappings that were used during import
                             importFieldMappings: { ...bulkImportState.fieldMappings },
                             // Store the complete original CSV row with original column names
-                            originalImport: originalCsvData
+                            originalImport: originalCsvData,
+                            // Store custom fields as first-class properties
+                            customFields: item._customFields || {},
+                            // Store custom field definitions for reference
+                            customFieldDefs: bulkImportState.customFields.map(cf => ({ key: cf.key, label: cf.label, sourceColumn: cf.sourceColumn }))
                         };
+
+                        // Also spread custom fields directly onto the entity for easy access
+                        if (item._customFields) {
+                            Object.assign(taskObject, item._customFields);
+                        }
 
                         if (!entities.task) entities.task = [];
                         entities.task.push(taskObject);
@@ -48210,7 +48474,10 @@ Cmd/Ctrl + K - Command palette
                                 // Include field mappings used during import
                                 importFieldMappings: taskObject.importFieldMappings,
                                 // Include original CSV row with original column names
-                                originalImport: taskObject.originalImport
+                                originalImport: taskObject.originalImport,
+                                // Include custom fields
+                                customFields: taskObject.customFields,
+                                customFieldDefs: taskObject.customFieldDefs
                             }
                         }, false);
 
@@ -48241,8 +48508,24 @@ Cmd/Ctrl + K - Command palette
                             // Store the field mappings that were used during import
                             importFieldMappings: { ...bulkImportState.fieldMappings },
                             // Store the complete original CSV row with original column names
-                            originalImport: originalCsvData
+                            originalImport: originalCsvData,
+                            // Store custom fields as first-class properties
+                            customFields: item._customFields || {},
+                            // Store custom field definitions for reference
+                            customFieldDefs: bulkImportState.customFields.map(cf => ({ key: cf.key, label: cf.label, sourceColumn: cf.sourceColumn }))
                         };
+
+                        // Also spread custom fields directly onto the entity for easy access
+                        if (item._customFields) {
+                            Object.assign(entity, item._customFields);
+                        }
+
+                        // Add all mapped entity fields to the entity object
+                        fields.forEach(field => {
+                            if (item[field.key] && field.key !== 'name') {
+                                entity[field.key] = item[field.key];
+                            }
+                        });
 
                         entities[entityType].push(entity);
 
@@ -48261,7 +48544,12 @@ Cmd/Ctrl + K - Command palette
                                 // Include field mappings used during import
                                 importFieldMappings: entity.importFieldMappings,
                                 // Include original CSV row with original column names
-                                originalImport: entity.originalImport
+                                originalImport: entity.originalImport,
+                                // Include custom fields
+                                customFields: entity.customFields,
+                                customFieldDefs: entity.customFieldDefs,
+                                // Include all entity field values
+                                ...Object.fromEntries(fields.filter(f => f.key !== 'name' && item[f.key]).map(f => [f.key, item[f.key]]))
                             }
                         }, false);
 
