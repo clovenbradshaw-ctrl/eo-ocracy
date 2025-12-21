@@ -14817,6 +14817,110 @@
             white-space: nowrap;
         }
 
+        /* Table Multi-Select Styles */
+        .task-table-checkbox {
+            width: 40px;
+            text-align: center;
+        }
+
+        .task-table-checkbox input[type="checkbox"] {
+            width: 18px;
+            height: 18px;
+            cursor: pointer;
+            accent-color: #C88F4A;
+            border-radius: 4px;
+        }
+
+        .task-table tr.selected {
+            background: #FFF8F0 !important;
+        }
+
+        .task-table tr.selected:hover {
+            background: #FFF4E8 !important;
+        }
+
+        .table-selection-bar {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+            padding: 0.75rem 1rem;
+            background: linear-gradient(135deg, #8B5A2B 0%, #C88F4A 100%);
+            border-radius: 8px;
+            margin-bottom: 0.75rem;
+            color: white;
+            animation: slideDown 0.2s ease-out;
+        }
+
+        @keyframes slideDown {
+            from {
+                opacity: 0;
+                transform: translateY(-10px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .table-selection-bar .selection-count {
+            font-weight: 600;
+            font-size: 0.9rem;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .table-selection-bar .selection-count i {
+            font-size: 1.1rem;
+        }
+
+        .table-selection-bar .selection-actions {
+            display: flex;
+            gap: 0.5rem;
+            margin-left: auto;
+        }
+
+        .table-selection-bar button {
+            padding: 0.4rem 0.75rem;
+            border: 1px solid rgba(255,255,255,0.3);
+            border-radius: 6px;
+            background: rgba(255,255,255,0.1);
+            color: white;
+            font-size: 0.85rem;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            gap: 0.35rem;
+            transition: all 0.15s ease;
+        }
+
+        .table-selection-bar button:hover {
+            background: rgba(255,255,255,0.2);
+            border-color: rgba(255,255,255,0.5);
+        }
+
+        .table-selection-bar button.danger {
+            background: rgba(220, 38, 38, 0.3);
+            border-color: rgba(220, 38, 38, 0.5);
+        }
+
+        .table-selection-bar button.danger:hover {
+            background: rgba(220, 38, 38, 0.5);
+        }
+
+        .table-selection-bar .clear-selection {
+            background: transparent;
+            border: none;
+            padding: 0.4rem;
+            font-size: 1.1rem;
+            opacity: 0.8;
+        }
+
+        .table-selection-bar .clear-selection:hover {
+            opacity: 1;
+            background: transparent;
+        }
+
         /* ============================================
            TIMELINE VIEW STYLES
            ============================================ */
@@ -29745,6 +29849,11 @@ John Doe,Engineering,john@example.com"
         // View switching
         function switchView(view) {
             currentView = view;
+
+            // Clear table selection when switching views
+            if (typeof selectedTaskIds !== 'undefined') {
+                selectedTaskIds.clear();
+            }
 
             // Update both old view-toggle-btn and new view-tab classes
             document.querySelectorAll('.view-toggle-btn, .view-tab').forEach(btn => {
@@ -55508,6 +55617,7 @@ Options:
 
         let tableSortColumn = 'name';
         let tableSortDirection = 'asc';
+        let selectedTaskIds = new Set(); // Track selected tasks for multi-select
 
         function renderTaskTable() {
             const content = document.getElementById('taskBoardContent');
@@ -55599,11 +55709,46 @@ Options:
                 return 'ph-caret-up-down';
             };
 
+            // Check if all visible tasks are selected
+            const allSelected = sortedTasks.length > 0 && sortedTasks.every(t => selectedTaskIds.has(t.id));
+            const someSelected = selectedTaskIds.size > 0;
+
             let html = `
                 <div class="task-table-container">
+                    ${someSelected ? `
+                    <div class="table-selection-bar">
+                        <button class="clear-selection" onclick="clearTableSelection()" title="Clear selection">
+                            <i class="ph ph-x"></i>
+                        </button>
+                        <div class="selection-count">
+                            <i class="ph ph-check-square"></i>
+                            <span>${selectedTaskIds.size} selected</span>
+                        </div>
+                        <div class="selection-actions">
+                            <button onclick="bulkSetTaskStatus('completed')">
+                                <i class="ph ph-check-circle"></i> Mark Done
+                            </button>
+                            <button onclick="bulkSetTaskStatus('in_progress')">
+                                <i class="ph ph-clock"></i> In Progress
+                            </button>
+                            <button onclick="bulkSetTaskStatus('pending')">
+                                <i class="ph ph-circle"></i> To Do
+                            </button>
+                            <button class="danger" onclick="bulkDeleteTasks()">
+                                <i class="ph ph-trash"></i> Delete
+                            </button>
+                        </div>
+                    </div>
+                    ` : ''}
                     <table class="task-table">
                         <thead>
                             <tr>
+                                <th class="task-table-checkbox">
+                                    <input type="checkbox"
+                                           ${allSelected ? 'checked' : ''}
+                                           onclick="toggleSelectAllTasks(this.checked)"
+                                           title="Select all">
+                                </th>
                                 <th onclick="sortTaskTable('name')" class="sortable">
                                     Name <i class="ph ${getSortIcon('name')}"></i>
                                 </th>
@@ -55654,8 +55799,14 @@ Options:
                     </div>`;
                 }).join('') : '<span class="task-table-empty">-</span>';
 
+                const isSelected = selectedTaskIds.has(task.id);
                 html += `
-                    <tr onclick="showEntityDetails('${task.id}')" style="cursor: pointer;">
+                    <tr class="${isSelected ? 'selected' : ''}" onclick="showEntityDetails('${task.id}')" style="cursor: pointer;">
+                        <td class="task-table-checkbox" onclick="event.stopPropagation();">
+                            <input type="checkbox"
+                                   ${isSelected ? 'checked' : ''}
+                                   onclick="toggleTaskSelection('${task.id}', this.checked)">
+                        </td>
                         <td class="task-table-name">
                             <i class="ph ph-file-text"></i> ${task.name}
                         </td>
@@ -55690,6 +55841,71 @@ Options:
                 tableSortDirection = 'asc';
             }
             renderTaskTable();
+        }
+
+        // Table multi-select functions
+        function toggleTaskSelection(taskId, isChecked) {
+            if (isChecked) {
+                selectedTaskIds.add(taskId);
+            } else {
+                selectedTaskIds.delete(taskId);
+            }
+            renderTaskTable();
+        }
+
+        function toggleSelectAllTasks(selectAll) {
+            const tasks = getAdvancedFilteredTasks();
+            if (selectAll) {
+                tasks.forEach(t => selectedTaskIds.add(t.id));
+            } else {
+                tasks.forEach(t => selectedTaskIds.delete(t.id));
+            }
+            renderTaskTable();
+        }
+
+        function clearTableSelection() {
+            selectedTaskIds.clear();
+            renderTaskTable();
+        }
+
+        function bulkSetTaskStatus(newStatus) {
+            if (selectedTaskIds.size === 0) return;
+
+            const statusLabels = { pending: 'To Do', in_progress: 'In Progress', completed: 'Done' };
+            const count = selectedTaskIds.size;
+
+            selectedTaskIds.forEach(taskId => {
+                const task = entities.task.find(t => t.id === taskId);
+                if (task) {
+                    task.status = newStatus;
+                }
+            });
+
+            saveEntitiesToLocalStorage();
+            selectedTaskIds.clear();
+            renderTaskTable();
+            showToast(`Updated ${count} task${count > 1 ? 's' : ''} to "${statusLabels[newStatus]}"`, 'success');
+        }
+
+        function bulkDeleteTasks() {
+            if (selectedTaskIds.size === 0) return;
+
+            const count = selectedTaskIds.size;
+            if (!confirm(`Are you sure you want to delete ${count} task${count > 1 ? 's' : ''}? This cannot be undone.`)) {
+                return;
+            }
+
+            selectedTaskIds.forEach(taskId => {
+                // Remove from entities
+                entities.task = entities.task.filter(t => t.id !== taskId);
+                // Remove any relationships involving this task
+                relationships = relationships.filter(r => r.subject !== taskId && r.object !== taskId);
+            });
+
+            saveEntitiesToLocalStorage();
+            selectedTaskIds.clear();
+            renderTaskTable();
+            showToast(`Deleted ${count} task${count > 1 ? 's' : ''}`, 'success');
         }
 
         // ============================================
