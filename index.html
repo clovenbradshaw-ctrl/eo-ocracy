@@ -535,6 +535,19 @@
             background: #ffebee;
         }
 
+        .header-dropdown-item.toggle-item {
+            justify-content: flex-start;
+        }
+
+        .header-dropdown-item.toggle-item.active {
+            background: #E8F5E9;
+            color: #2E7D32;
+        }
+
+        .header-dropdown-item.toggle-item.active i {
+            color: #2E7D32;
+        }
+
         .header-dropdown-divider {
             height: 1px;
             background: #E5DDD1;
@@ -13898,99 +13911,6 @@
             box-shadow: 0 4px 12px rgba(200, 143, 74, 0.15);
         }
 
-        .kanban-card.selected {
-            border-color: #C88F4A;
-            background: linear-gradient(135deg, #FFF8F0 0%, #FFF4E8 100%);
-            box-shadow: 0 0 0 2px rgba(200, 143, 74, 0.3);
-        }
-
-        .kanban-card-checkbox {
-            width: 16px;
-            height: 16px;
-            cursor: pointer;
-            accent-color: #C88F4A;
-            flex-shrink: 0;
-            margin-top: 2px;
-        }
-
-        .kanban-card-header {
-            display: flex;
-            align-items: flex-start;
-            gap: 0.5rem;
-        }
-
-        .kanban-selection-bar {
-            display: flex;
-            align-items: center;
-            gap: 1rem;
-            padding: 0.75rem 1rem;
-            background: linear-gradient(135deg, #8B5A2B 0%, #C88F4A 100%);
-            border-radius: 8px;
-            margin-bottom: 0.75rem;
-            color: white;
-            animation: slideDown 0.2s ease-out;
-        }
-
-        .kanban-selection-bar .selection-count {
-            font-weight: 600;
-            font-size: 0.9rem;
-            display: flex;
-            align-items: center;
-            gap: 0.5rem;
-        }
-
-        .kanban-selection-bar .selection-count i {
-            font-size: 1.1rem;
-        }
-
-        .kanban-selection-bar .selection-actions {
-            display: flex;
-            gap: 0.5rem;
-            margin-left: auto;
-            flex-wrap: wrap;
-        }
-
-        .kanban-selection-bar button {
-            padding: 0.4rem 0.75rem;
-            border: 1px solid rgba(255,255,255,0.3);
-            border-radius: 6px;
-            background: rgba(255,255,255,0.1);
-            color: white;
-            font-size: 0.85rem;
-            cursor: pointer;
-            display: flex;
-            align-items: center;
-            gap: 0.35rem;
-            transition: all 0.15s ease;
-        }
-
-        .kanban-selection-bar button:hover {
-            background: rgba(255,255,255,0.2);
-            border-color: rgba(255,255,255,0.5);
-        }
-
-        .kanban-selection-bar button.danger {
-            background: rgba(220, 38, 38, 0.3);
-            border-color: rgba(220, 38, 38, 0.5);
-        }
-
-        .kanban-selection-bar button.danger:hover {
-            background: rgba(220, 38, 38, 0.5);
-        }
-
-        .kanban-selection-bar .clear-selection {
-            background: transparent;
-            border: none;
-            padding: 0.4rem;
-            font-size: 1.1rem;
-            opacity: 0.8;
-        }
-
-        .kanban-selection-bar .clear-selection:hover {
-            opacity: 1;
-            background: transparent;
-        }
-
         .kanban-card.dragging {
             opacity: 0.5;
             transform: rotate(2deg);
@@ -24759,8 +24679,10 @@
                             <span id="updateStatusText">Updates disabled</span>
                         </div>
                     </div>
-                    <button class="header-dropdown-item" onclick="checkForUpdatesNow(); closeActionsMenu()">
-                        <i class="ph ph-cloud-arrow-down"></i> Check for Updates Now
+                    <!-- Toast Notifications Toggle -->
+                    <button class="header-dropdown-item toggle-item" id="toastNotificationsToggle" onclick="toggleToastNotifications()">
+                        <i class="ph ph-chat-circle-dots"></i>
+                        Toast Notifications: <span>Off</span>
                     </button>
                     <button class="header-dropdown-item" onclick="restoreFromXano(); closeActionsMenu()">
                         <i class="ph ph-cloud-arrow-down"></i> Restore from Cloud
@@ -29938,6 +29860,9 @@ John Doe,Engineering,john@example.com"
         // ==========================================
 
         function showToast(message, type = 'info') {
+            // Skip non-error toasts if notifications are disabled
+            if (!toastNotificationsEnabled && type !== 'error') return;
+
             const toast = document.getElementById('toastNotification');
             if (!toast) return;
 
@@ -37386,6 +37311,9 @@ Cmd/Ctrl + K - Command palette
 
         // Show activity upload toast notification
         function showActivityToast(type, title, detail = '') {
+            // Skip non-error toasts if notifications are disabled
+            if (!toastNotificationsEnabled && type !== 'error') return;
+
             // Remove any existing toast
             const existingToast = document.getElementById('activityToast');
             if (existingToast) {
@@ -37510,6 +37438,48 @@ Cmd/Ctrl + K - Command palette
                     checkXanoConnection();
                 }
             }, 60000);
+        }
+
+        // ============================================
+        // TOAST NOTIFICATION PREFERENCE
+        // ============================================
+        let toastNotificationsEnabled = false; // Default: off
+
+        function toggleToastNotifications() {
+            toastNotificationsEnabled = !toastNotificationsEnabled;
+            const toggle = document.getElementById('toastNotificationsToggle');
+
+            if (toggle) {
+                if (toastNotificationsEnabled) {
+                    toggle.classList.add('active');
+                    toggle.querySelector('span').textContent = 'On';
+                } else {
+                    toggle.classList.remove('active');
+                    toggle.querySelector('span').textContent = 'Off';
+                }
+            }
+
+            try {
+                localStorage.setItem('toastNotificationsEnabled', toastNotificationsEnabled);
+            } catch (e) {
+                console.warn('Could not save toast notification preference');
+            }
+        }
+
+        function restoreToastNotificationPreference() {
+            try {
+                const savedPref = localStorage.getItem('toastNotificationsEnabled');
+                if (savedPref === 'true') {
+                    toastNotificationsEnabled = true;
+                    const toggle = document.getElementById('toastNotificationsToggle');
+                    if (toggle) {
+                        toggle.classList.add('active');
+                        toggle.querySelector('span').textContent = 'On';
+                    }
+                }
+            } catch (e) {
+                console.warn('Could not restore toast notification preference');
+            }
         }
 
         // ============================================
@@ -55475,22 +55445,15 @@ Options:
                 </div>
             ` : '';
 
-            const isSelected = selectedTaskIds.has(task.id);
-
             return `
-                <div class="${cardClasses} ${isSelected ? 'selected' : ''}"
+                <div class="${cardClasses}"
                      draggable="true"
                      data-id="${task.id}"
                      data-predecessor-id="${task.predecessorId || ''}"
                      ondragstart="handleKanbanDragStart(event)"
                      ondragend="handleKanbanDragEnd(event)"
                      onclick="showEntityDetails('${task.id}')">
-                    <div class="kanban-card-header" style="display: flex; align-items: flex-start; gap: 0.5rem;">
-                        <input type="checkbox"
-                               class="kanban-card-checkbox"
-                               ${isSelected ? 'checked' : ''}
-                               onclick="event.stopPropagation(); toggleKanbanTaskSelection('${task.id}', this.checked)"
-                               title="Select task">
+                    <div class="kanban-card-header">
                     <div class="kanban-card-title" style="display: flex; align-items: center; gap: 0.5rem; flex: 1;">
                         ${task.name}
                         ${hasSubtasks ? `<span class="kanban-card-subtask-badge" title="${completedSubtasks} of ${subtasks.length} subtasks complete${movementNote ? ' - ' + movementNote : ''}"><i class="ph ph-list-checks"></i> ${completedSubtasks}/${subtasks.length}</span>` : ''}
@@ -55621,42 +55584,7 @@ Options:
                 { key: 'completed', label: 'Done', icon: 'ph-check-circle' }
             ];
 
-            // Check if any tasks are selected
-            const allSelected = tasks.length > 0 && tasks.every(t => selectedTaskIds.has(t.id));
-            const someSelected = selectedTaskIds.size > 0;
-
-            let html = '';
-
-            // Add selection bar if tasks are selected
-            if (someSelected) {
-                html += `
-                    <div class="kanban-selection-bar">
-                        <button class="clear-selection" onclick="clearKanbanSelection()" title="Clear selection">
-                            <i class="ph ph-x"></i>
-                        </button>
-                        <div class="selection-count">
-                            <i class="ph ph-check-square"></i>
-                            <span>${selectedTaskIds.size} selected</span>
-                        </div>
-                        <div class="selection-actions">
-                            <button onclick="bulkSetKanbanTaskStatus('completed')">
-                                <i class="ph ph-check-circle"></i> Mark Done
-                            </button>
-                            <button onclick="bulkSetKanbanTaskStatus('in_progress')">
-                                <i class="ph ph-clock"></i> In Progress
-                            </button>
-                            <button onclick="bulkSetKanbanTaskStatus('pending')">
-                                <i class="ph ph-circle"></i> To Do
-                            </button>
-                            <button class="danger" onclick="bulkDeleteTasksKanban()">
-                                <i class="ph ph-trash"></i> Delete
-                            </button>
-                        </div>
-                    </div>
-                `;
-            }
-
-            html += '<div class="kanban-board">';
+            let html = '<div class="kanban-board">';
 
             statuses.forEach(status => {
                 // Get tasks for this column
@@ -56228,74 +56156,6 @@ Options:
             saveToLocalStorage();
             selectedTaskIds.clear();
             renderTaskTable();
-            showToast(`Deleted ${count} task${count > 1 ? 's' : ''}`, 'success');
-        }
-
-        // ============================================
-        // KANBAN VIEW MULTI-SELECT FUNCTIONS
-        // ============================================
-
-        function toggleKanbanTaskSelection(taskId, isChecked) {
-            if (isChecked) {
-                selectedTaskIds.add(taskId);
-            } else {
-                selectedTaskIds.delete(taskId);
-            }
-            renderKanbanBoard();
-        }
-
-        function toggleSelectAllKanbanTasks(selectAll) {
-            const tasks = getAdvancedFilteredTasks();
-            if (selectAll) {
-                tasks.forEach(t => selectedTaskIds.add(t.id));
-            } else {
-                tasks.forEach(t => selectedTaskIds.delete(t.id));
-            }
-            renderKanbanBoard();
-        }
-
-        function clearKanbanSelection() {
-            selectedTaskIds.clear();
-            renderKanbanBoard();
-        }
-
-        function bulkSetKanbanTaskStatus(newStatus) {
-            if (selectedTaskIds.size === 0) return;
-
-            const statusLabels = { pending: 'To Do', in_progress: 'In Progress', completed: 'Done' };
-            const count = selectedTaskIds.size;
-
-            selectedTaskIds.forEach(taskId => {
-                const task = entities.task.find(t => t.id === taskId);
-                if (task) {
-                    task.status = newStatus;
-                }
-            });
-
-            saveToLocalStorage();
-            selectedTaskIds.clear();
-            renderKanbanBoard();
-            showToast(`Updated ${count} task${count > 1 ? 's' : ''} to "${statusLabels[newStatus]}"`, 'success');
-        }
-
-        function bulkDeleteTasksKanban() {
-            if (selectedTaskIds.size === 0) return;
-
-            const count = selectedTaskIds.size;
-            if (!confirm(`Are you sure you want to delete ${count} task${count > 1 ? 's' : ''}? This cannot be undone.`)) {
-                return;
-            }
-
-            selectedTaskIds.forEach(taskId => {
-                // Remove from entities
-                entities.task = entities.task.filter(t => t.id !== taskId);
-                // Remove any relationships involving this task
-                relationships = relationships.filter(r => r.subject !== taskId && r.object !== taskId);
-            });
-
-            saveToLocalStorage();
-            selectedTaskIds.clear();
-            renderKanbanBoard();
             showToast(`Deleted ${count} task${count > 1 ? 's' : ''}`, 'success');
         }
 
@@ -60003,6 +59863,7 @@ Options:
                     // Initialize simplified UX
                     checkWelcomeBanner();
                     restorePanelStates();
+                    restoreToastNotificationPreference();
                     updateStructureSectionVisibility();
                     initSidebar();
                 } catch (e) {
