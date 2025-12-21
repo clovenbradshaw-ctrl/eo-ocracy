@@ -47598,15 +47598,12 @@ Cmd/Ctrl + K - Command palette
                             }
                         }
 
-                        // Preserve ALL original CSV data (including unmapped columns) for future use
-                        // This allows the client app to access any imported field later
-                        const importedData = {};
-                        const knownFields = ['name', 'description', 'status', 'dueDate', 'priority', 'matterNumber', 'tags', 'role', 'externalId', '_errors', '_row'];
-                        for (const key of Object.keys(item)) {
-                            if (!knownFields.includes(key)) {
-                                importedData[key] = item[key];
-                            }
-                        }
+                        // Preserve ALL original CSV data with original column names
+                        // item._original contains the raw CSV row with original headers
+                        const originalRow = item._original || {};
+
+                        // Store a copy of the original CSV data (with original column names)
+                        const originalCsvData = { ...originalRow };
 
                         // Create task object with all fields
                         const taskObject = {
@@ -47632,10 +47629,10 @@ Cmd/Ctrl + K - Command palette
                             assignedEntityType: assignedEntityType,
                             externalId: item.externalId || generateUUID(),
                             importedFrom: 'csv_bulk_import',
-                            // Store ALL original CSV data for future access
-                            importedData: Object.keys(importedData).length > 0 ? importedData : null,
-                            // Store the complete original row as-is
-                            originalImport: { ...item, _errors: undefined, _row: undefined }
+                            // Store the field mappings that were used during import
+                            importFieldMappings: { ...bulkImportState.fieldMappings },
+                            // Store the complete original CSV row with original column names
+                            originalImport: originalCsvData
                         };
 
                         if (!entities.task) entities.task = [];
@@ -47659,8 +47656,9 @@ Cmd/Ctrl + K - Command palette
                                 externalId: taskObject.externalId,
                                 matterNumber: item.matterNumber || null,
                                 import_source: 'bulk_import',
-                                // Include ALL original data for reconstruction
-                                importedData: taskObject.importedData,
+                                // Include field mappings used during import
+                                importFieldMappings: taskObject.importFieldMappings,
+                                // Include original CSV row with original column names
                                 originalImport: taskObject.originalImport
                             }
                         }, false);
