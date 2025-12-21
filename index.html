@@ -535,6 +535,19 @@
             background: #ffebee;
         }
 
+        .header-dropdown-item.toggle-item {
+            justify-content: flex-start;
+        }
+
+        .header-dropdown-item.toggle-item.active {
+            background: #E8F5E9;
+            color: #2E7D32;
+        }
+
+        .header-dropdown-item.toggle-item.active i {
+            color: #2E7D32;
+        }
+
         .header-dropdown-divider {
             height: 1px;
             background: #E5DDD1;
@@ -24666,8 +24679,10 @@
                             <span id="updateStatusText">Updates disabled</span>
                         </div>
                     </div>
-                    <button class="header-dropdown-item" onclick="checkForUpdatesNow(); closeActionsMenu()">
-                        <i class="ph ph-cloud-arrow-down"></i> Check for Updates Now
+                    <!-- Toast Notifications Toggle -->
+                    <button class="header-dropdown-item toggle-item" id="toastNotificationsToggle" onclick="toggleToastNotifications()">
+                        <i class="ph ph-chat-circle-dots"></i>
+                        Toast Notifications: <span>Off</span>
                     </button>
                     <button class="header-dropdown-item" onclick="restoreFromXano(); closeActionsMenu()">
                         <i class="ph ph-cloud-arrow-down"></i> Restore from Cloud
@@ -29845,6 +29860,9 @@ John Doe,Engineering,john@example.com"
         // ==========================================
 
         function showToast(message, type = 'info') {
+            // Skip non-error toasts if notifications are disabled
+            if (!toastNotificationsEnabled && type !== 'error') return;
+
             const toast = document.getElementById('toastNotification');
             if (!toast) return;
 
@@ -37293,6 +37311,9 @@ Cmd/Ctrl + K - Command palette
 
         // Show activity upload toast notification
         function showActivityToast(type, title, detail = '') {
+            // Skip non-error toasts if notifications are disabled
+            if (!toastNotificationsEnabled && type !== 'error') return;
+
             // Remove any existing toast
             const existingToast = document.getElementById('activityToast');
             if (existingToast) {
@@ -37417,6 +37438,48 @@ Cmd/Ctrl + K - Command palette
                     checkXanoConnection();
                 }
             }, 60000);
+        }
+
+        // ============================================
+        // TOAST NOTIFICATION PREFERENCE
+        // ============================================
+        let toastNotificationsEnabled = false; // Default: off
+
+        function toggleToastNotifications() {
+            toastNotificationsEnabled = !toastNotificationsEnabled;
+            const toggle = document.getElementById('toastNotificationsToggle');
+
+            if (toggle) {
+                if (toastNotificationsEnabled) {
+                    toggle.classList.add('active');
+                    toggle.querySelector('span').textContent = 'On';
+                } else {
+                    toggle.classList.remove('active');
+                    toggle.querySelector('span').textContent = 'Off';
+                }
+            }
+
+            try {
+                localStorage.setItem('toastNotificationsEnabled', toastNotificationsEnabled);
+            } catch (e) {
+                console.warn('Could not save toast notification preference');
+            }
+        }
+
+        function restoreToastNotificationPreference() {
+            try {
+                const savedPref = localStorage.getItem('toastNotificationsEnabled');
+                if (savedPref === 'true') {
+                    toastNotificationsEnabled = true;
+                    const toggle = document.getElementById('toastNotificationsToggle');
+                    if (toggle) {
+                        toggle.classList.add('active');
+                        toggle.querySelector('span').textContent = 'On';
+                    }
+                }
+            } catch (e) {
+                console.warn('Could not restore toast notification preference');
+            }
         }
 
         // ============================================
@@ -59800,6 +59863,7 @@ Options:
                     // Initialize simplified UX
                     checkWelcomeBanner();
                     restorePanelStates();
+                    restoreToastNotificationPreference();
                     updateStructureSectionVisibility();
                     initSidebar();
                 } catch (e) {
