@@ -46935,12 +46935,62 @@ Cmd/Ctrl + K - Command palette
                 updateParentOptions();
                 renderActivityList();
 
-                if (currentView === 'graph') {
-                    updateGraph();
-                } else if (currentView === 'tree') {
-                    renderTreeView();
-                } else if (currentView === 'card') {
-                    renderCardView();
+                // Refresh the current view to display imported data
+                switch (currentView) {
+                    case 'graph':
+                        updateGraph();
+                        break;
+                    case 'tree':
+                        renderTreeView();
+                        break;
+                    case 'card':
+                    case 'cards':
+                        renderCardView();
+                        break;
+                    case 'tasks':
+                        renderTaskBoardView();
+                        break;
+                    case 'kanban':
+                        renderKanbanBoard();
+                        break;
+                    case 'table':
+                        renderTaskTable();
+                        break;
+                    case 'timeline':
+                        renderTimeline();
+                        break;
+                    case 'gantt':
+                        renderGanttView();
+                        break;
+                    case 'calendar':
+                        renderCalendarView();
+                        break;
+                    case 'venn':
+                        renderVennView();
+                        break;
+                    case 'orgchart':
+                        renderOrgChartView();
+                        break;
+                    case 'structure':
+                        renderStructureView();
+                        break;
+                    case 'flow':
+                        renderFlowView();
+                        break;
+                    case 'shape':
+                        renderShapeView();
+                        break;
+                    case 'workflows':
+                        if (typeof renderWorkflowsView === 'function') renderWorkflowsView();
+                        break;
+                    case 'company-rules':
+                        if (typeof renderCompanyRulesView === 'function') renderCompanyRulesView();
+                        break;
+                    case 'stream':
+                        if (typeof renderStreamArchive === 'function') renderStreamArchive();
+                        break;
+                    default:
+                        updateGraph();
                 }
 
                 // Show success
