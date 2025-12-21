@@ -28192,6 +28192,11 @@ John Doe,Engineering,john@example.com"
 
         let relationships = [];
 
+        // Track locally deleted items to prevent them from reappearing during sync
+        // These sets persist until the deletion is confirmed in the API response
+        const locallyDeletedEntityIds = new Set();
+        const locallyDeletedRelationshipIds = new Set();
+
         // Ensure all required entity types exist (for backwards compatibility with older saved data)
         function normalizeEntities(e) {
             const requiredTypes = ['unit', 'team', 'role', 'person', 'task', 'product', 'workflow', 'stream'];
@@ -36719,6 +36724,12 @@ Cmd/Ctrl + K - Command palette
             // Add to recycle bin
             addToRecycleBin(entityData, 'entity', entityType, removedRelationships);
 
+            // Track deleted items locally to prevent reappearance during sync
+            locallyDeletedEntityIds.add(entityId);
+            for (const rel of removedRelationships) {
+                locallyDeletedRelationshipIds.add(rel.id);
+            }
+
             // Remove from entities
             entities[entityType] = entities[entityType].filter(e => e.id !== entityId);
 
@@ -36726,8 +36737,8 @@ Cmd/Ctrl + K - Command palette
                 r.subject !== entityId && r.object !== entityId
             );
 
-            // Log to Xano - await to ensure deletion is persisted before continuing
-            const result = await logActivityToXano({
+            // Log to Xano with retry logic to ensure deletion is persisted
+            let result = await logActivityToXano({
                 event_verb: 'NUL',
                 eo_operator: 'NUL',
                 k_frame: 'Entity Nullification',
@@ -36741,9 +36752,33 @@ Cmd/Ctrl + K - Command palette
                 }
             });
 
-            // Warn if sync failed (deletion still happened locally)
+            // Retry up to 3 times if sync failed
             if (!result) {
-                console.warn('⚠️ Deletion may not have synced to server');
+                console.warn('⚠️ Deletion sync failed, retrying...');
+                for (let attempt = 1; attempt <= 3; attempt++) {
+                    await new Promise(resolve => setTimeout(resolve, 1000 * attempt)); // Exponential backoff
+                    result = await logActivityToXano({
+                        event_verb: 'NUL',
+                        eo_operator: 'NUL',
+                        k_frame: 'Entity Nullification',
+                        object_type: entityType,
+                        object_id: entityId,
+                        object_label: entityName,
+                        data_json: {
+                            entity_name: entityName,
+                            entity_type: entityType,
+                            removed_relationships: removedRelationships.length,
+                            retry_attempt: attempt
+                        }
+                    });
+                    if (result) {
+                        console.log(`✅ Deletion synced on retry attempt ${attempt}`);
+                        break;
+                    }
+                }
+                if (!result) {
+                    console.error('❌ Deletion failed to sync after 3 retries - item will stay deleted locally');
+                }
             }
 
             // Close modals and refresh
@@ -36997,7 +37032,7 @@ Cmd/Ctrl + K - Command palette
             document.getElementById('deleteConfirmModal').classList.add('open');
         }
 
-        function confirmDeleteRelationship() {
+        async function confirmDeleteRelationship() {
             if (!relationshipToDelete) return;
 
             const rel = relationships.find(r => r.id === relationshipToDelete);
@@ -37007,6 +37042,7 @@ Cmd/Ctrl + K - Command palette
                 return;
             }
 
+            const relId = relationshipToDelete;
             const subject = findEntity(rel.subject);
             const object = findEntity(rel.object);
             const operatorData = eoOperators[rel.predicate];
@@ -37021,15 +37057,18 @@ Cmd/Ctrl + K - Command palette
             // Add to recycle bin
             addToRecycleBin(rel, 'relationship', null);
 
-            relationships = relationships.filter(r => r.id !== relationshipToDelete);
+            // Track deleted relationship locally to prevent reappearance during sync
+            locallyDeletedRelationshipIds.add(relId);
 
-            // Log deletion to Xano
-            logActivityToXano({
+            relationships = relationships.filter(r => r.id !== relId);
+
+            // Log deletion to Xano with retry logic
+            let result = await logActivityToXano({
                 event_verb: 'NUL',
                 eo_operator: 'NUL',
                 k_frame: 'Removal',
                 object_type: 'relationship',
-                object_id: relationshipToDelete,
+                object_id: relId,
                 object_label: `${subject?.name} → ${object?.name}`,
                 data_json: {
                     relationship_deleted: true,
@@ -37038,6 +37077,36 @@ Cmd/Ctrl + K - Command palette
                     predicate: rel.predicate
                 }
             });
+
+            // Retry up to 3 times if sync failed
+            if (!result) {
+                console.warn('⚠️ Relationship deletion sync failed, retrying...');
+                for (let attempt = 1; attempt <= 3; attempt++) {
+                    await new Promise(resolve => setTimeout(resolve, 1000 * attempt));
+                    result = await logActivityToXano({
+                        event_verb: 'NUL',
+                        eo_operator: 'NUL',
+                        k_frame: 'Removal',
+                        object_type: 'relationship',
+                        object_id: relId,
+                        object_label: `${subject?.name} → ${object?.name}`,
+                        data_json: {
+                            relationship_deleted: true,
+                            subject_id: rel.subject,
+                            object_id: rel.object,
+                            predicate: rel.predicate,
+                            retry_attempt: attempt
+                        }
+                    });
+                    if (result) {
+                        console.log(`✅ Relationship deletion synced on retry attempt ${attempt}`);
+                        break;
+                    }
+                }
+                if (!result) {
+                    console.error('❌ Relationship deletion failed to sync after 3 retries');
+                }
+            }
 
             relationshipToDelete = null;
             closeDeleteConfirmModal();
@@ -37705,7 +37774,7 @@ Cmd/Ctrl + K - Command palette
             }
             return 0;
         })();
-        const LOCAL_CHANGE_GRACE_PERIOD_MS = 5000; // 5 seconds grace period after local changes
+        const LOCAL_CHANGE_GRACE_PERIOD_MS = 15000; // 15 seconds grace period after local changes (increased for deletion resilience)
 
         // Check if we should skip overwriting state (to prevent reverting local changes)
         function shouldSkipStateOverwrite(context = '') {
@@ -37821,10 +37890,41 @@ Cmd/Ctrl + K - Command palette
                         (sum, arr) => sum + arr.length, 0
                     );
 
+                    // Clear locally deleted items that are confirmed deleted in Xano
+                    // This prevents the tracking sets from growing indefinitely
+                    if (reconstructed.deletedEntityIds) {
+                        for (const deletedId of reconstructed.deletedEntityIds) {
+                            if (locallyDeletedEntityIds.has(deletedId)) {
+                                locallyDeletedEntityIds.delete(deletedId);
+                                debug.log(`✓ Cleared confirmed deletion from tracking: entity ${deletedId}`);
+                            }
+                        }
+                    }
+                    if (reconstructed.deletedRelationshipIds) {
+                        for (const deletedId of reconstructed.deletedRelationshipIds) {
+                            if (locallyDeletedRelationshipIds.has(deletedId)) {
+                                locallyDeletedRelationshipIds.delete(deletedId);
+                                debug.log(`✓ Cleared confirmed deletion from tracking: relationship ${deletedId}`);
+                            }
+                        }
+                    }
+
                     if (totalEntities > 0) {
                         // MERGE instead of replacing - preserve local entities not yet synced to Xano
                         const reconstructedEntities = normalizeEntities(JSON.parse(JSON.stringify(reconstructed.entities)));
                         const reconstructedRelationships = JSON.parse(JSON.stringify(reconstructed.relationships));
+
+                        // Filter out locally deleted entities from reconstructed data
+                        // This prevents deleted items from reappearing if NUL activity isn't in Xano yet
+                        for (const type of Object.keys(reconstructedEntities)) {
+                            reconstructedEntities[type] = reconstructedEntities[type].filter(e => {
+                                if (locallyDeletedEntityIds.has(e.id)) {
+                                    debug.log(`🚫 Excluding locally deleted ${type} from sync: ${e.name || e.id}`);
+                                    return false;
+                                }
+                                return true;
+                            });
+                        }
 
                         // Build a set of entity IDs from reconstructed data
                         const reconstructedEntityIds = new Set();
@@ -37835,11 +37935,17 @@ Cmd/Ctrl + K - Command palette
                         }
 
                         // Preserve local entities that don't exist in reconstructed data (not yet synced)
+                        // BUT skip entities that were locally deleted
                         for (const type of Object.keys(entities)) {
                             if (!reconstructedEntities[type]) {
                                 reconstructedEntities[type] = [];
                             }
                             for (const localEntity of entities[type] || []) {
+                                // Skip if this entity was locally deleted
+                                if (locallyDeletedEntityIds.has(localEntity.id)) {
+                                    debug.log(`🚫 Not preserving deleted ${type}: ${localEntity.name || localEntity.id}`);
+                                    continue;
+                                }
                                 if (!reconstructedEntityIds.has(localEntity.id)) {
                                     debug.log(`🔄 Preserving local-only ${type}: ${localEntity.name || localEntity.id}`);
                                     reconstructedEntities[type].push(localEntity);
@@ -37847,12 +37953,27 @@ Cmd/Ctrl + K - Command palette
                             }
                         }
 
+                        // Filter out locally deleted relationships from reconstructed data
+                        const filteredReconstructedRelationships = reconstructedRelationships.filter(r => {
+                            if (locallyDeletedRelationshipIds.has(r.id)) {
+                                debug.log(`🚫 Excluding locally deleted relationship from sync: ${r.id}`);
+                                return false;
+                            }
+                            return true;
+                        });
+
                         // Similarly preserve local relationships not in reconstructed data
-                        const reconstructedRelationshipIds = new Set(reconstructedRelationships.map(r => r.id));
+                        // BUT skip relationships that were locally deleted
+                        const reconstructedRelationshipIds = new Set(filteredReconstructedRelationships.map(r => r.id));
                         for (const localRel of relationships) {
+                            // Skip if this relationship was locally deleted
+                            if (locallyDeletedRelationshipIds.has(localRel.id)) {
+                                debug.log(`🚫 Not preserving deleted relationship: ${localRel.id}`);
+                                continue;
+                            }
                             if (!reconstructedRelationshipIds.has(localRel.id)) {
                                 debug.log(`🔄 Preserving local-only relationship: ${localRel.id}`);
-                                reconstructedRelationships.push(localRel);
+                                filteredReconstructedRelationships.push(localRel);
                             }
                         }
 
@@ -37863,7 +37984,7 @@ Cmd/Ctrl + K - Command palette
                         }
 
                         entities = reconstructedEntities;
-                        relationships = reconstructedRelationships;
+                        relationships = filteredReconstructedRelationships;
 
                         // Update workspace
                         if (currentWorkspaceId && workspaces[currentWorkspaceId]) {
@@ -38703,7 +38824,9 @@ Cmd/Ctrl + K - Command palette
 
             return {
                 entities: reconstructedEntities,
-                relationships: finalRelationships
+                relationships: finalRelationships,
+                deletedEntityIds: deletedEntityIds,
+                deletedRelationshipIds: deletedRelationshipIds
             };
         }
 
