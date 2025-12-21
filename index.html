@@ -27890,7 +27890,6 @@ John Doe,Engineering,john@example.com"
                 // Skip refresh if there are pending local changes to prevent reverting
                 // (shouldSkipStateOverwrite is defined later in file, so check if it exists)
                 if (typeof shouldSkipStateOverwrite === 'function' && shouldSkipStateOverwrite('forceRefreshFromStorage')) {
-                    console.log('[RefreshSystem] Skipping force refresh - local changes pending');
                     return;
                 }
 
@@ -27908,7 +27907,6 @@ John Doe,Engineering,john@example.com"
                     if (ws.taskLinks) taskLinks = ws.taskLinks;
                 }
                 refreshAllViews();
-                console.log('[RefreshSystem] Force refresh from storage completed');
             } catch (e) {
                 console.error('[RefreshSystem] Error during force refresh:', e);
             }
@@ -27927,7 +27925,6 @@ John Doe,Engineering,john@example.com"
          */
         function handleVisibilityChange() {
             if (document.visibilityState === 'visible') {
-                console.log('[RefreshSystem] Tab became visible, refreshing...');
                 debouncedForceRefreshFromStorage();
             }
         }
@@ -27937,7 +27934,6 @@ John Doe,Engineering,john@example.com"
          * Catches edge cases visibility change might miss
          */
         function handleWindowFocus() {
-            console.log('[RefreshSystem] Window focused, refreshing...');
             debouncedForceRefreshFromStorage();
         }
 
@@ -27952,7 +27948,6 @@ John Doe,Engineering,john@example.com"
         function handleStorageChange(event) {
             // Only respond to changes in our storage keys
             if (event.key === 'holonicWorkspaces' && event.newValue) {
-                console.log('[RefreshSystem] Cross-tab storage change detected');
                 debouncedForceRefreshFromStorage();
             }
         }
@@ -27969,7 +27964,6 @@ John Doe,Engineering,john@example.com"
             console.error('[RefreshSystem] Unhandled error detected:', event.error || event.message);
             // Attempt recovery refresh after a short delay
             setTimeout(() => {
-                console.log('[RefreshSystem] Attempting error recovery refresh...');
                 try {
                     refreshAllViews();
                 } catch (e) {
@@ -27985,7 +27979,6 @@ John Doe,Engineering,john@example.com"
             console.error('[RefreshSystem] Unhandled promise rejection:', event.reason);
             // Attempt recovery refresh after a short delay
             setTimeout(() => {
-                console.log('[RefreshSystem] Attempting rejection recovery refresh...');
                 try {
                     refreshAllViews();
                 } catch (e) {
@@ -28004,13 +27997,10 @@ John Doe,Engineering,john@example.com"
          */
         function startPeriodicSync(intervalMs = 30000) {
             if (_periodicSyncInterval) {
-                console.log('[RefreshSystem] Periodic sync already running');
                 return;
             }
-            console.log('[RefreshSystem] Starting periodic sync every', intervalMs, 'ms');
             _periodicSyncInterval = setInterval(() => {
                 if (document.visibilityState === 'visible') {
-                    console.log('[RefreshSystem] Periodic sync triggered');
                     forceRefreshFromStorage();
                 }
             }, intervalMs);
@@ -28023,7 +28013,6 @@ John Doe,Engineering,john@example.com"
             if (_periodicSyncInterval) {
                 clearInterval(_periodicSyncInterval);
                 _periodicSyncInterval = null;
-                console.log('[RefreshSystem] Periodic sync stopped');
             }
         }
 
@@ -28119,7 +28108,6 @@ John Doe,Engineering,john@example.com"
          * Usage: window.eoRefresh() or eoRefresh()
          */
         window.eoRefresh = function() {
-            console.log('[RefreshSystem] Manual refresh triggered via eoRefresh()');
             refreshAllViews();
             return {
                 success: true,
@@ -28134,7 +28122,6 @@ John Doe,Engineering,john@example.com"
          * Usage: window.eoEnsureSync() or eoEnsureSync()
          */
         window.eoEnsureSync = function() {
-            console.log('[RefreshSystem] Force sync triggered via eoEnsureSync()');
             forceRefreshFromStorage();
             return {
                 success: true,
@@ -28206,8 +28193,6 @@ John Doe,Engineering,john@example.com"
 
             // Flush pending saves before page unload to prevent data loss on quick refresh
             window.addEventListener('beforeunload', handleBeforeUnload);
-
-            console.log('[RefreshSystem] Listeners initialized');
         }
 
         /**
@@ -28216,7 +28201,6 @@ John Doe,Engineering,john@example.com"
          */
         function handleBeforeUnload(event) {
             if (_hasPendingChanges) {
-                console.log('[RefreshSystem] Flushing pending changes before unload');
                 // Synchronously save to localStorage before page unloads
                 saveWorkspaces();
                 _hasPendingChanges = false;
@@ -47349,7 +47333,6 @@ Cmd/Ctrl + K - Command palette
          */
         window.eoAutoRefresh = function(enable) {
             _autoRefreshAfterSave = enable;
-            console.log('[RefreshSystem] Auto-refresh after save:', enable ? 'enabled' : 'disabled');
             return { autoRefreshEnabled: _autoRefreshAfterSave };
         };
 
