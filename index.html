@@ -58874,6 +58874,16 @@ Options:
                 initUpdatePolling();
                 debug.log('🔄 Update polling system initialized');
 
+                // Immediately fetch latest state from Xano to ensure we have fresh data
+                // This runs after localStorage is loaded to get any updates that happened
+                // while the user was away
+                debug.log('🔄 Fetching latest state from Xano...');
+                performAutoRefresh().then(() => {
+                    debug.log('✅ Initial state sync complete');
+                }).catch(err => {
+                    debug.warn('⚠️ Could not sync initial state:', err);
+                });
+
                 debug.log('🎉 Initialization complete!');
                 debug.log('📊 Current state:', {
                     entities: {
