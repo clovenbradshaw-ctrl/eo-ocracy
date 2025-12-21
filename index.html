@@ -20429,15 +20429,19 @@
         .calendar-days {
             display: grid;
             grid-template-columns: repeat(7, 1fr);
+            grid-auto-rows: 1fr;
         }
 
         .calendar-day {
-            min-height: 100px;
+            height: 120px;
             padding: 0.5rem;
             border-right: 1px solid #E5DDD1;
             border-bottom: 1px solid #E5DDD1;
             cursor: pointer;
             transition: background 0.2s;
+            overflow: hidden;
+            display: flex;
+            flex-direction: column;
         }
 
         .calendar-day:nth-child(7n) {
@@ -20461,6 +20465,7 @@
             font-size: 0.875rem;
             font-weight: 500;
             margin-bottom: 0.25rem;
+            flex-shrink: 0;
         }
 
         .calendar-day.today .calendar-day-number {
@@ -20472,6 +20477,9 @@
             display: flex;
             flex-direction: column;
             gap: 0.25rem;
+            flex: 1;
+            min-height: 0;
+            overflow: hidden;
         }
 
         .calendar-task {
@@ -20485,6 +20493,7 @@
             display: flex;
             align-items: center;
             gap: 0.25rem;
+            flex-shrink: 0;
         }
 
         .calendar-task-name {
