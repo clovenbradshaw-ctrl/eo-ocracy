@@ -37034,13 +37034,12 @@ Cmd/Ctrl + K - Command palette
         // Fetch updates from the Xano activity_store_updates endpoint
         async function fetchUpdatesFromXano() {
             try {
-                const params = new URLSearchParams({
-                    app_id: APP_ID
-                });
+                const params = new URLSearchParams();
 
                 // If we have a last timestamp, only get updates since then
+                // The API uses 'timestamp' parameter and filters: created_at > timestamp
                 if (lastUpdateTimestamp) {
-                    params.append('since', lastUpdateTimestamp);
+                    params.append('timestamp', lastUpdateTimestamp);
                 }
 
                 debug.log('🔄 Checking for updates from Xano...');
@@ -37068,9 +37067,17 @@ Cmd/Ctrl + K - Command palette
                 // Update the last timestamp if we got data
                 if (data && data.length > 0) {
                     // Find the most recent timestamp from the updates
-                    const timestamps = data.map(u => u.created_at || u.timestamp).filter(Boolean);
+                    // Xano's created_at is a Unix timestamp (integer in milliseconds)
+                    const timestamps = data.map(u => {
+                        const ts = u.created_at || u.timestamp;
+                        if (!ts) return null;
+                        // If it's already a number, use it directly
+                        if (typeof ts === 'number') return ts;
+                        // If it's a string, convert to milliseconds
+                        return new Date(ts).getTime();
+                    }).filter(Boolean);
                     if (timestamps.length > 0) {
-                        lastUpdateTimestamp = Math.max(...timestamps.map(t => new Date(t).getTime()));
+                        lastUpdateTimestamp = Math.max(...timestamps);
                     }
                 }
 
