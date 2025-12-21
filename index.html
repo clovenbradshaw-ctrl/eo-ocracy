@@ -47402,6 +47402,18 @@ Cmd/Ctrl + K - Command palette
 
             let html = '';
 
+            // Entity fields section header
+            html += `
+                <div style="margin-bottom: 0.75rem; padding-bottom: 0.5rem; border-bottom: 1px solid #E5DDD1;">
+                    <div style="font-size: 0.85rem; font-weight: 600; color: #6B5642;">
+                        <i class="ph ph-database"></i> Entity Fields
+                    </div>
+                    <div style="font-size: 0.7rem; color: #8B6F47; margin-top: 0.25rem;">
+                        Map CSV columns to these entity-specific fields
+                    </div>
+                </div>
+            `;
+
             // Field mapping rows
             fields.forEach(field => {
                 const currentMapping = Object.entries(bulkImportState.fieldMappings).find(([src, tgt]) => tgt === field.key);
@@ -47446,6 +47458,54 @@ Cmd/Ctrl + K - Command palette
                     ${hasValueMapping ? `<div id="valueMappingContainer_${field.key}" style="margin-bottom: 0.5rem;">${renderValueMappingUI(field, mappedColumn)}</div>` : ''}
                 `;
             });
+
+            // All CSV Columns section - show ALL columns from the imported data
+            const mappedColumns = new Set(Object.keys(bulkImportState.fieldMappings));
+            const unmappedColumns = bulkImportState.headers.filter(h => !mappedColumns.has(h));
+
+            html += `
+                <div style="margin-top: 1.5rem; margin-bottom: 0.75rem; padding-top: 1rem; border-top: 2px solid #E5DDD1;">
+                    <div style="font-size: 0.85rem; font-weight: 600; color: #6B5642;">
+                        <i class="ph ph-list-dashes"></i> All Import Columns (${bulkImportState.headers.length})
+                    </div>
+                    <div style="font-size: 0.7rem; color: #8B6F47; margin-top: 0.25rem;">
+                        All data will be stored in the database with original column names
+                    </div>
+                </div>
+                <div style="background: #FAF7F5; border-radius: 8px; padding: 0.75rem; border: 1px solid #E5DDD1;">
+                    <div style="display: flex; flex-wrap: wrap; gap: 0.5rem;">
+            `;
+
+            bulkImportState.headers.forEach(header => {
+                const isMapped = mappedColumns.has(header);
+                const mappedTo = isMapped ? bulkImportState.fieldMappings[header] : null;
+                const mappedField = mappedTo ? fields.find(f => f.key === mappedTo) : null;
+
+                html += `
+                    <div style="
+                        padding: 0.35rem 0.6rem;
+                        border-radius: 4px;
+                        font-size: 0.75rem;
+                        font-family: monospace;
+                        ${isMapped ?
+                            'background: #E8F5E9; color: #2E7D32; border: 1px solid #A5D6A7;' :
+                            'background: #fff; color: #6B5642; border: 1px solid #E5DDD1;'}
+                    ">
+                        ${escapeHtml(header)}
+                        ${isMapped ? `<i class="ph ph-arrow-right" style="margin: 0 0.25rem; opacity: 0.6;"></i><span style="font-family: inherit; font-weight: 500;">${mappedField ? mappedField.label : mappedTo}</span>` : ''}
+                    </div>
+                `;
+            });
+
+            html += `
+                    </div>
+                    <div style="margin-top: 0.75rem; padding-top: 0.75rem; border-top: 1px dashed #E5DDD1; font-size: 0.7rem; color: #8B6F47;">
+                        <i class="ph ph-info" style="margin-right: 0.25rem;"></i>
+                        <strong>${mappedColumns.size}</strong> column${mappedColumns.size !== 1 ? 's' : ''} mapped to entity fields.
+                        <strong>${unmappedColumns.length}</strong> additional column${unmappedColumns.length !== 1 ? 's' : ''} will be stored as raw data.
+                    </div>
+                </div>
+            `;
 
             container.innerHTML = html;
             updateBulkImportNextButton();
@@ -47607,12 +47667,27 @@ Cmd/Ctrl + K - Command palette
             const countEl = document.getElementById('bulkImportMappedCount');
             const fields = bulkImportFields[bulkImportState.entityType];
 
-            // Build header
+            // Get mapped columns and unmapped columns
+            const mappedColumnSet = new Set(Object.keys(bulkImportState.fieldMappings));
+            const unmappedColumns = bulkImportState.headers.filter(h => !mappedColumnSet.has(h));
+
+            // Build header - show entity fields first, then additional columns
             let html = '<thead><tr>';
             html += '<th class="row-number-header"></th>';
+
+            // Entity fields columns
             fields.forEach(f => {
-                html += `<th>${f.label}</th>`;
+                const isMapped = Object.values(bulkImportState.fieldMappings).includes(f.key);
+                html += `<th style="${isMapped ? 'background: #E8F5E9;' : ''}">${f.label}</th>`;
             });
+
+            // Additional data columns (unmapped CSV columns)
+            if (unmappedColumns.length > 0) {
+                unmappedColumns.forEach(col => {
+                    html += `<th style="background: #FFF8E1; font-size: 0.7rem; color: #8B6F47;">${escapeHtml(col)}</th>`;
+                });
+            }
+
             html += '</tr></thead><tbody>';
 
             // Process and show preview
@@ -47620,6 +47695,8 @@ Cmd/Ctrl + K - Command palette
             previewRows.forEach((row, idx) => {
                 html += '<tr>';
                 html += `<td class="row-number">${idx + 1}</td>`;
+
+                // Entity fields values
                 fields.forEach(f => {
                     let value = '';
                     let displayValue = '';
@@ -47650,11 +47727,21 @@ Cmd/Ctrl + K - Command palette
 
                     html += `<td>${displayValue || '<span style="color: #ccc;">—</span>'}</td>`;
                 });
+
+                // Additional data values (unmapped columns)
+                if (unmappedColumns.length > 0) {
+                    unmappedColumns.forEach(col => {
+                        const value = row[col] || '';
+                        html += `<td style="font-size: 0.75rem; color: #8B6F47; max-width: 150px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;" title="${escapeHtml(value)}">${escapeHtml(value) || '<span style="color: #ddd;">—</span>'}</td>`;
+                    });
+                }
+
                 html += '</tr>';
             });
 
+            const totalColumns = fields.length + unmappedColumns.length + 1;
             if (bulkImportState.parsedData.length > 10) {
-                html += `<tr><td colspan="${fields.length + 1}" style="text-align: center; color: #8B6F47; font-style: italic;">... and ${bulkImportState.parsedData.length - 10} more rows</td></tr>`;
+                html += `<tr><td colspan="${totalColumns}" style="text-align: center; color: #8B6F47; font-style: italic;">... and ${bulkImportState.parsedData.length - 10} more rows</td></tr>`;
             }
 
             html += '</tbody>';
@@ -47927,10 +48014,20 @@ Cmd/Ctrl + K - Command palette
                     } else {
                         // Standard entity creation (non-task)
                         const id = entityType[0] + Date.now() + Math.random().toString(36).substr(2, 5);
+
+                        // Preserve ALL original CSV data with original column names
+                        const originalRow = item._original || {};
+                        const originalCsvData = { ...originalRow };
+
                         const entity = {
                             id,
                             name,
-                            type: entityType
+                            type: entityType,
+                            importedFrom: 'csv_bulk_import',
+                            // Store the field mappings that were used during import
+                            importFieldMappings: { ...bulkImportState.fieldMappings },
+                            // Store the complete original CSV row with original column names
+                            originalImport: originalCsvData
                         };
 
                         entities[entityType].push(entity);
@@ -47946,7 +48043,11 @@ Cmd/Ctrl + K - Command palette
                             data_json: {
                                 entity_type: entityType,
                                 entity_name: name,
-                                import_source: 'bulk_import'
+                                import_source: 'bulk_import',
+                                // Include field mappings used during import
+                                importFieldMappings: entity.importFieldMappings,
+                                // Include original CSV row with original column names
+                                originalImport: entity.originalImport
                             }
                         }, false);
 
