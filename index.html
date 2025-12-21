@@ -27051,6 +27051,13 @@ John Doe,Engineering,john@example.com"
                     workspaces = data.workspaces || {};
                     currentWorkspaceId = data.currentWorkspaceId || null;
 
+                    // Clean up any workspace names with restore timestamps
+                    Object.values(workspaces).forEach(ws => {
+                        if (ws.name && ws.name.startsWith('Restored from Xano')) {
+                            ws.name = 'My Organization';
+                        }
+                    });
+
                     // Validate current workspace exists
                     if (currentWorkspaceId && !workspaces[currentWorkspaceId]) {
                         currentWorkspaceId = Object.keys(workspaces)[0] || null;
@@ -60286,7 +60293,7 @@ Options:
                             const wsId = generateWorkspaceId();
                             workspaces[wsId] = {
                                 id: wsId,
-                                name: 'Restored Data',
+                                name: 'My Organization',
                                 entities: reconstructed.entities,
                                 relationships: reconstructed.relationships,
                                 hasSampleData: false,
