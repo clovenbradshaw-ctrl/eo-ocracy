@@ -46260,11 +46260,14 @@ Cmd/Ctrl + K - Command palette
             sendEmail: {
                 type: 'task_notification',
                 email: 'test@example.com',
-                subject: 'You were tagged in: Test Task',
+                subject: '[TaskFlow] Test Task',
                 sender: 'Test User via TaskFlow',
                 app: 'taskflow',
                 workspace: 'Test Workspace',
                 timestamp: new Date().toISOString(),
+                // Gmail threading headers - emails with same threadId will be grouped
+                threadId: 'task-test-task-id@taskflow.app',
+                messageId: `test-task-id.${Date.now()}@taskflow.app`,
                 notification: {
                     recipientName: 'Test Recipient',
                     recipientEmail: 'test@example.com',
@@ -52927,6 +52930,11 @@ Options:
             // Generate HTML email template
             const htmlBody = EmailTemplates.taskNotification(notificationData);
 
+            // Generate threading headers for Gmail
+            const timestamp = Date.now();
+            const threadId = `task-${task.id}@taskflow.app`;
+            const messageId = `${task.id}.${timestamp}@taskflow.app`;
+
             try {
                 const response = await fetch(AuthManager.webhookUrl, {
                     method: 'POST',
@@ -52936,11 +52944,14 @@ Options:
                     body: JSON.stringify({
                         type: 'task_notification',
                         email: recipient.email,
-                        subject: `You were tagged in: ${task.name}`,
+                        subject: `[TaskFlow] ${task.name}`,
                         sender: `${senderName} via TaskFlow`,
                         app: 'taskflow',
                         workspace: workspaceName,
                         timestamp: new Date().toISOString(),
+                        // Gmail threading headers
+                        threadId: threadId,
+                        messageId: messageId,
                         notification: notificationData,
                         htmlBody: htmlBody
                     })
