@@ -65535,10 +65535,64 @@ Options:
                 updateStatus('Loaded from storage');
                 debug.log('✅ Loaded data from localStorage');
 
-                // Still connect to Xano for activity logging
+                // Fetch Xano activities and MERGE with localStorage data
+                // This ensures externally imported data shows up even when localStorage exists
                 getActivitiesFromXano().then(xanoActivities => {
                     if (xanoActivities && xanoActivities.length > 0) {
                         debug.log('✅ Connected to Xano. Found', xanoActivities.length, 'activities');
+
+                        // Reconstruct entities from Xano and merge with localStorage
+                        const reconstructed = reconstructEntitiesFromActivities(xanoActivities);
+                        const totalReconstructed = Object.values(reconstructed.entities).reduce(
+                            (sum, arr) => sum + arr.length, 0
+                        );
+
+                        if (totalReconstructed > 0) {
+                            // Build set of current entity IDs from localStorage
+                            const localEntityIds = new Set();
+                            for (const type of Object.keys(entities)) {
+                                for (const entity of entities[type] || []) {
+                                    localEntityIds.add(entity.id);
+                                }
+                            }
+
+                            // Add any Xano entities that aren't in localStorage
+                            let addedCount = 0;
+                            for (const type of Object.keys(reconstructed.entities)) {
+                                if (!entities[type]) {
+                                    entities[type] = [];
+                                }
+                                for (const xanoEntity of reconstructed.entities[type] || []) {
+                                    if (!localEntityIds.has(xanoEntity.id)) {
+                                        entities[type].push(xanoEntity);
+                                        addedCount++;
+                                    }
+                                }
+                            }
+
+                            // Also merge relationships
+                            const localRelIds = new Set(relationships.map(r => r.id));
+                            for (const rel of reconstructed.relationships || []) {
+                                if (!localRelIds.has(rel.id)) {
+                                    relationships.push(rel);
+                                }
+                            }
+
+                            if (addedCount > 0) {
+                                debug.log(`✅ Merged ${addedCount} new entities from Xano into localStorage`);
+                                // Save merged data back to workspace
+                                if (currentWorkspaceId && workspaces[currentWorkspaceId]) {
+                                    workspaces[currentWorkspaceId].entities = JSON.parse(JSON.stringify(entities));
+                                    workspaces[currentWorkspaceId].relationships = JSON.parse(JSON.stringify(relationships));
+                                    workspaces[currentWorkspaceId].updatedAt = Date.now();
+                                    saveWorkspaces();
+                                }
+                                // Refresh views to show newly merged data
+                                refreshAllViews();
+                                updateFilterStatus();
+                                updateTaskCountBadge();
+                            }
+                        }
                     } else {
                         debug.log('ℹ️ Xano connected but no activities found for this app');
                     }
