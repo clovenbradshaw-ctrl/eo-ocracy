@@ -47238,12 +47238,12 @@ Cmd/Ctrl + K - Command palette
             },
 
             // Transform status values to internal format
+            // Only "done" or "completed" map to completed; everything else defaults to pending
             taskStatus: (value) => {
                 if (!value) return 'pending';
                 const lower = value.toLowerCase().trim();
                 if (lower === 'complete' || lower === 'completed' || lower === 'done') return 'completed';
-                if (lower === 'in_progress' || lower === 'in progress' || lower === 'inprogress' || lower === 'active') return 'in_progress';
-                return 'pending'; // Default to pending
+                return 'pending'; // Default to pending for all other values
             },
 
             // Transform priority values to internal format
