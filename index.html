@@ -47632,37 +47632,68 @@ Cmd/Ctrl + K - Command palette
             const container = document.getElementById('bulkImportMappingContainer');
             const fields = bulkImportFields[bulkImportState.entityType];
 
-            // Auto-map fields based on header names
-            bulkImportState.fieldMappings = {};
-            bulkImportState.setAllValues = {};
+            // Only do auto-mapping on first render (when fieldMappings is empty and no custom fields yet)
+            // This preserves user's mappings when re-rendering after adding custom fields
+            const isFirstRender = Object.keys(bulkImportState.fieldMappings).length === 0 && bulkImportState.customFields.length === 0;
 
-            fields.forEach(field => {
-                // Try to find a matching header - check field key, label, and aliases
-                const matchingHeader = bulkImportState.headers.find(h => {
-                    const headerLower = h.toLowerCase().replace(/[_\s-]/g, '');
-                    const keyLower = field.key.toLowerCase().replace(/[_\s-]/g, '');
-                    const labelLower = field.label.toLowerCase().split(' ')[0].replace(/[_\s-]/g, '');
+            if (isFirstRender) {
+                // Auto-map entity fields based on header names
+                fields.forEach(field => {
+                    // Try to find a matching header - check field key, label, and aliases
+                    const matchingHeader = bulkImportState.headers.find(h => {
+                        const headerLower = h.toLowerCase().replace(/[_\s-]/g, '');
+                        const keyLower = field.key.toLowerCase().replace(/[_\s-]/g, '');
+                        const labelLower = field.label.toLowerCase().split(' ')[0].replace(/[_\s-]/g, '');
 
-                    // Check exact or partial match with key/label
-                    if (headerLower.includes(keyLower) || headerLower.includes(labelLower) ||
-                        keyLower.includes(headerLower) || labelLower.includes(headerLower)) {
-                        return true;
+                        // Check exact or partial match with key/label
+                        if (headerLower.includes(keyLower) || headerLower.includes(labelLower) ||
+                            keyLower.includes(headerLower) || labelLower.includes(headerLower)) {
+                            return true;
+                        }
+
+                        // Check aliases if defined
+                        if (field.aliases) {
+                            return field.aliases.some(alias => {
+                                const aliasLower = alias.toLowerCase().replace(/[_\s-]/g, '');
+                                return headerLower === aliasLower || headerLower.includes(aliasLower) || aliasLower.includes(headerLower);
+                            });
+                        }
+
+                        return false;
+                    });
+                    if (matchingHeader && !Object.values(bulkImportState.fieldMappings).includes(field.key)) {
+                        bulkImportState.fieldMappings[matchingHeader] = field.key;
                     }
+                });
 
-                    // Check aliases if defined
-                    if (field.aliases) {
-                        return field.aliases.some(alias => {
-                            const aliasLower = alias.toLowerCase().replace(/[_\s-]/g, '');
-                            return headerLower === aliasLower || headerLower.includes(aliasLower) || aliasLower.includes(headerLower);
+                // Auto-add all remaining unmapped columns as custom fields (additive mapping)
+                const entityMappedColumns = new Set(Object.keys(bulkImportState.fieldMappings));
+                bulkImportState.headers.forEach(columnName => {
+                    if (!entityMappedColumns.has(columnName)) {
+                        // Generate a key from the column name (camelCase, alphanumeric)
+                        const key = columnName
+                            .toLowerCase()
+                            .replace(/[^a-z0-9\s_-]/gi, '')
+                            .replace(/[\s_-]+(.)?/g, (_, c) => c ? c.toUpperCase() : '')
+                            .replace(/^[A-Z]/, c => c.toLowerCase());
+
+                        // Generate a readable label from the column name
+                        const label = columnName
+                            .replace(/[_-]/g, ' ')
+                            .replace(/([A-Z])/g, ' $1')
+                            .trim()
+                            .split(' ')
+                            .map(word => word.charAt(0).toUpperCase() + word.slice(1).toLowerCase())
+                            .join(' ');
+
+                        bulkImportState.customFields.push({
+                            key: key || 'customField' + bulkImportState.customFields.length,
+                            label: label || columnName,
+                            sourceColumn: columnName
                         });
                     }
-
-                    return false;
                 });
-                if (matchingHeader && !Object.values(bulkImportState.fieldMappings).includes(field.key)) {
-                    bulkImportState.fieldMappings[matchingHeader] = field.key;
-                }
-            });
+            }
 
             let html = '';
 
