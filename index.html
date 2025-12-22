@@ -30105,17 +30105,25 @@ John Doe,Engineering,john@example.com"
                 }
 
                 // Build a set of person IDs that have been created (INS) in activity history
+                // Also track which persons were imported via CSV (should not be removed by Airtable sync)
                 const existingPersonIds = new Set();
                 const removedPersonIds = new Set();
+                const bulkImportedPersonIds = new Set();
 
                 for (const activity of activities) {
                     const objectType = activity.object_type;
                     const objectId = activity.object_id || activity.entity_id;
                     const operator = activity.eo_operator || activity.event_type;
+                    const dataJson = activity.data_json || {};
+                    const importSource = dataJson.import_source || dataJson.source;
 
                     if (objectType === 'person') {
                         if (operator === 'INS') {
                             existingPersonIds.add(objectId);
+                            // Track if this person was bulk imported (not from Airtable)
+                            if (importSource === 'bulk_import') {
+                                bulkImportedPersonIds.add(objectId);
+                            }
                         } else if (operator === 'NUL') {
                             removedPersonIds.add(objectId);
                         }
@@ -30128,6 +30136,7 @@ John Doe,Engineering,john@example.com"
                 }
 
                 debug.log(`📊 Found ${existingPersonIds.size} existing users in activity history`);
+                debug.log(`📊 Found ${bulkImportedPersonIds.size} bulk-imported users (excluded from removal)`);
 
                 // Build a set of current Airtable user IDs
                 const airtableUserIds = new Set(airtableUsers.map(u => u.id));
@@ -30136,7 +30145,10 @@ John Doe,Engineering,john@example.com"
                 const usersToAdd = airtableUsers.filter(user => !existingPersonIds.has(user.id));
 
                 // Find users in activity history that aren't in Airtable anymore (removed users)
-                const usersToRemove = [...existingPersonIds].filter(id => !airtableUserIds.has(id));
+                // IMPORTANT: Exclude bulk-imported persons - they didn't come from Airtable so shouldn't be removed
+                const usersToRemove = [...existingPersonIds].filter(id =>
+                    !airtableUserIds.has(id) && !bulkImportedPersonIds.has(id)
+                );
 
                 debug.log(`➕ Users to add to history: ${usersToAdd.length}`);
                 debug.log(`➖ Users removed from Airtable: ${usersToRemove.length}`);
