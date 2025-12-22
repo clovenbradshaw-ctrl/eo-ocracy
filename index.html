@@ -26435,6 +26435,11 @@
                                 <i class="ph ph-check-circle"></i>
                                 <span>Completed</span>
                             </button>
+                            <div class="quick-filter-divider"></div>
+                            <button class="quick-filter-selector active" id="quickFilterHideOldCompleted" onclick="toggleQuickSelector('hideOldCompleted')" title="Hide tasks completed over 7 days ago">
+                                <i class="ph ph-eye-slash"></i>
+                                <span>Hide Old</span>
+                            </button>
                         </div>
                         <button class="inline-filter-more-btn" id="inlineFilterMoreBtn" onclick="openAdvancedFilterPanel()" title="Filters">
                             <i class="ph ph-funnel"></i>
@@ -34035,7 +34040,8 @@ John Doe,Engineering,john@example.com"
             onlyMe: false,      // Quick filter: only tasks related to current user
             onlyMyTeams: false, // Quick filter: only tasks related to user's teams
             recent: false,      // Quick filter: only recently created tasks (last 7 days)
-            onlyCompleted: false // Quick filter: only show completed tasks
+            onlyCompleted: false, // Quick filter: only show completed tasks
+            hideOldCompleted: true // Quick filter: hide tasks completed more than 7 days ago (default ON)
         };
 
         // Time travel state
@@ -34508,6 +34514,9 @@ John Doe,Engineering,john@example.com"
                         }
                     }
                     break;
+                case 'hideOldCompleted':
+                    advancedFilters.hideOldCompleted = !advancedFilters.hideOldCompleted;
+                    break;
             }
 
             syncAllFilterUI();
@@ -34520,6 +34529,7 @@ John Doe,Engineering,john@example.com"
             const myTeamsBtn = document.getElementById('quickFilterMyTeams');
             const recentBtn = document.getElementById('quickFilterRecent');
             const completedBtn = document.getElementById('quickFilterCompleted');
+            const hideOldCompletedBtn = document.getElementById('quickFilterHideOldCompleted');
 
             if (mineBtn) {
                 mineBtn.classList.toggle('active', advancedFilters.onlyMe);
@@ -34532,6 +34542,9 @@ John Doe,Engineering,john@example.com"
             }
             if (completedBtn) {
                 completedBtn.classList.toggle('active', advancedFilters.onlyCompleted);
+            }
+            if (hideOldCompletedBtn) {
+                hideOldCompletedBtn.classList.toggle('active', advancedFilters.hideOldCompleted);
             }
         }
 
@@ -35103,6 +35116,23 @@ John Doe,Engineering,john@example.com"
 
                 tasks = tasks.filter(task => {
                     if (!task.createdAt) return false;
+                    const createdDate = new Date(task.createdAt);
+                    return createdDate >= sevenDaysAgo;
+                });
+            }
+
+            // Quick filter: Hide tasks completed more than 7 days ago
+            if (advancedFilters.hideOldCompleted) {
+                const sevenDaysAgo = new Date();
+                sevenDaysAgo.setDate(sevenDaysAgo.getDate() - 7);
+                sevenDaysAgo.setHours(0, 0, 0, 0);
+
+                tasks = tasks.filter(task => {
+                    // Only filter out completed tasks
+                    if (task.status !== 'completed') return true;
+                    // Keep completed tasks without createdAt (shouldn't happen, but safe)
+                    if (!task.createdAt) return true;
+                    // Hide if completed (createdAt) is older than 7 days
                     const createdDate = new Date(task.createdAt);
                     return createdDate >= sevenDaysAgo;
                 });
@@ -49870,12 +49900,12 @@ Cmd/Ctrl + K - Command palette
             },
 
             // Transform status values to internal format
-            // Only "done" or "completed" map to completed; everything else defaults to pending
+            // Only "pending" maps to pending; everything else defaults to completed
             taskStatus: (value) => {
-                if (!value) return 'pending';
+                if (!value) return 'completed';
                 const lower = value.toLowerCase().trim();
-                if (lower === 'complete' || lower === 'completed' || lower === 'done') return 'completed';
-                return 'pending'; // Default to pending for all other values
+                if (lower === 'pending' || lower === 'not started' || lower === 'todo' || lower === 'to do') return 'pending';
+                return 'completed'; // Default to completed for all other values
             },
 
             // Transform priority values to internal format
