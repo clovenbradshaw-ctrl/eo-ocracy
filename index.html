@@ -16059,10 +16059,7 @@
 
         /* Inline Role Dropdown Styles */
         .simple-task-role-dropdown {
-            position: absolute;
-            top: 100%;
-            left: 0;
-            margin-top: 4px;
+            position: fixed;
             background: white;
             border-radius: 12px;
             box-shadow: 0 12px 40px rgba(0, 0, 0, 0.2), 0 0 0 1px rgba(200, 143, 74, 0.2);
@@ -16072,7 +16069,7 @@
             max-width: 320px;
             max-height: 350px;
             overflow-y: auto;
-            z-index: 1001;
+            z-index: 10002;
             display: none;
         }
 
@@ -51126,7 +51123,8 @@ Cmd/Ctrl + K - Command palette
         // Toggle task role dropdown
         function toggleTaskRoleDropdown(taskId) {
             const dropdown = document.getElementById(`roleDropdown_${taskId}`);
-            if (dropdown) {
+            const wrapper = document.getElementById(`roleChipWrapper_${taskId}`);
+            if (dropdown && wrapper) {
                 const wasOpen = dropdown.classList.contains('show');
                 // Close all other dropdowns first
                 document.querySelectorAll('.simple-task-role-dropdown.show').forEach(d => d.classList.remove('show'));
@@ -51134,6 +51132,28 @@ Cmd/Ctrl + K - Command palette
 
                 if (!wasOpen) {
                     populateTaskRoleOptions(taskId);
+
+                    // Position the dropdown relative to the trigger element
+                    const chip = wrapper.querySelector('.simple-task-chip');
+                    if (chip) {
+                        const rect = chip.getBoundingClientRect();
+                        dropdown.style.top = (rect.bottom + 4) + 'px';
+                        dropdown.style.left = rect.left + 'px';
+
+                        // Adjust if dropdown would go off-screen to the right
+                        const dropdownWidth = 280; // approximate width
+                        if (rect.left + dropdownWidth > window.innerWidth) {
+                            dropdown.style.left = (window.innerWidth - dropdownWidth - 10) + 'px';
+                        }
+
+                        // Adjust if dropdown would go off-screen at the bottom
+                        const maxHeight = 350;
+                        if (rect.bottom + 4 + maxHeight > window.innerHeight) {
+                            // Position above the chip instead
+                            dropdown.style.top = Math.max(10, rect.top - maxHeight - 4) + 'px';
+                        }
+                    }
+
                     dropdown.classList.add('show');
                 }
             }
