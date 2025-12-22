@@ -50088,8 +50088,65 @@ Cmd/Ctrl + K - Command palette
         }
 
         function parseDataContent(content) {
-            const lines = content.split('\n').filter(line => line.trim());
-            if (lines.length < 2) {
+            // Normalize line endings (handle Windows \r\n and old Mac \r)
+            content = content.replace(/\r\n/g, '\n').replace(/\r/g, '\n');
+
+            // Detect delimiter from first line (before any quoted content)
+            const firstLineEnd = content.indexOf('\n');
+            const firstLine = firstLineEnd > 0 ? content.substring(0, firstLineEnd) : content;
+            const delimiter = firstLine.includes('\t') ? '\t' : ',';
+
+            // Parse CSV properly handling multi-line quoted values
+            function parseCSV(text, delim) {
+                const rows = [];
+                let currentRow = [];
+                let currentValue = '';
+                let inQuotes = false;
+
+                for (let i = 0; i < text.length; i++) {
+                    const char = text[i];
+
+                    if (char === '"') {
+                        if (inQuotes && text[i + 1] === '"') {
+                            // Escaped quote inside quoted value
+                            currentValue += '"';
+                            i++;
+                        } else {
+                            // Toggle quote state
+                            inQuotes = !inQuotes;
+                        }
+                    } else if (char === delim && !inQuotes) {
+                        // End of field
+                        currentRow.push(currentValue.trim());
+                        currentValue = '';
+                    } else if (char === '\n' && !inQuotes) {
+                        // End of row (only if not inside quotes)
+                        currentRow.push(currentValue.trim());
+                        if (currentRow.some(v => v)) {  // Skip empty rows
+                            rows.push(currentRow);
+                        }
+                        currentRow = [];
+                        currentValue = '';
+                    } else {
+                        // Regular character (including newlines inside quotes)
+                        currentValue += char;
+                    }
+                }
+
+                // Don't forget the last value/row
+                if (currentValue || currentRow.length > 0) {
+                    currentRow.push(currentValue.trim());
+                    if (currentRow.some(v => v)) {
+                        rows.push(currentRow);
+                    }
+                }
+
+                return rows;
+            }
+
+            const allRows = parseCSV(content, delimiter);
+
+            if (allRows.length < 2) {
                 bulkImportState.parsedData = [];
                 bulkImportState.headers = [];
                 document.getElementById('bulkImportDataPreview').style.display = 'none';
@@ -50097,60 +50154,28 @@ Cmd/Ctrl + K - Command palette
                 return;
             }
 
-            // Detect delimiter (tab or comma)
-            const firstLine = lines[0];
-            const delimiter = firstLine.includes('\t') ? '\t' : ',';
-
-            // Parse CSV/TSV with proper quote handling
-            function parseLine(line, delim) {
-                const result = [];
-                let current = '';
-                let inQuotes = false;
-
-                for (let i = 0; i < line.length; i++) {
-                    const char = line[i];
-                    if (char === '"') {
-                        if (inQuotes && line[i + 1] === '"') {
-                            current += '"';
-                            i++;
-                        } else {
-                            inQuotes = !inQuotes;
-                        }
-                    } else if (char === delim && !inQuotes) {
-                        result.push(current.trim());
-                        current = '';
-                    } else {
-                        current += char;
-                    }
-                }
-                result.push(current.trim());
-                return result;
-            }
-
-            // Parse headers
-            bulkImportState.headers = parseLine(lines[0], delimiter);
+            // First row is headers
+            bulkImportState.headers = allRows[0];
             const expectedColumnCount = bulkImportState.headers.length;
 
             // Parse data rows and track column count mismatches
             bulkImportState.parsedData = [];
             bulkImportState.columnCountWarnings = [];
-            for (let i = 1; i < lines.length; i++) {
-                const values = parseLine(lines[i], delimiter);
-                if (values.some(v => v.trim())) {  // Skip empty rows
-                    // Track column count mismatches - indicates possible unquoted commas
-                    if (values.length !== expectedColumnCount) {
-                        bulkImportState.columnCountWarnings.push({
-                            row: i,
-                            expected: expectedColumnCount,
-                            actual: values.length
-                        });
-                    }
-                    const row = {};
-                    bulkImportState.headers.forEach((header, idx) => {
-                        row[header] = values[idx] || '';
+            for (let i = 1; i < allRows.length; i++) {
+                const values = allRows[i];
+                // Track column count mismatches - indicates possible unquoted commas
+                if (values.length !== expectedColumnCount) {
+                    bulkImportState.columnCountWarnings.push({
+                        row: i,
+                        expected: expectedColumnCount,
+                        actual: values.length
                     });
-                    bulkImportState.parsedData.push(row);
                 }
+                const row = {};
+                bulkImportState.headers.forEach((header, idx) => {
+                    row[header] = values[idx] || '';
+                });
+                bulkImportState.parsedData.push(row);
             }
 
             // Update preview
