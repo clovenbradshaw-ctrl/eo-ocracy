@@ -24981,6 +24981,771 @@
         .person-email-display i {
             color: #8B6F47;
         }
+
+        /* ============================================================
+           VISUALIZATION RULES STYLES
+           ============================================================ */
+
+        /* Visualization Rules Button in header */
+        .viz-rules-btn {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            padding: 6px 12px;
+            background: linear-gradient(135deg, #8B6F47 0%, #6B5642 100%);
+            color: white;
+            border: none;
+            border-radius: 6px;
+            font-size: 13px;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+
+        .viz-rules-btn:hover {
+            transform: translateY(-1px);
+            box-shadow: 0 4px 12px rgba(139, 111, 71, 0.3);
+        }
+
+        .viz-rules-btn .badge {
+            background: rgba(255,255,255,0.25);
+            padding: 2px 6px;
+            border-radius: 10px;
+            font-size: 11px;
+        }
+
+        /* Visualization Rules Panel (slide-out) */
+        .viz-rules-panel {
+            position: fixed;
+            top: 0;
+            right: -450px;
+            width: 450px;
+            height: 100vh;
+            background: white;
+            box-shadow: -4px 0 20px rgba(0,0,0,0.15);
+            z-index: 1001;
+            transition: right 0.3s ease;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .viz-rules-panel.open {
+            right: 0;
+        }
+
+        .viz-rules-panel-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 16px 20px;
+            border-bottom: 1px solid #eee;
+            background: linear-gradient(135deg, #f8f6f3 0%, #efe9e0 100%);
+        }
+
+        .viz-rules-panel-title {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            font-size: 16px;
+            font-weight: 600;
+            color: #333;
+        }
+
+        .viz-rules-panel-title i {
+            color: #8B6F47;
+            font-size: 20px;
+        }
+
+        .viz-rules-panel-close {
+            background: none;
+            border: none;
+            font-size: 20px;
+            color: #666;
+            cursor: pointer;
+            padding: 4px;
+            border-radius: 4px;
+        }
+
+        .viz-rules-panel-close:hover {
+            background: rgba(0,0,0,0.05);
+            color: #333;
+        }
+
+        .viz-rules-panel-body {
+            flex: 1;
+            overflow-y: auto;
+            padding: 16px;
+        }
+
+        .viz-rules-panel-actions {
+            padding: 16px;
+            border-top: 1px solid #eee;
+            background: #f8f6f3;
+        }
+
+        /* Rule Cards */
+        .viz-rule-card {
+            background: white;
+            border: 1px solid #e0ddd8;
+            border-radius: 10px;
+            padding: 14px;
+            margin-bottom: 12px;
+            transition: all 0.2s ease;
+        }
+
+        .viz-rule-card:hover {
+            border-color: #8B6F47;
+            box-shadow: 0 2px 8px rgba(139, 111, 71, 0.1);
+        }
+
+        .viz-rule-card.disabled {
+            opacity: 0.6;
+            background: #f8f6f3;
+        }
+
+        .viz-rule-card-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-bottom: 8px;
+        }
+
+        .viz-rule-card-title {
+            font-weight: 600;
+            font-size: 14px;
+            color: #333;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .viz-rule-card-type {
+            font-size: 10px;
+            padding: 2px 8px;
+            border-radius: 12px;
+            background: #e8e4de;
+            color: #6B5642;
+            font-weight: 500;
+            text-transform: uppercase;
+        }
+
+        .viz-rule-card-type.computed { background: #e3f2fd; color: #1565c0; }
+        .viz-rule-card-type.merge { background: #f3e5f5; color: #7b1fa2; }
+        .viz-rule-card-type.remap { background: #fff3e0; color: #ef6c00; }
+        .viz-rule-card-type.conditional { background: #e8f5e9; color: #2e7d32; }
+        .viz-rule-card-type.promotion { background: #fce4ec; color: #c2185b; }
+        .viz-rule-card-type.aggregation { background: #e0f7fa; color: #00838f; }
+        .viz-rule-card-type.grouping { background: #f1f8e9; color: #558b2f; }
+
+        .viz-rule-card-actions {
+            display: flex;
+            gap: 4px;
+        }
+
+        .viz-rule-card-action {
+            background: none;
+            border: none;
+            padding: 4px 8px;
+            border-radius: 4px;
+            cursor: pointer;
+            color: #888;
+            font-size: 14px;
+            transition: all 0.15s;
+        }
+
+        .viz-rule-card-action:hover {
+            background: #f0f0f0;
+            color: #333;
+        }
+
+        .viz-rule-card-action.delete:hover {
+            background: #fee;
+            color: #c00;
+        }
+
+        .viz-rule-card-description {
+            font-size: 12px;
+            color: #666;
+            margin-bottom: 8px;
+        }
+
+        .viz-rule-card-meta {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            font-size: 11px;
+            color: #888;
+        }
+
+        .viz-rule-card-meta span {
+            display: flex;
+            align-items: center;
+            gap: 4px;
+        }
+
+        .viz-rule-card-preview {
+            margin-top: 10px;
+            padding: 10px;
+            background: #f8f6f3;
+            border-radius: 6px;
+            font-family: 'SF Mono', Monaco, Consolas, monospace;
+            font-size: 11px;
+            color: #555;
+            overflow-x: auto;
+        }
+
+        /* Empty State */
+        .viz-rules-empty {
+            text-align: center;
+            padding: 40px 20px;
+            color: #888;
+        }
+
+        .viz-rules-empty i {
+            font-size: 48px;
+            color: #ddd;
+            margin-bottom: 16px;
+        }
+
+        .viz-rules-empty h3 {
+            font-size: 16px;
+            color: #666;
+            margin-bottom: 8px;
+        }
+
+        .viz-rules-empty p {
+            font-size: 13px;
+            margin-bottom: 20px;
+        }
+
+        /* Rule Editor Modal */
+        .viz-rule-editor-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(0,0,0,0.5);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 1002;
+            opacity: 0;
+            visibility: hidden;
+            transition: all 0.2s ease;
+        }
+
+        .viz-rule-editor-overlay.open {
+            opacity: 1;
+            visibility: visible;
+        }
+
+        .viz-rule-editor {
+            background: white;
+            border-radius: 12px;
+            width: 90%;
+            max-width: 700px;
+            max-height: 85vh;
+            display: flex;
+            flex-direction: column;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+            transform: scale(0.95);
+            transition: transform 0.2s ease;
+        }
+
+        .viz-rule-editor-overlay.open .viz-rule-editor {
+            transform: scale(1);
+        }
+
+        .viz-rule-editor-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 16px 20px;
+            border-bottom: 1px solid #eee;
+            background: linear-gradient(135deg, #f8f6f3 0%, #efe9e0 100%);
+            border-radius: 12px 12px 0 0;
+        }
+
+        .viz-rule-editor-title {
+            font-size: 18px;
+            font-weight: 600;
+            color: #333;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .viz-rule-editor-title i {
+            color: #8B6F47;
+        }
+
+        .viz-rule-editor-close {
+            background: none;
+            border: none;
+            font-size: 22px;
+            color: #666;
+            cursor: pointer;
+            padding: 4px;
+        }
+
+        .viz-rule-editor-body {
+            flex: 1;
+            overflow-y: auto;
+            padding: 20px;
+        }
+
+        .viz-rule-editor-footer {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 16px 20px;
+            border-top: 1px solid #eee;
+            background: #f8f6f3;
+            border-radius: 0 0 12px 12px;
+        }
+
+        /* Form Fields */
+        .viz-rule-form-group {
+            margin-bottom: 20px;
+        }
+
+        .viz-rule-form-label {
+            display: block;
+            font-size: 13px;
+            font-weight: 600;
+            color: #555;
+            margin-bottom: 6px;
+        }
+
+        .viz-rule-form-hint {
+            font-size: 11px;
+            color: #888;
+            font-weight: normal;
+            margin-left: 8px;
+        }
+
+        .viz-rule-form-input {
+            width: 100%;
+            padding: 10px 12px;
+            border: 1px solid #ddd;
+            border-radius: 6px;
+            font-size: 14px;
+            transition: border-color 0.15s;
+        }
+
+        .viz-rule-form-input:focus {
+            outline: none;
+            border-color: #8B6F47;
+            box-shadow: 0 0 0 3px rgba(139, 111, 71, 0.1);
+        }
+
+        .viz-rule-form-select {
+            width: 100%;
+            padding: 10px 12px;
+            border: 1px solid #ddd;
+            border-radius: 6px;
+            font-size: 14px;
+            background: white;
+            cursor: pointer;
+        }
+
+        .viz-rule-form-select:focus {
+            outline: none;
+            border-color: #8B6F47;
+        }
+
+        .viz-rule-form-row {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 16px;
+        }
+
+        .viz-rule-form-row.three-col {
+            grid-template-columns: 1fr 1fr 1fr;
+        }
+
+        /* Type Selection Pills */
+        .viz-rule-type-pills {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 8px;
+        }
+
+        .viz-rule-type-pill {
+            padding: 8px 14px;
+            border: 2px solid #e0ddd8;
+            border-radius: 8px;
+            background: white;
+            font-size: 13px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            transition: all 0.15s;
+        }
+
+        .viz-rule-type-pill:hover {
+            border-color: #8B6F47;
+            background: #faf8f5;
+        }
+
+        .viz-rule-type-pill.active {
+            border-color: #8B6F47;
+            background: linear-gradient(135deg, #8B6F47 0%, #6B5642 100%);
+            color: white;
+        }
+
+        .viz-rule-type-pill i {
+            font-size: 16px;
+        }
+
+        /* Field Selector (chip-style) */
+        .viz-rule-field-selector {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 6px;
+            padding: 10px;
+            border: 1px solid #ddd;
+            border-radius: 6px;
+            min-height: 44px;
+            background: #fafafa;
+        }
+
+        .viz-rule-field-chip {
+            display: flex;
+            align-items: center;
+            gap: 4px;
+            padding: 4px 10px;
+            background: #8B6F47;
+            color: white;
+            border-radius: 20px;
+            font-size: 12px;
+        }
+
+        .viz-rule-field-chip-remove {
+            cursor: pointer;
+            margin-left: 4px;
+            opacity: 0.8;
+        }
+
+        .viz-rule-field-chip-remove:hover {
+            opacity: 1;
+        }
+
+        .viz-rule-field-dropdown {
+            position: relative;
+        }
+
+        .viz-rule-field-add-btn {
+            padding: 4px 10px;
+            background: #eee;
+            border: 1px dashed #ccc;
+            border-radius: 20px;
+            font-size: 12px;
+            cursor: pointer;
+            color: #666;
+        }
+
+        .viz-rule-field-add-btn:hover {
+            background: #e0e0e0;
+            border-color: #999;
+        }
+
+        .viz-rule-field-menu {
+            position: absolute;
+            top: 100%;
+            left: 0;
+            background: white;
+            border: 1px solid #ddd;
+            border-radius: 6px;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+            max-height: 200px;
+            overflow-y: auto;
+            min-width: 200px;
+            z-index: 10;
+            display: none;
+        }
+
+        .viz-rule-field-menu.open {
+            display: block;
+        }
+
+        .viz-rule-field-menu-item {
+            padding: 8px 12px;
+            cursor: pointer;
+            font-size: 13px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .viz-rule-field-menu-item:hover {
+            background: #f5f5f5;
+        }
+
+        .viz-rule-field-menu-item .field-path {
+            color: #888;
+            font-size: 11px;
+        }
+
+        /* Mapping Table */
+        .viz-rule-mapping-table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+
+        .viz-rule-mapping-table th,
+        .viz-rule-mapping-table td {
+            padding: 10px;
+            text-align: left;
+            border-bottom: 1px solid #eee;
+        }
+
+        .viz-rule-mapping-table th {
+            font-size: 11px;
+            font-weight: 600;
+            color: #888;
+            text-transform: uppercase;
+        }
+
+        .viz-rule-mapping-input {
+            width: 100%;
+            padding: 6px 10px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            font-size: 13px;
+        }
+
+        .viz-rule-mapping-add {
+            padding: 6px 12px;
+            background: #f5f5f5;
+            border: 1px dashed #ccc;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 12px;
+            color: #666;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+        .viz-rule-mapping-add:hover {
+            background: #eee;
+        }
+
+        /* Condition Builder */
+        .viz-rule-condition {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            padding: 10px;
+            background: #f8f6f3;
+            border-radius: 6px;
+            margin-bottom: 8px;
+        }
+
+        .viz-rule-condition-field {
+            flex: 1;
+        }
+
+        .viz-rule-condition-op {
+            width: 120px;
+        }
+
+        .viz-rule-condition-value {
+            flex: 1;
+        }
+
+        .viz-rule-condition-remove {
+            background: none;
+            border: none;
+            color: #c00;
+            cursor: pointer;
+            padding: 4px;
+        }
+
+        /* Preview Section */
+        .viz-rule-preview {
+            background: #1e1e1e;
+            border-radius: 8px;
+            padding: 16px;
+            margin-top: 20px;
+        }
+
+        .viz-rule-preview-title {
+            color: #888;
+            font-size: 11px;
+            text-transform: uppercase;
+            margin-bottom: 10px;
+        }
+
+        .viz-rule-preview-content {
+            font-family: 'SF Mono', Monaco, Consolas, monospace;
+            font-size: 12px;
+            color: #d4d4d4;
+            line-height: 1.6;
+        }
+
+        .viz-rule-preview-content .key {
+            color: #9cdcfe;
+        }
+
+        .viz-rule-preview-content .value {
+            color: #ce9178;
+        }
+
+        .viz-rule-preview-content .computed {
+            color: #4ec9b0;
+        }
+
+        /* Toggle Switch */
+        .viz-rule-toggle {
+            position: relative;
+            width: 36px;
+            height: 20px;
+        }
+
+        .viz-rule-toggle input {
+            opacity: 0;
+            width: 0;
+            height: 0;
+        }
+
+        .viz-rule-toggle-slider {
+            position: absolute;
+            cursor: pointer;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background-color: #ccc;
+            transition: 0.2s;
+            border-radius: 20px;
+        }
+
+        .viz-rule-toggle-slider:before {
+            position: absolute;
+            content: "";
+            height: 14px;
+            width: 14px;
+            left: 3px;
+            bottom: 3px;
+            background-color: white;
+            transition: 0.2s;
+            border-radius: 50%;
+        }
+
+        .viz-rule-toggle input:checked + .viz-rule-toggle-slider {
+            background-color: #8B6F47;
+        }
+
+        .viz-rule-toggle input:checked + .viz-rule-toggle-slider:before {
+            transform: translateX(16px);
+        }
+
+        /* Primary button for save */
+        .viz-rule-btn-primary {
+            padding: 10px 20px;
+            background: linear-gradient(135deg, #8B6F47 0%, #6B5642 100%);
+            color: white;
+            border: none;
+            border-radius: 6px;
+            font-size: 14px;
+            font-weight: 500;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            transition: all 0.2s;
+        }
+
+        .viz-rule-btn-primary:hover {
+            transform: translateY(-1px);
+            box-shadow: 0 4px 12px rgba(139, 111, 71, 0.3);
+        }
+
+        .viz-rule-btn-secondary {
+            padding: 10px 20px;
+            background: white;
+            color: #666;
+            border: 1px solid #ddd;
+            border-radius: 6px;
+            font-size: 14px;
+            cursor: pointer;
+        }
+
+        .viz-rule-btn-secondary:hover {
+            background: #f5f5f5;
+        }
+
+        /* Card enhanced fields display */
+        .kanban-card-enhanced-fields {
+            margin-top: 8px;
+            padding-top: 8px;
+            border-top: 1px dashed #e0ddd8;
+        }
+
+        .kanban-card-enhanced-field {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            font-size: 11px;
+            color: #666;
+            margin-bottom: 4px;
+        }
+
+        .kanban-card-enhanced-field-label {
+            color: #888;
+            font-weight: 500;
+        }
+
+        .kanban-card-enhanced-field-value {
+            color: #333;
+        }
+
+        .kanban-card-enhanced-field-value.computed {
+            color: #8B6F47;
+            font-style: italic;
+        }
+
+        /* Conditional styling classes */
+        .viz-display-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 4px;
+            padding: 2px 8px;
+            border-radius: 12px;
+            font-size: 11px;
+            font-weight: 500;
+        }
+
+        .viz-display-badge.red { background: #fee; color: #c00; }
+        .viz-display-badge.orange { background: #fff3e0; color: #e65100; }
+        .viz-display-badge.yellow { background: #fffde7; color: #f57f17; }
+        .viz-display-badge.green { background: #e8f5e9; color: #2e7d32; }
+        .viz-display-badge.blue { background: #e3f2fd; color: #1565c0; }
+        .viz-display-badge.purple { background: #f3e5f5; color: #7b1fa2; }
+        .viz-display-badge.gray { background: #f5f5f5; color: #666; }
+
+        /* Panel backdrop */
+        .viz-rules-backdrop {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(0,0,0,0.3);
+            z-index: 1000;
+            opacity: 0;
+            visibility: hidden;
+            transition: all 0.3s ease;
+        }
+
+        .viz-rules-backdrop.open {
+            opacity: 1;
+            visibility: visible;
+        }
     </style>
 
     <!-- Login Overlay - gates app until authenticated -->
@@ -25681,6 +26446,11 @@
                         </button>
                         <button class="inline-filter-icon-btn" onclick="openTimeTravelModal()" title="Historical view">
                             <i class="ph ph-clock-counter-clockwise"></i>
+                        </button>
+                        <button class="viz-rules-btn" onclick="openVisualizationRulesPanel()" title="Visualization Rules">
+                            <i class="ph ph-magic-wand"></i>
+                            <span>Rules</span>
+                            <span class="badge" id="vizRulesCount" style="display: none;">0</span>
                         </button>
                         <div class="inline-filter-settings-wrapper">
                             <button class="inline-filter-icon-btn" onclick="toggleViewSettings()" title="View settings">
@@ -26676,6 +27446,120 @@ John Doe,Engineering,john@example.com"
         </div>
     </div>
     </div><!-- End mainAppContainer -->
+
+    <!-- Visualization Rules Panel (slide-out) -->
+    <div id="vizRulesBackdrop" class="viz-rules-backdrop" onclick="closeVisualizationRulesPanel()"></div>
+    <div id="vizRulesPanel" class="viz-rules-panel">
+        <div class="viz-rules-panel-header">
+            <div class="viz-rules-panel-title">
+                <i class="ph ph-magic-wand"></i>
+                Visualization Rules
+            </div>
+            <button class="viz-rules-panel-close" onclick="closeVisualizationRulesPanel()">
+                <i class="ph ph-x"></i>
+            </button>
+        </div>
+        <div class="viz-rules-panel-body" id="vizRulesPanelBody">
+            <!-- Rules list will be rendered here -->
+        </div>
+        <div class="viz-rules-panel-actions">
+            <button class="viz-rule-btn-primary" onclick="openRuleEditor()">
+                <i class="ph ph-plus"></i> Create New Rule
+            </button>
+        </div>
+    </div>
+
+    <!-- Visualization Rule Editor Modal -->
+    <div id="vizRuleEditorOverlay" class="viz-rule-editor-overlay" onclick="if(event.target === this) closeRuleEditor()">
+        <div class="viz-rule-editor">
+            <div class="viz-rule-editor-header">
+                <div class="viz-rule-editor-title">
+                    <i class="ph ph-magic-wand"></i>
+                    <span id="ruleEditorTitle">Create Visualization Rule</span>
+                </div>
+                <button class="viz-rule-editor-close" onclick="closeRuleEditor()">
+                    <i class="ph ph-x"></i>
+                </button>
+            </div>
+            <div class="viz-rule-editor-body" id="ruleEditorBody">
+                <!-- Rule Type Selection -->
+                <div class="viz-rule-form-group">
+                    <label class="viz-rule-form-label">Rule Type</label>
+                    <div class="viz-rule-type-pills" id="ruleTypePills">
+                        <div class="viz-rule-type-pill active" data-type="computed_field" onclick="selectRuleType('computed_field')">
+                            <i class="ph ph-function"></i> Computed Field
+                        </div>
+                        <div class="viz-rule-type-pill" data-type="field_merge" onclick="selectRuleType('field_merge')">
+                            <i class="ph ph-git-merge"></i> Field Merge
+                        </div>
+                        <div class="viz-rule-type-pill" data-type="value_remap" onclick="selectRuleType('value_remap')">
+                            <i class="ph ph-arrows-left-right"></i> Value Remap
+                        </div>
+                        <div class="viz-rule-type-pill" data-type="conditional_display" onclick="selectRuleType('conditional_display')">
+                            <i class="ph ph-eye"></i> Conditional Display
+                        </div>
+                        <div class="viz-rule-type-pill" data-type="field_promotion" onclick="selectRuleType('field_promotion')">
+                            <i class="ph ph-arrow-up"></i> Field Promotion
+                        </div>
+                        <div class="viz-rule-type-pill" data-type="aggregation" onclick="selectRuleType('aggregation')">
+                            <i class="ph ph-chart-bar"></i> Aggregation
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Basic Info -->
+                <div class="viz-rule-form-row">
+                    <div class="viz-rule-form-group">
+                        <label class="viz-rule-form-label">Rule Name</label>
+                        <input type="text" id="ruleEditorName" class="viz-rule-form-input" placeholder="e.g., Full Name from Parts">
+                    </div>
+                    <div class="viz-rule-form-group">
+                        <label class="viz-rule-form-label">Apply To</label>
+                        <select id="ruleEditorScope" class="viz-rule-form-select" onchange="updateRuleScopeTarget()">
+                            <option value="entity_type">Entity Type</option>
+                            <option value="global">All Entities</option>
+                        </select>
+                    </div>
+                </div>
+
+                <div class="viz-rule-form-group" id="ruleEditorScopeTargetGroup">
+                    <label class="viz-rule-form-label">Target Entity Type</label>
+                    <select id="ruleEditorScopeTarget" class="viz-rule-form-select">
+                        <option value="task">Tasks</option>
+                        <option value="person">People</option>
+                        <option value="role">Roles</option>
+                        <option value="unit">Units</option>
+                        <option value="team">Teams</option>
+                        <option value="product">Products</option>
+                    </select>
+                </div>
+
+                <div class="viz-rule-form-group">
+                    <label class="viz-rule-form-label">Description <span class="viz-rule-form-hint">(optional)</span></label>
+                    <input type="text" id="ruleEditorDescription" class="viz-rule-form-input" placeholder="What does this rule do?">
+                </div>
+
+                <!-- Dynamic Rule Configuration (changes based on rule type) -->
+                <div id="ruleEditorConfig">
+                    <!-- This will be populated dynamically based on rule type -->
+                </div>
+
+                <!-- Preview Section -->
+                <div class="viz-rule-preview" id="ruleEditorPreview">
+                    <div class="viz-rule-preview-title">Rule Preview</div>
+                    <div class="viz-rule-preview-content" id="rulePreviewContent">
+                        Select a rule type and configure it to see a preview.
+                    </div>
+                </div>
+            </div>
+            <div class="viz-rule-editor-footer">
+                <button class="viz-rule-btn-secondary" onclick="closeRuleEditor()">Cancel</button>
+                <button class="viz-rule-btn-primary" onclick="saveRule()">
+                    <i class="ph ph-check"></i> <span id="ruleEditorSaveText">Create Rule</span>
+                </button>
+            </div>
+        </div>
+    </div>
 
     <script>
         // ==========================================
@@ -29284,6 +30168,1739 @@ John Doe,Engineering,john@example.com"
                 unassignedRoles: true
             }
         };
+
+        // ============================================================
+        // VISUALIZATION RULES SYSTEM
+        // Dynamic field transformations stored in activity store
+        // ============================================================
+
+        // Rule types supported by the system
+        const VISUALIZATION_RULE_TYPES = {
+            COMPUTED_FIELD: 'computed_field',      // Create virtual fields from formulas
+            FIELD_MERGE: 'field_merge',            // Combine multiple fields
+            VALUE_REMAP: 'value_remap',            // Transform values for display
+            CONDITIONAL_DISPLAY: 'conditional_display', // Show/hide/style based on conditions
+            FIELD_PROMOTION: 'field_promotion',    // Elevate custom fields to first-class
+            AGGREGATION: 'aggregation',            // Rollup/summary fields
+            GROUPING: 'grouping'                   // Custom grouping for views
+        };
+
+        // Formula types for computed fields
+        const FORMULA_TYPES = {
+            CONCAT: 'concat',           // Concatenate strings
+            TEMPLATE: 'template',       // Template string with {field} placeholders
+            DATE_DIFF: 'date_diff',     // Difference between dates
+            MATH: 'math',               // Mathematical operations
+            COALESCE: 'coalesce',       // First non-empty value
+            CONDITIONAL: 'conditional', // If-then-else logic
+            LOOKUP: 'lookup',           // Lookup from related entity
+            COUNT: 'count',             // Count related items
+            CUSTOM: 'custom'            // Custom JavaScript expression (safe subset)
+        };
+
+        // Store for visualization rules (synced with activity_store)
+        let visualizationRules = [];
+
+        // Cache for computed values to avoid recalculation
+        let visualizationRuleCache = new Map();
+
+        // Rule editor state
+        let ruleEditorState = {
+            isOpen: false,
+            editingRule: null,
+            ruleType: 'computed_field',
+            scope: 'entity_type',
+            scopeTarget: 'task'
+        };
+
+        // ============================================================
+        // VISUALIZATION RULE ENGINE
+        // ============================================================
+
+        // Get nested value from object using dot notation
+        function getNestedValue(obj, path) {
+            if (!obj || !path) return undefined;
+            const parts = path.split('.');
+            let current = obj;
+            for (const part of parts) {
+                if (current === null || current === undefined) return undefined;
+                current = current[part];
+            }
+            return current;
+        }
+
+        // Set nested value in object using dot notation
+        function setNestedValue(obj, path, value) {
+            const parts = path.split('.');
+            let current = obj;
+            for (let i = 0; i < parts.length - 1; i++) {
+                if (!(parts[i] in current)) {
+                    current[parts[i]] = {};
+                }
+                current = current[parts[i]];
+            }
+            current[parts[parts.length - 1]] = value;
+        }
+
+        // Check if entity matches rule scope
+        function matchesRuleScope(entity, rule) {
+            if (!rule.enabled) return false;
+
+            switch (rule.scope) {
+                case 'global':
+                    return true;
+                case 'entity_type':
+                    return entity.type === rule.scopeTarget;
+                case 'entity_instance':
+                    return entity.id === rule.scopeTarget;
+                case 'view':
+                    // View-specific rules are handled separately
+                    return false;
+                default:
+                    return false;
+            }
+        }
+
+        // Evaluate a formula for computed fields
+        function evaluateFormula(definition, entity) {
+            const { formula, inputs, template, expression, mapping, conditions } = definition;
+
+            try {
+                switch (formula) {
+                    case 'concat':
+                        return (inputs || [])
+                            .map(field => getNestedValue(entity, field) || '')
+                            .filter(v => v !== '')
+                            .join(' ');
+
+                    case 'template':
+                        if (!template) return '';
+                        return template.replace(/\{(\w+(?:\.\w+)*)\}/g, (match, field) => {
+                            const val = getNestedValue(entity, field);
+                            return val !== undefined && val !== null ? val : '';
+                        });
+
+                    case 'date_diff':
+                        const [dateField, compareField] = inputs || [];
+                        const dateVal = getNestedValue(entity, dateField);
+                        const compareVal = compareField === 'today' ? new Date().toISOString().split('T')[0] : getNestedValue(entity, compareField);
+                        if (!dateVal || !compareVal) return null;
+                        const d1 = new Date(dateVal);
+                        const d2 = new Date(compareVal);
+                        const diffTime = d1 - d2;
+                        const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
+                        return definition.format === 'days' ? diffDays : diffTime;
+
+                    case 'math':
+                        // Safe math evaluation
+                        const mathExpr = expression || '';
+                        const values = {};
+                        (inputs || []).forEach(field => {
+                            const val = parseFloat(getNestedValue(entity, field)) || 0;
+                            values[field.replace(/\./g, '_')] = val;
+                        });
+                        // Simple expression evaluation (only allows numbers, +, -, *, /, (), and variable names)
+                        let safeExpr = mathExpr;
+                        Object.entries(values).forEach(([key, val]) => {
+                            safeExpr = safeExpr.replace(new RegExp(key, 'g'), val);
+                        });
+                        if (/^[\d\s+\-*/().]+$/.test(safeExpr)) {
+                            return eval(safeExpr);
+                        }
+                        return null;
+
+                    case 'coalesce':
+                        for (const field of (inputs || [])) {
+                            const val = getNestedValue(entity, field);
+                            if (val !== undefined && val !== null && val !== '') {
+                                return val;
+                            }
+                        }
+                        return definition.defaultValue || null;
+
+                    case 'conditional':
+                        // Evaluate conditions in order
+                        for (const cond of (conditions || [])) {
+                            if (evaluateCondition(cond.when, entity)) {
+                                if (cond.and && !evaluateCondition(cond.and, entity)) continue;
+                                return cond.then;
+                            }
+                        }
+                        return definition.else || null;
+
+                    case 'lookup':
+                        // Look up value from related entity
+                        const { relationshipField, targetType, targetField } = definition;
+                        const relatedId = getNestedValue(entity, relationshipField);
+                        if (!relatedId || !targetType) return null;
+                        const relatedEntity = (entities[targetType] || []).find(e => e.id === relatedId);
+                        return relatedEntity ? getNestedValue(relatedEntity, targetField || 'name') : null;
+
+                    case 'count':
+                        // Count related entities
+                        const { countType, countField, countCondition } = definition;
+                        if (!countType) return 0;
+                        let countItems = entities[countType] || [];
+                        if (countField && countCondition) {
+                            countItems = countItems.filter(item =>
+                                getNestedValue(item, countField) === (countCondition === '$id' ? entity.id : countCondition)
+                            );
+                        }
+                        return countItems.length;
+
+                    default:
+                        return null;
+                }
+            } catch (error) {
+                console.warn('Error evaluating formula:', error);
+                return null;
+            }
+        }
+
+        // Evaluate a single condition
+        function evaluateCondition(condition, entity) {
+            if (!condition) return true;
+
+            const { field, operator, value } = condition;
+            const fieldValue = getNestedValue(entity, field);
+            const compareValue = value === 'today' ? new Date().toISOString().split('T')[0] : value;
+
+            switch (operator) {
+                case 'eq': return fieldValue === compareValue;
+                case 'neq': return fieldValue !== compareValue;
+                case 'gt': return fieldValue > compareValue;
+                case 'gte': return fieldValue >= compareValue;
+                case 'lt': return fieldValue < compareValue;
+                case 'lte': return fieldValue <= compareValue;
+                case 'contains': return String(fieldValue || '').toLowerCase().includes(String(compareValue || '').toLowerCase());
+                case 'starts_with': return String(fieldValue || '').toLowerCase().startsWith(String(compareValue || '').toLowerCase());
+                case 'ends_with': return String(fieldValue || '').toLowerCase().endsWith(String(compareValue || '').toLowerCase());
+                case 'is_empty': return !fieldValue || fieldValue === '';
+                case 'is_not_empty': return fieldValue && fieldValue !== '';
+                case 'in': return Array.isArray(compareValue) && compareValue.includes(fieldValue);
+                case 'not_in': return !Array.isArray(compareValue) || !compareValue.includes(fieldValue);
+                default: return false;
+            }
+        }
+
+        // Merge multiple fields into one
+        function mergeFields(definition, entity) {
+            const { sourceFields, mergeType, separator, excludeEmpty, deduplicate } = definition;
+
+            let values = (sourceFields || [])
+                .map(field => getNestedValue(entity, field))
+                .filter(v => !excludeEmpty || (v !== undefined && v !== null && v !== ''));
+
+            switch (mergeType) {
+                case 'array':
+                    if (deduplicate) {
+                        values = [...new Set(values.flat())];
+                    }
+                    return values.flat().filter(v => v);
+
+                case 'first_non_empty':
+                    return values.find(v => v !== undefined && v !== null && v !== '') || null;
+
+                case 'concat_string':
+                    return values.join(separator || ', ');
+
+                case 'sum':
+                    return values.reduce((sum, v) => sum + (parseFloat(v) || 0), 0);
+
+                case 'avg':
+                    const nums = values.filter(v => !isNaN(parseFloat(v)));
+                    return nums.length > 0 ? nums.reduce((sum, v) => sum + parseFloat(v), 0) / nums.length : null;
+
+                default:
+                    return values;
+            }
+        }
+
+        // Remap a value for display
+        function remapValue(definition, entity) {
+            const { targetField, mapping, defaultValue } = definition;
+            const fieldValue = getNestedValue(entity, targetField);
+
+            if (mapping && mapping[fieldValue]) {
+                return mapping[fieldValue];
+            }
+
+            // Check for pattern matching
+            if (mapping) {
+                for (const [pattern, result] of Object.entries(mapping)) {
+                    if (pattern.startsWith('/') && pattern.endsWith('/')) {
+                        const regex = new RegExp(pattern.slice(1, -1), 'i');
+                        if (regex.test(String(fieldValue))) {
+                            return result;
+                        }
+                    }
+                }
+            }
+
+            return defaultValue || { display: fieldValue, color: null };
+        }
+
+        // Apply all visualization rules to an entity
+        function applyVisualizationRules(entity, rulesSubset = null) {
+            if (!entity) return entity;
+
+            // Check cache first
+            const cacheKey = `${entity.id}_${entity.type}_${JSON.stringify(entity)}`;
+            if (visualizationRuleCache.has(cacheKey)) {
+                return visualizationRuleCache.get(cacheKey);
+            }
+
+            const rules = rulesSubset || visualizationRules;
+            const applicableRules = rules
+                .filter(rule => matchesRuleScope(entity, rule))
+                .sort((a, b) => (a.priority || 0) - (b.priority || 0));
+
+            if (applicableRules.length === 0) {
+                return entity;
+            }
+
+            // Create enhanced copy with computed and display properties
+            const enhanced = {
+                ...entity,
+                _computed: {},
+                _display: {},
+                _promoted: {}
+            };
+
+            for (const rule of applicableRules) {
+                try {
+                    switch (rule.ruleType) {
+                        case VISUALIZATION_RULE_TYPES.COMPUTED_FIELD:
+                            enhanced._computed[rule.definition.outputField] = evaluateFormula(rule.definition, enhanced);
+                            break;
+
+                        case VISUALIZATION_RULE_TYPES.FIELD_MERGE:
+                            enhanced._computed[rule.definition.outputField] = mergeFields(rule.definition, enhanced);
+                            break;
+
+                        case VISUALIZATION_RULE_TYPES.VALUE_REMAP:
+                            enhanced._display[rule.definition.targetField] = remapValue(rule.definition, enhanced);
+                            break;
+
+                        case VISUALIZATION_RULE_TYPES.CONDITIONAL_DISPLAY:
+                            const displayConfig = evaluateConditionalDisplay(rule.definition, enhanced);
+                            if (displayConfig) {
+                                enhanced._display[rule.definition.targetField] = {
+                                    ...enhanced._display[rule.definition.targetField],
+                                    ...displayConfig
+                                };
+                            }
+                            break;
+
+                        case VISUALIZATION_RULE_TYPES.FIELD_PROMOTION:
+                            const promotedValue = getNestedValue(enhanced, rule.definition.sourceField);
+                            enhanced._promoted[rule.definition.promoteTo] = {
+                                value: promotedValue,
+                                label: rule.definition.displayLabel,
+                                showIn: rule.definition.showIn || ['card', 'detail'],
+                                dataType: rule.definition.dataType || 'string'
+                            };
+                            break;
+
+                        case VISUALIZATION_RULE_TYPES.AGGREGATION:
+                            enhanced._computed[rule.definition.outputField] = evaluateAggregation(rule.definition, enhanced);
+                            break;
+                    }
+                } catch (error) {
+                    console.warn(`Error applying rule ${rule.id}:`, error);
+                }
+            }
+
+            // Cache the result (with size limit)
+            if (visualizationRuleCache.size > 1000) {
+                const firstKey = visualizationRuleCache.keys().next().value;
+                visualizationRuleCache.delete(firstKey);
+            }
+            visualizationRuleCache.set(cacheKey, enhanced);
+
+            return enhanced;
+        }
+
+        // Evaluate conditional display rules
+        function evaluateConditionalDisplay(definition, entity) {
+            const { conditions } = definition;
+
+            for (const cond of (conditions || [])) {
+                let matches = evaluateCondition(cond.when, entity);
+                if (cond.and) {
+                    matches = matches && evaluateCondition(cond.and, entity);
+                }
+                if (cond.or) {
+                    matches = matches || evaluateCondition(cond.or, entity);
+                }
+                if (matches) {
+                    return cond.apply;
+                }
+            }
+
+            return null;
+        }
+
+        // Evaluate aggregation rules
+        function evaluateAggregation(definition, entity) {
+            const { aggregateFrom, operation, field, conditions, format } = definition;
+
+            let items = [];
+
+            // Determine what to aggregate
+            if (aggregateFrom === 'children') {
+                // Find child entities (tasks with this as predecessor, or entities nested under this)
+                items = (entities.task || []).filter(t => t.predecessorId === entity.id);
+            } else if (aggregateFrom === 'relationships') {
+                // Find related entities via relationships
+                items = relationships
+                    .filter(r => r.subject === entity.id || r.object === entity.id)
+                    .map(r => r.subject === entity.id ? r.object : r.subject)
+                    .map(id => Object.values(entities).flat().find(e => e.id === id))
+                    .filter(Boolean);
+            } else if (entities[aggregateFrom]) {
+                items = entities[aggregateFrom];
+            }
+
+            // Apply conditions if specified
+            if (conditions && conditions.filter) {
+                items = items.filter(item => evaluateCondition(conditions.filter, item));
+            }
+
+            // Calculate based on operation
+            switch (operation) {
+                case 'count':
+                    return items.length;
+
+                case 'sum':
+                    return items.reduce((sum, item) => sum + (parseFloat(getNestedValue(item, field)) || 0), 0);
+
+                case 'avg':
+                    if (items.length === 0) return null;
+                    return items.reduce((sum, item) => sum + (parseFloat(getNestedValue(item, field)) || 0), 0) / items.length;
+
+                case 'min':
+                    const minVals = items.map(item => parseFloat(getNestedValue(item, field))).filter(v => !isNaN(v));
+                    return minVals.length > 0 ? Math.min(...minVals) : null;
+
+                case 'max':
+                    const maxVals = items.map(item => parseFloat(getNestedValue(item, field))).filter(v => !isNaN(v));
+                    return maxVals.length > 0 ? Math.max(...maxVals) : null;
+
+                case 'ratio':
+                    if (!conditions || !conditions.numerator) return null;
+                    const numItems = items.filter(item => evaluateCondition(conditions.numerator, item));
+                    const denomItems = conditions.denominator === 'all' ? items :
+                        items.filter(item => evaluateCondition(conditions.denominator, item));
+
+                    if (format === '{completed}/{total}') {
+                        return `${numItems.length}/${denomItems.length}`;
+                    }
+                    return denomItems.length > 0 ? numItems.length / denomItems.length : 0;
+
+                case 'percent':
+                    if (!conditions || !conditions.numerator) return null;
+                    const numPct = items.filter(item => evaluateCondition(conditions.numerator, item)).length;
+                    return items.length > 0 ? Math.round((numPct / items.length) * 100) : 0;
+
+                default:
+                    return null;
+            }
+        }
+
+        // Get field value with rule enhancements
+        function getEnhancedFieldValue(entity, fieldPath, options = {}) {
+            const { preferDisplay = false, preferComputed = true } = options;
+
+            // If entity has been enhanced, check computed/display values first
+            if (preferComputed && entity._computed && entity._computed[fieldPath] !== undefined) {
+                return entity._computed[fieldPath];
+            }
+            if (preferDisplay && entity._display && entity._display[fieldPath]) {
+                const displayVal = entity._display[fieldPath];
+                return displayVal.display || displayVal;
+            }
+            if (entity._promoted && entity._promoted[fieldPath]) {
+                return entity._promoted[fieldPath].value;
+            }
+
+            // Fall back to raw value
+            return getNestedValue(entity, fieldPath);
+        }
+
+        // Get all promoted fields for an entity
+        function getPromotedFields(entity) {
+            if (!entity._promoted) return [];
+            return Object.entries(entity._promoted).map(([key, config]) => ({
+                key,
+                ...config
+            }));
+        }
+
+        // Get display configuration for a field
+        function getFieldDisplayConfig(entity, fieldPath) {
+            if (!entity._display || !entity._display[fieldPath]) {
+                return null;
+            }
+            return entity._display[fieldPath];
+        }
+
+        // Clear visualization rule cache (call when rules change)
+        function clearVisualizationRuleCache() {
+            visualizationRuleCache.clear();
+        }
+
+        // ============================================================
+        // VISUALIZATION RULE PERSISTENCE
+        // ============================================================
+
+        // Create a new visualization rule
+        async function createVisualizationRule(ruleData) {
+            const rule = {
+                id: 'viz_rule_' + Date.now() + '_' + Math.random().toString(36).substr(2, 9),
+                type: 'visualization_rule',
+                ruleType: ruleData.ruleType,
+                name: ruleData.name || 'Untitled Rule',
+                description: ruleData.description || '',
+                scope: ruleData.scope || 'entity_type',
+                scopeTarget: ruleData.scopeTarget || 'task',
+                definition: ruleData.definition || {},
+                priority: ruleData.priority || visualizationRules.length,
+                enabled: ruleData.enabled !== false,
+                createdAt: new Date().toISOString(),
+                createdBy: AminoIdentity.getUser()?.email || 'anonymous'
+            };
+
+            // Add to local store
+            visualizationRules.push(rule);
+            clearVisualizationRuleCache();
+
+            // Log to activity store
+            await logActivityToXano({
+                event_verb: 'CREATE',
+                eo_operator: 'INS',
+                object_type: 'visualization_rule',
+                object_id: rule.id,
+                object_label: rule.name,
+                data_json: {
+                    rule: rule
+                }
+            }, false);
+
+            renderVisualizationRulesPanel();
+            return rule;
+        }
+
+        // Update an existing visualization rule
+        async function updateVisualizationRule(ruleId, updates) {
+            const ruleIndex = visualizationRules.findIndex(r => r.id === ruleId);
+            if (ruleIndex === -1) {
+                console.warn('Rule not found:', ruleId);
+                return null;
+            }
+
+            const oldRule = { ...visualizationRules[ruleIndex] };
+            const updatedRule = {
+                ...visualizationRules[ruleIndex],
+                ...updates,
+                updatedAt: new Date().toISOString()
+            };
+
+            visualizationRules[ruleIndex] = updatedRule;
+            clearVisualizationRuleCache();
+
+            // Log to activity store
+            await logActivityToXano({
+                event_verb: 'UPDATE',
+                eo_operator: 'ALT',
+                object_type: 'visualization_rule',
+                object_id: ruleId,
+                object_label: updatedRule.name,
+                data_json: {
+                    old_rule: oldRule,
+                    new_rule: updatedRule
+                }
+            }, false);
+
+            renderVisualizationRulesPanel();
+            return updatedRule;
+        }
+
+        // Delete a visualization rule
+        async function deleteVisualizationRule(ruleId) {
+            const ruleIndex = visualizationRules.findIndex(r => r.id === ruleId);
+            if (ruleIndex === -1) return false;
+
+            const deletedRule = visualizationRules[ruleIndex];
+            visualizationRules.splice(ruleIndex, 1);
+            clearVisualizationRuleCache();
+
+            // Log to activity store
+            await logActivityToXano({
+                event_verb: 'DELETE',
+                eo_operator: 'NUL',
+                object_type: 'visualization_rule',
+                object_id: ruleId,
+                object_label: deletedRule.name,
+                data_json: {
+                    deleted_rule: deletedRule
+                }
+            }, false);
+
+            renderVisualizationRulesPanel();
+            return true;
+        }
+
+        // Toggle a visualization rule enabled/disabled
+        async function toggleVisualizationRule(ruleId) {
+            const rule = visualizationRules.find(r => r.id === ruleId);
+            if (!rule) return false;
+
+            await updateVisualizationRule(ruleId, { enabled: !rule.enabled });
+
+            // Re-render current view to apply/remove rule effects
+            if (currentView === 'kanban') {
+                renderKanbanBoard();
+            } else if (currentView === 'tasks') {
+                renderTaskBoardView();
+            }
+
+            return true;
+        }
+
+        // Load visualization rules from activity store
+        function loadVisualizationRulesFromActivities(activities) {
+            const ruleActivities = activities
+                .filter(a => a.object_type === 'visualization_rule')
+                .sort((a, b) => new Date(a.timestamp || a.created_at) - new Date(b.timestamp || b.created_at));
+
+            const rulesMap = new Map();
+
+            for (const activity of ruleActivities) {
+                const ruleId = activity.object_id;
+                const data = activity.data_json || activity.data || {};
+
+                if (activity.event_verb === 'CREATE' && data.rule) {
+                    rulesMap.set(ruleId, data.rule);
+                } else if (activity.event_verb === 'UPDATE' && data.new_rule) {
+                    rulesMap.set(ruleId, data.new_rule);
+                } else if (activity.event_verb === 'DELETE') {
+                    rulesMap.delete(ruleId);
+                }
+            }
+
+            visualizationRules = Array.from(rulesMap.values());
+            clearVisualizationRuleCache();
+        }
+
+        // Get rules applicable to a specific entity type
+        function getRulesForEntityType(entityType) {
+            return visualizationRules.filter(rule =>
+                rule.enabled &&
+                (rule.scope === 'global' ||
+                 (rule.scope === 'entity_type' && rule.scopeTarget === entityType))
+            );
+        }
+
+        // Get grouping rules for a specific view
+        function getGroupingRules(viewType) {
+            return visualizationRules.filter(rule =>
+                rule.enabled &&
+                rule.ruleType === VISUALIZATION_RULE_TYPES.GROUPING &&
+                rule.scope === 'view' &&
+                rule.scopeTarget === viewType
+            );
+        }
+
+        // ============================================================
+        // VISUALIZATION RULES UI
+        // ============================================================
+
+        // Open the visualization rules panel
+        function openVisualizationRulesPanel() {
+            document.getElementById('vizRulesBackdrop').classList.add('open');
+            document.getElementById('vizRulesPanel').classList.add('open');
+            renderVisualizationRulesPanel();
+        }
+
+        // Close the visualization rules panel
+        function closeVisualizationRulesPanel() {
+            document.getElementById('vizRulesBackdrop').classList.remove('open');
+            document.getElementById('vizRulesPanel').classList.remove('open');
+        }
+
+        // Render the rules list in the panel
+        function renderVisualizationRulesPanel() {
+            const container = document.getElementById('vizRulesPanelBody');
+
+            if (visualizationRules.length === 0) {
+                container.innerHTML = `
+                    <div class="viz-rules-empty">
+                        <i class="ph ph-magic-wand"></i>
+                        <h3>No Visualization Rules</h3>
+                        <p>Create rules to transform and enhance how your data is displayed without changing the underlying data.</p>
+                    </div>
+                `;
+                return;
+            }
+
+            const ruleTypeLabels = {
+                computed_field: 'Computed',
+                field_merge: 'Merge',
+                value_remap: 'Remap',
+                conditional_display: 'Conditional',
+                field_promotion: 'Promotion',
+                aggregation: 'Aggregation',
+                grouping: 'Grouping'
+            };
+
+            const ruleTypeClasses = {
+                computed_field: 'computed',
+                field_merge: 'merge',
+                value_remap: 'remap',
+                conditional_display: 'conditional',
+                field_promotion: 'promotion',
+                aggregation: 'aggregation',
+                grouping: 'grouping'
+            };
+
+            container.innerHTML = visualizationRules.map(rule => `
+                <div class="viz-rule-card ${!rule.enabled ? 'disabled' : ''}" data-rule-id="${rule.id}">
+                    <div class="viz-rule-card-header">
+                        <div class="viz-rule-card-title">
+                            <span class="viz-rule-card-type ${ruleTypeClasses[rule.ruleType] || ''}">${ruleTypeLabels[rule.ruleType] || rule.ruleType}</span>
+                            ${rule.name}
+                        </div>
+                        <div class="viz-rule-card-actions">
+                            <label class="viz-rule-toggle" title="${rule.enabled ? 'Disable' : 'Enable'} rule">
+                                <input type="checkbox" ${rule.enabled ? 'checked' : ''} onchange="toggleVisualizationRule('${rule.id}')">
+                                <span class="viz-rule-toggle-slider"></span>
+                            </label>
+                            <button class="viz-rule-card-action" onclick="editRule('${rule.id}')" title="Edit">
+                                <i class="ph ph-pencil"></i>
+                            </button>
+                            <button class="viz-rule-card-action delete" onclick="confirmDeleteRule('${rule.id}')" title="Delete">
+                                <i class="ph ph-trash"></i>
+                            </button>
+                        </div>
+                    </div>
+                    ${rule.description ? `<div class="viz-rule-card-description">${rule.description}</div>` : ''}
+                    <div class="viz-rule-card-meta">
+                        <span><i class="ph ph-target"></i> ${rule.scope === 'global' ? 'All entities' : rule.scopeTarget}</span>
+                        ${rule.definition.outputField ? `<span><i class="ph ph-arrow-right"></i> ${rule.definition.outputField}</span>` : ''}
+                    </div>
+                    ${renderRulePreview(rule)}
+                </div>
+            `).join('');
+        }
+
+        // Render a preview of the rule configuration
+        function renderRulePreview(rule) {
+            let preview = '';
+
+            switch (rule.ruleType) {
+                case 'computed_field':
+                    if (rule.definition.formula === 'template') {
+                        preview = `Template: "${rule.definition.template || ''}"`;
+                    } else if (rule.definition.formula === 'concat') {
+                        preview = `Concat: ${(rule.definition.inputs || []).join(' + ')}`;
+                    } else if (rule.definition.formula === 'coalesce') {
+                        preview = `First of: ${(rule.definition.inputs || []).join(' | ')}`;
+                    } else {
+                        preview = `Formula: ${rule.definition.formula || 'none'}`;
+                    }
+                    break;
+
+                case 'field_merge':
+                    preview = `${rule.definition.mergeType || 'merge'}: ${(rule.definition.sourceFields || []).join(', ')}`;
+                    break;
+
+                case 'value_remap':
+                    const mappingCount = Object.keys(rule.definition.mapping || {}).length;
+                    preview = `${mappingCount} value mapping${mappingCount !== 1 ? 's' : ''} for ${rule.definition.targetField || 'field'}`;
+                    break;
+
+                case 'conditional_display':
+                    const condCount = (rule.definition.conditions || []).length;
+                    preview = `${condCount} condition${condCount !== 1 ? 's' : ''} for ${rule.definition.targetField || 'field'}`;
+                    break;
+
+                case 'field_promotion':
+                    preview = `${rule.definition.sourceField} → ${rule.definition.promoteTo}`;
+                    break;
+
+                case 'aggregation':
+                    preview = `${rule.definition.operation || 'count'} from ${rule.definition.aggregateFrom || 'children'}`;
+                    break;
+
+                default:
+                    preview = '';
+            }
+
+            return preview ? `<div class="viz-rule-card-preview">${preview}</div>` : '';
+        }
+
+        // Open the rule editor modal
+        function openRuleEditor(ruleId = null) {
+            ruleEditorState.editingRule = ruleId ? visualizationRules.find(r => r.id === ruleId) : null;
+            ruleEditorState.ruleType = ruleEditorState.editingRule?.ruleType || 'computed_field';
+
+            // Update title
+            document.getElementById('ruleEditorTitle').textContent = ruleId ? 'Edit Visualization Rule' : 'Create Visualization Rule';
+            document.getElementById('ruleEditorSaveText').textContent = ruleId ? 'Save Changes' : 'Create Rule';
+
+            // Populate form fields
+            if (ruleEditorState.editingRule) {
+                document.getElementById('ruleEditorName').value = ruleEditorState.editingRule.name || '';
+                document.getElementById('ruleEditorDescription').value = ruleEditorState.editingRule.description || '';
+                document.getElementById('ruleEditorScope').value = ruleEditorState.editingRule.scope || 'entity_type';
+                document.getElementById('ruleEditorScopeTarget').value = ruleEditorState.editingRule.scopeTarget || 'task';
+            } else {
+                document.getElementById('ruleEditorName').value = '';
+                document.getElementById('ruleEditorDescription').value = '';
+                document.getElementById('ruleEditorScope').value = 'entity_type';
+                document.getElementById('ruleEditorScopeTarget').value = 'task';
+            }
+
+            // Update type pills
+            selectRuleType(ruleEditorState.ruleType);
+            updateRuleScopeTarget();
+
+            // Show modal
+            document.getElementById('vizRuleEditorOverlay').classList.add('open');
+        }
+
+        // Close the rule editor modal
+        function closeRuleEditor() {
+            document.getElementById('vizRuleEditorOverlay').classList.remove('open');
+            ruleEditorState.editingRule = null;
+        }
+
+        // Edit an existing rule
+        function editRule(ruleId) {
+            openRuleEditor(ruleId);
+        }
+
+        // Confirm and delete a rule
+        async function confirmDeleteRule(ruleId) {
+            const rule = visualizationRules.find(r => r.id === ruleId);
+            if (!rule) return;
+
+            if (confirm(`Delete rule "${rule.name}"? This cannot be undone.`)) {
+                await deleteVisualizationRule(ruleId);
+
+                // Re-render current view
+                if (currentView === 'kanban') {
+                    renderKanbanBoard();
+                } else if (currentView === 'tasks') {
+                    renderTaskBoardView();
+                }
+            }
+        }
+
+        // Select a rule type in the editor
+        function selectRuleType(type) {
+            ruleEditorState.ruleType = type;
+
+            // Update pill selection
+            document.querySelectorAll('.viz-rule-type-pill').forEach(pill => {
+                pill.classList.toggle('active', pill.dataset.type === type);
+            });
+
+            // Render type-specific configuration
+            renderRuleTypeConfig(type);
+            updateRulePreview();
+        }
+
+        // Show/hide scope target based on scope selection
+        function updateRuleScopeTarget() {
+            const scope = document.getElementById('ruleEditorScope').value;
+            document.getElementById('ruleEditorScopeTargetGroup').style.display =
+                scope === 'entity_type' ? 'block' : 'none';
+        }
+
+        // Render configuration fields based on rule type
+        function renderRuleTypeConfig(type) {
+            const container = document.getElementById('ruleEditorConfig');
+            const existingDef = ruleEditorState.editingRule?.definition || {};
+
+            switch (type) {
+                case 'computed_field':
+                    container.innerHTML = `
+                        <div class="viz-rule-form-row">
+                            <div class="viz-rule-form-group">
+                                <label class="viz-rule-form-label">Output Field Name</label>
+                                <input type="text" id="ruleConfigOutputField" class="viz-rule-form-input"
+                                    placeholder="e.g., fullName" value="${existingDef.outputField || ''}" onchange="updateRulePreview()">
+                            </div>
+                            <div class="viz-rule-form-group">
+                                <label class="viz-rule-form-label">Formula Type</label>
+                                <select id="ruleConfigFormula" class="viz-rule-form-select" onchange="updateFormulaInputs(); updateRulePreview()">
+                                    <option value="concat" ${existingDef.formula === 'concat' ? 'selected' : ''}>Concatenate Fields</option>
+                                    <option value="template" ${existingDef.formula === 'template' ? 'selected' : ''}>Template String</option>
+                                    <option value="coalesce" ${existingDef.formula === 'coalesce' ? 'selected' : ''}>First Non-Empty</option>
+                                    <option value="date_diff" ${existingDef.formula === 'date_diff' ? 'selected' : ''}>Date Difference</option>
+                                    <option value="math" ${existingDef.formula === 'math' ? 'selected' : ''}>Math Expression</option>
+                                </select>
+                            </div>
+                        </div>
+                        <div id="formulaInputsContainer"></div>
+                    `;
+                    updateFormulaInputs();
+                    break;
+
+                case 'field_merge':
+                    container.innerHTML = `
+                        <div class="viz-rule-form-row">
+                            <div class="viz-rule-form-group">
+                                <label class="viz-rule-form-label">Output Field Name</label>
+                                <input type="text" id="ruleConfigOutputField" class="viz-rule-form-input"
+                                    placeholder="e.g., allCategories" value="${existingDef.outputField || ''}" onchange="updateRulePreview()">
+                            </div>
+                            <div class="viz-rule-form-group">
+                                <label class="viz-rule-form-label">Merge Type</label>
+                                <select id="ruleConfigMergeType" class="viz-rule-form-select" onchange="updateRulePreview()">
+                                    <option value="array" ${existingDef.mergeType === 'array' ? 'selected' : ''}>Array (combine all)</option>
+                                    <option value="first_non_empty" ${existingDef.mergeType === 'first_non_empty' ? 'selected' : ''}>First Non-Empty</option>
+                                    <option value="concat_string" ${existingDef.mergeType === 'concat_string' ? 'selected' : ''}>Concatenate as String</option>
+                                </select>
+                            </div>
+                        </div>
+                        <div class="viz-rule-form-group">
+                            <label class="viz-rule-form-label">Source Fields <span class="viz-rule-form-hint">(comma-separated)</span></label>
+                            <input type="text" id="ruleConfigSourceFields" class="viz-rule-form-input"
+                                placeholder="e.g., category1, category2, customFields.legacyCategory"
+                                value="${(existingDef.sourceFields || []).join(', ')}" onchange="updateRulePreview()">
+                        </div>
+                        <div class="viz-rule-form-row">
+                            <div class="viz-rule-form-group">
+                                <label class="viz-rule-form-label">
+                                    <input type="checkbox" id="ruleConfigExcludeEmpty" ${existingDef.excludeEmpty ? 'checked' : ''} onchange="updateRulePreview()">
+                                    Exclude empty values
+                                </label>
+                            </div>
+                            <div class="viz-rule-form-group">
+                                <label class="viz-rule-form-label">
+                                    <input type="checkbox" id="ruleConfigDeduplicate" ${existingDef.deduplicate ? 'checked' : ''} onchange="updateRulePreview()">
+                                    Remove duplicates
+                                </label>
+                            </div>
+                        </div>
+                    `;
+                    break;
+
+                case 'value_remap':
+                    const mappings = existingDef.mapping || {};
+                    const mappingRows = Object.entries(mappings).map(([from, to], i) => `
+                        <tr>
+                            <td><input type="text" class="viz-rule-mapping-input remap-from" value="${from}" onchange="updateRulePreview()"></td>
+                            <td><input type="text" class="viz-rule-mapping-input remap-to-display" value="${typeof to === 'object' ? to.display : to}" onchange="updateRulePreview()"></td>
+                            <td><input type="text" class="viz-rule-mapping-input remap-to-color" value="${typeof to === 'object' ? to.color || '' : ''}" placeholder="e.g., red, green" onchange="updateRulePreview()"></td>
+                            <td><button class="viz-rule-card-action delete" onclick="this.closest('tr').remove(); updateRulePreview()"><i class="ph ph-trash"></i></button></td>
+                        </tr>
+                    `).join('');
+
+                    container.innerHTML = `
+                        <div class="viz-rule-form-group">
+                            <label class="viz-rule-form-label">Target Field</label>
+                            <input type="text" id="ruleConfigTargetField" class="viz-rule-form-input"
+                                placeholder="e.g., status or customFields.legacyStatus" value="${existingDef.targetField || ''}" onchange="updateRulePreview()">
+                        </div>
+                        <div class="viz-rule-form-group">
+                            <label class="viz-rule-form-label">Value Mappings</label>
+                            <table class="viz-rule-mapping-table" id="remapMappingTable">
+                                <thead>
+                                    <tr>
+                                        <th>From Value</th>
+                                        <th>Display As</th>
+                                        <th>Color</th>
+                                        <th></th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    ${mappingRows || `
+                                        <tr>
+                                            <td><input type="text" class="viz-rule-mapping-input remap-from" placeholder="e.g., 1" onchange="updateRulePreview()"></td>
+                                            <td><input type="text" class="viz-rule-mapping-input remap-to-display" placeholder="e.g., Active" onchange="updateRulePreview()"></td>
+                                            <td><input type="text" class="viz-rule-mapping-input remap-to-color" placeholder="e.g., green" onchange="updateRulePreview()"></td>
+                                            <td><button class="viz-rule-card-action delete" onclick="this.closest('tr').remove(); updateRulePreview()"><i class="ph ph-trash"></i></button></td>
+                                        </tr>
+                                    `}
+                                </tbody>
+                            </table>
+                            <button class="viz-rule-mapping-add" onclick="addRemapRow()">
+                                <i class="ph ph-plus"></i> Add Mapping
+                            </button>
+                        </div>
+                    `;
+                    break;
+
+                case 'field_promotion':
+                    container.innerHTML = `
+                        <div class="viz-rule-form-row">
+                            <div class="viz-rule-form-group">
+                                <label class="viz-rule-form-label">Source Field</label>
+                                <input type="text" id="ruleConfigSourceField" class="viz-rule-form-input"
+                                    placeholder="e.g., customFields.matterNumber" value="${existingDef.sourceField || ''}" onchange="updateRulePreview()">
+                            </div>
+                            <div class="viz-rule-form-group">
+                                <label class="viz-rule-form-label">Promote To</label>
+                                <input type="text" id="ruleConfigPromoteTo" class="viz-rule-form-input"
+                                    placeholder="e.g., matterNumber" value="${existingDef.promoteTo || ''}" onchange="updateRulePreview()">
+                            </div>
+                        </div>
+                        <div class="viz-rule-form-row">
+                            <div class="viz-rule-form-group">
+                                <label class="viz-rule-form-label">Display Label</label>
+                                <input type="text" id="ruleConfigDisplayLabel" class="viz-rule-form-input"
+                                    placeholder="e.g., Matter #" value="${existingDef.displayLabel || ''}" onchange="updateRulePreview()">
+                            </div>
+                            <div class="viz-rule-form-group">
+                                <label class="viz-rule-form-label">Data Type</label>
+                                <select id="ruleConfigDataType" class="viz-rule-form-select" onchange="updateRulePreview()">
+                                    <option value="string" ${existingDef.dataType === 'string' ? 'selected' : ''}>String</option>
+                                    <option value="number" ${existingDef.dataType === 'number' ? 'selected' : ''}>Number</option>
+                                    <option value="date" ${existingDef.dataType === 'date' ? 'selected' : ''}>Date</option>
+                                    <option value="boolean" ${existingDef.dataType === 'boolean' ? 'selected' : ''}>Boolean</option>
+                                </select>
+                            </div>
+                        </div>
+                        <div class="viz-rule-form-group">
+                            <label class="viz-rule-form-label">Show In</label>
+                            <div style="display: flex; gap: 16px; flex-wrap: wrap;">
+                                <label><input type="checkbox" id="ruleConfigShowCard" ${(existingDef.showIn || ['card']).includes('card') ? 'checked' : ''} onchange="updateRulePreview()"> Card</label>
+                                <label><input type="checkbox" id="ruleConfigShowDetail" ${(existingDef.showIn || ['card']).includes('detail') ? 'checked' : ''} onchange="updateRulePreview()"> Detail View</label>
+                                <label><input type="checkbox" id="ruleConfigShowList" ${(existingDef.showIn || []).includes('list') ? 'checked' : ''} onchange="updateRulePreview()"> List</label>
+                                <label><input type="checkbox" id="ruleConfigShowFilter" ${(existingDef.showIn || []).includes('filter') ? 'checked' : ''} onchange="updateRulePreview()"> Filter</label>
+                            </div>
+                        </div>
+                    `;
+                    break;
+
+                case 'conditional_display':
+                    const conditions = existingDef.conditions || [{ when: {}, apply: {} }];
+                    const conditionRows = conditions.map((cond, i) => `
+                        <div class="viz-rule-condition" data-index="${i}">
+                            <select class="viz-rule-form-select viz-rule-condition-field cond-field" style="flex:1" onchange="updateRulePreview()">
+                                <option value="">Select field...</option>
+                                <option value="status" ${cond.when?.field === 'status' ? 'selected' : ''}>status</option>
+                                <option value="priority" ${cond.when?.field === 'priority' ? 'selected' : ''}>priority</option>
+                                <option value="dueDate" ${cond.when?.field === 'dueDate' ? 'selected' : ''}>dueDate</option>
+                                <option value="assignee" ${cond.when?.field === 'assignee' ? 'selected' : ''}>assignee</option>
+                            </select>
+                            <select class="viz-rule-form-select viz-rule-condition-op cond-op" style="width:100px" onchange="updateRulePreview()">
+                                <option value="eq" ${cond.when?.operator === 'eq' ? 'selected' : ''}>equals</option>
+                                <option value="neq" ${cond.when?.operator === 'neq' ? 'selected' : ''}>not equals</option>
+                                <option value="lt" ${cond.when?.operator === 'lt' ? 'selected' : ''}>less than</option>
+                                <option value="gt" ${cond.when?.operator === 'gt' ? 'selected' : ''}>greater than</option>
+                                <option value="is_empty" ${cond.when?.operator === 'is_empty' ? 'selected' : ''}>is empty</option>
+                                <option value="is_not_empty" ${cond.when?.operator === 'is_not_empty' ? 'selected' : ''}>is not empty</option>
+                            </select>
+                            <input type="text" class="viz-rule-form-input viz-rule-condition-value cond-value" style="flex:1"
+                                placeholder="Value" value="${cond.when?.value || ''}" onchange="updateRulePreview()">
+                            <span style="color:#888">→</span>
+                            <input type="text" class="viz-rule-form-input cond-apply-color" style="width:80px"
+                                placeholder="Color" value="${cond.apply?.color || ''}" onchange="updateRulePreview()">
+                            <input type="text" class="viz-rule-form-input cond-apply-prefix" style="width:80px"
+                                placeholder="Prefix" value="${cond.apply?.prefix || ''}" onchange="updateRulePreview()">
+                            <button class="viz-rule-condition-remove" onclick="this.closest('.viz-rule-condition').remove(); updateRulePreview()">
+                                <i class="ph ph-x"></i>
+                            </button>
+                        </div>
+                    `).join('');
+
+                    container.innerHTML = `
+                        <div class="viz-rule-form-group">
+                            <label class="viz-rule-form-label">Target Field</label>
+                            <input type="text" id="ruleConfigTargetField" class="viz-rule-form-input"
+                                placeholder="e.g., status" value="${existingDef.targetField || ''}" onchange="updateRulePreview()">
+                        </div>
+                        <div class="viz-rule-form-group">
+                            <label class="viz-rule-form-label">Conditions</label>
+                            <div id="conditionsContainer">
+                                ${conditionRows}
+                            </div>
+                            <button class="viz-rule-mapping-add" onclick="addConditionRow()">
+                                <i class="ph ph-plus"></i> Add Condition
+                            </button>
+                        </div>
+                    `;
+                    break;
+
+                case 'aggregation':
+                    container.innerHTML = `
+                        <div class="viz-rule-form-row">
+                            <div class="viz-rule-form-group">
+                                <label class="viz-rule-form-label">Output Field Name</label>
+                                <input type="text" id="ruleConfigOutputField" class="viz-rule-form-input"
+                                    placeholder="e.g., subtaskCount" value="${existingDef.outputField || ''}" onchange="updateRulePreview()">
+                            </div>
+                            <div class="viz-rule-form-group">
+                                <label class="viz-rule-form-label">Aggregate From</label>
+                                <select id="ruleConfigAggregateFrom" class="viz-rule-form-select" onchange="updateRulePreview()">
+                                    <option value="children" ${existingDef.aggregateFrom === 'children' ? 'selected' : ''}>Child Tasks</option>
+                                    <option value="relationships" ${existingDef.aggregateFrom === 'relationships' ? 'selected' : ''}>Relationships</option>
+                                    <option value="task" ${existingDef.aggregateFrom === 'task' ? 'selected' : ''}>All Tasks</option>
+                                </select>
+                            </div>
+                        </div>
+                        <div class="viz-rule-form-row">
+                            <div class="viz-rule-form-group">
+                                <label class="viz-rule-form-label">Operation</label>
+                                <select id="ruleConfigOperation" class="viz-rule-form-select" onchange="updateRulePreview()">
+                                    <option value="count" ${existingDef.operation === 'count' ? 'selected' : ''}>Count</option>
+                                    <option value="sum" ${existingDef.operation === 'sum' ? 'selected' : ''}>Sum</option>
+                                    <option value="avg" ${existingDef.operation === 'avg' ? 'selected' : ''}>Average</option>
+                                    <option value="min" ${existingDef.operation === 'min' ? 'selected' : ''}>Minimum</option>
+                                    <option value="max" ${existingDef.operation === 'max' ? 'selected' : ''}>Maximum</option>
+                                    <option value="ratio" ${existingDef.operation === 'ratio' ? 'selected' : ''}>Ratio</option>
+                                    <option value="percent" ${existingDef.operation === 'percent' ? 'selected' : ''}>Percentage</option>
+                                </select>
+                            </div>
+                            <div class="viz-rule-form-group">
+                                <label class="viz-rule-form-label">Field (for sum/avg/min/max)</label>
+                                <input type="text" id="ruleConfigField" class="viz-rule-form-input"
+                                    placeholder="e.g., estimatedHours" value="${existingDef.field || ''}" onchange="updateRulePreview()">
+                            </div>
+                        </div>
+                    `;
+                    break;
+
+                default:
+                    container.innerHTML = '<p style="color:#888;text-align:center;">Select a rule type to configure it.</p>';
+            }
+        }
+
+        // Update formula-specific input fields
+        function updateFormulaInputs() {
+            const formula = document.getElementById('ruleConfigFormula')?.value;
+            const container = document.getElementById('formulaInputsContainer');
+            if (!container) return;
+
+            const existingDef = ruleEditorState.editingRule?.definition || {};
+
+            switch (formula) {
+                case 'concat':
+                case 'coalesce':
+                    container.innerHTML = `
+                        <div class="viz-rule-form-group">
+                            <label class="viz-rule-form-label">Source Fields <span class="viz-rule-form-hint">(comma-separated)</span></label>
+                            <input type="text" id="ruleConfigInputs" class="viz-rule-form-input"
+                                placeholder="e.g., firstName, lastName"
+                                value="${(existingDef.inputs || []).join(', ')}" onchange="updateRulePreview()">
+                        </div>
+                    `;
+                    break;
+
+                case 'template':
+                    container.innerHTML = `
+                        <div class="viz-rule-form-group">
+                            <label class="viz-rule-form-label">Template <span class="viz-rule-form-hint">(use {fieldName} for placeholders)</span></label>
+                            <input type="text" id="ruleConfigTemplate" class="viz-rule-form-input"
+                                placeholder="e.g., {firstName} {lastName} ({department})"
+                                value="${existingDef.template || ''}" onchange="updateRulePreview()">
+                        </div>
+                    `;
+                    break;
+
+                case 'date_diff':
+                    container.innerHTML = `
+                        <div class="viz-rule-form-row">
+                            <div class="viz-rule-form-group">
+                                <label class="viz-rule-form-label">Date Field</label>
+                                <input type="text" id="ruleConfigDateField" class="viz-rule-form-input"
+                                    placeholder="e.g., dueDate" value="${(existingDef.inputs || [])[0] || ''}" onchange="updateRulePreview()">
+                            </div>
+                            <div class="viz-rule-form-group">
+                                <label class="viz-rule-form-label">Compare To</label>
+                                <select id="ruleConfigCompareField" class="viz-rule-form-select" onchange="updateRulePreview()">
+                                    <option value="today" ${(existingDef.inputs || [])[1] === 'today' ? 'selected' : ''}>Today</option>
+                                    <option value="createdAt" ${(existingDef.inputs || [])[1] === 'createdAt' ? 'selected' : ''}>Created Date</option>
+                                </select>
+                            </div>
+                        </div>
+                    `;
+                    break;
+
+                case 'math':
+                    container.innerHTML = `
+                        <div class="viz-rule-form-group">
+                            <label class="viz-rule-form-label">Input Fields <span class="viz-rule-form-hint">(comma-separated)</span></label>
+                            <input type="text" id="ruleConfigInputs" class="viz-rule-form-input"
+                                placeholder="e.g., estimatedHours, actualHours"
+                                value="${(existingDef.inputs || []).join(', ')}" onchange="updateRulePreview()">
+                        </div>
+                        <div class="viz-rule-form-group">
+                            <label class="viz-rule-form-label">Expression <span class="viz-rule-form-hint">(use field names, e.g., estimatedHours - actualHours)</span></label>
+                            <input type="text" id="ruleConfigExpression" class="viz-rule-form-input"
+                                placeholder="e.g., estimatedHours - actualHours"
+                                value="${existingDef.expression || ''}" onchange="updateRulePreview()">
+                        </div>
+                    `;
+                    break;
+            }
+        }
+
+        // Add a new row to the value remap table
+        function addRemapRow() {
+            const tbody = document.querySelector('#remapMappingTable tbody');
+            if (!tbody) return;
+
+            const tr = document.createElement('tr');
+            tr.innerHTML = `
+                <td><input type="text" class="viz-rule-mapping-input remap-from" placeholder="e.g., 1" onchange="updateRulePreview()"></td>
+                <td><input type="text" class="viz-rule-mapping-input remap-to-display" placeholder="e.g., Active" onchange="updateRulePreview()"></td>
+                <td><input type="text" class="viz-rule-mapping-input remap-to-color" placeholder="e.g., green" onchange="updateRulePreview()"></td>
+                <td><button class="viz-rule-card-action delete" onclick="this.closest('tr').remove(); updateRulePreview()"><i class="ph ph-trash"></i></button></td>
+            `;
+            tbody.appendChild(tr);
+        }
+
+        // Add a new condition row
+        function addConditionRow() {
+            const container = document.getElementById('conditionsContainer');
+            if (!container) return;
+
+            const div = document.createElement('div');
+            div.className = 'viz-rule-condition';
+            div.innerHTML = `
+                <select class="viz-rule-form-select viz-rule-condition-field cond-field" style="flex:1" onchange="updateRulePreview()">
+                    <option value="">Select field...</option>
+                    <option value="status">status</option>
+                    <option value="priority">priority</option>
+                    <option value="dueDate">dueDate</option>
+                    <option value="assignee">assignee</option>
+                </select>
+                <select class="viz-rule-form-select viz-rule-condition-op cond-op" style="width:100px" onchange="updateRulePreview()">
+                    <option value="eq">equals</option>
+                    <option value="neq">not equals</option>
+                    <option value="lt">less than</option>
+                    <option value="gt">greater than</option>
+                    <option value="is_empty">is empty</option>
+                    <option value="is_not_empty">is not empty</option>
+                </select>
+                <input type="text" class="viz-rule-form-input viz-rule-condition-value cond-value" style="flex:1"
+                    placeholder="Value" onchange="updateRulePreview()">
+                <span style="color:#888">→</span>
+                <input type="text" class="viz-rule-form-input cond-apply-color" style="width:80px"
+                    placeholder="Color" onchange="updateRulePreview()">
+                <input type="text" class="viz-rule-form-input cond-apply-prefix" style="width:80px"
+                    placeholder="Prefix" onchange="updateRulePreview()">
+                <button class="viz-rule-condition-remove" onclick="this.closest('.viz-rule-condition').remove(); updateRulePreview()">
+                    <i class="ph ph-x"></i>
+                </button>
+            `;
+            container.appendChild(div);
+        }
+
+        // Update the rule preview
+        function updateRulePreview() {
+            const previewContent = document.getElementById('rulePreviewContent');
+            if (!previewContent) return;
+
+            const ruleData = collectRuleData();
+            if (!ruleData) {
+                previewContent.innerHTML = 'Configure the rule to see a preview.';
+                return;
+            }
+
+            // Create a sample preview
+            let preview = '';
+
+            switch (ruleData.ruleType) {
+                case 'computed_field':
+                    preview = `<span class="key">_computed</span>: {<br>`;
+                    preview += `  <span class="key">${ruleData.definition.outputField || 'outputField'}</span>: <span class="computed">[calculated value]</span><br>`;
+                    preview += `}`;
+                    break;
+
+                case 'field_merge':
+                    preview = `<span class="key">_computed</span>: {<br>`;
+                    preview += `  <span class="key">${ruleData.definition.outputField || 'outputField'}</span>: <span class="computed">[merged from ${(ruleData.definition.sourceFields || []).length} fields]</span><br>`;
+                    preview += `}`;
+                    break;
+
+                case 'value_remap':
+                    const mappingCount = Object.keys(ruleData.definition.mapping || {}).length;
+                    preview = `<span class="key">_display</span>: {<br>`;
+                    preview += `  <span class="key">${ruleData.definition.targetField || 'field'}</span>: { <span class="value">display</span>, <span class="value">color</span> }<br>`;
+                    preview += `  <span style="color:#888">// ${mappingCount} value mappings defined</span><br>`;
+                    preview += `}`;
+                    break;
+
+                case 'field_promotion':
+                    preview = `<span class="key">_promoted</span>: {<br>`;
+                    preview += `  <span class="key">${ruleData.definition.promoteTo || 'field'}</span>: {<br>`;
+                    preview += `    value: <span class="computed">[from ${ruleData.definition.sourceField || 'source'}]</span>,<br>`;
+                    preview += `    label: <span class="value">"${ruleData.definition.displayLabel || ''}"</span><br>`;
+                    preview += `  }<br>`;
+                    preview += `}`;
+                    break;
+
+                default:
+                    preview = `Rule type: <span class="value">${ruleData.ruleType}</span><br>`;
+                    preview += `Applied to: <span class="value">${ruleData.scope === 'global' ? 'all entities' : ruleData.scopeTarget}</span>`;
+            }
+
+            previewContent.innerHTML = preview;
+        }
+
+        // Collect rule data from the form
+        function collectRuleData() {
+            const name = document.getElementById('ruleEditorName')?.value?.trim();
+            const description = document.getElementById('ruleEditorDescription')?.value?.trim();
+            const scope = document.getElementById('ruleEditorScope')?.value || 'entity_type';
+            const scopeTarget = document.getElementById('ruleEditorScopeTarget')?.value || 'task';
+            const ruleType = ruleEditorState.ruleType;
+
+            let definition = {};
+
+            switch (ruleType) {
+                case 'computed_field':
+                    const formula = document.getElementById('ruleConfigFormula')?.value;
+                    definition = {
+                        outputField: document.getElementById('ruleConfigOutputField')?.value?.trim(),
+                        formula: formula
+                    };
+
+                    if (formula === 'concat' || formula === 'coalesce') {
+                        const inputs = document.getElementById('ruleConfigInputs')?.value || '';
+                        definition.inputs = inputs.split(',').map(s => s.trim()).filter(s => s);
+                    } else if (formula === 'template') {
+                        definition.template = document.getElementById('ruleConfigTemplate')?.value;
+                    } else if (formula === 'date_diff') {
+                        definition.inputs = [
+                            document.getElementById('ruleConfigDateField')?.value?.trim(),
+                            document.getElementById('ruleConfigCompareField')?.value
+                        ];
+                        definition.format = 'days';
+                    } else if (formula === 'math') {
+                        const inputs = document.getElementById('ruleConfigInputs')?.value || '';
+                        definition.inputs = inputs.split(',').map(s => s.trim()).filter(s => s);
+                        definition.expression = document.getElementById('ruleConfigExpression')?.value;
+                    }
+                    break;
+
+                case 'field_merge':
+                    const sourceFields = document.getElementById('ruleConfigSourceFields')?.value || '';
+                    definition = {
+                        outputField: document.getElementById('ruleConfigOutputField')?.value?.trim(),
+                        mergeType: document.getElementById('ruleConfigMergeType')?.value,
+                        sourceFields: sourceFields.split(',').map(s => s.trim()).filter(s => s),
+                        excludeEmpty: document.getElementById('ruleConfigExcludeEmpty')?.checked,
+                        deduplicate: document.getElementById('ruleConfigDeduplicate')?.checked
+                    };
+                    break;
+
+                case 'value_remap':
+                    const mapping = {};
+                    document.querySelectorAll('#remapMappingTable tbody tr').forEach(row => {
+                        const from = row.querySelector('.remap-from')?.value?.trim();
+                        const toDisplay = row.querySelector('.remap-to-display')?.value?.trim();
+                        const toColor = row.querySelector('.remap-to-color')?.value?.trim();
+                        if (from && toDisplay) {
+                            mapping[from] = { display: toDisplay, color: toColor || null };
+                        }
+                    });
+                    definition = {
+                        targetField: document.getElementById('ruleConfigTargetField')?.value?.trim(),
+                        mapping: mapping
+                    };
+                    break;
+
+                case 'field_promotion':
+                    const showIn = [];
+                    if (document.getElementById('ruleConfigShowCard')?.checked) showIn.push('card');
+                    if (document.getElementById('ruleConfigShowDetail')?.checked) showIn.push('detail');
+                    if (document.getElementById('ruleConfigShowList')?.checked) showIn.push('list');
+                    if (document.getElementById('ruleConfigShowFilter')?.checked) showIn.push('filter');
+
+                    definition = {
+                        sourceField: document.getElementById('ruleConfigSourceField')?.value?.trim(),
+                        promoteTo: document.getElementById('ruleConfigPromoteTo')?.value?.trim(),
+                        displayLabel: document.getElementById('ruleConfigDisplayLabel')?.value?.trim(),
+                        dataType: document.getElementById('ruleConfigDataType')?.value,
+                        showIn: showIn
+                    };
+                    break;
+
+                case 'conditional_display':
+                    const conditions = [];
+                    document.querySelectorAll('#conditionsContainer .viz-rule-condition').forEach(row => {
+                        const field = row.querySelector('.cond-field')?.value;
+                        const op = row.querySelector('.cond-op')?.value;
+                        const value = row.querySelector('.cond-value')?.value?.trim();
+                        const color = row.querySelector('.cond-apply-color')?.value?.trim();
+                        const prefix = row.querySelector('.cond-apply-prefix')?.value?.trim();
+
+                        if (field) {
+                            conditions.push({
+                                when: { field, operator: op, value },
+                                apply: { color: color || null, prefix: prefix || null }
+                            });
+                        }
+                    });
+                    definition = {
+                        targetField: document.getElementById('ruleConfigTargetField')?.value?.trim(),
+                        conditions: conditions
+                    };
+                    break;
+
+                case 'aggregation':
+                    definition = {
+                        outputField: document.getElementById('ruleConfigOutputField')?.value?.trim(),
+                        aggregateFrom: document.getElementById('ruleConfigAggregateFrom')?.value,
+                        operation: document.getElementById('ruleConfigOperation')?.value,
+                        field: document.getElementById('ruleConfigField')?.value?.trim()
+                    };
+                    break;
+            }
+
+            return {
+                name,
+                description,
+                scope,
+                scopeTarget,
+                ruleType,
+                definition
+            };
+        }
+
+        // Save the rule
+        async function saveRule() {
+            const ruleData = collectRuleData();
+
+            if (!ruleData.name) {
+                alert('Please enter a rule name.');
+                return;
+            }
+
+            if (ruleEditorState.editingRule) {
+                // Update existing rule
+                await updateVisualizationRule(ruleEditorState.editingRule.id, ruleData);
+            } else {
+                // Create new rule
+                await createVisualizationRule(ruleData);
+            }
+
+            closeRuleEditor();
+
+            // Re-render current view to apply rule effects
+            if (currentView === 'kanban') {
+                renderKanbanBoard();
+            } else if (currentView === 'tasks') {
+                renderTaskBoardView();
+            }
+        }
+
+        // Update the visualization rules count badge
+        function updateVisualizationRulesCountBadge() {
+            const badge = document.getElementById('vizRulesCount');
+            if (!badge) return;
+
+            const activeCount = visualizationRules.filter(r => r.enabled).length;
+            if (activeCount > 0) {
+                badge.textContent = activeCount;
+                badge.style.display = 'inline';
+            } else {
+                badge.style.display = 'none';
+            }
+        }
+
+        // Render enhanced fields from visualization rules on an entity card
+        function renderEnhancedFields(entity) {
+            if (!entity) return '';
+
+            const enhanced = applyVisualizationRules(entity);
+            const parts = [];
+
+            // Render computed fields
+            if (enhanced._computed) {
+                for (const [key, value] of Object.entries(enhanced._computed)) {
+                    if (value !== null && value !== undefined && value !== '') {
+                        // Find the rule to get the display label
+                        const rule = visualizationRules.find(r =>
+                            r.enabled &&
+                            r.definition.outputField === key
+                        );
+                        const label = rule?.name || key;
+
+                        parts.push(`
+                            <div class="kanban-card-enhanced-field">
+                                <span class="kanban-card-enhanced-field-label">${label}:</span>
+                                <span class="kanban-card-enhanced-field-value computed">${formatEnhancedValue(value)}</span>
+                            </div>
+                        `);
+                    }
+                }
+            }
+
+            // Render promoted fields (only if showIn includes 'card')
+            if (enhanced._promoted) {
+                for (const [key, config] of Object.entries(enhanced._promoted)) {
+                    if (config.value !== null && config.value !== undefined && config.value !== '' &&
+                        config.showIn && config.showIn.includes('card')) {
+                        parts.push(`
+                            <div class="kanban-card-enhanced-field">
+                                <span class="kanban-card-enhanced-field-label">${config.label || key}:</span>
+                                <span class="kanban-card-enhanced-field-value">${formatEnhancedValue(config.value)}</span>
+                            </div>
+                        `);
+                    }
+                }
+            }
+
+            // Render display modifications (badges, colors, etc.)
+            if (enhanced._display) {
+                for (const [field, displayConfig] of Object.entries(enhanced._display)) {
+                    if (displayConfig && displayConfig.color) {
+                        // These would be applied to existing field displays
+                        // For now, just render additional badge if there's a prefix
+                        if (displayConfig.prefix) {
+                            parts.push(`
+                                <div class="kanban-card-enhanced-field">
+                                    <span class="viz-display-badge ${displayConfig.color}">${displayConfig.prefix}${displayConfig.display || field}</span>
+                                </div>
+                            `);
+                        }
+                    }
+                }
+            }
+
+            if (parts.length === 0) return '';
+
+            return `<div class="kanban-card-enhanced-fields">${parts.join('')}</div>`;
+        }
+
+        // Format enhanced field value for display
+        function formatEnhancedValue(value) {
+            if (value === null || value === undefined) return '';
+            if (Array.isArray(value)) return value.join(', ');
+            if (typeof value === 'object') return JSON.stringify(value);
+            return String(value);
+        }
+
+        // Suggest visualization rules based on import data
+        function suggestVisualizationRulesForImport() {
+            const suggestions = [];
+            const entityType = bulkImportState.entityType || 'task';
+
+            // Get unmapped columns
+            const mappedColumns = new Set(Object.keys(bulkImportState.fieldMappings));
+            const customFieldColumns = new Set(bulkImportState.customFields.map(cf => cf.sourceColumn));
+            const unmappedColumns = bulkImportState.headers.filter(h =>
+                !mappedColumns.has(h) && !customFieldColumns.has(h)
+            );
+
+            // Get custom fields
+            const customFields = bulkImportState.customFields || [];
+
+            // Analyze data patterns to suggest rules
+            const sampleData = bulkImportState.parsedData.slice(0, 10);
+
+            // Suggest field promotions for custom fields
+            customFields.forEach(cf => {
+                const hasData = sampleData.some(row => row[cf.sourceColumn] && row[cf.sourceColumn].trim());
+                if (hasData) {
+                    suggestions.push({
+                        type: 'field_promotion',
+                        name: `Promote ${cf.label || cf.key}`,
+                        description: `Show "${cf.sourceColumn}" as a first-class field on ${entityType} cards`,
+                        config: {
+                            ruleType: 'field_promotion',
+                            scopeTarget: entityType,
+                            definition: {
+                                sourceField: `customFields.${cf.key}`,
+                                promoteTo: cf.key,
+                                displayLabel: cf.label || cf.sourceColumn,
+                                showIn: ['card', 'detail'],
+                                dataType: 'string'
+                            }
+                        }
+                    });
+                }
+            });
+
+            // Check for fields that could be merged (e.g., firstName + lastName)
+            const nameFields = bulkImportState.headers.filter(h =>
+                /first.*name|last.*name|given.*name|surname|forename/i.test(h)
+            );
+            if (nameFields.length >= 2) {
+                suggestions.push({
+                    type: 'field_merge',
+                    name: 'Combine Name Parts',
+                    description: `Merge ${nameFields.join(' + ')} into a full name`,
+                    config: {
+                        ruleType: 'computed_field',
+                        scopeTarget: entityType,
+                        definition: {
+                            outputField: 'fullName',
+                            formula: 'concat',
+                            inputs: nameFields.map(f => {
+                                const mapping = bulkImportState.fieldMappings[f];
+                                return mapping || `originalImport.${f}`;
+                            })
+                        }
+                    }
+                });
+            }
+
+            // Check for status-like fields that need remapping
+            unmappedColumns.forEach(col => {
+                const values = [...new Set(sampleData.map(row => row[col]).filter(Boolean))];
+
+                // If there are just a few unique values, it might be a status field needing remap
+                if (values.length > 0 && values.length <= 10) {
+                    // Check if values look like codes (short, possibly numeric)
+                    const looksLikeCodes = values.every(v => String(v).length <= 3 || /^\d+$/.test(String(v)));
+                    if (looksLikeCodes && values.length >= 2) {
+                        suggestions.push({
+                            type: 'value_remap',
+                            name: `Remap ${col} values`,
+                            description: `Transform codes "${values.slice(0, 3).join('", "')}"... to readable labels`,
+                            config: {
+                                ruleType: 'value_remap',
+                                scopeTarget: entityType,
+                                definition: {
+                                    targetField: `originalImport.${col}`,
+                                    mapping: Object.fromEntries(values.map(v => [v, { display: v, color: null }]))
+                                }
+                            }
+                        });
+                    }
+                }
+            });
+
+            // Show suggestions in a modal
+            showRuleSuggestionsModal(suggestions);
+        }
+
+        // Display suggested rules in a modal for user to accept/modify
+        function showRuleSuggestionsModal(suggestions) {
+            if (suggestions.length === 0) {
+                alert('No rule suggestions found for the current import data. You can still create rules manually from the Rules panel.');
+                return;
+            }
+
+            // Close import modal and open rules panel with suggestions
+            closeBulkImportModal();
+            openVisualizationRulesPanel();
+
+            // Create suggestion cards in the panel
+            const container = document.getElementById('vizRulesPanelBody');
+
+            let html = `
+                <div style="background: linear-gradient(135deg, #fff3e0 0%, #ffe0b2 100%); padding: 16px; border-radius: 8px; margin-bottom: 16px;">
+                    <div style="display: flex; align-items: center; gap: 8px; margin-bottom: 8px;">
+                        <i class="ph ph-sparkle" style="color: #ef6c00; font-size: 20px;"></i>
+                        <span style="font-weight: 600; color: #e65100;">Suggested Rules from Import</span>
+                    </div>
+                    <p style="font-size: 12px; color: #666; margin-bottom: 12px;">
+                        Based on your import data, we've identified ${suggestions.length} potential visualization rule${suggestions.length !== 1 ? 's' : ''}.
+                        Click "Create" to add a rule, or "Customize" to edit before creating.
+                    </p>
+                </div>
+            `;
+
+            suggestions.forEach((suggestion, index) => {
+                const typeLabels = {
+                    field_promotion: 'Promotion',
+                    field_merge: 'Merge',
+                    computed_field: 'Computed',
+                    value_remap: 'Remap'
+                };
+                const typeClasses = {
+                    field_promotion: 'promotion',
+                    field_merge: 'merge',
+                    computed_field: 'computed',
+                    value_remap: 'remap'
+                };
+
+                html += `
+                    <div class="viz-rule-card" style="border-left: 4px solid #ef6c00;">
+                        <div class="viz-rule-card-header">
+                            <div class="viz-rule-card-title">
+                                <span class="viz-rule-card-type ${typeClasses[suggestion.type] || ''}">${typeLabels[suggestion.type] || suggestion.type}</span>
+                                ${suggestion.name}
+                            </div>
+                        </div>
+                        <div class="viz-rule-card-description">${suggestion.description}</div>
+                        <div style="display: flex; gap: 8px; margin-top: 12px;">
+                            <button onclick="createSuggestedRule(${index})" style="padding: 6px 12px; background: #8B6F47; color: white; border: none; border-radius: 6px; font-size: 12px; cursor: pointer; display: flex; align-items: center; gap: 4px;">
+                                <i class="ph ph-check"></i> Create
+                            </button>
+                            <button onclick="customizeSuggestedRule(${index})" style="padding: 6px 12px; background: white; color: #666; border: 1px solid #ddd; border-radius: 6px; font-size: 12px; cursor: pointer; display: flex; align-items: center; gap: 4px;">
+                                <i class="ph ph-pencil"></i> Customize
+                            </button>
+                        </div>
+                    </div>
+                `;
+            });
+
+            // Store suggestions for later use
+            window._ruleSuggestions = suggestions;
+
+            container.innerHTML = html;
+        }
+
+        // Create a suggested rule directly
+        async function createSuggestedRule(index) {
+            const suggestions = window._ruleSuggestions || [];
+            const suggestion = suggestions[index];
+            if (!suggestion) return;
+
+            await createVisualizationRule({
+                name: suggestion.name,
+                description: suggestion.description,
+                scope: 'entity_type',
+                scopeTarget: suggestion.config.scopeTarget,
+                ruleType: suggestion.config.ruleType,
+                definition: suggestion.config.definition
+            });
+
+            // Remove from suggestions
+            suggestions.splice(index, 1);
+
+            if (suggestions.length > 0) {
+                showRuleSuggestionsModal(suggestions);
+            } else {
+                renderVisualizationRulesPanel();
+            }
+        }
+
+        // Open rule editor with suggested rule pre-filled
+        function customizeSuggestedRule(index) {
+            const suggestions = window._ruleSuggestions || [];
+            const suggestion = suggestions[index];
+            if (!suggestion) return;
+
+            // Store the suggestion config to pre-fill the editor
+            ruleEditorState.editingRule = {
+                name: suggestion.name,
+                description: suggestion.description,
+                scope: 'entity_type',
+                scopeTarget: suggestion.config.scopeTarget,
+                ruleType: suggestion.config.ruleType,
+                definition: suggestion.config.definition
+            };
+            ruleEditorState.ruleType = suggestion.config.ruleType;
+
+            // Open editor
+            document.getElementById('ruleEditorTitle').textContent = 'Customize Suggested Rule';
+            document.getElementById('ruleEditorSaveText').textContent = 'Create Rule';
+            document.getElementById('ruleEditorName').value = suggestion.name || '';
+            document.getElementById('ruleEditorDescription').value = suggestion.description || '';
+            document.getElementById('ruleEditorScope').value = 'entity_type';
+            document.getElementById('ruleEditorScopeTarget').value = suggestion.config.scopeTarget || 'task';
+
+            selectRuleType(suggestion.config.ruleType);
+            updateRuleScopeTarget();
+
+            document.getElementById('vizRuleEditorOverlay').classList.add('open');
+
+            // Clear the editingRule ID so it creates a new rule
+            ruleEditorState.editingRule.id = null;
+        }
 
         // EO Operators - Emergence Operators for activity modeling
         // Internal codes used for data store, friendly labels for UI
@@ -39499,6 +42116,10 @@ Cmd/Ctrl + K - Command palette
                 }
                 cachedActivities = enrichedActivities;
 
+                // Load visualization rules from activities
+                loadVisualizationRulesFromActivities(enrichedActivities);
+                updateVisualizationRulesCountBadge();
+
                 return enrichedActivities;
             } catch (error) {
                 console.error('Error fetching activities from Xano:', error);
@@ -47863,6 +50484,20 @@ Cmd/Ctrl + K - Command palette
                         <strong>${bulkImportState.customFields.length}</strong> custom field${bulkImportState.customFields.length !== 1 ? 's' : ''}.
                         <strong>${unmappedColumns.length}</strong> additional column${unmappedColumns.length !== 1 ? 's' : ''} stored as raw data.
                     </div>
+                    ${unmappedColumns.length > 0 || bulkImportState.customFields.length > 0 ? `
+                    <div style="margin-top: 0.75rem; padding: 0.75rem; background: linear-gradient(135deg, #f8f6f3 0%, #efe9e0 100%); border-radius: 8px;">
+                        <div style="display: flex; align-items: center; gap: 8px; margin-bottom: 8px;">
+                            <i class="ph ph-magic-wand" style="color: #8B6F47;"></i>
+                            <span style="font-size: 12px; font-weight: 600; color: #6B5642;">Visualization Rules</span>
+                        </div>
+                        <p style="font-size: 11px; color: #888; margin-bottom: 8px;">
+                            Create rules to transform, merge, or display custom/unmapped fields without modifying the imported data.
+                        </p>
+                        <button onclick="suggestVisualizationRulesForImport()" style="padding: 6px 12px; background: #8B6F47; color: white; border: none; border-radius: 6px; font-size: 11px; cursor: pointer; display: flex; align-items: center; gap: 6px;">
+                            <i class="ph ph-sparkle"></i> Suggest Rules for Unmapped Fields
+                        </button>
+                    </div>
+                    ` : ''}
                 </div>
             `;
 
@@ -58147,6 +60782,7 @@ Options:
                         </div>
                     </div>
                     ${aminoTagsHtml}
+                    ${renderEnhancedFields(task)}
                     <div class="task-card-creator">
                         <span class="creator-label">Created by:</span>
                         ${getCreatorDisplayName(task.createdBy)} · ${formatTimeAgo(task.createdAt)}
