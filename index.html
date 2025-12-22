@@ -32275,9 +32275,14 @@ John Doe,Engineering,john@example.com"
         // Rule 0: The log is the database. Everything else is a view.
 
         const EvidenceSync = {
+            // Feature flag: when true, state is derived from log instead of stored separately
+            // Set to true to enable Phase 2 behavior
+            USE_LOG_AS_SOURCE: true,
+
             // Local operation log key in localStorage
             LOCAL_LOG_KEY: 'eo_operation_log',
             SYNC_STATUS_KEY: 'eo_sync_status',
+            BOOTSTRAP_KEY: 'eo_log_bootstrapped',
 
             // Operation types (semantic operators)
             OP: {
@@ -32802,6 +32807,101 @@ John Doe,Engineering,john@example.com"
             // INITIALIZATION
             // ==========================================
 
+            // ==========================================
+            // BOOTSTRAP: Migrate existing state to log
+            // ==========================================
+
+            // Check if we need to bootstrap the log from existing state
+            needsBootstrap() {
+                const bootstrapped = localStorage.getItem(this.BOOTSTRAP_KEY);
+                const log = this.getLocalLog();
+                return !bootstrapped && log.length === 0;
+            },
+
+            // Bootstrap the operation log from existing entities/relationships
+            // This is a one-time migration for existing data
+            bootstrapFromState(existingEntities, existingRelationships) {
+                debug.log('EvidenceSync: Bootstrapping log from existing state...');
+
+                const bootstrapTime = new Date().toISOString();
+                let opCount = 0;
+
+                // Create operations for all existing entities
+                for (const type of Object.keys(existingEntities)) {
+                    for (const entity of existingEntities[type] || []) {
+                        const op = this.createOperation(this.OP.CREATE, type, entity.id, {
+                            ...entity,
+                            _bootstrapped: true
+                        }, { kFrame: 'Bootstrap from existing state' });
+                        op.syncStatus = this.STATUS.SYNCED; // Assume existing data was synced
+                        op.createdAt = entity.createdAt || bootstrapTime;
+                        this.appendToLog(op);
+                        opCount++;
+                    }
+                }
+
+                // Create operations for all existing relationships
+                for (const rel of existingRelationships || []) {
+                    const op = this.createOperation(this.OP.CONNECT, 'relationship', rel.id, {
+                        ...rel,
+                        _bootstrapped: true
+                    }, { kFrame: 'Bootstrap from existing state' });
+                    op.syncStatus = this.STATUS.SYNCED;
+                    this.appendToLog(op);
+                    opCount++;
+                }
+
+                // Mark as bootstrapped
+                localStorage.setItem(this.BOOTSTRAP_KEY, bootstrapTime);
+                debug.log(`EvidenceSync: Bootstrapped ${opCount} operations from existing state`);
+
+                return opCount;
+            },
+
+            // ==========================================
+            // APPLY DERIVED STATE
+            // ==========================================
+
+            // Apply derived state to the global entities/relationships
+            // This makes the log the source of truth
+            applyDerivedState() {
+                if (!this.USE_LOG_AS_SOURCE) return false;
+
+                const derived = this.deriveState();
+
+                // Update global state
+                if (typeof entities !== 'undefined') {
+                    // Preserve entity structure
+                    for (const type of Object.keys(derived.entities)) {
+                        entities[type] = derived.entities[type];
+                    }
+                }
+
+                if (typeof relationships !== 'undefined') {
+                    relationships.length = 0;
+                    relationships.push(...derived.relationships);
+                }
+
+                debug.log('EvidenceSync: Applied derived state from log');
+                return true;
+            },
+
+            // Get entity counts from derived state (for debugging)
+            getDerivedStateCounts() {
+                const derived = this.deriveState();
+                const counts = {};
+                for (const type of Object.keys(derived.entities)) {
+                    counts[type] = derived.entities[type].length;
+                }
+                counts.relationships = derived.relationships.length;
+                counts.tombstones = derived.tombstones.size;
+                return counts;
+            },
+
+            // ==========================================
+            // INITIALIZATION
+            // ==========================================
+
             init() {
                 debug.log('EvidenceSync: Initializing...');
 
@@ -32831,7 +32931,7 @@ John Doe,Engineering,john@example.com"
                 });
 
                 this.updateSyncStatus();
-                debug.log('EvidenceSync: Initialized');
+                debug.log('EvidenceSync: Initialized', this.USE_LOG_AS_SOURCE ? '(log-as-source mode)' : '(parallel mode)');
             }
         };
 
@@ -52638,6 +52738,24 @@ Cmd/Ctrl + K - Command palette
                 workflowInstances = JSON.parse(JSON.stringify(ws.workflowInstances || []));
                 workflowViolations = JSON.parse(JSON.stringify(ws.workflowViolations || []));
                 taskLinks = JSON.parse(JSON.stringify(ws.taskLinks || []));
+
+                // ==========================================
+                // EVIDENCE-PRESERVING SYNC: Bootstrap & Apply
+                // ==========================================
+
+                // Bootstrap the operation log from existing state if needed (one-time migration)
+                if (EvidenceSync.needsBootstrap()) {
+                    debug.log('📋 First run: bootstrapping EvidenceSync log from existing state...');
+                    EvidenceSync.bootstrapFromState(entities, relationships);
+                }
+
+                // If using log as source of truth, derive state from log
+                // This ensures the log is authoritative (Phase 2)
+                if (EvidenceSync.USE_LOG_AS_SOURCE) {
+                    const logCounts = EvidenceSync.getDerivedStateCounts();
+                    debug.log('📋 EvidenceSync: Deriving state from log...', logCounts);
+                    EvidenceSync.applyDerivedState();
+                }
 
                 // Update UI
                 const nameEl = document.getElementById('workspaceNameText');
