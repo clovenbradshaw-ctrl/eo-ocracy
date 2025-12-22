@@ -48314,6 +48314,9 @@ Cmd/Ctrl + K - Command palette
         function renderFinalPreview() {
             const table = document.getElementById('bulkImportFinalTable');
             const fields = bulkImportFields[bulkImportState.entityType];
+            const totalRows = bulkImportState.processedData.length;
+            const maxPreviewRows = 100; // Limit preview to prevent browser freeze on large imports
+            const rowsToShow = Math.min(totalRows, maxPreviewRows);
 
             let html = '<thead><tr>';
             html += '<th class="row-number-header"></th>';
@@ -48323,7 +48326,9 @@ Cmd/Ctrl + K - Command palette
             html += '<th>Status</th>';
             html += '</tr></thead><tbody>';
 
-            bulkImportState.processedData.forEach((row, idx) => {
+            // Only render first maxPreviewRows to prevent browser freeze
+            for (let idx = 0; idx < rowsToShow; idx++) {
+                const row = bulkImportState.processedData[idx];
                 const hasErrors = row._errors.length > 0;
                 html += `<tr class="${hasErrors ? 'error' : ''}">`;
                 html += `<td class="row-number">${idx + 1}</td>`;
@@ -48337,7 +48342,16 @@ Cmd/Ctrl + K - Command palette
                     : '<span style="color: #4CAF50;"><i class="ph ph-check"></i> Valid</span>'
                 }</td>`;
                 html += '</tr>';
-            });
+            }
+
+            // Show truncation notice for large imports
+            if (totalRows > maxPreviewRows) {
+                const remainingRows = totalRows - maxPreviewRows;
+                html += `<tr class="preview-truncation-notice">`;
+                html += `<td colspan="${fields.length + 2}" style="text-align: center; padding: 12px; background: #f5f5f5; color: #666; font-style: italic;">`;
+                html += `<i class="ph ph-info"></i> Showing first ${maxPreviewRows} of ${totalRows} rows. ${remainingRows} more row${remainingRows !== 1 ? 's' : ''} will be imported.`;
+                html += `</td></tr>`;
+            }
 
             html += '</tbody>';
             table.innerHTML = html;
