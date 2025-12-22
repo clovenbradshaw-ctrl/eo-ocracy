@@ -50045,10 +50045,19 @@ Cmd/Ctrl + K - Command palette
         }
 
         function selectBulkImportType(type) {
+            const previousType = bulkImportState.entityType;
             bulkImportState.entityType = type;
             document.querySelectorAll('.bulk-import-entity-btn').forEach(btn => {
                 btn.classList.toggle('active', btn.dataset.type === type);
             });
+
+            // Reset field mappings when entity type changes (different entity types have different fields)
+            if (previousType !== type) {
+                bulkImportState.fieldMappings = {};
+                bulkImportState.valueMappings = {};
+                bulkImportState.customFields = [];
+                bulkImportState.setAllValues = {};
+            }
 
             // Re-validate if we have data
             if (bulkImportState.parsedData.length > 0) {
@@ -50314,47 +50323,60 @@ Cmd/Ctrl + K - Command palette
 
             if (isFirstRender) {
                 // Auto-map entity fields based on header names
-                // Use strict matching to avoid false positives from short column names
+                // Prioritize exact matches over partial matches to avoid mapping "notes_status" when "status" exists
                 fields.forEach(field => {
-                    const matchingHeader = bulkImportState.headers.find(h => {
-                        const headerLower = h.toLowerCase().replace(/[_\s-]/g, '');
-                        const keyLower = field.key.toLowerCase().replace(/[_\s-]/g, '');
-                        const labelLower = field.label.toLowerCase().split(' ')[0].replace(/[_\s-]/g, '');
+                    const keyLower = field.key.toLowerCase().replace(/[_\s-]/g, '');
+                    const labelLower = field.label.toLowerCase().split(' ')[0].replace(/[_\s-]/g, '');
+                    const minLengthForPartial = 4;
 
-                        // Exact match is always valid
+                    // First pass: look for exact matches only
+                    let matchingHeader = bulkImportState.headers.find(h => {
+                        const headerLower = h.toLowerCase().replace(/[_\s-]/g, '');
+                        // Exact match with key or label
                         if (headerLower === keyLower || headerLower === labelLower) {
                             return true;
                         }
-
-                        // For partial matches, only match if:
-                        // 1. The header contains the full field key/label (e.g., "task_status" contains "status")
-                        // 2. OR the field key/label contains the header AND header is at least 4 chars
-                        //    (prevents "s" from matching "status")
-                        const minLengthForPartial = 4;
-                        if (headerLower.includes(keyLower) || headerLower.includes(labelLower)) {
-                            return true;
-                        }
-                        if (headerLower.length >= minLengthForPartial &&
-                            (keyLower.includes(headerLower) || labelLower.includes(headerLower))) {
-                            return true;
-                        }
-
-                        // Check aliases if defined - require exact or near-exact matches
+                        // Exact match with aliases
                         if (field.aliases) {
                             return field.aliases.some(alias => {
                                 const aliasLower = alias.toLowerCase().replace(/[_\s-]/g, '');
-                                // Exact match
-                                if (headerLower === aliasLower) return true;
-                                // Header contains the alias
-                                if (headerLower.includes(aliasLower)) return true;
-                                // Alias contains header only if header is long enough
-                                if (headerLower.length >= minLengthForPartial && aliasLower.includes(headerLower)) return true;
-                                return false;
+                                return headerLower === aliasLower;
                             });
                         }
-
                         return false;
                     });
+
+                    // Second pass: if no exact match, look for partial matches
+                    if (!matchingHeader) {
+                        matchingHeader = bulkImportState.headers.find(h => {
+                            const headerLower = h.toLowerCase().replace(/[_\s-]/g, '');
+
+                            // Header contains the full field key/label (e.g., "task_status" contains "status")
+                            if (headerLower.includes(keyLower) || headerLower.includes(labelLower)) {
+                                return true;
+                            }
+                            // Field key/label contains the header (only if header is long enough)
+                            if (headerLower.length >= minLengthForPartial &&
+                                (keyLower.includes(headerLower) || labelLower.includes(headerLower))) {
+                                return true;
+                            }
+
+                            // Check aliases for partial matches
+                            if (field.aliases) {
+                                return field.aliases.some(alias => {
+                                    const aliasLower = alias.toLowerCase().replace(/[_\s-]/g, '');
+                                    // Header contains the alias
+                                    if (headerLower.includes(aliasLower)) return true;
+                                    // Alias contains header only if header is long enough
+                                    if (headerLower.length >= minLengthForPartial && aliasLower.includes(headerLower)) return true;
+                                    return false;
+                                });
+                            }
+
+                            return false;
+                        });
+                    }
+
                     if (matchingHeader && !Object.values(bulkImportState.fieldMappings).includes(field.key)) {
                         bulkImportState.fieldMappings[matchingHeader] = field.key;
                     }
