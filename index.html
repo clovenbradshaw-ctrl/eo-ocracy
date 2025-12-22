@@ -403,6 +403,202 @@
             background: rgba(255,255,255,0.15);
         }
 
+        /* Sync Status Indicator (Evidence-Preserving Sync - Rule 4) */
+        .sync-status-indicator {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            position: relative;
+            width: 36px;
+            height: 36px;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: background 0.2s;
+        }
+        .sync-status-indicator:hover {
+            background: rgba(255,255,255,0.15);
+        }
+        .sync-status-indicator .sync-icon {
+            font-size: 20px;
+            transition: all 0.3s;
+        }
+        .sync-status-indicator .sync-icon.synced {
+            color: #4ade80;
+        }
+        .sync-status-indicator .sync-icon.pending {
+            color: #fbbf24;
+            animation: pulse-sync 1.5s ease-in-out infinite;
+        }
+        .sync-status-indicator .sync-icon.failed {
+            color: #f87171;
+        }
+        @keyframes pulse-sync {
+            0%, 100% { opacity: 1; transform: scale(1); }
+            50% { opacity: 0.6; transform: scale(0.95); }
+        }
+        .sync-status-badge {
+            position: absolute;
+            top: 2px;
+            right: 2px;
+            background: #f87171;
+            color: white;
+            font-size: 10px;
+            font-weight: 600;
+            min-width: 16px;
+            height: 16px;
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 0 4px;
+        }
+
+        /* Sync Status Panel */
+        .sync-status-panel-overlay {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(0,0,0,0.5);
+            z-index: 1000;
+        }
+        .sync-status-panel-overlay.open {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        .sync-status-panel {
+            background: white;
+            border-radius: 12px;
+            width: 90%;
+            max-width: 500px;
+            max-height: 80vh;
+            overflow: hidden;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+        }
+        .sync-status-panel-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 16px 20px;
+            border-bottom: 1px solid #e5e7eb;
+            background: #f9fafb;
+        }
+        .sync-status-panel-header h3 {
+            margin: 0;
+            font-size: 16px;
+            font-weight: 600;
+            color: #111827;
+        }
+        .sync-status-panel-close {
+            background: none;
+            border: none;
+            font-size: 20px;
+            color: #6b7280;
+            cursor: pointer;
+            padding: 4px;
+            border-radius: 4px;
+        }
+        .sync-status-panel-close:hover {
+            background: #e5e7eb;
+        }
+        .sync-status-panel-body {
+            padding: 20px;
+            overflow-y: auto;
+            max-height: calc(80vh - 60px);
+        }
+        .sync-status-summary {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 12px;
+            margin-bottom: 20px;
+        }
+        .sync-status-stat {
+            background: #f9fafb;
+            padding: 12px;
+            border-radius: 8px;
+            text-align: center;
+        }
+        .sync-status-stat-value {
+            font-size: 24px;
+            font-weight: 700;
+            color: #111827;
+        }
+        .sync-status-stat-label {
+            font-size: 12px;
+            color: #6b7280;
+            margin-top: 4px;
+        }
+        .sync-status-stat.pending .sync-status-stat-value { color: #f59e0b; }
+        .sync-status-stat.failed .sync-status-stat-value { color: #ef4444; }
+        .sync-status-stat.synced .sync-status-stat-value { color: #10b981; }
+
+        .sync-failed-list {
+            margin-top: 16px;
+        }
+        .sync-failed-list h4 {
+            font-size: 14px;
+            font-weight: 600;
+            color: #374151;
+            margin: 0 0 12px 0;
+        }
+        .sync-failed-item {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 12px;
+            background: #fef2f2;
+            border: 1px solid #fecaca;
+            border-radius: 8px;
+            margin-bottom: 8px;
+        }
+        .sync-failed-item-info {
+            flex: 1;
+        }
+        .sync-failed-item-label {
+            font-weight: 500;
+            color: #991b1b;
+        }
+        .sync-failed-item-error {
+            font-size: 12px;
+            color: #b91c1c;
+            margin-top: 2px;
+        }
+        .sync-failed-item-retry {
+            background: #dc2626;
+            color: white;
+            border: none;
+            padding: 6px 12px;
+            border-radius: 6px;
+            font-size: 12px;
+            font-weight: 500;
+            cursor: pointer;
+        }
+        .sync-failed-item-retry:hover {
+            background: #b91c1c;
+        }
+        .sync-retry-all-btn {
+            width: 100%;
+            background: #3b82f6;
+            color: white;
+            border: none;
+            padding: 12px;
+            border-radius: 8px;
+            font-size: 14px;
+            font-weight: 500;
+            cursor: pointer;
+            margin-top: 12px;
+        }
+        .sync-retry-all-btn:hover {
+            background: #2563eb;
+        }
+        .sync-retry-all-btn:disabled {
+            background: #9ca3af;
+            cursor: not-allowed;
+        }
+
         /* Actions Menu */
         .header-actions-menu {
             position: relative;
@@ -25910,6 +26106,14 @@
                 </button>
             </div>
 
+            <!-- Sync Status Indicator (Rule 4: explicit and inspectable) -->
+            <div class="sync-status-indicator" id="syncStatusIndicator" onclick="openSyncStatusPanel()" title="Sync Status">
+                <i class="ph ph-cloud-check sync-icon synced"></i>
+                <i class="ph ph-cloud-arrow-up sync-icon pending" style="display:none"></i>
+                <i class="ph ph-cloud-slash sync-icon failed" style="display:none"></i>
+                <span class="sync-status-badge" id="syncStatusBadge" style="display:none">0</span>
+            </div>
+
             <!-- Actions Menu -->
             <div class="header-actions-menu">
                 <button class="header-icon-btn" onclick="toggleActionsMenu(event)" title="Actions">
@@ -26145,6 +26349,45 @@
     </div>
 
     <!-- History Panel -->
+    <!-- Sync Status Panel (Rule 4: explicit and inspectable, Rule 6: recoverable) -->
+    <div class="sync-status-panel-overlay" id="syncStatusPanelOverlay" onclick="closeSyncStatusPanel()">
+        <div class="sync-status-panel" onclick="event.stopPropagation()">
+            <div class="sync-status-panel-header">
+                <h3><i class="ph ph-cloud"></i> Sync Status</h3>
+                <button class="sync-status-panel-close" onclick="closeSyncStatusPanel()">
+                    <i class="ph ph-x"></i>
+                </button>
+            </div>
+            <div class="sync-status-panel-body">
+                <div class="sync-status-summary">
+                    <div class="sync-status-stat synced">
+                        <div class="sync-status-stat-value" id="syncStatSynced">0</div>
+                        <div class="sync-status-stat-label">Synced</div>
+                    </div>
+                    <div class="sync-status-stat pending">
+                        <div class="sync-status-stat-value" id="syncStatPending">0</div>
+                        <div class="sync-status-stat-label">Pending</div>
+                    </div>
+                    <div class="sync-status-stat failed">
+                        <div class="sync-status-stat-value" id="syncStatFailed">0</div>
+                        <div class="sync-status-stat-label">Failed</div>
+                    </div>
+                </div>
+                <div class="sync-failed-list" id="syncFailedList" style="display:none">
+                    <h4>Failed Operations</h4>
+                    <div id="syncFailedItems"></div>
+                    <button class="sync-retry-all-btn" id="syncRetryAllBtn" onclick="retryAllFailedSync()">
+                        <i class="ph ph-arrows-clockwise"></i> Retry All Failed
+                    </button>
+                </div>
+                <div id="syncAllGood" style="text-align: center; padding: 20px; color: #6b7280;">
+                    <i class="ph ph-check-circle" style="font-size: 48px; color: #10b981; display: block; margin-bottom: 8px;"></i>
+                    All operations synced successfully
+                </div>
+            </div>
+        </div>
+    </div>
+
     <div class="history-panel-overlay" id="historyPanelOverlay" onclick="closeHistoryPanel()"></div>
     <div class="history-panel" id="historyPanel">
         <div class="history-panel-header">
@@ -32026,6 +32269,670 @@ John Doe,Engineering,john@example.com"
         const APP_ID = 'holonic-org-graph'; // Your app identifier
 
         // ==========================================
+        // EVIDENCE-PRESERVING SYNC SYSTEM
+        // ==========================================
+        // Implements the Evidence-Preserving Sync Rules (see SYNC_RULES.md)
+        // Rule 0: The log is the database. Everything else is a view.
+
+        const EvidenceSync = {
+            // Local operation log key in localStorage
+            LOCAL_LOG_KEY: 'eo_operation_log',
+            SYNC_STATUS_KEY: 'eo_sync_status',
+
+            // Operation types (semantic operators)
+            OP: {
+                CREATE: 'INS',      // Insert/create
+                UPDATE: 'ALT',      // Alter/update
+                DELETE: 'NUL',      // Nullify/delete (tombstone)
+                CONNECT: 'CON',     // Connect/relate
+                DISCONNECT: 'DIS',  // Disconnect/unrelate
+            },
+
+            // Sync status for operations
+            STATUS: {
+                LOCAL: 'local',         // Recorded locally only
+                PENDING: 'pending',     // Queued for sync
+                SYNCING: 'syncing',     // Currently syncing
+                SYNCED: 'synced',       // Confirmed synced
+                FAILED: 'failed',       // Sync failed (retryable)
+                CONFLICT: 'conflict',   // Needs resolution
+            },
+
+            // Generate unique operation ID (Rule 7: idempotency)
+            generateOpId() {
+                const timestamp = Date.now().toString(36);
+                const random = Math.random().toString(36).substring(2, 10);
+                const deviceId = this.getDeviceId().substring(0, 6);
+                return `op_${timestamp}_${deviceId}_${random}`;
+            },
+
+            // Get or create device ID for origin tracking (Rule 2)
+            getDeviceId() {
+                let deviceId = localStorage.getItem('eo_device_id');
+                if (!deviceId) {
+                    deviceId = 'dev_' + Math.random().toString(36).substring(2, 15);
+                    localStorage.setItem('eo_device_id', deviceId);
+                }
+                return deviceId;
+            },
+
+            // Get current user origin info (Rule 2: preserve origin)
+            getOrigin() {
+                const aminoUser = typeof AminoIdentity !== 'undefined' ? AminoIdentity.getUser() : null;
+                return {
+                    deviceId: this.getDeviceId(),
+                    userId: aminoUser?.id || aminoUser?.email || 'anonymous',
+                    userEmail: aminoUser?.email || null,
+                    userName: aminoUser?.name || null,
+                    timestamp: new Date().toISOString(),
+                    source: aminoUser ? (aminoUser.source || 'amino') : 'anonymous'
+                };
+            },
+
+            // ==========================================
+            // LOCAL OPERATION LOG (Rule 1, Rule 8)
+            // ==========================================
+
+            // Get the local operation log
+            getLocalLog() {
+                try {
+                    const stored = localStorage.getItem(this.LOCAL_LOG_KEY);
+                    return stored ? JSON.parse(stored) : [];
+                } catch (e) {
+                    console.error('EvidenceSync: Failed to read local log', e);
+                    return [];
+                }
+            },
+
+            // Append operation to local log (append-only!)
+            appendToLog(operation) {
+                const log = this.getLocalLog();
+                log.push(operation);
+                try {
+                    localStorage.setItem(this.LOCAL_LOG_KEY, JSON.stringify(log));
+                    this.notifyLogChange(operation);
+                    return true;
+                } catch (e) {
+                    console.error('EvidenceSync: Failed to append to log', e);
+                    return false;
+                }
+            },
+
+            // Create an operation record (Rule 1, Rule 2)
+            createOperation(opType, objectType, objectId, data, metadata = {}) {
+                const opId = this.generateOpId();
+                const origin = this.getOrigin();
+
+                const operation = {
+                    // Core identity
+                    opId: opId,
+                    opType: opType,
+
+                    // Target
+                    objectType: objectType,
+                    objectId: objectId,
+                    objectLabel: data.name || data.label || objectId,
+
+                    // Payload
+                    data: data,
+
+                    // Origin (Rule 2)
+                    origin: origin,
+
+                    // Context
+                    kFrame: metadata.kFrame || null,
+                    workspaceId: typeof currentWorkspaceId !== 'undefined' ? currentWorkspaceId : null,
+
+                    // Sync status (Rule 4)
+                    syncStatus: this.STATUS.LOCAL,
+                    syncAttempts: 0,
+                    lastSyncAttempt: null,
+                    syncError: null,
+
+                    // Timestamps
+                    createdAt: origin.timestamp,
+                    localSequence: Date.now() // For local ordering
+                };
+
+                return operation;
+            },
+
+            // ==========================================
+            // RECORDING OPERATIONS (main API)
+            // ==========================================
+
+            // Record a create operation
+            recordCreate(objectType, objectId, data, metadata = {}) {
+                const op = this.createOperation(this.OP.CREATE, objectType, objectId, data, metadata);
+                this.appendToLog(op);
+                this.queueForSync(op);
+                return op;
+            },
+
+            // Record an update operation
+            recordUpdate(objectType, objectId, changes, metadata = {}) {
+                const op = this.createOperation(this.OP.UPDATE, objectType, objectId, changes, metadata);
+                this.appendToLog(op);
+                this.queueForSync(op);
+                return op;
+            },
+
+            // Record a delete operation (Rule 9: tombstone, not erasure)
+            recordDelete(objectType, objectId, deletedData, metadata = {}) {
+                const op = this.createOperation(this.OP.DELETE, objectType, objectId, {
+                    ...deletedData,
+                    _tombstone: true,
+                    _deletedAt: new Date().toISOString()
+                }, { ...metadata, kFrame: metadata.kFrame || 'Deletion' });
+                this.appendToLog(op);
+                this.queueForSync(op);
+                return op;
+            },
+
+            // Record a relationship operation
+            recordConnect(subjectId, predicate, objectId, data = {}, metadata = {}) {
+                const relationshipId = data.id || `rel_${subjectId}_${predicate}_${objectId}`;
+                const op = this.createOperation(this.OP.CONNECT, 'relationship', relationshipId, {
+                    id: relationshipId,
+                    subject: subjectId,
+                    predicate: predicate,
+                    object: objectId,
+                    ...data
+                }, metadata);
+                this.appendToLog(op);
+                this.queueForSync(op);
+                return op;
+            },
+
+            recordDisconnect(relationshipId, relationshipData, metadata = {}) {
+                const op = this.createOperation(this.OP.DISCONNECT, 'relationship', relationshipId, {
+                    ...relationshipData,
+                    _tombstone: true,
+                    _deletedAt: new Date().toISOString()
+                }, { ...metadata, kFrame: metadata.kFrame || 'Disconnection' });
+                this.appendToLog(op);
+                this.queueForSync(op);
+                return op;
+            },
+
+            // ==========================================
+            // STATE DERIVATION (Rule 1: state is derived)
+            // ==========================================
+
+            // Derive current state from operation log
+            deriveState(operations = null) {
+                const ops = operations || this.getLocalLog();
+
+                const state = {
+                    entities: {
+                        unit: [],
+                        team: [],
+                        role: [],
+                        person: [],
+                        task: [],
+                        product: [],
+                        workflow: [],
+                        stream: []
+                    },
+                    relationships: [],
+                    tombstones: new Set() // Track deleted IDs
+                };
+
+                const entityMap = new Map();
+                const relationshipMap = new Map();
+
+                // Sort by local sequence for deterministic replay
+                const sortedOps = [...ops].sort((a, b) =>
+                    (a.localSequence || 0) - (b.localSequence || 0)
+                );
+
+                for (const op of sortedOps) {
+                    const { opType, objectType, objectId, data } = op;
+
+                    if (objectType === 'relationship') {
+                        // Handle relationship operations
+                        if (opType === this.OP.CONNECT) {
+                            relationshipMap.set(objectId, { ...data });
+                        } else if (opType === this.OP.DISCONNECT) {
+                            relationshipMap.delete(objectId);
+                            state.tombstones.add(objectId);
+                        }
+                    } else if (state.entities[objectType]) {
+                        // Handle entity operations
+                        if (opType === this.OP.CREATE) {
+                            if (!state.tombstones.has(objectId)) {
+                                entityMap.set(objectId, {
+                                    ...data,
+                                    id: objectId,
+                                    type: objectType,
+                                    _origin: op.origin,
+                                    _opId: op.opId
+                                });
+                            }
+                        } else if (opType === this.OP.UPDATE) {
+                            if (entityMap.has(objectId) && !state.tombstones.has(objectId)) {
+                                const existing = entityMap.get(objectId);
+                                entityMap.set(objectId, {
+                                    ...existing,
+                                    ...data,
+                                    _lastUpdate: op.origin,
+                                    _lastOpId: op.opId
+                                });
+                            }
+                        } else if (opType === this.OP.DELETE) {
+                            entityMap.delete(objectId);
+                            state.tombstones.add(objectId);
+                        }
+                    }
+                }
+
+                // Convert maps to arrays grouped by type
+                for (const [id, entity] of entityMap) {
+                    const type = entity.type;
+                    if (state.entities[type]) {
+                        state.entities[type].push(entity);
+                    }
+                }
+
+                state.relationships = Array.from(relationshipMap.values());
+
+                return state;
+            },
+
+            // ==========================================
+            // SYNC QUEUE (Rule 6, Rule 8)
+            // ==========================================
+
+            syncQueue: [],
+            isSyncing: false,
+
+            queueForSync(operation) {
+                operation.syncStatus = this.STATUS.PENDING;
+                this.syncQueue.push(operation);
+                this.updateSyncStatus();
+                this.processSyncQueue();
+            },
+
+            async processSyncQueue() {
+                if (this.isSyncing || this.syncQueue.length === 0) return;
+                if (!navigator.onLine) {
+                    debug.log('EvidenceSync: Offline, queue preserved');
+                    return;
+                }
+
+                this.isSyncing = true;
+
+                while (this.syncQueue.length > 0) {
+                    const op = this.syncQueue[0];
+                    op.syncStatus = this.STATUS.SYNCING;
+                    op.syncAttempts++;
+                    op.lastSyncAttempt = new Date().toISOString();
+
+                    try {
+                        await this.syncOperationToRemote(op);
+                        op.syncStatus = this.STATUS.SYNCED;
+                        op.syncError = null;
+                        this.syncQueue.shift(); // Remove from queue
+                        this.updateOperationInLog(op);
+                    } catch (error) {
+                        op.syncStatus = this.STATUS.FAILED;
+                        op.syncError = error.message;
+                        this.updateOperationInLog(op);
+
+                        // Retry with exponential backoff (max 3 attempts)
+                        if (op.syncAttempts < 3) {
+                            const delay = Math.pow(2, op.syncAttempts) * 1000;
+                            debug.log(`EvidenceSync: Retry in ${delay}ms`, op.opId);
+                            await new Promise(r => setTimeout(r, delay));
+                        } else {
+                            // Move to end of queue or surface to user
+                            this.syncQueue.shift();
+                            this.surfaceSyncFailure(op);
+                        }
+                    }
+
+                    this.updateSyncStatus();
+                }
+
+                this.isSyncing = false;
+            },
+
+            // Sync single operation to Xano
+            async syncOperationToRemote(op) {
+                const payload = {
+                    app_id: APP_ID,
+                    entity_id: op.objectId,
+                    event_type: op.opType,
+                    data: {
+                        opId: op.opId,
+                        event_verb: op.opType,
+                        eo_operator: op.opType,
+                        agent_type: op.origin.source,
+                        agent_id: op.origin.userId,
+                        agent_email: op.origin.userEmail,
+                        device_id: op.origin.deviceId,
+                        object_type: op.objectType,
+                        object_id: op.objectId,
+                        object_label: op.objectLabel,
+                        k_frame: op.kFrame,
+                        workspace_id: op.workspaceId,
+                        local_timestamp: op.createdAt,
+                        ...op.data
+                    }
+                };
+
+                const response = await fetch(`${XANO_BASE_URL}/activity_store`, {
+                    method: 'POST',
+                    mode: 'cors',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(payload)
+                });
+
+                if (!response.ok) {
+                    throw new Error(`Sync failed: ${response.status} ${response.statusText}`);
+                }
+
+                return await response.json();
+            },
+
+            // Update operation status in the log
+            updateOperationInLog(updatedOp) {
+                const log = this.getLocalLog();
+                const index = log.findIndex(op => op.opId === updatedOp.opId);
+                if (index !== -1) {
+                    log[index] = updatedOp;
+                    localStorage.setItem(this.LOCAL_LOG_KEY, JSON.stringify(log));
+                }
+            },
+
+            // ==========================================
+            // SYNC STATUS (Rule 4: explicit and inspectable)
+            // ==========================================
+
+            getSyncStatus() {
+                const log = this.getLocalLog();
+                const status = {
+                    total: log.length,
+                    local: 0,
+                    pending: this.syncQueue.length,
+                    synced: 0,
+                    failed: 0,
+                    conflict: 0
+                };
+
+                for (const op of log) {
+                    if (op.syncStatus === this.STATUS.SYNCED) status.synced++;
+                    else if (op.syncStatus === this.STATUS.FAILED) status.failed++;
+                    else if (op.syncStatus === this.STATUS.CONFLICT) status.conflict++;
+                    else if (op.syncStatus === this.STATUS.LOCAL) status.local++;
+                }
+
+                return status;
+            },
+
+            updateSyncStatus() {
+                const status = this.getSyncStatus();
+                localStorage.setItem(this.SYNC_STATUS_KEY, JSON.stringify(status));
+                this.notifySyncStatusChange(status);
+            },
+
+            // Get operations that failed (Rule 6: recoverable)
+            getFailedOperations() {
+                return this.getLocalLog().filter(op => op.syncStatus === this.STATUS.FAILED);
+            },
+
+            // Retry a failed operation
+            retryOperation(opId) {
+                const log = this.getLocalLog();
+                const op = log.find(o => o.opId === opId);
+                if (op && op.syncStatus === this.STATUS.FAILED) {
+                    op.syncAttempts = 0; // Reset attempts
+                    this.queueForSync(op);
+                    return true;
+                }
+                return false;
+            },
+
+            // Retry all failed operations
+            retryAllFailed() {
+                const failed = this.getFailedOperations();
+                for (const op of failed) {
+                    op.syncAttempts = 0;
+                    this.queueForSync(op);
+                }
+                return failed.length;
+            },
+
+            // Surface sync failure to user (Rule 6)
+            surfaceSyncFailure(op) {
+                console.error('EvidenceSync: Operation sync failed permanently', op);
+                if (typeof showActivityToast === 'function') {
+                    showActivityToast('error', 'Sync Failed',
+                        `Could not sync "${op.objectLabel}". Click to retry.`,
+                        () => this.retryOperation(op.opId)
+                    );
+                }
+            },
+
+            // ==========================================
+            // EVENT NOTIFICATIONS
+            // ==========================================
+
+            listeners: {
+                logChange: [],
+                syncStatusChange: []
+            },
+
+            onLogChange(callback) {
+                this.listeners.logChange.push(callback);
+            },
+
+            onSyncStatusChange(callback) {
+                this.listeners.syncStatusChange.push(callback);
+            },
+
+            notifyLogChange(operation) {
+                for (const cb of this.listeners.logChange) {
+                    try { cb(operation); } catch (e) { console.error(e); }
+                }
+            },
+
+            notifySyncStatusChange(status) {
+                for (const cb of this.listeners.syncStatusChange) {
+                    try { cb(status); } catch (e) { console.error(e); }
+                }
+            },
+
+            // ==========================================
+            // MERGE & CONFLICT (Rule 3, Rule 5)
+            // ==========================================
+
+            // Merge remote operations into local log without overwriting local intent
+            mergeRemoteOperations(remoteOps) {
+                const localLog = this.getLocalLog();
+                const localOpIds = new Set(localLog.map(op => op.opId));
+
+                let newOps = 0;
+                for (const remoteOp of remoteOps) {
+                    // Skip if we already have this operation (idempotency)
+                    const remoteOpId = remoteOp.data?.opId || remoteOp.id;
+                    if (localOpIds.has(remoteOpId)) continue;
+
+                    // Convert remote format to local format
+                    const localOp = this.remoteToLocalFormat(remoteOp);
+                    localOp.syncStatus = this.STATUS.SYNCED; // Already on server
+
+                    this.appendToLog(localOp);
+                    newOps++;
+                }
+
+                if (newOps > 0) {
+                    debug.log(`EvidenceSync: Merged ${newOps} remote operations`);
+                }
+
+                return newOps;
+            },
+
+            // Convert remote Xano format to local operation format
+            remoteToLocalFormat(remoteOp) {
+                const data = remoteOp.data || {};
+                return {
+                    opId: data.opId || `remote_${remoteOp.id}`,
+                    opType: data.eo_operator || remoteOp.event_type,
+                    objectType: data.object_type,
+                    objectId: data.object_id || remoteOp.entity_id,
+                    objectLabel: data.object_label,
+                    data: data,
+                    origin: {
+                        deviceId: data.device_id || 'remote',
+                        userId: data.agent_id,
+                        userEmail: data.agent_email,
+                        timestamp: remoteOp.created_at,
+                        source: data.agent_type || 'remote'
+                    },
+                    kFrame: data.k_frame,
+                    workspaceId: data.workspace_id,
+                    syncStatus: this.STATUS.SYNCED,
+                    createdAt: remoteOp.created_at,
+                    localSequence: new Date(remoteOp.created_at).getTime()
+                };
+            },
+
+            // ==========================================
+            // INITIALIZATION
+            // ==========================================
+
+            init() {
+                debug.log('EvidenceSync: Initializing...');
+
+                // Process any pending operations from previous session
+                const log = this.getLocalLog();
+                const pending = log.filter(op =>
+                    op.syncStatus === this.STATUS.LOCAL ||
+                    op.syncStatus === this.STATUS.PENDING ||
+                    op.syncStatus === this.STATUS.FAILED
+                );
+
+                for (const op of pending) {
+                    if (op.syncStatus !== this.STATUS.FAILED || op.syncAttempts < 3) {
+                        this.syncQueue.push(op);
+                    }
+                }
+
+                if (this.syncQueue.length > 0) {
+                    debug.log(`EvidenceSync: ${this.syncQueue.length} operations pending sync`);
+                    this.processSyncQueue();
+                }
+
+                // Listen for online/offline
+                window.addEventListener('online', () => {
+                    debug.log('EvidenceSync: Back online, processing queue');
+                    this.processSyncQueue();
+                });
+
+                this.updateSyncStatus();
+                debug.log('EvidenceSync: Initialized');
+            }
+        };
+
+        // ==========================================
+        // SYNC STATUS UI FUNCTIONS
+        // ==========================================
+
+        function openSyncStatusPanel() {
+            document.getElementById('syncStatusPanelOverlay').classList.add('open');
+            renderSyncStatusPanel();
+        }
+
+        function closeSyncStatusPanel() {
+            document.getElementById('syncStatusPanelOverlay').classList.remove('open');
+        }
+
+        function renderSyncStatusPanel() {
+            const status = EvidenceSync.getSyncStatus();
+            const failed = EvidenceSync.getFailedOperations();
+
+            // Update summary stats
+            document.getElementById('syncStatSynced').textContent = status.synced;
+            document.getElementById('syncStatPending').textContent = status.pending + status.local;
+            document.getElementById('syncStatFailed').textContent = status.failed;
+
+            // Show/hide failed list
+            const failedList = document.getElementById('syncFailedList');
+            const allGood = document.getElementById('syncAllGood');
+
+            if (failed.length > 0) {
+                failedList.style.display = 'block';
+                allGood.style.display = 'none';
+
+                const itemsContainer = document.getElementById('syncFailedItems');
+                itemsContainer.innerHTML = failed.map(op => `
+                    <div class="sync-failed-item">
+                        <div class="sync-failed-item-info">
+                            <div class="sync-failed-item-label">${op.objectLabel || op.objectId}</div>
+                            <div class="sync-failed-item-error">${op.syncError || 'Unknown error'}</div>
+                        </div>
+                        <button class="sync-failed-item-retry" onclick="retrySingleSync('${op.opId}')">
+                            Retry
+                        </button>
+                    </div>
+                `).join('');
+            } else {
+                failedList.style.display = 'none';
+                allGood.style.display = 'block';
+            }
+        }
+
+        function retrySingleSync(opId) {
+            EvidenceSync.retryOperation(opId);
+            renderSyncStatusPanel();
+        }
+
+        function retryAllFailedSync() {
+            const count = EvidenceSync.retryAllFailed();
+            if (count > 0) {
+                showActivityToast('info', 'Retrying', `Retrying ${count} failed operation(s)...`);
+            }
+            renderSyncStatusPanel();
+        }
+
+        // Update sync status indicator in header
+        function updateSyncStatusIndicator(status) {
+            const indicator = document.getElementById('syncStatusIndicator');
+            if (!indicator) return;
+
+            const syncedIcon = indicator.querySelector('.sync-icon.synced');
+            const pendingIcon = indicator.querySelector('.sync-icon.pending');
+            const failedIcon = indicator.querySelector('.sync-icon.failed');
+            const badge = document.getElementById('syncStatusBadge');
+
+            // Hide all icons
+            syncedIcon.style.display = 'none';
+            pendingIcon.style.display = 'none';
+            failedIcon.style.display = 'none';
+            badge.style.display = 'none';
+
+            if (status.failed > 0) {
+                failedIcon.style.display = 'block';
+                badge.style.display = 'flex';
+                badge.textContent = status.failed;
+                indicator.title = `${status.failed} sync failure(s) - click to view`;
+            } else if (status.pending > 0 || status.local > 0) {
+                pendingIcon.style.display = 'block';
+                badge.style.display = 'flex';
+                badge.textContent = status.pending + (status.local || 0);
+                badge.style.background = '#fbbf24';
+                indicator.title = `${status.pending + (status.local || 0)} pending sync(s)`;
+            } else {
+                syncedIcon.style.display = 'block';
+                indicator.title = 'All synced';
+            }
+        }
+
+        // Wire up EvidenceSync status listener
+        EvidenceSync.onSyncStatusChange(updateSyncStatusIndicator);
+
+        // ==========================================
         // AIRTABLE API CONFIGURATION & SERVICE
         // ==========================================
 
@@ -35556,10 +36463,13 @@ John Doe,Engineering,john@example.com"
         // Helper to create entity
         function createEntity(type, name) {
             const id = generateId(type);
-            const entity = { id, name, type, description: '' };
+            const entity = { id, name, type, description: '', createdAt: new Date().toISOString() };
 
             if (!entities[type]) entities[type] = [];
             entities[type].push(entity);
+
+            // Record to Evidence-Preserving Sync (Rule 1: operations, not snapshots)
+            EvidenceSync.recordCreate(type, id, entity, { kFrame: 'Entity Creation' });
 
             // Track in undo history
             pushToUndoHistory({
@@ -41504,8 +42414,18 @@ Cmd/Ctrl + K - Command palette
         const LOCAL_CHANGE_GRACE_PERIOD_MS = 15000; // 15 seconds grace period after local changes (increased for deletion resilience)
 
         // Check if we should skip overwriting state (to prevent reverting local changes)
+        // NOTE: This is a transitional guard. The proper fix is to use EvidenceSync's
+        // operation-based merge (Rule 5: Local intent must not be silently overwritten).
+        // Eventually, state should only be derived from EvidenceSync.deriveState().
         function shouldSkipStateOverwrite(context = '') {
-            // Skip if there are pending API calls
+            // Skip if EvidenceSync has pending local operations (Rule 5)
+            const syncStatus = EvidenceSync.getSyncStatus();
+            if (syncStatus.pending > 0 || syncStatus.local > 0) {
+                debug.log(`⏳ [${context}] Skipping state overwrite: ${syncStatus.pending + syncStatus.local} unsynced operation(s) in EvidenceSync`);
+                return true;
+            }
+
+            // Skip if there are pending API calls (legacy check)
             if (pendingActivityLogs > 0) {
                 debug.log(`⏳ [${context}] Skipping state overwrite: ${pendingActivityLogs} pending activity log(s)`);
                 return true;
@@ -41519,6 +42439,19 @@ Cmd/Ctrl + K - Command palette
             }
 
             return false;
+        }
+
+        // Merge remote activities into EvidenceSync log (Rule 1: operations, not snapshots)
+        // This is the preferred way to handle remote data - merge operations, don't overwrite state
+        function mergeRemoteActivitiesWithEvidenceSync(activities) {
+            const merged = EvidenceSync.mergeRemoteOperations(activities);
+            if (merged > 0) {
+                debug.log(`📥 Merged ${merged} remote operations into EvidenceSync log`);
+                // Optionally derive state from the merged log
+                // const newState = EvidenceSync.deriveState();
+                // This could replace the current state reconstruction approach
+            }
+            return merged;
         }
 
         // Fetch updates from the Xano activity_store_updates endpoint
@@ -43180,9 +44113,17 @@ Cmd/Ctrl + K - Command palette
             // Capture related relationships before deleting
             const deletedRelationships = relationships.filter(r => r.subject === id || r.object === id);
 
-            // Remove entity and relationships
+            // Remove entity and relationships from local state
             entities[type] = entities[type].filter(e => e.id !== id);
             relationships = relationships.filter(r => r.subject !== id && r.object !== id);
+
+            // Record deletion to Evidence-Preserving Sync (Rule 9: tombstone, not erasure)
+            EvidenceSync.recordDelete(type, id, entity, { kFrame: 'Entity Removal' });
+
+            // Also record relationship deletions as disconnections
+            for (const rel of deletedRelationships) {
+                EvidenceSync.recordDisconnect(rel.id, rel, { kFrame: 'Cascade from Entity Deletion' });
+            }
 
             // Track in undo history
             pushToUndoHistory({
@@ -43195,26 +44136,6 @@ Cmd/Ctrl + K - Command palette
 
             // Add to recycle bin
             addToRecycleBin(entity, 'entity', type, deletedRelationships);
-
-            // Log to Xano activity store - await to ensure deletion is persisted
-            const result = await logActivityToXano({
-                event_verb: 'NUL', // NUL = Nullification
-                k_frame: 'Removal',
-                eo_operator: 'NUL',
-                object_type: type,
-                object_id: id,
-                object_label: entity.name,
-                data_json: {
-                    entity_type: type,
-                    entity_name: entity.name,
-                    action: 'deleted'
-                }
-            });
-
-            // Warn if sync failed (deletion still happened locally)
-            if (!result) {
-                console.warn('⚠️ Deletion may not have synced to server');
-            }
 
             // Save and refresh all views for instant visibility
             saveToLocalStorage();
@@ -65247,6 +66168,9 @@ Options:
 
             // Initialize Amino user identity detection
             AminoIdentity.init();
+
+            // Initialize Evidence-Preserving Sync system
+            EvidenceSync.init();
 
             // Initialize Xano connection status check
             initXanoConnectionCheck();
