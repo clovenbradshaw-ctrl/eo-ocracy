@@ -58206,14 +58206,21 @@ Options:
             const statuses = [
                 { key: 'pending', label: 'To Do', icon: 'ph-circle-dashed' },
                 { key: 'in_progress', label: 'In Progress', icon: 'ph-spinner' },
-                { key: 'completed', label: 'Done', icon: 'ph-check-circle' }
+                { key: 'completed', label: 'Done', icon: 'ph-check-circle' },
+                { key: 'uncategorized', label: 'Uncategorized', icon: 'ph-question' }
             ];
+
+            // Valid status keys for filtering
+            const validStatusKeys = ['pending', 'in_progress', 'completed'];
 
             let html = '<div class="kanban-board">';
 
             statuses.forEach(status => {
                 // Get tasks for this column
-                const columnTasks = tasks.filter(t => t.status === status.key);
+                // Uncategorized column gets tasks without a valid status
+                const columnTasks = status.key === 'uncategorized'
+                    ? tasks.filter(t => !validStatusKeys.includes(t.status))
+                    : tasks.filter(t => t.status === status.key);
 
                 // Group tasks by their sequence root
                 const tasksByRoot = new Map(); // rootId -> [tasks in sequence in this column]
@@ -58229,7 +58236,10 @@ Options:
                     if (root) {
                         // Get all tasks in this sequence that are in this column
                         const fullSequence = getTaskSequence(root.id);
-                        const sequenceInColumn = fullSequence.filter(t => t.status === status.key);
+                        // For uncategorized column, match tasks without valid status
+                        const sequenceInColumn = status.key === 'uncategorized'
+                            ? fullSequence.filter(t => !validStatusKeys.includes(t.status))
+                            : fullSequence.filter(t => t.status === status.key);
 
                         if (sequenceInColumn.length > 1) {
                             // This is a multi-task sequence in this column
@@ -58389,7 +58399,11 @@ Options:
 
             if (!draggedTaskId) return;
 
-            const newStatus = event.currentTarget.parentElement.dataset.status;
+            let newStatus = event.currentTarget.parentElement.dataset.status;
+            // If dropped on uncategorized column, set to 'pending' as default
+            if (newStatus === 'uncategorized') {
+                newStatus = 'pending';
+            }
             const task = entities.task.find(t => t.id === draggedTaskId);
             const taskId = draggedTaskId; // Capture for closure
 
