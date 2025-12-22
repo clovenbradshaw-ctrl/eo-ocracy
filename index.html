@@ -26500,6 +26500,20 @@
 
                     <div class="bulk-import-section">
                         <div class="bulk-import-section-title">
+                            <i class="ph ph-tag"></i> Import Source Tag <span style="font-weight: normal; color: #8B6F47;">(optional)</span>
+                        </div>
+                        <div style="display: flex; gap: 0.75rem; align-items: center;">
+                            <input type="text" id="bulkImportSourceTag" placeholder="e.g., Clio, Asana, Manual Entry..."
+                                style="flex: 1; padding: 0.5rem 0.75rem; border: 1px solid #E5DDD1; border-radius: 6px; font-size: 0.875rem; background: #FAF7F5;"
+                                oninput="bulkImportState.sourceTag = this.value.trim()">
+                            <div style="font-size: 0.75rem; color: #8B6F47; max-width: 200px;">
+                                This tag will be added to all imported items for easy filtering
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="bulk-import-section">
+                        <div class="bulk-import-section-title">
                             <i class="ph ph-clipboard-text"></i> How would you like to input data?
                         </div>
                         <div class="bulk-import-tabs">
@@ -47382,13 +47396,15 @@ Cmd/Ctrl + K - Command palette
                 setAllValues: {},
                 valueMappings: {}, // Custom value mappings for single-select fields like status
                 customFields: [], // User-defined custom fields: [{ key: 'fieldname', label: 'Field Name', sourceColumn: 'csv_column' }]
-                processedData: []
+                processedData: [],
+                sourceTag: '' // Import source tag (e.g., "Clio", "Asana") - added to all imported items
             };
 
             // Reset UI
             document.getElementById('bulkImportPasteArea').value = '';
             document.getElementById('bulkImportFileInput').value = '';
             document.getElementById('bulkImportFileName').textContent = '';
+            document.getElementById('bulkImportSourceTag').value = '';
             document.getElementById('bulkImportDataPreview').style.display = 'none';
 
             // Reset entity type buttons
@@ -47486,12 +47502,22 @@ Cmd/Ctrl + K - Command palette
 
             // Parse headers
             bulkImportState.headers = parseLine(lines[0], delimiter);
+            const expectedColumnCount = bulkImportState.headers.length;
 
-            // Parse data rows
+            // Parse data rows and track column count mismatches
             bulkImportState.parsedData = [];
+            bulkImportState.columnCountWarnings = [];
             for (let i = 1; i < lines.length; i++) {
                 const values = parseLine(lines[i], delimiter);
                 if (values.some(v => v.trim())) {  // Skip empty rows
+                    // Track column count mismatches - indicates possible unquoted commas
+                    if (values.length !== expectedColumnCount) {
+                        bulkImportState.columnCountWarnings.push({
+                            row: i,
+                            expected: expectedColumnCount,
+                            actual: values.length
+                        });
+                    }
                     const row = {};
                     bulkImportState.headers.forEach((header, idx) => {
                         row[header] = values[idx] || '';
@@ -47535,6 +47561,27 @@ Cmd/Ctrl + K - Command palette
             previewContainer.style.display = 'block';
             rowCount.textContent = `${bulkImportState.parsedData.length} rows`;
 
+            // Show warning if there are column count mismatches
+            let warningHtml = '';
+            if (bulkImportState.columnCountWarnings && bulkImportState.columnCountWarnings.length > 0) {
+                const warningCount = bulkImportState.columnCountWarnings.length;
+                warningHtml = `
+                    <div style="background: #FFF3CD; border: 1px solid #FFCC02; border-radius: 6px; padding: 0.75rem; margin-bottom: 0.75rem; font-size: 0.8rem;">
+                        <div style="display: flex; align-items: flex-start; gap: 0.5rem;">
+                            <i class="ph ph-warning" style="color: #856404; font-size: 1rem; margin-top: 0.1rem;"></i>
+                            <div>
+                                <strong style="color: #856404;">Column count mismatch detected</strong>
+                                <div style="color: #856404; margin-top: 0.25rem;">
+                                    ${warningCount} row${warningCount > 1 ? 's have' : ' has'} a different number of columns than the header.
+                                    This may indicate commas within field values that need to be quoted.
+                                    Please verify the data in the preview below.
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                `;
+            }
+
             // Build table
             let html = '<thead><tr>';
             html += '<th class="row-number-header"></th>';
@@ -47559,6 +47606,14 @@ Cmd/Ctrl + K - Command palette
             }
 
             html += '</tbody>';
+            // Update or remove warning container
+            let warningContainer = document.getElementById('bulkImportColumnWarning');
+            if (!warningContainer) {
+                warningContainer = document.createElement('div');
+                warningContainer.id = 'bulkImportColumnWarning';
+                table.parentNode.insertBefore(warningContainer, table);
+            }
+            warningContainer.innerHTML = warningHtml;
             table.innerHTML = html;
         }
 
@@ -47641,22 +47696,41 @@ Cmd/Ctrl + K - Command palette
 
             fields.forEach(field => {
                 // Try to find a matching header - check field key, label, and aliases
+                // Use strict matching to avoid false positives from short column names
                 const matchingHeader = bulkImportState.headers.find(h => {
                     const headerLower = h.toLowerCase().replace(/[_\s-]/g, '');
                     const keyLower = field.key.toLowerCase().replace(/[_\s-]/g, '');
                     const labelLower = field.label.toLowerCase().split(' ')[0].replace(/[_\s-]/g, '');
 
-                    // Check exact or partial match with key/label
-                    if (headerLower.includes(keyLower) || headerLower.includes(labelLower) ||
-                        keyLower.includes(headerLower) || labelLower.includes(headerLower)) {
+                    // Exact match is always valid
+                    if (headerLower === keyLower || headerLower === labelLower) {
                         return true;
                     }
 
-                    // Check aliases if defined
+                    // For partial matches, only match if:
+                    // 1. The header contains the full field key/label (e.g., "task_status" contains "status")
+                    // 2. OR the field key/label contains the header AND header is at least 4 chars
+                    //    (prevents "s" from matching "status")
+                    const minLengthForPartial = 4;
+                    if (headerLower.includes(keyLower) || headerLower.includes(labelLower)) {
+                        return true;
+                    }
+                    if (headerLower.length >= minLengthForPartial &&
+                        (keyLower.includes(headerLower) || labelLower.includes(headerLower))) {
+                        return true;
+                    }
+
+                    // Check aliases if defined - require exact or near-exact matches
                     if (field.aliases) {
                         return field.aliases.some(alias => {
                             const aliasLower = alias.toLowerCase().replace(/[_\s-]/g, '');
-                            return headerLower === aliasLower || headerLower.includes(aliasLower) || aliasLower.includes(headerLower);
+                            // Exact match
+                            if (headerLower === aliasLower) return true;
+                            // Header contains the alias
+                            if (headerLower.includes(aliasLower)) return true;
+                            // Alias contains header only if header is long enough
+                            if (headerLower.length >= minLengthForPartial && aliasLower.includes(headerLower)) return true;
+                            return false;
                         });
                     }
 
@@ -48380,8 +48454,12 @@ Cmd/Ctrl + K - Command palette
                         const dueDate = bulkImportTransforms.date(item.dueDate);
                         const priority = bulkImportTransforms.priority(item.priority);
 
-                        // Build tags array from matterNumber and tags field
+                        // Build tags array from matterNumber, tags field, and sourceTag
                         const tags = [];
+                        // Add import source tag first if specified
+                        if (bulkImportState.sourceTag) {
+                            tags.push(bulkImportState.sourceTag);
+                        }
                         if (item.matterNumber) {
                             tags.push(item.matterNumber);
                         }
@@ -48402,6 +48480,51 @@ Cmd/Ctrl + K - Command palette
                                 assignedEntityId = role.id;
                                 assignedEntityType = 'role';
                             }
+                        }
+
+                        // Handle assignee - find or create person
+                        let assigneePersonId = null;
+                        if (item.assignee && item.assignee.trim()) {
+                            const assigneeName = item.assignee.trim();
+
+                            // Try to find existing person by name (case-insensitive)
+                            if (!entities.person) entities.person = [];
+                            let existingPerson = entities.person.find(p =>
+                                p.name && p.name.toLowerCase() === assigneeName.toLowerCase()
+                            );
+
+                            if (!existingPerson) {
+                                // Create a new person entity
+                                const newPersonId = 'person' + Date.now() + Math.random().toString(36).substr(2, 5);
+                                const newPerson = {
+                                    id: newPersonId,
+                                    name: assigneeName,
+                                    type: 'person',
+                                    description: '',
+                                    email: '',
+                                    activityStatus: 'Active',
+                                    importedFrom: 'csv_bulk_import',
+                                    createdAt: new Date().toISOString(),
+                                    createdBy: currentUserId
+                                };
+                                entities.person.push(newPerson);
+                                existingPerson = newPerson;
+
+                                // Log the person creation
+                                logActivityToXano({
+                                    event_verb: 'INS',
+                                    eo_operator: 'INS',
+                                    k_frame: 'Person (Auto-created from Task Import)',
+                                    object_type: 'person',
+                                    object_id: newPersonId,
+                                    object_label: assigneeName,
+                                    data_json: {
+                                        entity_name: assigneeName,
+                                        import_source: 'bulk_import_auto_create'
+                                    }
+                                }, false);
+                            }
+                            assigneePersonId = existingPerson.id;
                         }
 
                         // Preserve ALL original CSV data with original column names
@@ -48433,6 +48556,7 @@ Cmd/Ctrl + K - Command palette
                             visibilityTeamId: null,
                             assignedEntityId: assignedEntityId,
                             assignedEntityType: assignedEntityType,
+                            assigneePersonId: assigneePersonId,
                             externalId: item.externalId || generateUUID(),
                             importedFrom: 'csv_bulk_import',
                             // Store the field mappings that were used during import
@@ -48492,6 +48616,17 @@ Cmd/Ctrl + K - Command palette
                             });
                         }
 
+                        // Create assignee relationship if found
+                        if (assigneePersonId) {
+                            const assigneeRelId = 'rel' + Date.now() + Math.random().toString(36).substr(2, 5) + 'a';
+                            relationships.push({
+                                id: assigneeRelId,
+                                subject: assigneePersonId,
+                                predicate: 'CON',
+                                object: taskId
+                            });
+                        }
+
                     } else {
                         // Standard entity creation (non-task)
                         const id = entityType[0] + Date.now() + Math.random().toString(36).substr(2, 5);
@@ -48526,6 +48661,12 @@ Cmd/Ctrl + K - Command palette
                                 entity[field.key] = item[field.key];
                             }
                         });
+
+                        // Add import source tag if specified (prepend to tags array)
+                        if (bulkImportState.sourceTag) {
+                            const existingTags = entity.tags ? (Array.isArray(entity.tags) ? entity.tags : entity.tags.split(/[,;]/).map(t => t.trim()).filter(t => t)) : [];
+                            entity.tags = [bulkImportState.sourceTag, ...existingTags];
+                        }
 
                         entities[entityType].push(entity);
 
