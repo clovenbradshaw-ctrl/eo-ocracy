@@ -37558,20 +37558,8 @@ Cmd/Ctrl + K - Command palette
                 oldParentRel = JSON.parse(JSON.stringify(relationships[existingParentIdx]));
                 relationships.splice(existingParentIdx, 1);
 
-                // Log removal
-                logActivityToXano({
-                    event_verb: 'NUL',
-                    eo_operator: 'NUL',
-                    k_frame: 'Parent Removal',
-                    object_type: 'relationship',
-                    object_id: oldParentRel.id,
-                    object_label: `Removed parent from ${currentModalEntity.name}`,
-                    data_json: {
-                        entity_id: entityId,
-                        entity_name: currentModalEntity.name,
-                        old_parent_id: oldParentRel.subject
-                    }
-                });
+                // Record removal to Evidence-Preserving Sync (Rule 9: tombstone)
+                EvidenceSync.recordDisconnect(oldParentRel.id, oldParentRel, { kFrame: 'Parent Removal' });
             }
 
             // Create new parent relationship
@@ -37586,6 +37574,9 @@ Cmd/Ctrl + K - Command palette
 
             relationships.push(relationship);
 
+            // Record to Evidence-Preserving Sync (Rule 1: operations)
+            EvidenceSync.recordConnect(newParentId, 'DES', entityId, relationship, { kFrame: 'Parent Assignment' });
+
             // Track in undo history
             pushToUndoHistory({
                 type: 'change_parent',
@@ -37594,24 +37585,6 @@ Cmd/Ctrl + K - Command palette
                 oldParentRel: oldParentRel,
                 newParentRel: JSON.parse(JSON.stringify(relationship)),
                 description: `Move ${currentModalEntity.name} to ${newParent.name}${oldParent ? ` (was in ${oldParent.name})` : ''}`
-            });
-
-            // Log to Xano
-            logActivityToXano({
-                event_verb: 'DES',
-                eo_operator: 'DES',
-                k_frame: 'Parent Assignment',
-                object_type: 'relationship',
-                object_id: relId,
-                object_label: `${currentModalEntity.name} nested under ${newParent.name}`,
-                data_json: {
-                    subject_id: newParentId,
-                    subject_name: newParent.name,
-                    subject_type: newParent.type,
-                    object_id: entityId,
-                    object_name: currentModalEntity.name,
-                    object_type: currentModalEntityType
-                }
             });
 
             saveToLocalStorage();
@@ -37650,21 +37623,8 @@ Cmd/Ctrl + K - Command palette
                     description: `Remove ${currentModalEntity.name} from ${oldParent?.name || 'parent'}`
                 });
 
-                // Log removal
-                logActivityToXano({
-                    event_verb: 'NUL',
-                    eo_operator: 'NUL',
-                    k_frame: 'Parent Removal',
-                    object_type: 'relationship',
-                    object_id: oldRel.id,
-                    object_label: `Removed ${currentModalEntity.name} from ${oldParent?.name || 'parent'}`,
-                    data_json: {
-                        entity_id: entityId,
-                        entity_name: currentModalEntity.name,
-                        old_parent_id: oldRel.subject,
-                        old_parent_name: oldParent?.name
-                    }
-                });
+                // Record removal to Evidence-Preserving Sync (Rule 9: tombstone)
+                EvidenceSync.recordDisconnect(oldRel.id, oldRel, { kFrame: 'Parent Removal' });
 
                 saveToLocalStorage();
                 closeModalParentDropdown();
@@ -38022,33 +37982,21 @@ Cmd/Ctrl + K - Command palette
 
             relationships.push(relationship);
 
-            // Track in undo history
+            // Record to Evidence-Preserving Sync (Rule 1: operations, not snapshots)
             const operatorData = eoOperators[operatorCode];
+            EvidenceSync.recordConnect(
+                currentModalEntity.id,
+                operatorCode,
+                targetId,
+                relationship,
+                { kFrame: 'Connection' }
+            );
+
+            // Track in undo history
             pushToUndoHistory({
                 type: 'create_relationship',
                 data: JSON.parse(JSON.stringify(relationship)),
                 description: `${operatorData.label}: ${currentModalEntity.name} → ${targetEntity.name}`
-            });
-
-            // Log to Xano
-            logActivityToXano({
-                event_verb: operatorCode,
-                eo_operator: operatorCode,
-                k_frame: 'Connection',
-                object_type: 'relationship',
-                object_id: relId,
-                object_label: `${currentModalEntity.name} ${operatorData.label} ${targetEntity.name}`,
-                data_json: {
-                    subject_id: currentModalEntity.id,
-                    subject_type: currentModalEntityType,
-                    subject_name: currentModalEntity.name,
-                    predicate: operatorCode,
-                    predicate_label: operatorData.label,
-                    object_id: targetId,
-                    object_type: targetEntity.type,
-                    object_name: targetEntity.name,
-                    notes: notes
-                }
             });
 
             // Save and refresh all views for instant visibility
@@ -38867,32 +38815,21 @@ Cmd/Ctrl + K - Command palette
 
             relationships.push(relationship);
 
-            // Track in undo history
+            // Record to Evidence-Preserving Sync (Rule 1: operations, not snapshots)
             const operatorData = eoOperators[operatorCode];
+            EvidenceSync.recordConnect(
+                currentModalEntity.id,
+                operatorCode,
+                targetId,
+                relationship,
+                { kFrame: 'Connection' }
+            );
+
+            // Track in undo history
             pushToUndoHistory({
                 type: 'create_relationship',
                 data: JSON.parse(JSON.stringify(relationship)),
                 description: `${operatorData.label}: ${currentModalEntity.name} → ${targetEntity.name}`
-            });
-
-            // Log to Xano
-            logActivityToXano({
-                event_verb: operatorCode,
-                eo_operator: operatorCode,
-                k_frame: 'Connection',
-                object_type: 'relationship',
-                object_id: relId,
-                object_label: `${currentModalEntity.name} ${operatorData.label} ${targetEntity.name}`,
-                data_json: {
-                    subject_id: currentModalEntity.id,
-                    subject_type: currentModalEntityType,
-                    subject_name: currentModalEntity.name,
-                    predicate: operatorCode,
-                    predicate_label: operatorData.label,
-                    object_id: targetId,
-                    object_type: targetEntity.type,
-                    object_name: targetEntity.name
-                }
             });
 
             // Save and refresh
@@ -41018,20 +40955,11 @@ Cmd/Ctrl + K - Command palette
             // Update entity
             currentModalEntity.name = newName;
 
-            // Log to Xano
-            logActivityToXano({
-                event_verb: 'ALT',
-                eo_operator: 'ALT',
-                k_frame: 'Entity Modification',
-                object_type: currentModalEntityType,
-                object_id: currentModalEntity.id,
-                object_label: `${currentName} → ${newName}`,
-                data_json: {
-                    old_name: currentName,
-                    new_name: newName,
-                    entity_type: currentModalEntityType
-                }
-            });
+            // Record to Evidence-Preserving Sync (Rule 1: operations, not snapshots)
+            EvidenceSync.recordUpdate(currentModalEntityType, currentModalEntity.id, {
+                name: newName,
+                _previousName: currentName
+            }, { kFrame: 'Name Change' });
 
             // Update display
             document.getElementById('modalEntityName').textContent = newName;
@@ -41091,21 +41019,11 @@ Cmd/Ctrl + K - Command palette
             // Update entity
             currentModalEntity.description = newDesc;
 
-            // Log to Xano
-            logActivityToXano({
-                event_verb: 'ALT',
-                eo_operator: 'ALT',
-                k_frame: 'Description Change',
-                object_type: currentModalEntityType,
-                object_id: currentModalEntity.id,
-                object_label: `Updated description for ${currentModalEntity.name}`,
-                data_json: {
-                    entity_name: currentModalEntity.name,
-                    old_description: currentDesc,
-                    new_description: newDesc,
-                    entity_type: currentModalEntityType
-                }
-            });
+            // Record to Evidence-Preserving Sync (Rule 1: operations, not snapshots)
+            EvidenceSync.recordUpdate(currentModalEntityType, currentModalEntity.id, {
+                description: newDesc,
+                _previousDescription: currentDesc
+            }, { kFrame: 'Description Change' });
 
             // Update display
             const displayEl = document.getElementById('modalDescriptionDisplay');
@@ -41193,38 +41111,19 @@ Cmd/Ctrl + K - Command palette
             currentModalEntity.name = newName;
             currentModalEntity.description = newDesc;
 
-            // Log to Xano with consistent field tracking
+            // Record to Evidence-Preserving Sync (Rule 1: operations, not snapshots)
+            const changes = {};
             if (nameChanged) {
-                logActivityToXano({
-                    event_verb: 'ALT',
-                    eo_operator: 'ALT',
-                    k_frame: 'Name Change',
-                    object_type: currentModalEntityType,
-                    object_id: currentModalEntity.id,
-                    object_label: newName,
-                    data_json: {
-                        field: 'name',
-                        old_value: currentName,
-                        new_value: newName
-                    }
-                });
+                changes.name = newName;
+                changes._previousName = currentName;
             }
-
             if (descChanged) {
-                logActivityToXano({
-                    event_verb: 'ALT',
-                    eo_operator: 'ALT',
-                    k_frame: 'Description Change',
-                    object_type: currentModalEntityType,
-                    object_id: currentModalEntity.id,
-                    object_label: newName,
-                    data_json: {
-                        field: 'description',
-                        old_value: currentDesc,
-                        new_value: newDesc
-                    }
-                });
+                changes.description = newDesc;
+                changes._previousDescription = currentDesc;
             }
+            EvidenceSync.recordUpdate(currentModalEntityType, currentModalEntity.id, changes, {
+                kFrame: nameChanged && descChanged ? 'Entity Edit' : (nameChanged ? 'Name Change' : 'Description Change')
+            });
 
             // Close edit modal and update main modal
             closeEntityEditModal();
@@ -41697,51 +41596,9 @@ Cmd/Ctrl + K - Command palette
 
             relationships = relationships.filter(r => r.id !== relId);
 
-            // Log deletion to Xano with retry logic
-            let result = await logActivityToXano({
-                event_verb: 'NUL',
-                eo_operator: 'NUL',
-                k_frame: 'Removal',
-                object_type: 'relationship',
-                object_id: relId,
-                object_label: `${subject?.name} → ${object?.name}`,
-                data_json: {
-                    relationship_deleted: true,
-                    subject_id: rel.subject,
-                    object_id: rel.object,
-                    predicate: rel.predicate
-                }
-            });
-
-            // Retry up to 3 times if sync failed
-            if (!result) {
-                console.warn('⚠️ Relationship deletion sync failed, retrying...');
-                for (let attempt = 1; attempt <= 3; attempt++) {
-                    await new Promise(resolve => setTimeout(resolve, 1000 * attempt));
-                    result = await logActivityToXano({
-                        event_verb: 'NUL',
-                        eo_operator: 'NUL',
-                        k_frame: 'Removal',
-                        object_type: 'relationship',
-                        object_id: relId,
-                        object_label: `${subject?.name} → ${object?.name}`,
-                        data_json: {
-                            relationship_deleted: true,
-                            subject_id: rel.subject,
-                            object_id: rel.object,
-                            predicate: rel.predicate,
-                            retry_attempt: attempt
-                        }
-                    });
-                    if (result) {
-                        console.log(`✅ Relationship deletion synced on retry attempt ${attempt}`);
-                        break;
-                    }
-                }
-                if (!result) {
-                    console.error('❌ Relationship deletion failed to sync after 3 retries');
-                }
-            }
+            // Record deletion to Evidence-Preserving Sync (Rule 9: tombstone, not erasure)
+            // EvidenceSync has built-in retry logic
+            EvidenceSync.recordDisconnect(relId, rel, { kFrame: 'Relationship Removal' });
 
             relationshipToDelete = null;
             closeDeleteConfirmModal();
