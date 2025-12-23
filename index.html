@@ -51045,13 +51045,6 @@ Cmd/Ctrl + K - Command palette
                 }
 
                 return 'medium'; // Default
-            },
-
-            // Transform to integer
-            integer: (value) => {
-                if (!value || value === '') return null;
-                const parsed = parseInt(value, 10);
-                return isNaN(parsed) ? null : parsed;
             }
         };
 
@@ -51151,9 +51144,6 @@ Cmd/Ctrl + K - Command palette
                 { key: 'role', label: 'Assigned Role', required: false, type: 'relationship', targetType: 'role' },
                 { key: 'externalId', label: 'External ID', required: false, aliases: ['uniqueid', 'unique_id', 'id', 'external_id', 'clio_id'] },
                 { key: 'matterNumber', label: 'Matter/Case Number', required: false, aliases: ['matter_display_number', 'matter_custom_number', 'case_number', 'matter'] },
-                { key: 'councilDistrict', label: 'Council District', required: false, aliases: ['council_district', 'district'] },
-                { key: 'councilDistrictNumber', label: 'Council District Number', required: false, aliases: ['council_district_number', 'district_number'], transform: 'integer' },
-                { key: 'councilMember', label: 'Council Member', required: false, aliases: ['council_member', 'council_rep', 'representative'] },
                 { key: 'tags', label: 'Tags', required: false, aliases: ['labels', 'categories'] }
             ]
         };
@@ -52351,10 +52341,6 @@ Cmd/Ctrl + K - Command palette
                             assignedEntityType: assignedEntityType,
                             assigneePersonId: assigneePersonId,
                             externalId: item.externalId || generateUUID(),
-                            matterNumber: item.matterNumber || null,
-                            councilDistrict: item.councilDistrict || null,
-                            councilDistrictNumber: item.councilDistrictNumber || null,
-                            councilMember: item.councilMember || null,
                             importedFrom: 'csv_bulk_import',
                             // Store the field mappings that were used during import
                             importFieldMappings: { ...bulkImportState.fieldMappings },
@@ -52391,9 +52377,6 @@ Cmd/Ctrl + K - Command palette
                                 tags: tags,
                                 externalId: taskObject.externalId,
                                 matterNumber: item.matterNumber || null,
-                                councilDistrict: item.councilDistrict || null,
-                                councilDistrictNumber: item.councilDistrictNumber || null,
-                                councilMember: item.councilMember || null,
                                 import_source: 'bulk_import',
                                 // Include field mappings used during import
                                 importFieldMappings: taskObject.importFieldMappings,
