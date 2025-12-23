@@ -62739,10 +62739,6 @@ Options:
                         aVal = roleA ? roleA.name.toLowerCase() : 'zzz';
                         bVal = roleB ? roleB.name.toLowerCase() : 'zzz';
                         break;
-                    case 'councilDistrict':
-                        aVal = a.councilDistrictNumber || 999;
-                        bVal = b.councilDistrictNumber || 999;
-                        break;
                     default:
                         aVal = a.name.toLowerCase();
                         bVal = b.name.toLowerCase();
@@ -62815,9 +62811,6 @@ Options:
                                 <th onclick="sortTaskTable('dueDate')" class="sortable">
                                     Due Date <i class="ph ${getSortIcon('dueDate')}"></i>
                                 </th>
-                                <th onclick="sortTaskTable('councilDistrict')" class="sortable">
-                                    Council District <i class="ph ${getSortIcon('councilDistrict')}"></i>
-                                </th>
                                 <th>Linked</th>
                             </tr>
                         </thead>
@@ -62874,7 +62867,6 @@ Options:
                         <td class="${dueDateStatus}">
                             ${task.dueDate ? formatDateShort(task.dueDate) : '<span class="task-table-empty">-</span>'}
                         </td>
-                        <td>${task.councilDistrict || (task.councilDistrictNumber ? `District ${task.councilDistrictNumber}` : '<span class="task-table-empty">-</span>')}</td>
                         <td class="task-table-amino">${aminoTagsHtml}</td>
                     </tr>
                 `;
