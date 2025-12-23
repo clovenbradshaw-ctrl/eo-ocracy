@@ -25939,6 +25939,201 @@
             opacity: 1;
             visibility: visible;
         }
+
+        /* Import Data Fields Section Styles */
+        .import-data-section {
+            margin-top: 16px;
+            padding-top: 16px;
+            border-top: 1px solid #E5DDD1;
+        }
+
+        .import-data-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-bottom: 12px;
+        }
+
+        .import-data-title {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            font-size: 13px;
+            font-weight: 600;
+            color: #3D2E1F;
+        }
+
+        .import-data-title i {
+            font-size: 16px;
+            color: #8B6F47;
+        }
+
+        .import-data-source-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 4px;
+            padding: 3px 8px;
+            background: #F3EDE8;
+            border-radius: 12px;
+            font-size: 11px;
+            color: #6B5642;
+        }
+
+        .import-data-container {
+            background: #FAF7F5;
+            border: 1px solid #E5DDD1;
+            border-radius: 10px;
+            padding: 14px;
+        }
+
+        .import-field-item {
+            display: flex;
+            align-items: flex-start;
+            justify-content: space-between;
+            padding: 10px 12px;
+            margin-bottom: 8px;
+            background: white;
+            border: 1px solid #E5DDD1;
+            border-radius: 8px;
+            transition: all 0.2s;
+        }
+
+        .import-field-item:last-child {
+            margin-bottom: 0;
+        }
+
+        .import-field-item:hover {
+            border-color: #C88F4A;
+        }
+
+        .import-field-item.promoted {
+            background: #FDF8F3;
+            border-color: #C88F4A;
+        }
+
+        .import-field-info {
+            flex: 1;
+            min-width: 0;
+        }
+
+        .import-field-name {
+            font-size: 12px;
+            font-weight: 600;
+            color: #3D2E1F;
+            margin-bottom: 4px;
+        }
+
+        .import-field-value {
+            font-size: 13px;
+            color: #6B5642;
+            word-break: break-word;
+        }
+
+        .import-field-value.empty {
+            color: #9CA3AF;
+            font-style: italic;
+        }
+
+        .import-field-toggle {
+            display: flex;
+            align-items: center;
+            gap: 4px;
+            padding: 6px 10px;
+            border: 1px solid #E5DDD1;
+            border-radius: 6px;
+            background: white;
+            color: #8B6F47;
+            font-size: 11px;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.2s;
+            white-space: nowrap;
+            margin-left: 12px;
+        }
+
+        .import-field-toggle:hover {
+            background: #FDF8F3;
+            border-color: #C88F4A;
+        }
+
+        .import-field-toggle.active {
+            background: #C88F4A;
+            border-color: #C88F4A;
+            color: white;
+        }
+
+        .import-field-toggle i {
+            font-size: 12px;
+        }
+
+        .import-data-hint {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            margin-top: 12px;
+            font-size: 12px;
+            color: #9CA3AF;
+        }
+
+        .import-data-hint i {
+            font-size: 14px;
+        }
+
+        .import-data-toggle-header {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            cursor: pointer;
+            padding: 4px 0;
+            user-select: none;
+        }
+
+        .import-data-toggle-header i.toggle-icon {
+            transition: transform 0.2s;
+            font-size: 14px;
+            color: #8B6F47;
+        }
+
+        .import-data-toggle-header.expanded i.toggle-icon {
+            transform: rotate(90deg);
+        }
+
+        .import-data-fields-list {
+            display: none;
+            margin-top: 12px;
+        }
+
+        .import-data-fields-list.show {
+            display: block;
+        }
+
+        /* Promoted Import Fields Display (shown in main modal) */
+        .promoted-import-fields {
+            margin-top: 12px;
+            display: flex;
+            flex-wrap: wrap;
+            gap: 8px;
+        }
+
+        .promoted-field-chip {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            padding: 6px 12px;
+            background: #FDF8F3;
+            border: 1px solid #E5DDD1;
+            border-radius: 8px;
+            font-size: 12px;
+        }
+
+        .promoted-field-label {
+            color: #8B6F47;
+            font-weight: 500;
+        }
+
+        .promoted-field-value {
+            color: #3D2E1F;
+        }
     </style>
 
     <!-- Login Overlay - gates app until authenticated -->
@@ -53796,6 +53991,9 @@ Cmd/Ctrl + K - Command palette
                         >${task.description || ''}</textarea>
                     </div>
 
+                    <!-- Promoted Import Fields (visible fields from original import) -->
+                    ${renderPromotedImportFields(task)}
+
                     <!-- Stream Source Link (if task came from Stream) -->
                     ${renderTaskStreamSource(task)}
 
@@ -53804,6 +54002,9 @@ Cmd/Ctrl + K - Command palette
 
                     <!-- Airtable Output/Deliverable - Always Visible -->
                     ${renderAirtableOutput(task)}
+
+                    <!-- Original Import Data Section (for imported tasks) -->
+                    ${renderImportDataSection(task)}
 
                     <!-- Email Notification Section -->
                     ${renderTaskEmailNotificationSection(task, connectedRoles)}
@@ -54046,6 +54247,193 @@ Cmd/Ctrl + K - Command palette
                             <button type="button" class="airtable-output-action-btn remove" onclick="event.stopPropagation(); removeTaskOutput('${task.id}')" title="Remove">
                                 <i class="ph ph-x"></i>
                             </button>
+                        </div>
+                    </div>
+                </div>
+            `;
+        }
+
+        // ==========================================
+        // IMPORT DATA FIELD VISIBILITY SYSTEM
+        // ==========================================
+
+        // Get the import style key for a task (used to group visibility settings)
+        function getImportStyleKey(task) {
+            if (!task || !task.importedFrom) return null;
+
+            // Create a key based on import source + source tag (if any)
+            const sourceTag = (task.tags && task.tags.length > 0) ? task.tags[0] : '';
+
+            // Check if the first tag looks like an import source tag
+            // Import source tags are typically single words like "Clio", "Asana", etc.
+            const isSourceTag = sourceTag && !sourceTag.includes(' ') && sourceTag.length < 30;
+
+            return `${task.importedFrom}${isSourceTag ? '_' + sourceTag : ''}`;
+        }
+
+        // Get visible import fields settings for a given import style
+        function getImportFieldVisibility(importStyleKey) {
+            if (!importStyleKey || !currentWorkspaceId) return {};
+            const storageKey = `importFieldVisibility_${currentWorkspaceId}_${importStyleKey}`;
+            try {
+                return JSON.parse(localStorage.getItem(storageKey)) || {};
+            } catch (e) {
+                return {};
+            }
+        }
+
+        // Set visibility for an import field (applies to all tasks of that import style)
+        function setImportFieldVisibility(importStyleKey, fieldName, isVisible) {
+            if (!importStyleKey || !currentWorkspaceId) return;
+            const storageKey = `importFieldVisibility_${currentWorkspaceId}_${importStyleKey}`;
+            const settings = getImportFieldVisibility(importStyleKey);
+            settings[fieldName] = isVisible;
+            localStorage.setItem(storageKey, JSON.stringify(settings));
+        }
+
+        // Toggle field visibility and refresh the modal
+        function toggleImportFieldVisibility(taskId, fieldName) {
+            const task = entities.task.find(t => t.id === taskId);
+            if (!task) return;
+
+            const importStyleKey = getImportStyleKey(task);
+            if (!importStyleKey) return;
+
+            const currentSettings = getImportFieldVisibility(importStyleKey);
+            const isCurrentlyVisible = currentSettings[fieldName] === true;
+
+            setImportFieldVisibility(importStyleKey, fieldName, !isCurrentlyVisible);
+
+            // Refresh the modal to show updated state
+            if (typeof openEntityModal === 'function') {
+                openEntityModal(taskId, 'task');
+            }
+
+            // Show toast notification
+            const action = !isCurrentlyVisible ? 'shown' : 'hidden';
+            showToast(`Field "${fieldName}" will now be ${action} for all tasks from this import`, 'success');
+        }
+
+        // Toggle the import data section expand/collapse
+        function toggleImportDataSection(taskId) {
+            const header = document.querySelector(`#importDataSection_${taskId} .import-data-toggle-header`);
+            const content = document.getElementById(`importDataFields_${taskId}`);
+
+            if (header && content) {
+                header.classList.toggle('expanded');
+                content.classList.toggle('show');
+            }
+        }
+
+        // Render promoted import fields as chips in the main modal area
+        function renderPromotedImportFields(task) {
+            if (!task || !task.originalImport || !task.importedFrom) {
+                return '';
+            }
+
+            const importStyleKey = getImportStyleKey(task);
+            if (!importStyleKey) return '';
+
+            const visibilitySettings = getImportFieldVisibility(importStyleKey);
+            const promotedFields = [];
+
+            // Get all original import fields
+            const originalData = task.originalImport || {};
+
+            // Find fields that are marked as visible
+            for (const [fieldName, value] of Object.entries(originalData)) {
+                if (visibilitySettings[fieldName] === true && value) {
+                    promotedFields.push({ name: fieldName, value: value });
+                }
+            }
+
+            if (promotedFields.length === 0) {
+                return '';
+            }
+
+            return `
+                <div class="promoted-import-fields">
+                    ${promotedFields.map(field => `
+                        <div class="promoted-field-chip">
+                            <span class="promoted-field-label">${escapeHtml(field.name)}:</span>
+                            <span class="promoted-field-value">${escapeHtml(String(field.value))}</span>
+                        </div>
+                    `).join('')}
+                </div>
+            `;
+        }
+
+        // Render the import data section for the task modal
+        function renderImportDataSection(task) {
+            if (!task || !task.originalImport || !task.importedFrom) {
+                return '';
+            }
+
+            const originalData = task.originalImport || {};
+            const fieldKeys = Object.keys(originalData);
+
+            if (fieldKeys.length === 0) {
+                return '';
+            }
+
+            const importStyleKey = getImportStyleKey(task);
+            const visibilitySettings = importStyleKey ? getImportFieldVisibility(importStyleKey) : {};
+
+            // Get the source tag if any
+            const sourceTag = (task.tags && task.tags.length > 0) ? task.tags[0] : null;
+            const isSourceTag = sourceTag && !sourceTag.includes(' ') && sourceTag.length < 30;
+
+            // Count promoted fields
+            const promotedCount = fieldKeys.filter(key => visibilitySettings[key] === true).length;
+
+            return `
+                <div class="import-data-section" id="importDataSection_${task.id}">
+                    <div class="import-data-header">
+                        <div class="import-data-toggle-header" onclick="toggleImportDataSection('${task.id}')">
+                            <i class="ph ph-caret-right toggle-icon"></i>
+                            <div class="import-data-title">
+                                <i class="ph ph-database"></i>
+                                <span>Original Import Data</span>
+                                ${promotedCount > 0 ? `<span style="font-size: 11px; color: #8B6F47;">(${promotedCount} visible)</span>` : ''}
+                            </div>
+                        </div>
+                        ${isSourceTag ? `
+                            <div class="import-data-source-badge">
+                                <i class="ph ph-tag"></i>
+                                ${escapeHtml(sourceTag)}
+                            </div>
+                        ` : ''}
+                    </div>
+
+                    <div class="import-data-fields-list" id="importDataFields_${task.id}">
+                        <div class="import-data-container">
+                            ${fieldKeys.map(fieldName => {
+                                const value = originalData[fieldName];
+                                const displayValue = value !== null && value !== undefined && value !== ''
+                                    ? String(value)
+                                    : '';
+                                const isPromoted = visibilitySettings[fieldName] === true;
+
+                                return `
+                                    <div class="import-field-item ${isPromoted ? 'promoted' : ''}">
+                                        <div class="import-field-info">
+                                            <div class="import-field-name">${escapeHtml(fieldName)}</div>
+                                            <div class="import-field-value ${!displayValue ? 'empty' : ''}">
+                                                ${displayValue ? escapeHtml(displayValue) : '(empty)'}
+                                            </div>
+                                        </div>
+                                        <button class="import-field-toggle ${isPromoted ? 'active' : ''}"
+                                                onclick="event.stopPropagation(); toggleImportFieldVisibility('${task.id}', '${escapeHtml(fieldName).replace(/'/g, "\\'")}')">
+                                            <i class="ph ${isPromoted ? 'ph-eye' : 'ph-eye-slash'}"></i>
+                                            ${isPromoted ? 'Visible' : 'Hidden'}
+                                        </button>
+                                    </div>
+                                `;
+                            }).join('')}
+                        </div>
+                        <div class="import-data-hint">
+                            <i class="ph ph-info"></i>
+                            Toggle fields to show them on all tasks from this import source
                         </div>
                     </div>
                 </div>
